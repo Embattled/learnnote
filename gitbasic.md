@@ -24,18 +24,37 @@ Git是分布式版本控制系统，所以，每个机器都必须自报家门�
 **新建一个版本库**
 `git init`
 
-## 3. 添加文件及提交
+## 3. 操作文件及提交
 
-### 添加文件
+### 1. 添加文件
 `git add readme.txt`  
 **`add`**命令用来添加新文件或者对文件的新修改到暂存区
 
+`git add .` 会监控工作区的状态树，使用它会把工作时的所有变化提交到暂存区，包括*文件内容修改(modified)* 以及*新文件(new)*，但**不包括被删除的文件**。
+
+`git add -u ` 仅监控**已经被add的文件（即tracked file）**，他会将被修改的文件提交到暂存区。add -u **不会提交新文件（untracked file）**。（git add --update的缩写,提交被修改(modified)和被删除(deleted)文件，不包括新文件(new)）
+
+`git add -A ` 是上面两个功能的合集（git add --all的缩写）(提交所有变化)
+
+
+### 2. 删除文件
+
 `git rm readme.txt` 用来添加一个删除文件的修改到暂存区
 
+
+### 3. 重命名一个文件或者移动文件
+
+直接在文件系统重命名会导致无法跟踪  
+使用 `git mv <old_name> <new_name>`来重命名文件  
+使用 `git mv -f * *` 来进行一个强制重命名,这会覆盖原本名为<new_name>的文件  
+
+使用 `git mv string.c src/` 来将一个文件移入文件夹,使用 `/` 来代表目录
+
+### 4. 提交更改
 ` git commit -m "wrote a readme file"`  
 `git commit` 提交更改,将暂存区的内容提交到版本库  
 每一次commit都是一个保存点,可以从这里还原版本库  
-`-m` 用来标注提交的说明
+`-m` 用来标注提交的说明  
 
 ## 4. 版本查看及穿梭
 ### **查看状态**  
@@ -94,10 +113,16 @@ Git的版本回退仅仅是更改一个名为`HEAD`的内部指针,HEAD指向的
 
 ## 2. 添加远程版本库
 
+使用`git remote`查看远程库的名称  
+使用`git remote -v`可以显示包括url的详细信息  
+
+**添加一个新的远程库**
 `git remote add <命名远程库> <url>`  
 例如  
 `git remote add origin  https://github.com/embattled/learnnote.git`  
 origin是默认的远程库叫法,也可以自定义
+
+
 
 ## 3. 推送到远程库
 
@@ -165,8 +190,66 @@ Git用<kbd><<<<<<<</kbd>，<kbd>=======</kbd>，<kbd>>>>>>>></kbd>标记出不�
 通常合并分支时,git会在可能的时候使用`Fast forward`模式,这种模式的缺点就是删除分支后就会丢失分支的信息
 
 使用  
-`git merge --no-ff` 来强制禁用 `fast forward`模式,这种模式就会在`merge`的时候自动生成新的`commit`
+`git merge --no-ff` 来强制禁用 `fast forward`模式,这种模式就会在`merge`的时候自动生成新的`commit`,因此还应加上`-m`来描述这个提交  
+`git merge --no-ff -m "merge with no-ff" dev`
+
 
 通常`master`分支是用来发布稳定版本的,而`dev`分支是用来保存不稳定版本的  
 在此之下才是各个团队工作人员自己的分支
+
+开发一个新的feature,最好新建一个分支  
+如果要丢弃一个没有被合并过的分支,可以通过  
+`git branch -D <name>`强行删除  
+
+### 团队协作
+在团队中,对于dev分支,同事的的最新提交和你试图推送的提交有冲突  
+
+对于一个分支,也需要指定本地与远端的链接
+`git branch --set-upstream-to dev origin/dev`  
+此时会提示  
+`Branch 'dev' set up to track remote branch 'dev' from 'origin'.`  
+
+链接好后即可pull,   使用`git pull`将远端的分支抓取下来,在本地合并,解决冲突后再提交  
+
+
+## 4. Bug处理以及现场保存
+
+git提供了一个保存现场的功能  
+`git stash`  
+此时再用`git status`查看工作区就是干净的状态
+
+建立新的分支并处理好bug后**还原现场**
+
+`git switch dev`  切换回当前工作的分支  
+
+有两个办法恢复现场
+1. `git stash apply`恢复,但是stash的内容不删除,需要手动`git stash drop`删除
+2. `git stash pop`恢复的同时也将stash的内容删除了  
+
+使用`git stash list`命令查看现场列表  
+在多次stash后,可以指定要恢复的`stash`  
+`git stash apply stash@{0}
+
+### 小结 
+
+* 查看远程库信息，使用`git remote -v`
+
+* 本地新建的分支如果不推送到远程，对其他人就是不可见的
+
+* 从本地推送分支，使用`git push origin branch-name`,如果推送失败，先用`git pull`抓取远程的新提交
+
+* 在本地创建和远程分支对应的分支，使用`git checkout -b branch-name origin/branch-name`,本地和远程分支的名称最好一致；
+
+* 建立本地分支和远程分支的关联，使用`git branch --set-upstream <branch-name> <origin/branch-name>`
+
+* 从远程抓取分支，使用`git pull`，如果有冲突，要先处理冲突。
+
+
+### Bug处理
+
+对于一个已经存在于所有分支的bug,git提供了一个`cherry-pick`,能够将一个特定的分支复制到当前分支  
+`git switch dev`
+`git cherry-pick <ID>`  
+此时git会自动给dev分支进行一次提交,该commit会获得一个不同的ID, 使用该命令可以省去重复修复bug的过程
+
 
