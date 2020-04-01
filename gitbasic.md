@@ -13,6 +13,11 @@ Git是分布式版本控制系统，所以，每个机器都必须自报家门�
 
 注意`git config`命令的`--global` 参数，用了这个参数，表示你这台机器上所有的Git仓库都会使用这个配置，当然也可以对某个仓库指定不同的用户名和Email地址
 
+### 定义Git全局的 .gitignore 文件
+创建相应的 .gitignore 文件，可以放在任意位置。然后在使用以下命令配置Git:  
+`git config --global core.excludesfile ~/.gitignore`
+
+
 ## 2. 创建一个版本库
 
 **一些基础的Linux命令**
@@ -55,6 +60,15 @@ Git是分布式版本控制系统，所以，每个机器都必须自报家门�
 `git commit` 提交更改,将暂存区的内容提交到版本库  
 每一次commit都是一个保存点,可以从这里还原版本库  
 `-m` 用来标注提交的说明  
+
+### 5. 过滤文件
+在根目录新建 `.gitignore` 来过滤不想跟踪的文件  
+  * 以斜杠`/`开头表示目录  `/mtk` 过滤整个文件夹  `/mtk/do.c` 过滤某个具体文件  `!/mtk/one.txt` 追踪(不过滤)某个具体文件
+  * 以星号`*`通配多个字符  `*.zip` 过滤所有.zip文件  
+  * 以问号`?`通配单个字符  
+  * 以方括号`[]`包含单个字符的匹配列表  
+  * 以叹号`!`表示不忽略(跟踪)匹配到的文件或目录。  
+  * 注意： git 对于 .gitignore配置文件是按行从上到下进行规则匹配的  
 
 ## 4. 版本查看及穿梭
 ### **查看状态**  
@@ -173,7 +187,7 @@ GitHub给出的地址不止一个，还可以用`https://github.com/michaelliao/
 
 ## 2.解决分支的冲突
 
-当Git无法执行“快速合并”，只能试图把各自的修改合并起来，但这种合并就可能会有冲突  
+当Git无法执行`快速合并`，只能试图把各自的修改合并起来，但这种合并就可能会有冲突  
 必须手动解决冲突后再提交
 
 使用`git status`可以告诉我们冲突的文件
@@ -238,7 +252,7 @@ git提供了一个保存现场的功能
 
 * 从本地推送分支，使用`git push origin branch-name`,如果推送失败，先用`git pull`抓取远程的新提交
 
-* 在本地创建和远程分支对应的分支，使用`git checkout -b branch-name origin/branch-name`,本地和远程分支的名称最好一致；
+* 在本地创建和远程分支对应的分支，使用`git checkout -b branch-name origin/branch-name`,本地和远程分支的名称最好一致
 
 * 建立本地分支和远程分支的关联，使用`git branch --set-upstream <branch-name> <origin/branch-name>`
 
