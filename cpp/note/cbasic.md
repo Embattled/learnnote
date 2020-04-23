@@ -1,4 +1,7 @@
-# 对C语言的复习补充笔记
+# 对C语言和C++的复习补充笔记
+
+c++对默认参数, 只需要在声明或者实现部分任意一处设定即可, 不能两处都设定  
+除法要想保留小数, 必须是用浮点数相除, 若是两个操作数都为整型, 结果会自动抹去小数  
 
 
 
@@ -36,10 +39,9 @@ b|代表二进制读写,追加在上面模式之后
 `int fputs(const char *str, FILE *stream)`  
 把字符串写入到指定的流 stream 中,但不包括空字符,把一个以 null 结尾的字符串写入到流中  
 
-----
-
 `int fgetc( FILE * fp );`  
 fgetc() 函数从 fp 所指向的输入文件中读取一个字符。返回值是读取的字符,如果发生错误则返回 EOF
+
 `char *fgets( char *buf, int n, FILE *fp );`   
 从输入流中读入 ***n - 1*** 个字符,并在最后追加一个 null 字符来终止字符串, 总计 n 个字符  
 如果这个函数在读取最后一个字符之前就遇到一个换行符 '\n' 或文件的末尾 EOF,则只会返回读取到的字符,包括换行符
@@ -90,4 +92,10 @@ size_t fwrite(const void *ptr, size_t size_of_elements, size_t number_of_element
 `if( feof ( FILE ) ) break;`  用来跳出读取
 
 
+
+
+## 2. string.h / cstring
+
+注意, c语言的字符串头文件只有 `string.h` 一个  
+`cstring` 是 c++ 中对 `string.h`的增强实现,属于C++库,而`string` 则是原生C++库
 
