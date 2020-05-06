@@ -21,7 +21,7 @@ The PGM and PPM formats (both ASCII and binary versions) have an <u>additional p
     注释行是从#到该行末
     如果图象数据以字节格式存储,仅仅在头部的最后一个字段的前面才能有注释,在头部的最后一个字段后面通常是一个回车或换行
 
-
+# PNM FORMAT
 ## PBM Format
 
 例如
