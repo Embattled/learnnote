@@ -160,6 +160,8 @@ origin是默认的远程库叫法,也可以自定义
 `git clone git@https://github.com/Embattled/learnnote.git`  
 GitHub给出的地址不止一个，还可以用`https://github.com/michaelliao/gitskills.git`这样的地址。实际上，Git支持多种协议，默认的`git://`使用`ssh`，但也可以使用https等其他协议。
 
+克隆后,若要更新代码,使用git pull
+
 
 # 3. Git的分支管理
 ## 1. 分支的基础操作

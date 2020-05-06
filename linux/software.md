@@ -107,10 +107,24 @@ apt 命令的引入就是为了解决命令过于分散的问题，它包括了 
 | apt search       | apt-cache search     | 搜索应用程序                   |
 | apt show         | apt-cache show       | 显示安装细节                   |
 
-### 2. apt自己的新命令
+### 2. 软件列表
 
 | 新的apt命令      | 命令的功能                           |
 | ---------------- | ------------------------------------ |
 | apt list         | 列出包含条件的包（已安装，可升级等） |
 | apt edit-sources | 编辑源列表                           |
 
+### 3. 软件降级
+
+```shell
+# 本质上都是通过指定版本号来指定版本安装实现降级
+apt install packagname=version
+
+# 通过apt-cache在cache中查找旧的版本号
+apt-cache show <name-of-program>  
+
+#  通过policy 将显示特定包的所有可用版本以及安装位置
+apt-cache policy <packagename>
+
+
+```
