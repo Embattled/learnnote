@@ -157,8 +157,13 @@ origin是默认的远程库叫法,也可以自定义
 
 ##  4. 从远端克隆一个项目
 
-`git clone git@https://github.com/Embattled/learnnote.git`  
-GitHub给出的地址不止一个，还可以用`https://github.com/michaelliao/gitskills.git`这样的地址。实际上，Git支持多种协议，默认的`git://`使用`ssh`，但也可以使用https等其他协议。
+`git clone git@github.com:Embattled/learnnote.git`  
+GitHub给出的地址不止一个，还可以用`https://github.com/Embattled/learnnote.git`这样的地址。实际上，Git支持多种协议，默认的`git://`使用`ssh`，但也可以使用https等其他协议。
+
+使用ssh的话，在github中保存公钥了后不用输入密码  
+使用http的话需要每次输入密码  
+
+## 5. 从远端更新代码
 
 克隆后,若要更新代码,使用git pull
 
