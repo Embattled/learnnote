@@ -209,7 +209,7 @@ bacon*=3
 * `append()` :`spam.append('hello') ` 将值添加到列表末尾
 * `insert()`: `spam.insert(1,'chicken')` 将值添加到参数下标处
 * `remove()`: `spam.remove('bat') ` 传入一个值，将该值从列表中删除，若该值不在列表中，返回`ValueError`错误,只会删除第一次出现的位置
-  * 若知道删除的下标,就用 `del spam[2]`
+  * 若知道删除的下标,就用 `del spam[2]` 在删除的同时返回删除的值,就用`a=spam.pop(2)`
   * 若知道要删除的值,就用`spam.remove('a')`
 * `sort()`: 
   * `spam.sort()`数值的列表或者字符串的列表可以使用该方法
@@ -217,6 +217,8 @@ bacon*=3
   * `sort()` 是当场排序,不是返回值,不能对混合值列表进行排序
   * `sort()` 是按照ASCII表排序,因此在大写是排在小写字母之前
     * 可以使用`spam.sort(key=str.lower)`使方法把所有的表项当作小写
+* 函数`sorted()`
+  * 可以返回一个排序的值,但是不会影响原本的值 `ab=sorted(spam)`
 
 ## 3. 字符串和元组
 ### 1. 字符串类型
@@ -276,6 +278,10 @@ myCat={ 'size':'fat','color':'gray','disposition':'loud' }
 
 字典的内容完全不做排序,没有**第一个**的概念
 
+创建空字典 `ice_cream_1 = {}`  
+加入一个新的键值对: ` ice_cream_1['flavor'] = 'vanilla' `  
+删除一个键值对 ` del ice_cream_1['flavor'] `  
+
 ## 2. 字典的使用
 字典有三个打印方法
 * `keys()`  :返回键值
@@ -302,6 +308,20 @@ string=pprint.pformat(someDictionary) #返回一个和 上一行打印内容相�
 print(string) # 效果和第一行相同
 ```
 
+## 3. 集合的使用
+集合（set）是一个无序的**不重复元素**序列。  
+可以使用大括号` { } `或者` set() `函数创建集合  
+注意: 创建一个空集合必须用` set()` 而不是 `{ }`，因为` { } `是用来创建一个空字典  
+
+* 添加元素 `s.add( x )` 如果 x 已经存在于集合, 则无改变, 
+  *  `thisset.add("Facebook")`
+* 更高级的添加元素 `s.update( x ) ` 这里 x 可以可以是列表，元组，字典等, x 还可以有多个用逗号分开
+  * `thisset.update([1,4],[5,6])  `
+* 移除元素 `s.remove( x )` 如果元素不存在就会错误
+* 另一个不会发生错误的移除元素方法 `s.discard( x )`
+* 清空集合 `s.clear()`
+* ` pop()`	随机移除元素
+
 # 4. 字符串操作
 
 ## 1. 字符串的输入
@@ -321,6 +341,7 @@ this is a long string with multiline.
 
 1. 大小写及内容检测方法
    * `upper()` 和 `lower()` 返回一个**新字符串**,将原本字符串中所有字母转变为大写/小写
+   * `name.title()`  标题方法, 将字符串的单词第一个字母大写  
    * `isupper()` 和 `islower()` 返回布尔值,如果这个字符串不为空且全部字符为大写/小写则返回`True`
    * 其他的 isX 方法,返回True的情况
      * isalpha()  非空且只包含字母
@@ -350,8 +371,11 @@ this is a long string with multiline.
    `'a'.ljust(5,'*')`  返回  `'a****'`
 
 5. 清除对齐方法  
-   strip()  rstrip() lstrip()  
+   `strip()  rstrip() lstrip()  `  
    在左右删除空白字符  
    传入参数指定需要删除的字符  注:这里第二个参数无视字符出现顺序  
    `'abcccba'.strip('ab')` 与
-   `'abcccba'.strip('ab')` 作用相同
+   `'abcccba'.strip('ba')` 作用相同
+
+6. 识别转换方法
+   

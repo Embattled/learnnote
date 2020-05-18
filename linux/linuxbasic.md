@@ -49,6 +49,13 @@ Linux 基金会的 FHS标准 制定了文件目录的标准
 
 # 设备文件  
 /dev/ 
+# ** 注意 /dev 下的文件是真实的设备 由UDEV在运行时创建
+# udev 是Linux kernel 2.6系列的设备管理器。它主要的功能是管理/dev目录底下的设备节点
+# /sys/class 是由kernel在运行时导出的，目的是通过文件系统暴露出硬件的层级关系
+/sys/class
+# 使用示例 查看网络接口的名称
+$ ls /sys/class/net
+
 
 # 配置文件 服务的启动脚本  采用默认安装方式的服务配置文件在此之中 
 /etc/
@@ -257,3 +264,28 @@ sh filename|新建一个子shell，继承当前环境变量
 .filename|只是执行当前目录下的脚本
 
 
+
+## 2. 开机自动脚本
+
+* Ubuntu18.04 默认是没有 /etc/rc.local 这个文件的，需要自己创建  
+* systemd 默认读取 `/etc/systemd/system `下的配置文件，该目录下的文件会`链接/lib/systemd/system/`下的文件。执行 `ls /lib/systemd/system `你可以看到有很多启动脚本，其中就有我们需要的 rc.local.service  
+* 查看rc.local.service文件内容
+
+```shell
+# This unit gets pulled automatically into multi-user.target by
+# systemd-rc-local-generator if /etc/rc.local is executable.
+[Unit]
+Description=/etc/rc.local Compatibility
+Documentation=man:systemd-rc-local-generator(8)
+ConditionFileIsExecutable=/etc/rc.local
+After=network.target
+
+[Service]
+Type=forking
+ExecStart=/etc/rc.local start
+TimeoutSec=0
+RemainAfterExit=yes
+GuessMainPID=no
+```
+
+剩下的内容在service.md里写了  

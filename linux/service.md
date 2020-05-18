@@ -8,7 +8,7 @@ systemd对应的进程管理命令就是 `systemctl`
 
 # service  
 
-service命令其实是去`/etc/init.d`目录下，去执行相关程序
+service命令其实是去`/etc/init.d`目录下，去执行相关程序, 已经被淘汰
 
 ```shell
 # service命令启动redis脚本
@@ -19,7 +19,8 @@ service redis start
 update-rc.d redis defaults
 ```
 
-# systemctl
+# 1. systemctl
+
 ## 1. 概念
 
 systemctl命令兼容了service  
@@ -27,8 +28,6 @@ systemctl命令兼容了service
 即systemctl也会去`/etc/init.d`目录下，查看，执行相关程序  
 
 ```shell
-systemctl redis start
-systemctl redis stop
 # 开机自启动
 systemctl enable redis
 ```
@@ -38,39 +37,10 @@ systemctl enable redis
 `/usr/lib/systemd/system(Centos)`  
 `/etc/systemd/system(Ubuntu)`  
 
+systemd 默认读取 `/etc/systemd/system `下的配置文件，该目录下的文件会链接/lib/systemd/system/下的文件。执行 ls /lib/systemd/system 你可以看到有很多启动脚本，其中就有最初用来定义开机脚本的 `rc.local.service`
+
 主要有四种类型文件.mount,.service,.target,.wants  
 代表四种`Unit`  
-
-一般都会有  
-Unit小节: 描述,启动时间与条件等等  
-
-### .service
-
-.service文件定义了一个服务，分为[Unit]，[Service]，[Install]三个小节
-
-Unit: 描述,启动时间与条件等等  
-Service: 变量所在的位置,启动的脚本,异常处理等  
-Install: 服务别名,多用户模式下参数等
-
-### .mounnt
-
-.mount文件定义了一个挂载点，[Mount]节点里配置了What(名称),Where(位置),Type(类型)三个数据项
-
-```
-What=hugetlbfs
-Where=/dev/hugepages
-Type=hugetlbfs
-```
-等于执行以下命令  
-`mount -t hugetlbfs /dev/hugepages hugetlbfs`  
-
-### .target
-
-.target定义了一些基础的组件，供.service文件调用
-
-### .wants文件
-
-`.wants`文件定义了要执行的文件集合，每次执行，`.wants`文件夹里面的文件都会执行  
 
 ## 2. Unit操作命令
 
@@ -152,3 +122,72 @@ isolate|切换到后面接的模式。
 
 我们还可以在不重新启动的情况下切换不同的 target，比如从图形界面切换到纯文本的模式：
 `systemctl isolate multi-user.target`
+
+# 2. Unit的编写与设置
+
+## 1. Unit的基本概念
+一般都会有  
+Unit小节: 描述,启动时间与条件等等  
+
+### .service
+
+.service文件定义了一个服务，分为[Unit]，[Service]，[Install]三个小节
+
+`[Unit]` 段: 启动顺序与依赖关系   
+`[Service] `段: 启动行为,如何启动，启动类型  
+`[Install]` 段: 定义如何安装这个配置文件，即怎样做到开机启动  
+### .mounnt
+
+.mount文件定义了一个挂载点，[Mount]节点里配置了What(名称),Where(位置),Type(类型)三个数据项
+
+```
+What=hugetlbfs
+Where=/dev/hugepages
+Type=hugetlbfs
+```
+等于执行以下命令  
+`mount -t hugetlbfs /dev/hugepages hugetlbfs`  
+
+### .target
+
+.target定义了一些基础的组件，供.service文件调用
+
+### .wants文件
+
+`.wants`文件定义了要执行的文件集合，每次执行，`.wants`文件夹里面的文件都会执行  
+
+## 2.编写开机启动rc.local
+
+查看`/lib/systemd/system/rc.local.server`,默认会缺少`Install`段,显然这样配置是无效的  
+
+```shell
+# rc.local.server的Unit段, 可以看到会执行 /etc/rc.local
+[Unit]
+Description=/etc/rc.local Compatibility
+Documentation=man:systemd-rc-local-generator(8)
+ConditionFileIsExecutable=/etc/rc.local
+After=network.target
+
+
+#修改文件进行配置  
+[Install]  
+WantedBy=multi-user.target  
+
+
+#之后再在/etc/目录下面创建rc.local文件，赋予执行权限
+
+$ touch /etc/rc.local
+$ chmod +x /etc/rc.local
+
+# 在rc.local里面写入
+# 注意：'#!/bin/sh' 这一行一定要加
+
+#!/bin/sh
+exit 0
+
+# 最后将/lib/systemd/system/rc.local.service 链接到/etc/systemd/system目录
+
+$ ln -s /lib/systemd/system/rc.local.service /etc/systemd/system/
+```
+
+

@@ -82,6 +82,10 @@ destination:规则对应的目标地址
 | -R       | --replace chain `rulenum` rule-specification：替换指定的规则为新的规则；                  |
 | -D       | --delete chain `rulenum` :根据规则编号删除规则；                                          |
 
+例: 路由转发的规则  
+`iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE`  
+
+
 | 链管理 | 功能                                                        |
 | ------ | ----------------------------------------------------------- |
 | -N     | --new-chain chain：新建一个自定义的规则链；                 |
@@ -90,6 +94,7 @@ destination:规则对应的目标地址
 | -E     | --rename-chain old-chain new-chain：重命名链；              |
 | -Z     | --zero [chain [rulenum]]：置零计数器                        |
 | -P     | --policy chain target， 设置链路的默认策略                  |
+
 
 ## 3. 匹配条件CRETERIA
 

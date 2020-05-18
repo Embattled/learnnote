@@ -1,6 +1,0 @@
-# DHCP CLIENT
-
-
-# dhcpcd
-
-q

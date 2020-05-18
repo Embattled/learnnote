@@ -77,7 +77,8 @@ dpkg 是Debian package的简写，为”Debian“ 操作系统 专门开发的�
 | -A pac.deb          | dpkg -A package_file           | 查看一个安装包的软件信息                                |
 
 ---
-
+`#dpkg --get-selections isc-dhcp-server`  确认软件已经成功安装  
+`#dpkg -s isc-dhcp-server`  用另一种方式确认成功安装]  
 
 dpkg –unpack package.deb     解开 deb 包的内容  
 dpkg -S keyword     搜索所属的包内容  
