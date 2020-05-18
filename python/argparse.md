@@ -31,6 +31,7 @@ parser.add_argument("-v", "--verbosity", type=int, choices=[0, 1, 2], help="incr
 parser.add_argument("-v", "--verbosity", action="count", default=0, help="increase output verbosity")
 
 
+
 # 可以创建一个矛盾参数组，当中的参数不能同时出现
 group = parser.add_mutually_exclusive_group()
 # 在group的方法中添加参数
