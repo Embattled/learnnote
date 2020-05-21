@@ -11,52 +11,52 @@
 #define THROWLENGTH 100
 
 //Read line to buffer
-int readLine(FILE *file, int length, char *buffer)
+int readLineAndCutoff(FILE *file, int length, char *buffer)
 {
     char *result;
-    //It's need one more byte to store '\0'
+    //It's need one more byte to store '\n'
     result = fgets(buffer, length + 1, file);
-    if (result == NULL)
+    //File is read over.
+    if (result == 0)
     {
         return FAILURE;
     }
-    //To throw off useless word.
-    char *throwBuffer = (char *)malloc(THROWLENGTH * sizeof(char));
-    if (strlen(buffer) == length)
+    //To judge this line is longer than set 'length'.
+    if (strlen(buffer)==length&&buffer[length-1]!='\n')
     {
+        //Set final byte to '\n' manually
+        buffer[strlen(buffer)]='\n';
+        char *throwBuffer = new char[THROWLENGTH * sizeof(char)];
         do
         {
-            memset(throwBuffer, '\0', THROWLENGTH);
             fgets(throwBuffer, THROWLENGTH, file);
         } while (strlen(throwBuffer) == THROWLENGTH - 1);
+        delete [] throwBuffer;
     }
-    free(throwBuffer);
     return SUCCESS;
 }
-int printLine(char *buffer)
-{
-    printf("%s\n", buffer);
-    return 0;
-}
+
+//Check file whether available, call cut off function
 int task0(const char *fileName, int length)
 {
     FILE *myfile = fopen(fileName, "r");
-    if (myfile == NULL)
+    if (myfile == 0)
     {
         return FAILURE;
     }
-    //It's need one more byte to store '\0'
-    int memSize = (length + 1) * sizeof(char);
-    char *buffer = (char *)malloc(memSize);
-    
-    while (readLine(myfile, length, buffer) == SUCCESS)
+    //It's need one more byte to store '\n',and one more byte to store '\0'
+    int memSize = (length + 2) * sizeof(char);
+    char *buffer = new char[memSize];
+    //To prevent string overflow.
+    buffer[memSize-1]='\0';
+    while (readLineAndCutoff(myfile, length, buffer) == SUCCESS)
     {
-        printLine(buffer);
-        memset(buffer, '\0', memSize);
+        printf("%s", buffer);
     }
-    free(buffer);
+    delete [] buffer;
     return SUCCESS;
 }
+//The main function, accept file path and call function.
 int main(int argc, char const *argv[])
 {
     if (argc == 2)
@@ -65,7 +65,9 @@ int main(int argc, char const *argv[])
         if (task0(argv[1], defaultLength) != SUCCESS)
         {
             printf("File doesn't exist!\n");
+            return 1;
         }
+
     }
     return 0;
 }

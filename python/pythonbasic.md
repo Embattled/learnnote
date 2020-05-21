@@ -70,7 +70,8 @@ range(12,16,2) #设置间隔，步长可以为负数
 
 使用 `import <name>` 来导入一个包,可以使用其中的函数  
 在使用的时候要加上包名 `name.function()`  
-使用 `from <name> import *` 可以使得调用包中函数不再需要包名  
+使用 `from <name> import *` 可以只单独导入一个函数,这时包中函数不再需要包名   
+使用 `as <alias>` 来为导入的包或者包中函数添加别名, 使得调用更方便  
 
 ### 常用的包
 * 包的下载 , 使用pip来下载及管理包
@@ -86,14 +87,15 @@ range(12,16,2) #设置间隔，步长可以为负数
 
 ### 1. 定义
 ```python
-`def functionName(): #python的函数参数不需要类型`
+def functionName(): #python的函数参数不需要类型`
+""" 关于函数的注释放在三个双引号中 """
   functionpass
   return None
   # python的所有函数都需要返回值,就算不手动写出也会在幕后给没有 return 的函数添加 return None
 ```
 ### 2. 参数
-* 位置识别,同C语言一样
-* **关键字参数**,根据调用时加在参数前面的关键字来识别,通常用于可选参数
+* 第一种是位置识别,同C语言一样
+* 第二种是**关键字参数**,根据`调用时`加在参数前面的关键字来识别,通常用于可选参数
   * 例如`print()` 函数的`end`和`sep`用来指定参数末尾打印什么,参数之间打印什么
   * `print('Hellow',end='')` 在打印后不会自动换行
   * `print('a','b','c')` 在参数之间会默认隔一个空格
@@ -379,3 +381,11 @@ this is a long string with multiline.
 
 6. 识别转换方法
    
+
+# 5. Python 的类
+
+python 的类通过`class`定义 , python的类名一般以大写字母开头
+
+类的构造函数  
+`def __init__(self,<other parameter>):`  
+`__init__` 是保留的构造函数名, `self` 是保留的参数, 类的所有方法都需要有`self`参数  

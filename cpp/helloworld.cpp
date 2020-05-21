@@ -1,15 +1,15 @@
-#include <iostream>
-#include <vector>
-#include <string> 
-using namespace std;
-
-int main()
+#include <stdio.h>
+#include <stdint.h>
+int is_big_endian(void)
 {
-    vector<string> msg {"Hello", "C++", "World", "from", "VS Code", "and the C++ extension!"};
-
-    for (const string& word : msg)
-    {
-        cout << word << " ";
-    }
-    cout << endl;
+union {
+uint32_t i;
+char c[4];
+} e = {0x10000000};
+return e.c[0];
 }
+int main(void)
+{
+printf("System is %s -endian.\n", is_big_endian() ? "big" : "little");
+return 0;
+} 
