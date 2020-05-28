@@ -1,17 +1,32 @@
 # Python 中虚拟环境配置 
 
+有多种虚拟环境配置方法  
+
 ## 1. 安装 
+
+使用virtualenv和virtualenvwrapper  
 
 使用pip3安装  
 `pip3 install virtualenv`  
+`$ pip install virtualenv virtualenvwrapper`  
 
 ## 2. 创建 进入 退出  
+
+
+Create an environment with `mkvirtualenv`
+
+Activate an environment (or switch to a different one) with `workon`
+
+Deactivate an environment with` deactivate`
+
+Remove an environment with`rmvirtualenv`
+
+
 
 ```shell
 # 在当前文件夹创建独立运行环境-命名
 # 得到独立第三方包的环境，并且指定解释器是python3
-virtualenv <环境名>  
-virtualenv --no-site-packages --python=python3  venv
+$ mkvirtualenv cv -p python3
 
 # 进入虚拟环境  
 source venv/bin/activate  
