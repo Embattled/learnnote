@@ -38,7 +38,7 @@
 ## 3. 系统相关
 在Linux中的项目尽量保存到Linux的文件系统中,才能更快的访问  
 
-在Linux的根目录 输入 ` explore.exe . `(不要忘记最后的点) 使用Windows文件资源管理器打开WSL文件系统  
+在Linux的根目录 输入 ` explorer.exe . `(不要忘记最后的点) 使用Windows文件资源管理器打开WSL文件系统  
 
 从 Windows (localhost) 访问 Linux 网络应用:  
 若要查找为 Linux 分发版提供支持的虚拟机的 IP 地址，请执行以下操作:  
