@@ -1,6 +1,6 @@
-# SSH的基本操作
+# 1. SSH的基本操作
 
-## 1. 安装与登录  
+## 1.1. 安装与登录  
 
 ```shell
 # 查看是否安装以及版本 ubuntu上默认只安装了openssh-client
@@ -30,9 +30,20 @@ $ cat id_rsa.pub >> .ssh/authorized_keys
 $ sudo chmod 600 .ssh/authorized_keys
 ```
 
+## 1.2. SHA1 支持
 
+新版Openssh中认为SHA1这种hash散列算法过于薄弱，已经不再支持，所以我们需要手动去enable对于SHA1的支持
 
-## SCP(secure copy )远程拷贝文件与文件夹
+```shell
+$ vim /etc/ssh/ssh_config
+#取消注释这一行内容：   MACs hmac-md5,hmac-sha1,umac-64@openssh.com,hmac-ripemd160
+#并且在文件结尾添加：
+HostkeyAlgorithms ssh-dss,ssh-rsa
+KexAlgorithms +diffie-hellman-group1-sha1
+
+```
+
+# 2. SCP(secure copy )远程拷贝文件与文件夹
 
 scp 是 linux 系统下基于 ssh 登陆进行安全的远程文件拷贝命令。  
 scp 是加密的，rcp 是不加密的，scp 是 rcp 的加强版。  
@@ -56,7 +67,7 @@ scp 是加密的，rcp 是不加密的，scp 是 rcp 的加强版。
 | -i identity_file     | 从指定文件中读取传输时使用的密钥文件，此参数直接传递给ssh。                                     |
 | -l limit             | 限定用户所能使用的带宽，以Kbit/s为单位。                                                        |
 | -o ssh_option        | 如果习惯于使用ssh_config(5)中的参数传递方式，                                                   |
-| -P port注意是大写的P | port是指定数据传输用到的端口号                                                                |
+| -P port注意是大写的P | port是指定数据传输用到的端口号                                                                  |
 | -S program           | 指定加密传输时所使用的程序。此程序必须能够理解ssh(1)的选项。                                    |
 
 

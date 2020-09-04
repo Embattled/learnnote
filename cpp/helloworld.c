@@ -1,22 +1,18 @@
-#include <stdio.h>
-union cupack {
-    char c[4];
-    unsigned int u;
-} data;
-
+#include "stdio.h"
 int main(void)
 {
-    //To set u=1, then u will be 0x0001.
-    data.u=1;
-    // If pc is big-endian, the 0x0001 in memorize is 0 0 0 1.
-    if (data.c[3]==1)
+    int s = 0;
+    int i;
+
+    for (i = 1; i < 8; i++)
     {
-        printf("System is big-endian.\n");
+        int j = 1;
+        while (i >= j)
+        {
+            s = j + s;
+            j = j + 1;
+        }
     }
-    // If pc is little-endian, the 0x0001 in memorize is 1 0 0 0 
-    if (data.c[0]==1)
-    {
-        printf("System is little-endian.\n");
-    }
+    printf("%d", s);
     return 0;
 }
