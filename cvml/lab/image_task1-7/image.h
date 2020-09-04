@@ -2,6 +2,8 @@
 #define IMAGE_H
 
 #define LOGICALERROR 4
+#define RYU_SUCCESS 0
+#define RYU_FAILURE 1
 
 namespace ryu
 {
@@ -24,6 +26,10 @@ namespace ryu
     int smooth(const mat *source, mat *destination, int weight);
     int sobel(const mat *source, mat *destination);
     int laplacian(const mat *source, mat *destination);
+
+    // ERROR OUTPUT
+
+    void lastErrorPrint();
 
 } // namespace ryu
 #endif

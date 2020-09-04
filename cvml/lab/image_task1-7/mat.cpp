@@ -12,11 +12,8 @@ using namespace ryu;
 mat::mat(const char *path)
 {
     cfilePath = path;
-    readFile();
-    if (statusCheck() != 0)
-    {
-        exit(0);
-    }
+    if (readFile() != RYU_MAT_SUCCESS)
+        statusCheck();
 }
 mat::mat(const ryu::mat &copymat)
 {
@@ -30,9 +27,16 @@ mat::mat(const ryu::mat &copymat)
     srcValueNumber = copymat.srcValueNumber;
 
     delete[] ascContent;
-    ascContent = new int[srcValueNumber];
-    //deep copy
-    memcpy(ascContent, copymat.ascContent, srcValueNumber * sizeof(int));
+    ascContent = new (std::nothrow) int[srcValueNumber];
+    if (ascContent == nullptr)
+    {
+        status = status | MEMNEWERROR;
+    }
+    else
+    {
+        //deep copy
+        memcpy(ascContent, copymat.ascContent, srcValueNumber * sizeof(int));
+    }
 }
 void mat::operator=(const mat &copymat)
 {
@@ -45,9 +49,16 @@ void mat::operator=(const mat &copymat)
     srcValueNumber = copymat.srcValueNumber;
 
     delete[] ascContent;
-    ascContent = new int[srcValueNumber];
-    //deep copy
-    memcpy(ascContent, copymat.ascContent, srcValueNumber * sizeof(int));
+    ascContent = new (std::nothrow) int[srcValueNumber];
+    if (ascContent == nullptr)
+    {
+        status = status | MEMNEWERROR;
+    }
+    else
+    {
+        //deep copy
+        memcpy(ascContent, copymat.ascContent, srcValueNumber * sizeof(int));
+    }
 }
 mat::mat(void)
 {
@@ -61,8 +72,9 @@ int mat::initialize(int format, int width, int high, int colordepth)
 {
     if (format < 1 || format > 3 || width < 1 || high < 1)
     {
-        std::cout << "Property error!" << std::endl;
-        return 1;
+        // std::cout << "Property error!" << std::endl;
+        status = status | PROPERTYERROR;
+        return RYU_MAT_FAILURE;
     }
     property[0] = format;
     property[1] = width;
@@ -71,8 +83,9 @@ int mat::initialize(int format, int width, int high, int colordepth)
     {
         if (colordepth < 1)
         {
-            std::cout << "initialize property colordepth error!" << std::endl;
-            return 1;
+            // std::cout << "initialize property colordepth error!" << std::endl;
+            status = status | PROPERTYERROR;
+            return RYU_MAT_FAILURE;
         }
         property[3] = colordepth;
     }
@@ -102,7 +115,7 @@ int mat::readFile()
     if (!fileStream.is_open())
     {
         status = status | OPENERROR;
-        return 0;
+        return RYU_MAT_FAILURE;
     }
 
     std::string format;
@@ -111,7 +124,7 @@ int mat::readFile()
     if (format.length() != 2 || format.find('P') != 0)
     {
         status = status | HEADERROR;
-        return 0;
+        return RYU_MAT_FAILURE;
     }
 
     int propertyIndex = 0;
@@ -119,7 +132,7 @@ int mat::readFile()
     if (type > 6 || type < 1)
     {
         status = status | HEADERROR;
-        return 0;
+        return RYU_MAT_FAILURE;
     }
     property[propertyIndex++] = type;
     property[3] = 0;
@@ -158,7 +171,7 @@ int mat::readFile()
         if (sstr.fail() || propertyIndex > colorDepthExist)
         {
             status = status | HEADERROR;
-            return 0;
+            return RYU_MAT_FAILURE;
         }
     }
 
@@ -167,6 +180,11 @@ int mat::readFile()
     srcValueNumber = pixelNum * colorNum;
 
     ascContent = new int[srcValueNumber];
+    if (ascContent == nullptr)
+    {
+        status = status | MEMNEWERROR;
+        return RYU_MAT_FAILURE;
+    }
     // For binary file.
     if (property[0] > 3)
     {
@@ -184,7 +202,7 @@ int mat::readFile()
             if (!fileStream.good())
             {
                 status = status | NOTMATCH;
-                return 0;
+                return RYU_MAT_FAILURE;
             }
 
             char buffer;
@@ -220,7 +238,7 @@ int mat::readFile()
             if (!fileStream.good())
             {
                 status = status | NOTMATCH;
-                return 0;
+                return RYU_MAT_FAILURE;
             }
 
             int *buffer = new int;
@@ -244,17 +262,19 @@ int mat::readFile()
         if (index != srcValueNumber)
         {
             status = status | NOTMATCH;
-            return 0;
+            return RYU_MAT_FAILURE;
         }
     }
+
     property[0] = property[0] < 4 ? property[0] : property[0] - 3;
-    return 0;
+    return RYU_MAT_SUCCESS;
 }
 
 int mat::writeAscFile(const char *inoutputPath)
 {
     //write head
     std::string outputpath;
+    //default output file name
     if (inoutputPath == nullptr)
     {
         outputpath = "output.pgm";
@@ -268,7 +288,7 @@ int mat::writeAscFile(const char *inoutputPath)
     if (!outFile.is_open())
     {
         status = status | OUTPATHERROR;
-        return 0;
+        return RYU_MAT_FAILURE;
     }
 
     int format = property[0];
@@ -279,7 +299,7 @@ int mat::writeAscFile(const char *inoutputPath)
     if (outFile.fail())
     {
         status = status | WRITEERROR;
-        return 0;
+        return RYU_MAT_FAILURE;
     }
 
     //write content
@@ -300,13 +320,13 @@ int mat::writeAscFile(const char *inoutputPath)
     if (!outFile.good())
     {
         status = status | WRITEERROR;
-        return 0;
+        return RYU_MAT_FAILURE;
     }
     if (statusCheck() != 0)
     {
         exit(0);
     }
-    return 0;
+    return RYU_MAT_SUCCESS;
 }
 
 int mat::statusCheck()
@@ -314,7 +334,7 @@ int mat::statusCheck()
     if (status == 0)
     {
         // std::cout << "Execute success!" << std::endl;
-        return 0;
+        return RYU_MAT_SUCCESS;
     }
 
     if ((status & OPENERROR) != 0)
@@ -327,5 +347,9 @@ int mat::statusCheck()
         std::cout << "Output destination path error." << std::endl;
     if ((status & WRITEERROR) != 0)
         std::cout << "Write process error." << std::endl;
-    return 1;
+    if ((status & MEMNEWERROR) != 0)
+        std::cout << "Memory allocation error." << std::endl;
+    if ((status & PROPERTYERROR) != 0)
+        std::cout << "Initialize property error." << std::endl;
+    return RYU_MAT_FAILURE;
 }

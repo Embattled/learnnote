@@ -6,6 +6,11 @@
 #define NOTMATCH 0b00000100
 #define OUTPATHERROR 0b00001000
 #define WRITEERROR 0b00010000
+#define MEMNEWERROR 0b00100000
+#define PROPERTYERROR 0b01000000
+
+#define RYU_MAT_SUCCESS 0
+#define RYU_MAT_FAILURE 1
 
 namespace ryu
 {
@@ -33,13 +38,12 @@ namespace ryu
         // write file
 
         // Check error and print information for easily debug.
-        char status = 0;
+        unsigned char status = 0;
 
         // Default parameter is to check image::status
-        int statusCheck();
 
     public:
-        int *ascContent = nullptr;
+        unsigned int *ascContent = nullptr;
 
         void printInfor();
         int getFormat() const { return property[0]; }
@@ -54,6 +58,8 @@ namespace ryu
         mat(const mat &copymat);
         void operator=(const mat &copy);
         mat(void);
+
+        int statusCheck();
         ~mat();
     };
 } // namespace ryu
