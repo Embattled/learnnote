@@ -64,7 +64,7 @@ peek(); //reads the next character without extracting it
 | bad()  | Returns true 如果有读写失败                | 例如对一个没有以写入标志打开的流执行写入或者写入的磁盘已没有空间 |
 | fail() | Returns true 在`bad()`的基础上检查格式问题 | 例如文件读出来的是字符但是传输给了一个整数变量                   |
 | eof()  | 检查是否到了文件末尾.                      |
-| 1.4.   | 1.4.                                       | 1.4.                                                             | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | good() | 最常用的函数, 对上面所有函数返回`true`的时候,返回`false` | `good()`与`bad()`不是对立函数,good一次检查更多的flag |
+| 1.4.   | 1.4.                                       | 1.4.                                                             | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | good() | 最常用的函数, 对上面所有函数返回`true`的时候,返回`false` | `good()`与`bad()`不是对立函数,good一次检查更多的flag |
 ---
 
 ## 1.5. 文件位置指针操作
@@ -125,7 +125,7 @@ int main () {
 6. 在内存限制不严重的情况下， 不要用float类型
 7. 
 
-## 关于 new 的检查
+## 2.2. 关于 new 的检查
 
 通常来说，new 使用 try catch 来捕捉异常  
 抛出的异常为 `std::bad_alloc` 类  
@@ -154,7 +154,90 @@ if (p == nullptr) {
 
 字符串实际上是使用 null 字符 `'\0'` 终止的一维字符数组.因此, 一个以 null 结尾的字符串, 包含了组成字符串的字符.
 
-## 3.1. **从C继承的基础的字符串操作**  
+C++ 中，独立的几个 string 对象可以占据也可以不占据各自特定的物理存储区，但是，如果采用引用计数避免了保存同一数据的拷贝副本，那么各个独立的对象（在处理上）必须看起来并表现得就像独占地拥有各自的存储区一样.   
+
+只有当字符串被修改的时候才创建各自的拷贝，这种实现方式称为写时复制（copy-on-write）策略。当字符串只是作为值参数（value parameter）或在其他只读情形下使用，这种方法能够节省时间和空间。
+  
+
+## 3.1. C++string 的定义使用
+
+
+```cpp
+
+//----------定义:
+std::string s2 = "c plus plus";
+// 初始化为sssss
+std::string s4 (5, 's');
+
+//----转为C风格字符指针
+//返回该字符串的 const 指针（const char*）
+string path = "D:\\demo.txt";
+FILE *fp = fopen(path.c_str(), "rt");
+
+
+//-----流输入
+//使用流对字符串进行输入的时候, 会把空格作为输入结束  
+string s;
+cin>>s;
+
+//-------访问字符串中的字符
+//string 可以通过下标来访问字符串中的字符
+for(int i=0,len=s.length(); i<len; i++){
+    cout<<s[i]<<" ";
+}
+```
+
+**字符串拼接**  使用 `+` 和 `+=`  
+1.  两边可以都是 string 字符串
+2.  一个 string 字符串和一个C风格的字符串
+3.  一个 string 字符串和一个字符数组
+4.  一个 string 字符串和一个单独的字符
+
+
+**基础8种迭代函数**  
+返回对应的迭代器
+```cpp
+.begin();  //开头
+.end();    //末尾
+.r*();     //反向迭代器
+.c*();     //c++ 11 新标准,const 迭代器,防止更改字符串内容
+.cr*();    //顺序为cr
+```
+
+## 3.2. 实用操作函数
+
+### 3.2.1. 关于子字符串的操作
+```cpp
+//获得子函数, pos 开始位置, 默认截取到字符串尾
+string substr (size_t pos = 0, size_t len = npos) const;
+
+//删除字符串中的一段 , 不用担心越界
+string& erase (size_t pos = 0, size_t len = npos);
+
+//插入字符串, 在指定位置插入另一个字符串
+//第一个参入要注意不能越界, 否则会抛出异常
+string& insert (size_t pos, const string& str);
+```
+### 3.2.2. 查找
+
+```cpp
+//查询函数, pos 表开始位置, 无视pos之前的匹配项
+//返回值为第一个匹配项出现的位置, 若无则返回 string::npos
+size_t find (const string& str, size_t pos = 0) const;
+size_t find (const char* s, size_t pos = 0) const;
+
+
+//rfind() 函数 和find的第二个参数功能相反
+//第二个参数表示最多查找到第二个参数处, 若无则返回无穷大值
+int index = s1.rfind(s2,6);
+
+//查找子字符串和字符串共同具有的字符在字符串中首次出现的位置
+//注意是任意一个共有的字符首次出现的位置
+constexpr size_type find_first_of( const basic_string& str,size_type pos = 0 ) const noexcept;
+
+```
+
+## 3.3. **从C继承的基础的字符串操作**  
 
 以下函数为c原生函数,包含在`<string.h>`头文件中, 在C++中也在 `<cstring>`中  
 使用`<string.h>` 不需要在函数名前加`std::`  
@@ -189,58 +272,6 @@ if (p == nullptr) {
 * 若LC_COLLATE为"POSIX"或"C"，则strcoll()与strcmp()作用完全相同 
 * 按照 C94 及 C99 标准的规定，程序在启动时设置 locale 为 "C"。在 "C" locale 下，字符串的比较就是按照内码一个字节一个字节地进行，这时 strcoll 与 strcmp 函数没有区别。在其他 locale 下，字符串的比较方式则不同了，例如在简体中文 locale 下，strcmp 仍然按内码比较，而 strcoll 对于汉字则是按拼音进行的（这也跟操作系统有关，Windows 还支持按笔划排序，可以在“区域和语言设置”里面修改
   
-
-## 3.2. 使用
-
-
-```cpp
-
-//----------定义:
-std::string s2 = "c plus plus";
-// 初始化为sssss
-std::string s4 (5, 's');
-
-//----转为C风格字符指针
-//返回该字符串的 const 指针（const char*）
-string path = "D:\\demo.txt";
-FILE *fp = fopen(path.c_str(), "rt");
-
-
-//-----流输入
-//使用流对字符串进行输入的时候, 会把空格作为输入结束  
-string s;
-cin>>s;
-
-```
-
-
-**基础8种迭代函数**  
-返回对应的迭代器
-```cpp
-.begin();  //开头
-.end();    //末尾
-.r*();     //反向迭代器
-.c*();     //c++ 11 新标准,const 迭代器,防止更改字符串内容
-.cr*();    //顺序为cr
-```
-
-### 3.2.1. 实用操作函数
-
-```cpp
-//获得子函数, pos 开始位置, 默认截取到字符串尾
-string substr (size_t pos = 0, size_t len = npos) const;
-
-//删除字符串
-string& erase (size_t pos = 0, size_t len = npos);
-
-
-//查询函数, pos 表开始位置, 无视pos之前的匹配项
-//返回值为第一个匹配项出现的位置, 若    无则返回 string::npos
-size_t find (const string& str, size_t pos = 0) const;
-
-
-```
-
 
 
 # 4. STL容器
@@ -437,6 +468,127 @@ else
 vector 常被称为向量容器，因为`该容器擅长在尾部插入或删除元素`，`时间复杂度为O(1)`；而对于在容器头部或者中部插入或删除元素，则花费时间要长一些（移动元素需要耗费时间），时间复杂度为线性阶`O(n)`。  
 
 
+vector的源码实现
+```cpp
+/*
+vector就是使用 3 个迭代器（可以理解成指针）来表示的
+_Myfirst 指向的是 vector 容器对象的起始字节位置
+_Mylast 指向当前最后一个元素的末尾字节
+_Myend 指向整个 vector 容器所占用内存空间的末尾字节。
+
+*/
+class vector{
+    ...
+protected:
+    pointer _Myfirst;
+    pointer _Mylast;
+    pointer _Myend;
+};
+```
+当 vector 的大小和容量相等（size==capacity）也就是满载时，如果再向其添加元素，那么 vector 就需要扩容。vector 容器扩容的过程需要经历以下 3 步：
+1. 完全弃用现有的内存空间，重新申请更大的内存空间；
+2. 将旧内存空间中的数据，按原有顺序移动到新的内存空间中；
+3. 最后将旧的内存空间释放。
+
+vector 容器扩容时，不同的编译器申请更多内存空间的量是不同的。以 VS 为例，它会扩容现有容器容量的 50%。  
+
+
+### 4.4.1. 创建
+
+```cpp
+// 最基础的定义
+std::vector<double> values;
+
+// 使用 reserve() 来重新分配空间,增加容量
+// 重新分配空间后可能导致之前定义的迭代器失效
+values.reserve(20);
+
+// 用类似数组的方法定义初始值
+std::vector<int> primes {2, 3, 5, 7, 11, 13, 17, 19};
+// 定义初始的元素个数
+std::vector<double> values(20);
+
+// 定义初始元素个数以及统一的初始值
+std::vector<double> values(20, 1.0);
+
+// 和 array 不同, 定义 vector 的时候, 元素个数和初始值都可以是变量
+std::vector<double> values(num, value);
+
+
+// vector的拷贝构造
+//可以用一对指针或者迭代器来指定拷贝初始值的范围
+int array[]={1,2,3};
+std::vector<int>values(array, array+2);//values 将保存{1,2}
+std::vector<int>value1{1,2,3,4,5};
+std::vector<int>value2(std::begin(value1),std::begin(value1)+3);//value2保存{1,2,3}
+
+
+```
+### 4.4.2. 访问修改元素
+
+1. 下标访问 (有越界可能)
+2. at() 访问(抛出 std::out_of_range 异常)
+3. front() back() 访问首尾元素 ( 返回引用, 可以修改值 )
+4. data 访问
+```cpp
+// 使用下标进行访问和修改
+values[0] = values[1] + values[2];
+
+// at() 方法访问
+values.at(0) = values.at(1);
+
+//修改首元素
+values.front() = 10;
+
+//输出容器中第 3 个元素的值
+cout << *(values.data() + 2) << endl;
+```
+
+### 4.4.3. 迭代器
+
+1. 8大迭代器生成函数, 使用auto接受返回的迭代器很方便, begin和end()配合迭代全部元素
+2. 可以使用全局的 begin(vector) 和 end(vector) 获取迭代器  
+3. size() 配合下标访问全部元素  
+
+      capacity() 成员函数，可以获得当前容器的容量  
+      通过 size() 成员函数，可以获得容器当前的大小。  
+
+
+* 可以调用` reserve()` 成员函数来增加容器的容量（但并不会改变存储元素的个数）
+  * 仅仅只是用来增加容量
+* 通过调用成员函数` resize() `可以改变容器的大小，并且该函数也可能会导致 vector 容器容量的增加。
+  * 会同时生成对应的初始值, 即调用后容器内就有多少个元素
+
+```cpp
+value.reserve(20);
+cout << "value 容量是(2)：" << value.capacity() << endl;    // 20 当前的容量
+cout << "value 大小是(2)：" << value.size() << endl;        // 15 个元素
+
+//将元素个数改变为 21 个，所以会增加 6 个默认初始化的元素
+value.resize(21);
+
+//将元素个数改变为 21 个，新增加的 6 个元素默认值为 99。
+value.resize(21,99);
+
+//当需要减小容器的大小时，会移除多余的元素。
+value.resize(20);
+```
+
+
+一旦 vector 容器的内存被重新分配，则和 vector 容器中元素相关的所有引用、指针以及迭代器，都可能会失效，最稳妥的方法就是重新生成。   
+
+对于 vector 容器而言，当增加新的元素时，有可能很快完成（即直接存在预留空间中）；也有可能会慢一些（扩容之后再放新元素）。  
+
+若需要保存容器的容量或者大小,尽量使用auto  
+vector<T> 对象的容量和大小类型都是 vector<T>::size_type  
+
+```cpp
+vector<int>::size_type cap = value.capacity();
+vector<int>::size_type size = value.size();
+
+auto cap = value.capacity();
+auto size = value.size();
+```
 
 
 ## 4.5. map 与 unordered_map
