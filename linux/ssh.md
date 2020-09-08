@@ -1,6 +1,6 @@
 # 1. SSH的基本操作
 
-## 1.1. 安装与登录  
+## 1.1. 安装  
 
 ```shell
 # 查看是否安装以及版本 ubuntu上默认只安装了openssh-client
@@ -15,8 +15,9 @@ $ ps -e | grep sshd
 $ service ssh start
 
 ```
+## 1.2. 登录及配置文件
 
-**公钥登录**  
+### 1.2.1. 公钥免密登录
 用户将自己的公钥储存在远程主机上,直接允许登录shell，不再要求密码。
 ```shell
 #用户必须提供公钥，如果没有公钥，可以生成一个  
@@ -30,7 +31,29 @@ $ cat id_rsa.pub >> .ssh/authorized_keys
 $ sudo chmod 600 .ssh/authorized_keys
 ```
 
-## 1.2. SHA1 支持
+### 1.2.2. 配置文件保存密码
+
+好处:  
+```shell
+#配置前
+ssh username@hostname -p port
+#然后输入密码
+
+#配置以后，我们只需要输入连接账户的别名即可
+ssh 别名
+```
+
+配置方法:
+在.ssh/config中配置，如果没有config，创建一个即可  
+```shell
+Host 别名
+    Hostname 主机名
+    Port 端口
+    User 用户名
+```
+
+
+## 1.3. SHA1 支持
 
 新版Openssh中认为SHA1这种hash散列算法过于薄弱，已经不再支持，所以我们需要手动去enable对于SHA1的支持
 

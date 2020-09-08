@@ -64,7 +64,7 @@ peek(); //reads the next character without extracting it
 | bad()  | Returns true 如果有读写失败                | 例如对一个没有以写入标志打开的流执行写入或者写入的磁盘已没有空间 |
 | fail() | Returns true 在`bad()`的基础上检查格式问题 | 例如文件读出来的是字符但是传输给了一个整数变量                   |
 | eof()  | 检查是否到了文件末尾.                      |
-| 1.4.   | 1.4.                                       | 1.4.                                                             | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | good() | 最常用的函数, 对上面所有函数返回`true`的时候,返回`false` | `good()`与`bad()`不是对立函数,good一次检查更多的flag |
+| 1.4.   | 1.4.                                       | 1.4.                                                             | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | good() | 最常用的函数, 对上面所有函数返回`true`的时候,返回`false` | `good()`与`bad()`不是对立函数,good一次检查更多的flag |
 ---
 
 ## 1.5. 文件位置指针操作
@@ -739,14 +739,14 @@ swap()成员函数的执行流程:
 当需要向序列两端频繁的添加或删除元素时，应首选 deque 容器。  
 
 
-## pair 
+## 4.6. pair 
 
 考虑到“键值对”并不是普通类型数据，C++ STL 标准库提供了 pair 类模板  
 专门用来将 2 个普通元素 first 和 second  创建成一个新元素`<first, second>`    
 
 * 注意: pair 类模板定义在 `<utility>` 头文件中
 
-### 构造函数
+### 4.6.1. 构造函数
 
 ```cpp
 // c++ 11 标准之前
@@ -762,9 +762,9 @@ template<class U, class V> pair (const pair<U,V>& pr);
 ```
 
 
-## 4.6. map 与 unordered_map
+## 4.7. map 
 
-### 4.6.1. 区别与关联
+### 4.7.1. 与 unordered_map 的区别与关联
 
 1. 二者的头文件不同
 ```cpp
@@ -818,18 +818,43 @@ template<class U, class V> pair (const pair<U,V>& pr);
 * 其底层实现是完全不同的，上方已经解释了
 * 外部使用来说却是一致的。
 
-### 4.6.2. 使用
-
-map是一个关联容器，它提供一对一的hash  
-
-1. 构造函数
+### 4.7.2. 构造函数
 
 ```cpp
-
 map<int, string> mapStudent;
+```
+
+### 4.7.3. 获取值
+
+map 类模板中对[ ]运算符进行了重载，这意味着，类似于借助数组下标可以直接访问数组中元素，通过指定的键，我们可以轻松获取 map 容器中该键对应的值
+1. 有当 map 容器中确实存有包含该指定键的键值对，借助重载的 [ ] 运算符才能成功获取该键对应的值
+2. 若当前 map 容器中没有包含该指定键的键值对，则此时使用 [ ] 运算符将不再是访问容器中的元素，而变成了向该 map 容器中增添一个键值对
+   * 键用 [ ] 运算符中指定的键
+   * 值取决于值的数据类型，如果是基本数据类型，则值为 0；如果是 string 类型，其值为 ""，即空字符串（即使用该类型的默认值作为键值对的值）
+  
+调用  at() 成员方法
+1. 成功找到键的键值对，并返回该键对应的值
+2. 没有键的键值对，会导致 at() 成员方法查找失败，并抛出 `out_of_range` 异常   
+
+借助 find() 成员方法间接实现此目的
+1. 该方法返回的是一个迭代器
+2. 如果查找成功，该迭代器指向查找到的键值对
+3. 反之，则指向 map 容器最后一个键值对之后的位置（和 end() 成功方法返回的迭代器一样
+   
+```cpp
+// 两个函数  find()  和 end()
+// find 返回迭代器指向当前查找元素的位置否则返回map::end()位置
+iter = mapStudent.find("123");
+if(iter != mapStudent.end())
+  cout<<"Find, the value is"<<iter->second<<endl;
+else
+  cout<<"Do not Find"<<endl;
 
 ```
-2. 元素插入
+find 函数返回迭代器对象 , 可以使用 `->` 直接获取数据
+
+
+### 4.7.4. 元素插入
 
 ```cpp
 // 定义一个map对象
@@ -860,22 +885,7 @@ if(!Insert_Pair.second)cout << ""Error insert new element" << endl;
 若关键字已存在 , insert 会返回插入失败 
 而数组方式会直接覆盖  
 
-3. 查找元素
-
-```cpp
-// 两个函数  find()  和 end()
-
-// find 返回迭代器指向当前查找元素的位置否则返回map::end()位置
-iter = mapStudent.find("123");
-if(iter != mapStudent.end())
-  cout<<"Find, the value is"<<iter->second<<endl;
-else
-  cout<<"Do not Find"<<endl;
-
-```
-find 函数返回迭代器对象 , 可以使用 `->` 直接获取数据
-
-4. 删除元素 
+### 4.7.5. 删除元素 
 ```cpp
 //主要通过函数 erase() , 删除成功返回 1 , 否则返回 0
 
@@ -891,8 +901,7 @@ mapStudent.erase(mapStudent.begin(), mapStudent.end());
 //等同于
 mapStudent.clear()
 ```
-
-5. 获取大小
+### 4.7.6. 获取大小
 
 ```cpp
 //函数定义
@@ -901,7 +910,7 @@ size_type size() const noexcept;
 //一般使用方法
 int nSize = mapStudent.size();
 ```
-6. 其他常用函数
+### 4.7.7. 其他常用函数
 begin()         返回指向map头部的迭代器  
 end()           返回指向map末尾的迭代器  
 rbegin()        返回一个指向map尾部的逆向迭代器  
