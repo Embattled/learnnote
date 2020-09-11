@@ -1,4 +1,5 @@
-# 1. C++ 的文件读写 fstream
+# 1. C++的流
+## 1.1. C++ 的文件读写流 fstream
 
 iostream 标准库,它提供了 cin 和 cout 方法分别用于从标准输入读取流和向标准输出写入流.  
 从文件读取流和向文件写入流,这就需要用到 C++ 中另一个标准库 `fstream`  
@@ -12,7 +13,7 @@ iostream 标准库,它提供了 cin 和 cout 方法分别用于从标准输入�
 
 要在 C++ 中进行文件处理, 必须在 C++ 源代码文件中包含头文件 `iostream` 和 `fstream`
 
-## 1.1. 文件打开与关闭
+### 1.1.1. 文件打开与关闭
 
 `ofstream` 和 `fstream` 对象都可以用来打开文件进行***写操作***, 如果**只需要打开文件进行读操作**, 则使用 `ifstream` 对象
 
@@ -32,7 +33,7 @@ myfile.close();
 | ios::trunc  | 如果该文件已经存在, 其内容将在打开文件之前被截断, 即把文件长度设为 0。 |
 | ios::binary | 二进制模式打开.                                                        |
 
-## 1.2. 文件读写
+### 1.1.2. 文件读写
 
 **对于字符文件**  
 对`ofstream` 或 `fstream` 对象,使用流插入运算符`（ << ）`向文件写入信息  
@@ -54,7 +55,7 @@ putback(char);// Puts the character ch back to the input stream so the next extr
 //功能是一样的，最大的区别在参数上 unget没有参数，是把已经从流读取出来的那个字符放回去，下次读取的时候可以读到这个字符 而putback是把参数c放入流中
 peek(); //reads the next character without extracting it 
 ```
-## 1.3. 检查函数
+### 1.1.3. 检查函数
 每一个流对象都有一个 `flag` 用于保存操作时的各种状态  
 使用 `clear()` 来清除`flag`
 
@@ -64,10 +65,10 @@ peek(); //reads the next character without extracting it
 | bad()  | Returns true 如果有读写失败                | 例如对一个没有以写入标志打开的流执行写入或者写入的磁盘已没有空间 |
 | fail() | Returns true 在`bad()`的基础上检查格式问题 | 例如文件读出来的是字符但是传输给了一个整数变量                   |
 | eof()  | 检查是否到了文件末尾.                      |
-| 1.4.   | 1.4.                                       | 1.4.                                                             | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | good() | 最常用的函数, 对上面所有函数返回`true`的时候,返回`false` | `good()`与`bad()`不是对立函数,good一次检查更多的flag |
+| 1.2.   | 1.4.                                       | 1.4.                                                             | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | good() | 最常用的函数, 对上面所有函数返回`true`的时候,返回`false` | `good()`与`bad()`不是对立函数,good一次检查更多的flag |
 ---
 
-## 1.5. 文件位置指针操作
+### 1.2.1. 文件位置指针操作
 
 tellp() —— 与tellg()有同样的功能，但它用于写文件时。
 * 当我们读取一个文件，并要知道内置指针的当前位置时，应该使用tellg()
@@ -112,6 +113,88 @@ int main () {
   cout << "size is: " << (end-begin) << " bytes.\n";
   return 0;
 ```
+
+## 字符串流 sstream
+
+头文件 `<sstream>`  
+* stringstream  同时可以支持C风格的串流的输入输出操作 stringstream则是从iostream(输入输出流类)和和stringstreambase（c++字符串流基类）派生而来
+* ostringstream 输出        是从ostream（输出流类）和stringstreambase（c++字符串流基类）派生而来
+* istringstream 输入        是从istream（输入流类）和stringstreambase（c++字符串流基类）派生而来
+
+事实上,在C++有两种字符串流，一种在`sstream`中定义，另一种在`strstream`中定义。它们实现的东西基本一样。
+```cpp
+//strstream里包含
+class strstreambuf;
+class istrstream;
+class ostrstream;
+class strstream;
+
+它们是基于C类型字符串char*编写的
+
+//sstream中包含
+class istringstream;
+class ostringstream;
+class stringbuf;
+class stringstream;
+它们是基于std::string编写的
+
+ostrstream::str();//返回的是char*类型的字符串
+ostringstream::str();//返回的是std::string类型的字符串
+```
+在使用的时候要注意到二者的区别，一般情况下推荐使用std::string类型的字符串
+当然如果为了保持和C的兼容，使用strstream也是不错的选择  
+
+
+### 从string中读取字符
+
+stringstream对象可以绑定一行字符串，然后以空格为分隔符把该行分隔开来
+```cpp
+// 构造函数
+istringstream::istringstream(string str);
+
+// 建立一个字符串
+std::string str = "I am coding ...";
+// 绑定字符串到流
+std::istringstream is(str);
+do
+{
+    std::string substr;
+    is>>substr;
+    std::cout << substr << std::endl;
+} while (is);
+
+```
+### 用来进行数据类型转换
+
+传入参数和目标对象的类型会被自动推导出来，所以不存在错误的格式化符的问题。相比c库的数据类型转换，sstream更加安全、自动和直接  
+
+```cpp
+stringstream sstream;
+string strResult;
+int nValue = 1000;
+
+// 将int类型的值放入输入流中
+sstream << nValue;
+// 从sstream中抽取前面插入的int类型的值，赋给string类型
+sstream >> strResult;
+
+```
+### 字符串流的高级操作
+
+* 清空字符串流的方式 `sstream.str("")`  `clear()`
+* 使用 `str()` 方法，将stringstream类型转换为string类型
+* 将多个字符串放入stringstream，实现字符串的拼接目的
+
+```cpp
+// 将多个字符串放入 sstream 中
+sstream << "first" << " " << "string,";
+sstream << " second string";
+cout<< sstream.str() << endl;
+// 清空 sstream
+sstream.str("");
+
+```
+
 
 
 # 2. 工程要点
@@ -272,7 +355,45 @@ constexpr size_type find_first_of( const basic_string& str,size_type pos = 0 ) c
 * 若LC_COLLATE为"POSIX"或"C"，则strcoll()与strcmp()作用完全相同 
 * 按照 C94 及 C99 标准的规定，程序在启动时设置 locale 为 "C"。在 "C" locale 下，字符串的比较就是按照内码一个字节一个字节地进行，这时 strcoll 与 strcmp 函数没有区别。在其他 locale 下，字符串的比较方式则不同了，例如在简体中文 locale 下，strcmp 仍然按内码比较，而 strcoll 对于汉字则是按拼音进行的（这也跟操作系统有关，Windows 还支持按笔划排序，可以在“区域和语言设置”里面修改
   
+## string 与数字类型的转换
 
+### 字符串转为数字
+
+除了使用C语言风格的函数 `ato*()` 和 `strto*` C++风格的函数为 `sto*()`
+
+```cpp
+#include <string> //string 头文件
+
+// idx不是空指针，则该函数还将idx的值设置为该数字后str中第一个字符的位置。
+int stoi (const string&  str, size_t* idx = 0, int base = 10);
+long stol (const string&  str, size_t* idx = 0, int base = 10);
+unsigned long stoul (const string&  str, size_t* idx = 0, int base = 10);
+long long stoll (const string&  str, size_t* idx = 0, int base = 10);
+unsigned long long stoull (const string&  str, size_t* idx = 0, int base = 10);
+float stof (const string&  str, size_t* idx = 0);
+double stod (const string&  str, size_t* idx = 0);
+long double stold (const string&  str, size_t* idx = 0);
+
+```
+### 数字转成字符串
+
+```cpp
+//  to_string 函数。将 val 解释为 string，并返回转换结果
+string to_string (int val);
+string to_string (long val);
+string to_string (long long val);
+string to_string (unsigned val);
+string to_string (unsigned long val);
+string to_string (unsigned long long val);
+string to_string (float val);
+string to_string (double val);
+string to_string (long double val);
+
+// 同样的参数还有 to_wstring()
+wstring to_wstring (int val);
+
+
+```
 
 # 4. STL容器
 
