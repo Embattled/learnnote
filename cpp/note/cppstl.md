@@ -65,7 +65,7 @@ peek(); //reads the next character without extracting it
 | bad()  | Returns true 如果有读写失败                | 例如对一个没有以写入标志打开的流执行写入或者写入的磁盘已没有空间 |
 | fail() | Returns true 在`bad()`的基础上检查格式问题 | 例如文件读出来的是字符但是传输给了一个整数变量                   |
 | eof()  | 检查是否到了文件末尾.                      |
-| 1.2.   | 1.4.                                       | 1.4.                                                             | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | good() | 最常用的函数, 对上面所有函数返回`true`的时候,返回`false` | `good()`与`bad()`不是对立函数,good一次检查更多的flag |
+| 1.2.   | 1.2.                                       | 1.2.                                                             | 1.2. | 1.2. | 1.2. | 1.2. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | good() | 最常用的函数, 对上面所有函数返回`true`的时候,返回`false` | `good()`与`bad()`不是对立函数,good一次检查更多的flag |
 ---
 
 ### 1.2.1. 文件位置指针操作
@@ -114,7 +114,7 @@ int main () {
   return 0;
 ```
 
-## 字符串流 sstream
+## 1.3. 字符串流 sstream
 
 头文件 `<sstream>`  
 * stringstream  同时可以支持C风格的串流的输入输出操作 stringstream则是从iostream(输入输出流类)和和stringstreambase（c++字符串流基类）派生而来
@@ -145,7 +145,7 @@ ostringstream::str();//返回的是std::string类型的字符串
 当然如果为了保持和C的兼容，使用strstream也是不错的选择  
 
 
-### 从string中读取字符
+### 1.3.1. 从string中读取字符
 
 stringstream对象可以绑定一行字符串，然后以空格为分隔符把该行分隔开来
 ```cpp
@@ -164,7 +164,7 @@ do
 } while (is);
 
 ```
-### 用来进行数据类型转换
+### 1.3.2. 用来进行数据类型转换
 
 传入参数和目标对象的类型会被自动推导出来，所以不存在错误的格式化符的问题。相比c库的数据类型转换，sstream更加安全、自动和直接  
 
@@ -179,7 +179,7 @@ sstream << nValue;
 sstream >> strResult;
 
 ```
-### 字符串流的高级操作
+### 1.3.3. 字符串流的高级操作
 
 * 清空字符串流的方式 `sstream.str("")`  `clear()`
 * 使用 `str()` 方法，将stringstream类型转换为string类型
@@ -355,9 +355,9 @@ constexpr size_type find_first_of( const basic_string& str,size_type pos = 0 ) c
 * 若LC_COLLATE为"POSIX"或"C"，则strcoll()与strcmp()作用完全相同 
 * 按照 C94 及 C99 标准的规定，程序在启动时设置 locale 为 "C"。在 "C" locale 下，字符串的比较就是按照内码一个字节一个字节地进行，这时 strcoll 与 strcmp 函数没有区别。在其他 locale 下，字符串的比较方式则不同了，例如在简体中文 locale 下，strcmp 仍然按内码比较，而 strcoll 对于汉字则是按拼音进行的（这也跟操作系统有关，Windows 还支持按笔划排序，可以在“区域和语言设置”里面修改
   
-## string 与数字类型的转换
+## 3.4. string 与数字类型的转换
 
-### 字符串转为数字
+### 3.4.1. 字符串转为数字
 
 除了使用C语言风格的函数 `ato*()` 和 `strto*` C++风格的函数为 `sto*()`
 
@@ -375,7 +375,7 @@ double stod (const string&  str, size_t* idx = 0);
 long double stold (const string&  str, size_t* idx = 0);
 
 ```
-### 数字转成字符串
+### 3.4.2. 数字转成字符串
 
 ```cpp
 //  to_string 函数。将 val 解释为 string，并返回转换结果
@@ -593,7 +593,7 @@ cout << *( words.data()+1);
 访问array容器中多个元素
 
 1. size() 函数能够返回容器中元素的个数（函数返回值为 size_t 类型）
-2.  empty() 成员函数，即可知道容器中有没有元素（如果容器中没有元素，此函数返回 true）
+2. empty() 成员函数，即可知道容器中有没有元素（如果容器中没有元素，此函数返回 true）
 
 ```cpp
 if(values.empty())
@@ -678,8 +678,9 @@ values[0] = values[1] + values[2];
 // at() 方法访问
 values.at(0) = values.at(1);
 
-//修改首元素
-values.front() = 10;
+//修改首尾元素 front() 和 back() 函数 ,  
+d.front() = 10;
+d.back() = 20;
 
 //输出容器中第 3 个元素的值
 cout << *(values.data() + 2) << endl;
@@ -849,7 +850,9 @@ swap()成员函数的执行流程:
 经过以上步骤，就成功的将 myvector 容器的容量由 100 缩减至 10。  
 
 
-## 4.5. deque
+## 4.5. deque 双端队列
+
+deque 容器和 vecotr 容器有很多相似之处
 
 主要要点:
 1. deque 是 double-ended queue 的缩写，又称双端队列容器。
@@ -859,15 +862,200 @@ swap()成员函数的执行流程:
 
 当需要向序列两端频繁的添加或删除元素时，应首选 deque 容器。  
 
+### 4.5.1. deque的底层实现原理
 
-## 4.6. pair 
+和 vector 容器采用连续的线性空间不同!!  
+
+1. deque 容器存储数据的空间是由许多`段`等长的连续空间构成，各段空间之间并不一定是连续的，可以位于在内存的不同区域  
+2. deque 容器用数组（数组名假设为 map）存储着各个连续空间的首地址。也就是说，map 数组中存储的都是指针，指向那些真正用来存储数据的各个连续空间
+3. 当 deque 容器需要在头部或尾部增加存储空间时，它会申请一段新的连续空间，同时在 map 数组的开头或结尾添加指向该空间的指针，由此该空间就串接到了 deque 容器的头部或尾部。
+4. 如果 map 数组满了, 再申请一块更大的连续空间供 map 数组使用，将原有数据（很多指针）拷贝到新的 map 数组中，然后释放旧的空间。map类似于普通 vector
+
+对迭代器的底层实现, 可以学习运算符重载函数的使用
+```cpp
+//当迭代器处于当前连续空间边缘的位置时，如果继续遍历，就需要跳跃到其它的连续空间中，该函数可用来实现此功能
+void set_node(map_pointer new_node){
+  node = new_node;//记录新的连续空间在 map 数组中的位置
+  first = *new_node; //更新 first 指针
+  //更新 last 指针，difference_type(buffer_size())表示每段连续空间的长度
+  last = first + difference_type(buffer_size());
+}
+//重载 * 运算符
+reference operator*() const{return *cur;}
+pointer operator->() const{return &(operator *());}
+//重载前置 ++ 运算符
+self & operator++(){
+  ++cur;
+  //处理 cur 处于连续空间边缘的特殊情况
+  if(cur == last){
+      //调用该函数，将迭代器跳跃到下一个连续空间中
+      set_node(node+1);
+      //对 cur 重新赋值
+      cur = first;
+  }
+  return *this;
+}
+//重置前置 -- 运算符
+self& operator--(){
+  //如果 cur 位于连续空间边缘，则先将迭代器跳跃到前一个连续空间中
+  if(cur == first){
+      set_node(node-1);
+      cur == last;
+  }
+  --cur;
+  return *this;
+}
+```
+
+deque 容器除了维护先前讲过的 map 数组，还需要维护 start、finish 这 2 个 deque 迭代器  
+1. start 迭代器记录着 map 数组中首个连续空间的信息
+2. start 迭代器中的 cur 指针指向的是连续空间中首个元素
+3. finish 迭代器记录着 map 数组中最后一个连续空间的信息
+4. 而 finish 迭代器中的 cur 指针指向的是连续空间最后一个元素的下一个位置
+
+deque 的源代码定义
+```cpp
+//_Alloc为内存分配器
+template<class _Ty,
+  class _Alloc = allocator<_Ty>>
+class deque{
+  ...
+protected:
+  iterator start;
+  iterator finish;
+  map_pointer map;
+...
+}
+```
+
+### 4.5.2. 定义deque
+
+```cpp
+// 空队列
+std::deque<int> d;
+
+// 初始元素的个数, 赋予默认值
+std::deque<int> d(10);
+
+// 初始元素的个数以及指定初始值
+std::deque<int> d(10, 5);
+
+// 拷贝构造
+std::deque<int> d2(d1);
+
+// 指定区间拷贝 (从其他任何容器中)
+std::array<int, 5>arr{ 11,12,13,14,15 };
+std::deque<int>d(arr.begin()+2, arr.end()); //13,14,15
+```
+
+### 4.5.3. 迭代器
+
+八大迭代器方法, 不多说  
+begin();  end();    
+rbegin();  rend();  
+cbegin();  cend();  
+crbegin();  crend();  
+
+全局函数适用于 deque `begin(deque) end(deque)`  
+```cpp
+for (auto i = d.begin(); i < d.end(); i++) 
+for (auto i = begin(d); i < end(d); i++)
+```
+
+### 4.5.4. 访问元素
+
+基本同 vector 一致  
+
+注意，和 vector 容器不同，deque 容器没有提供 data() 成员函数，  
+同时 deque 容器在存储元素时，也无法保证其会将元素存储在连续的内存空间中，因此尝试使用指针去访问 deque 容器中指定位置处的元素，是非常危险的。  
+
+```cpp
+deque<int>d{ 1,2,3,4 };
+
+// 下标访问
+cout << d[1] << endl;
+
+// at() 防止越界访问  抛出 std::out_of_range 异常
+d.at(1) = 5;
+
+// vector 也有的 front() 和 back() 函数 ,  
+d.front() = 10;
+d.back() = 20;
+```
+
+### 4.5.5. 修改元素
+
+push_back()、push_front() 或者 resize() 成员函数实现向（空）deque 容器中添加元素。  
+在实际应用中，常用 emplace()、emplace_front() 和 emplace_back() 分别代替 insert()、push_front() 和 push_back()  
+
+```cpp
+// 单参数 单使用方法函数
+push_back()     // 在容器现有元素的尾部添加一个元素，和 emplace_back() 不同，该函数添加新元素的过程是，先构造元素，然后再将该元素移动或复制到容器的尾部。
+pop_back()      // 移除容器尾部的一个元素。
+push_front()    // 在容器现有元素的头部添加一个元素，和 emplace_back() 不同，该函数添加新元素的过程是，先构造元素，然后再将该元素移动或复制到容器的头部。
+pop_front()     // 移除容器尾部的一个元素。
+emplace_back()  // C++ 11 新添加的成员函数，其功能是在容器尾部生成一个元素。和 push_back() 不同，该函数直接在容器头部构造元素，省去了复制或移动元素的过程。
+emplace_front() // C++ 11 新添加的成员函数，其功能是在容器头部生成一个元素。和 push_front() 不同，该函数直接在容器头部构造元素，省去了复制或移动元素的过程。
+
+//emplace() 需要 2 个参数，第一个为指定插入位置的迭代器，第二个是插入的值。
+d.emplace(d.begin() + 1, 4);
+
+
+insert()    // 在指定的位置直接生成一个元素。和 emplace() 不同的是，该函数添加新元素的过程是，先构造元素，然后再将该元素移动或复制到容器的指定位置。
+// insert 有四个重载 具体看vector 一样的
+
+erase()     // 移除一个元素或某一区域内的多个元素。
+clear()     // 删除容器中所有的元素。
+
+```
+
+## 4.6. list 双向链表
+
+1. list底层是以双向链表的形式实现的。这意味着，list 容器中的元素可以分散存储在内存空间里，而不是必须存储在一整块连续的内存空间中。  
+2. 每个元素都配备了 2 个指针，分别指向它的前一个元素和后一个元素。其中第一个元素的前向指针总为 null，因为它前面没有元素；同样，尾部元素的后向指针也总为 null。  
+3. list 容器具有一些其它容器（array、vector 和 deque）所不具备的优势，即它可以在序列已知的任何位置快速插入或删除元素（时间复杂度为O(1)）。并且在 list 容器中移动元素，也比其它容器的效率高。
+4. 缺点是，它不能像 array 和 vector 那样，通过位置直接访问元素。举个例子，如果要访问 list 容器中的第 6 个元素，它不支持容器对象名[6]这种语法格式，正确的做法是从容器中第一个元素或最后一个元素开始遍历容器，直到找到该位置。
+
+头文件: `#include <list>`  
+
+### 4.6.1. 定义  
+```cpp
+
+// 空
+std::list<int> values;
+
+// 指定大小
+std::list<int> values(10);
+
+// 大小和初始值
+std::list<int> values(10, 5);
+
+// 拷贝
+std::list<int> value2(value1);
+
+// 指定  起始和终止位置  拷贝
+std::list<int> values(a, a+5);
+
+//拷贝其它类型的容器，创建 list 容器
+std::array<int, 5>arr{ 11,12,13,14,15 };
+std::list<int>values(arr.begin()+2, arr.end());
+```
+
+### 迭代器
+
+同理, 也是8大迭代器方法和 全局的 `begin() end()`  
+
+
+## 4.7. pair 
 
 考虑到“键值对”并不是普通类型数据，C++ STL 标准库提供了 pair 类模板  
 专门用来将 2 个普通元素 first 和 second  创建成一个新元素`<first, second>`    
 
+pair 对象重载了 <、<=、>、>=、==、!= 这 6 的运算符，其运算规则是：对于进行比较的 2 个 pair 对象，先比较 pair.first 元素的大小，如果相等则继续比较 pair.second 元素的大小。  
+
 * 注意: pair 类模板定义在 `<utility>` 头文件中
 
-### 4.6.1. 构造函数
+### 4.7.1. 构造函数
 
 ```cpp
 // c++ 11 标准之前
@@ -880,12 +1068,37 @@ pair (const first_type& a, const second_type& b);
 // 拷贝（复制）构造函数，即借助另一个 pair 对象，创建新的 pair 对象
 template<class U, class V> pair (const pair<U,V>& pr);
 
+
+// 基于右值引用的构造函数
+// 移动构造函数
+template<class U, class V> pair (pair<U,V>&& pr);
+pair <string, string> pair4(make_pair("C++教程", "http://c.biancheng.net/cplus/"));
+
+
+// 使用右值引用参数，创建 pair 对象
+template<class U, class V> pair (U&& a, V&& b);
+```
+调用 make_pair() 函数，它也是` <utility>` 头文件提供的，其功能是生成一个 pair 对象。  
+当我们将 make_pair() 函数的返回值（是一个临时对象）作为参数传递给 pair() 构造函数时，其调用的是移动构造函数，而不是拷贝构造函数。  
+
+### 4.7.2. 值修改
+
+通过访问 `first second` 就可以访问pair的值  
+pair类模板还提供有一个 swap() 成员函数，能够互换 2 个 pair 对象的键值对，其操作成功的前提是这 2 个 pair 对象的键和值的类型要相同  
+
+```cpp
+pair1.first = "Java教程";
+pair1.second = "http://c.biancheng.net/java/";
+
+pair1.swap(pair2);
+
 ```
 
 
-## 4.7. map 
 
-### 4.7.1. 与 unordered_map 的区别与关联
+## 4.8. map unordered_map
+
+### 4.8.1. 与 unordered_map 的区别与关联
 
 1. 二者的头文件不同
 ```cpp
@@ -939,13 +1152,13 @@ template<class U, class V> pair (const pair<U,V>& pr);
 * 其底层实现是完全不同的，上方已经解释了
 * 外部使用来说却是一致的。
 
-### 4.7.2. 构造函数
+### 4.8.2. 构造函数
 
 ```cpp
 map<int, string> mapStudent;
 ```
 
-### 4.7.3. 获取值
+### 4.8.3. 获取值
 
 map 类模板中对[ ]运算符进行了重载，这意味着，类似于借助数组下标可以直接访问数组中元素，通过指定的键，我们可以轻松获取 map 容器中该键对应的值
 1. 有当 map 容器中确实存有包含该指定键的键值对，借助重载的 [ ] 运算符才能成功获取该键对应的值
@@ -975,7 +1188,7 @@ else
 find 函数返回迭代器对象 , 可以使用 `->` 直接获取数据
 
 
-### 4.7.4. 元素插入
+### 4.8.4. 元素插入
 
 ```cpp
 // 定义一个map对象
@@ -1006,7 +1219,7 @@ if(!Insert_Pair.second)cout << ""Error insert new element" << endl;
 若关键字已存在 , insert 会返回插入失败 
 而数组方式会直接覆盖  
 
-### 4.7.5. 删除元素 
+### 4.8.5. 删除元素 
 ```cpp
 //主要通过函数 erase() , 删除成功返回 1 , 否则返回 0
 
@@ -1022,7 +1235,7 @@ mapStudent.erase(mapStudent.begin(), mapStudent.end());
 //等同于
 mapStudent.clear()
 ```
-### 4.7.6. 获取大小
+### 4.8.6. 获取大小
 
 ```cpp
 //函数定义
@@ -1031,7 +1244,7 @@ size_type size() const noexcept;
 //一般使用方法
 int nSize = mapStudent.size();
 ```
-### 4.7.7. 其他常用函数
+### 4.8.7. 其他常用函数
 begin()         返回指向map头部的迭代器  
 end()           返回指向map末尾的迭代器  
 rbegin()        返回一个指向map尾部的逆向迭代器  
@@ -1048,3 +1261,58 @@ size()          返回map中元素的个数
 swap()           交换两个map  
 upper_bound()    返回键值>给定元素的第一个位置  
 value_comp()     返回比较元素value的函数  
+
+## 4.9. set multiset 
+
+set 容器定义于`<set>`头文件  
+
+* 和 map、multimap 容器不同，使用 set 容器存储的各个键值对，要求键 key 和值 value 必须相等。  当使用 set 容器存储键值对时，只需要为其提供各键值对中的 value 值（也就是 key 的值）即可。  
+* map、multimap 容器都会自行根据键的大小对存储的键值对进行排序， set 容器也会如此，只不过 set 容器中各键值对的键 key 和值 value 是相等的，根据 key 排序，也就等价为根据 value 排序。  
+
+
+用 set 容器存储的各个元素的值必须各不相同。更重要的是，从语法上讲 set 容器并没有强制对存储元素的类型做 const 修饰，即 set 容器中存储的元素的值是可以修改的。  
+但是，C++ 标准为了防止用户修改容器中元素的值，对所有可能会实现此操作的行为做了限制，使得在正常情况下，用户是无法做到修改 set 容器中元素的值的。  
+* 切勿尝试直接修改 set 容器中已存储元素的值，这很有可能破坏 set 容器中元素的有序性，
+* 最正确的修改 set 容器中元素值的做法是：先删除该元素，然后再添加一个修改后的元素。
+
+### 4.9.1. 创建set
+
+定义对象
+```cpp
+
+template < class T,                        // 键 key 和值 value 的类型
+           class Compare = less<T>,        // 指定 set 容器内部的排序规则
+           class Alloc = allocator<T>      // 指定分配器对象的类型
+           > class set;
+
+
+// 默认构造函数
+// 由于 set 容器支持随时向内部添加新的元素，因此创建空 set 容器的方法是经常使用的。
+std::set<std::string> myset;
+
+// 定义的同时初始化
+std::set<std::string> myset{"java","stl","python"};
+
+// 拷贝构造函数
+std::set<std::string> copyset(myset);
+// 等同于
+std::set<std::string> copyset = myset
+
+
+// 移动构造函数 retSet() 函数的返回值是一个临时 set 容器
+std::set<std::string> copyset(retSet());
+//或者
+std::set<std::string> copyset = retSet();
+
+
+// 拷贝部分元素初始化
+std::set<std::string> copyset(++myset.begin(), myset.end());
+
+
+// 指定排序方法 降序
+std::set<std::string,std::greater<string> > myset{"java","stl","python"};
+
+```
+
+### 4.9.2. 数据操作
+
