@@ -116,7 +116,32 @@
 若要获取整个矩阵的最大值可以用 `max(max(A))` 或者 `max(a(:))`  
 同理,对于求和也一样  
 
-## 1.6. 循环操作  
+## 1.6. 条件循环操作  
+
+基本上同python和 Matlab 一致 
+```m
+
+index=1:10
+# for 循环
+for i=1:10,
+  v(i)=1:10
+end;
+
+# while 循环
+while i<=5,
+  v(i)=100;
+  i=i+1;
+
+  if i==6,
+    break;
+  elseif i==5,
+    disp('The value is 5');
+  end;
+end;
+```
+
+## 1.7. 函数 function
+
 
 
 # 2. 数据可视化  

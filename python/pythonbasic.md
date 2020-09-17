@@ -613,3 +613,48 @@ re.search('x-{2,4}?x', 'x--xx----x')
 re.search('(bar)+', 'foo barbarbar baz')
 
 ```
+
+# Python 的包 环境管理 
+
+[官方推荐文档]<https://packaging.python.org/guides/tool-recommendations/>  
+
+## Python的包管理
+包管理工具有很多
+
+### distutils 和 setuptools
+
+distutils是 python 标准库的一部分  
+用于方便的打包和安装模块  是常用的 setup.py 的实现模块  
+setuptools 是对 distutils 的增强，尤其是引入了包依赖管理  
+
+
+[distutils打包文档]<https://docs.python.org/3.8/distutils/>  
+
+使用方法: 在工作目录下, 要打包的脚本文件是`foo.py` 和 `bar.py`  
+创建 `setup.py`  
+```py
+from distutils.core import setup  # 导入打包函数
+setup(
+    name='fooBar',  # 包名 
+    version='1.0',  # 版本
+    author='Will',  # 作者
+    author_email='wilber@sh.com',   # 邮件地址
+    url='http://www.cnblogs.com/wilber2013/',   # 作者网址
+    py_modules=['foo', 'bar'],      # 要打包的文件名称
+)
+```
+
+然后在工作目录下运行  `python setup.py sdist`  则会打包好  `fooBar-1.0.zip`  
+安装者则需要解压压缩包  然后运行  `python setup.py install`  就可以使用包了
+
+
+
+### pip 
+
+pip是目前最流行的Python包管理工具，它被当作easy_install的替代品，但是仍有大量的功能建立在setuptools之上。  
+
+pip的使用非常简单，并支持从任意能够通过 VCS 或浏览器访问到的地址安装 Python 包  
+
+* 安装:  pip install SomePackage 
+* 卸载:  pip uninstall SomePackage 
+s
