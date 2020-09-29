@@ -73,9 +73,9 @@ size_t fwrite(const void *ptr, size_t size_of_elements, size_t number_of_element
 
 ### 1.1.3. 1.3 C 文件流的指针操作
 
-#### 1.1.3.1. 判断文件指针是否到末尾
+**判断文件指针是否到末尾**
 `int feof(FILE *stream)`  当已经读到末尾时返回一个非零值  
-`if( feof ( FILE ) ) break;`  用来跳出读取
+`if( feof ( FILE ) ) break;`  用来跳出读取  
 
 
 

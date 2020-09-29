@@ -1,6 +1,6 @@
 # 1. C++的流
-## 1.1. C++ 的文件读写流 fstream
 
+## 1.1. C++ 的文件读写流 fstream
 iostream 标准库,它提供了 cin 和 cout 方法分别用于从标准输入读取流和向标准输出写入流.  
 从文件读取流和向文件写入流,这就需要用到 C++ 中另一个标准库 `fstream`  
 
@@ -65,11 +65,9 @@ peek(); //reads the next character without extracting it
 | bad()  | Returns true 如果有读写失败                | 例如对一个没有以写入标志打开的流执行写入或者写入的磁盘已没有空间 |
 | fail() | Returns true 在`bad()`的基础上检查格式问题 | 例如文件读出来的是字符但是传输给了一个整数变量                   |
 | eof()  | 检查是否到了文件末尾.                      |
-| 1.2.   | 1.2.                                       | 1.2.                                                             | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | good() | 最常用的函数, 对上面所有函数返回`true`的时候,返回`false` | `good()`与`bad()`不是对立函数,good一次检查更多的flag |
----
+| 1.3.   | 1.3.                                       | 1.3.                                                             | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | good() | 最常用的函数, 对上面所有函数返回`true`的时候,返回`false` | `good()`与`bad()`不是对立函数,good一次检查更多的flag |
 
-### 1.2.1. 文件位置指针操作
-
+### 1.1.4. 文件位置指针操作
 tellp() —— 与tellg()有同样的功能，但它用于写文件时。
 * 当我们读取一个文件，并要知道内置指针的当前位置时，应该使用tellg()
 * 当我们写入一个文件，并要知道内置指针的当前位置时，应该使用tellp()
@@ -114,7 +112,7 @@ int main () {
   return 0;
 ```
 
-## 1.3. 字符串流 sstream
+## 1.2. 字符串流 sstream
 
 头文件 `<sstream>`  
 * stringstream  同时可以支持C风格的串流的输入输出操作 stringstream则是从iostream(输入输出流类)和和stringstreambase（c++字符串流基类）派生而来
@@ -145,7 +143,7 @@ ostringstream::str();//返回的是std::string类型的字符串
 当然如果为了保持和C的兼容，使用strstream也是不错的选择  
 
 
-### 1.3.1. 从string中读取字符
+### 1.2.1. 从string中读取字符
 
 stringstream对象可以绑定一行字符串，然后以空格为分隔符把该行分隔开来
 ```cpp
@@ -164,7 +162,7 @@ do
 } while (is);
 
 ```
-### 1.3.2. 用来进行数据类型转换
+### 1.2.2. 用来进行数据类型转换
 
 传入参数和目标对象的类型会被自动推导出来，所以不存在错误的格式化符的问题。相比c库的数据类型转换，sstream更加安全、自动和直接  
 
@@ -179,7 +177,7 @@ sstream << nValue;
 sstream >> strResult;
 
 ```
-### 1.3.3. 字符串流的高级操作
+### 1.2.3. 字符串流的高级操作
 
 * 清空字符串流的方式 `sstream.str("")`  `clear()`
 * 使用 `str()` 方法，将stringstream类型转换为string类型
@@ -517,8 +515,20 @@ STL 标准库为每一种标准容器定义了一种迭代器类型，这意味�
 
 以上函数在实际使用时，其返回值类型都可以使用 auto 关键字代替，编译器可以自行判断出该迭代器的类型。
 
+## 4.3. 容器适配器
 
-## 4.3. array 升级的数组  
+
+### 4.3.1. pair 
+
+考虑到“键值对”并不是普通类型数据，C++ STL 标准库提供了 pair 类模板  
+专门用来将 2 个普通元素 first 和 second  创建成一个新元素`<first, second>`    
+
+pair 对象重载了 <、<=、>、>=、==、!= 这 6 的运算符，其运算规则是：对于进行比较的 2 个 pair 对象，先比较 pair.first 元素的大小，如果相等则继续比较 pair.second 元素的大小。  
+
+* 注意: pair 类模板定义在 `<utility>` 头文件中
+
+
+## 4.4. array 升级的数组  
 
 rray 容器是 C++ 11 标准中新增的序列容器，它就是在 C++ 普通数组的基础上，添加了一些成员函数和全局函数。  
 在使用上，它比普通数组更安全，且效率并没有因此变差。  
@@ -538,7 +548,7 @@ std::array<double, 10> values {0.5,1.0,1.5,,2.0};
 //剩余的元素都会被初始化为 0.0
 
 ```
-### 4.3.1. 安全的访问  
+### 4.4.1. 安全的访问  
 
 1. begin() end()
     C++ 11 标准库还新增加了 begin() 和 end() 这 2 个函数，和 array 容器包含的 begin() 和 end() 成员函数不同的是，标准库提供的这 2 个函数的操作对象，既可以是容器，还可以是普通数组。  
@@ -574,7 +584,7 @@ int main()
 
 
 ```
-### 4.3.2. array使用方法总结  
+### 4.4.2. array使用方法总结  
 
 访问array容器中单个元素
 1. 可以通过容器名[]的方式直接访问和使用容器中的元素，这和 C++ 标准数组访问元素的方式相同
@@ -603,7 +613,7 @@ else
     std::cout << "The container has "<< values.size()<<"elements.\n";
 ```
 
-## 4.4. vector 向量容器
+## 4.5. vector 向量容器
 
 它和 array 容器非常类似，都可以看做是对 C++ 普通数组的“升级版”。不同之处在于，array 实现的是静态数组（容量固定的数组），而 vector 实现的是一个动态数组，即可以进行元素的插入和删除，在此过程中，vector 会动态调整所占用的内存空间，整个过程无需人工干预  
 
@@ -635,7 +645,7 @@ protected:
 vector 容器扩容时，不同的编译器申请更多内存空间的量是不同的。以 VS 为例，它会扩容现有容器容量的 50%。  
 
 
-### 4.4.1. 创建
+### 4.5.1. 创建
 
 ```cpp
 // 最基础的定义
@@ -666,7 +676,7 @@ std::vector<int>value2(std::begin(value1),std::begin(value1)+3);//value2保存{1
 
 
 ```
-### 4.4.2. 访问修改元素
+### 4.5.2. 访问修改元素
 
 1. 下标访问 (有越界可能)
 2. at() 访问(抛出 std::out_of_range 异常)
@@ -687,7 +697,7 @@ d.back() = 20;
 cout << *(values.data() + 2) << endl;
 ```
 
-### 4.4.3. 添加元素
+### 4.5.3. 添加元素
 
 1. push_back() 和 emplace_back() 插入尾部
    * push_back() 向容器尾部添加元素时，首先会创建这个元素，然后再将这个元素拷贝或者移动到容器中（如果是拷贝的话，事后会自行销毁先前创建的这个元素）
@@ -729,7 +739,7 @@ demo.insert(demo.end(), { 10,11 });//{1,3,2,5,5,7,8,9,10,11}
 demo1.emplace(demo1.begin(), 3);
 ```
 
-### 4.4.4. 删除元素
+### 4.5.4. 删除元素
 
 成员函数  
 * pop_back()     | 删除 vector 容器中最后一个元素，该容器的大小（size）会减 1，但容量（capacity）不会发生改变。
@@ -759,7 +769,7 @@ swap() 函数在头文件 `<algorithm>` 和 `<utility>` 中都有定义，使用
 * swap(beg)、pop_back() |先调用 swap() 函数交换要删除的目标元素和容器最后一个元素的位置，然后使用 pop_back() 删除该目标元素。
 
 
-### 4.4.5. 迭代器
+### 4.5.5. 迭代器
 
 1. 8大迭代器生成函数, 使用auto接受返回的迭代器很方便, begin和end()配合迭代全部元素
 2. 可以使用全局的 begin(vector) 和 end(vector) 获取迭代器  
@@ -805,7 +815,7 @@ auto cap = value.capacity();
 auto size = value.size();
 ```
 
-### 4.4.6. vector 的容量高级操作
+### 4.5.6. vector 的容量高级操作
 
 vector 容器的扩容过程是非常耗时的，并且当容器进行扩容后，之前和该容器相关的所有指针、迭代器以及引用都会失效。因此在使用 vector 容器过程中，我们应尽量避免执行不必要的扩容操作。
 1. 分配一块大小是当前 vector 容量几倍的新存储空间。注意，多数 STL 版本中的 vector 容器，其容器都会以 2 的倍数增长，也就是说，每次 vector 容器扩容，它们的容量都会提高到之前的 2 倍；
@@ -824,7 +834,7 @@ reserve(n) 	强制 vector 容器的容量至少为 n。注意，如果 n 比当�
 * 避免 vector 容器执行不必要的扩容操作的关键在于，在使用 vector 容器初期，就要将其容量设为足够大的值
 * 在 vector 容器刚刚构造出来的那一刻，就应该借助 reserve() 成员方法为其扩充足够大的容量。
 
-### 4.4.7. vector 的容量 fit
+### 4.5.7. vector 的容量 fit
 
 
 ```cpp
@@ -851,7 +861,7 @@ swap()成员函数的执行流程:
 经过以上步骤，就成功的将 myvector 容器的容量由 100 缩减至 10。  
 
 
-## 4.5. deque 双端队列
+## 4.6. deque 双端队列
 
 deque 容器和 vecotr 容器有很多相似之处
 
@@ -863,7 +873,7 @@ deque 容器和 vecotr 容器有很多相似之处
 
 当需要向序列两端频繁的添加或删除元素时，应首选 deque 容器。  
 
-### 4.5.1. deque的底层实现原理
+### 4.6.1. deque的底层实现原理
 
 和 vector 容器采用连续的线性空间不同!!  
 
@@ -929,7 +939,7 @@ protected:
 }
 ```
 
-### 4.5.2. 定义deque
+### 4.6.2. 定义deque
 
 ```cpp
 // 空队列
@@ -949,7 +959,7 @@ std::array<int, 5>arr{ 11,12,13,14,15 };
 std::deque<int>d(arr.begin()+2, arr.end()); //13,14,15
 ```
 
-### 4.5.3. 迭代器
+### 4.6.3. 迭代器
 
 八大迭代器方法, 不多说  
 begin();  end();    
@@ -963,7 +973,7 @@ for (auto i = d.begin(); i < d.end(); i++)
 for (auto i = begin(d); i < end(d); i++)
 ```
 
-### 4.5.4. 访问元素
+### 4.6.4. 访问元素
 
 基本同 vector 一致  
 
@@ -984,7 +994,7 @@ d.front() = 10;
 d.back() = 20;
 ```
 
-### 4.5.5. 修改元素
+### 4.6.5. 修改元素
 
 push_back()、push_front() 或者 resize() 成员函数实现向（空）deque 容器中添加元素。  
 在实际应用中，常用 emplace()、emplace_front() 和 emplace_back() 分别代替 insert()、push_front() 和 push_back()  
@@ -1010,7 +1020,7 @@ clear()     // 删除容器中所有的元素。
 
 ```
 
-## 4.6. list 双向链表
+## 4.7. list 双向链表
 
 1. list底层是以双向链表的形式实现的。这意味着，list 容器中的元素可以分散存储在内存空间里，而不是必须存储在一整块连续的内存空间中。  
 2. 每个元素都配备了 2 个指针，分别指向它的前一个元素和后一个元素。其中第一个元素的前向指针总为 null，因为它前面没有元素；同样，尾部元素的后向指针也总为 null。  
@@ -1019,7 +1029,7 @@ clear()     // 删除容器中所有的元素。
 
 头文件: `#include <list>`  
 
-### 4.6.1. 定义  
+### 4.7.1. 定义  
 ```cpp
 
 // 空
@@ -1042,7 +1052,7 @@ std::array<int, 5>arr{ 11,12,13,14,15 };
 std::list<int>values(arr.begin()+2, arr.end());
 ```
 
-### 4.6.2. 迭代器
+### 4.7.2. 迭代器
 
 同理, 也是8大迭代器方法和 全局的 `begin() end()`  
 
@@ -1058,20 +1068,12 @@ std::list<int>values(arr.begin()+2, arr.end());
 * list 容器在进行插入（insert()）、接合（splice()）等操作时，都不会造成原有的 list 迭代器失效，甚至进行删除操作，而只有指向被删除元素的迭代器失效，其他迭代器不受任何影响。
 * 在进行插入操作之后，仍使用先前创建的迭代器遍历容器，虽然程序不会出错，但由于插入位置的不同，可能会遗漏新插入的元素。
 
-### 4.6.3. forward_list  C++11 单向链表
+### 4.7.3. forward_list  C++11 单向链表
 
 
 
-## 4.7. pair 
 
-考虑到“键值对”并不是普通类型数据，C++ STL 标准库提供了 pair 类模板  
-专门用来将 2 个普通元素 first 和 second  创建成一个新元素`<first, second>`    
-
-pair 对象重载了 <、<=、>、>=、==、!= 这 6 的运算符，其运算规则是：对于进行比较的 2 个 pair 对象，先比较 pair.first 元素的大小，如果相等则继续比较 pair.second 元素的大小。  
-
-* 注意: pair 类模板定义在 `<utility>` 头文件中
-
-### 4.7.1. 构造函数
+### 4.7.4. 构造函数
 
 ```cpp
 // c++ 11 标准之前
@@ -1097,7 +1099,7 @@ template<class U, class V> pair (U&& a, V&& b);
 调用 make_pair() 函数，它也是` <utility>` 头文件提供的，其功能是生成一个 pair 对象。  
 当我们将 make_pair() 函数的返回值（是一个临时对象）作为参数传递给 pair() 构造函数时，其调用的是移动构造函数，而不是拷贝构造函数。  
 
-### 4.7.2. 值修改
+### 4.7.5. 值修改
 
 通过访问 `first second` 就可以访问pair的值  
 pair类模板还提供有一个 swap() 成员函数，能够互换 2 个 pair 对象的键值对，其操作成功的前提是这 2 个 pair 对象的键和值的类型要相同  
@@ -1204,6 +1206,28 @@ else
 find 函数返回迭代器对象 , 可以使用 `->` 直接获取数据
 
 
+* lower_bound() upper_bound() equal_range()
+```cpp
+// lower_bound() upper_bound()  返回一个迭代器, 用来指向第一个[索引值]大于参数的迭代器
+const std::map<int, const char*> m{
+  { 0, "zero" },
+  { 1, "one" },
+  { 2, "two" },
+};
+
+
+// euqal_range() 则是返回一个pair 用来包含键值等于参数的始末迭代器
+auto p = m.equal_range(1);
+for (auto& q = p.first; q != p.second; ++q) {
+    std::cout << "m[" << q->first << "] = " << q->second << '\n';
+}
+// If there are no elements not less than key, past-the-end (see end()) iterator is returned as the first element. 
+// Similarly if there are no elements greater than key, past-the-end iterator is returned as the second element. 
+
+```
+
+
+
 ### 4.8.4. 元素插入
 
 ```cpp
@@ -1271,11 +1295,9 @@ empty()         如果map为空则返回true
 equal_range()   返回特殊条目的迭代器对  
 get_allocator() 返回map的配置器  
 key_comp()      返回比较元素key的函数  
-lower_bound()   返回键值>=给定元素的第一个位置  
 max_size()      返回可以容纳的最大元素个数  
 size()          返回map中元素的个数  
 swap()           交换两个map  
-upper_bound()    返回键值>给定元素的第一个位置  
 value_comp()     返回比较元素value的函数  
 
 ## 4.9. set multiset 
@@ -1446,3 +1468,51 @@ C++ STL 标准库中还提供有一个和 set 容器相似的关联式容器， 
 5. equal_range() 等方法，更常用于 multiset 容器。
 
 
+# 算法 
+
+使用STL算法的好处
+
+* 算法函数通常比自己写的循环结构效率更高；
+* 自己写循环比使用算法函数更容易出错；
+* 相比自己编写循环结构，直接调用算法函数的代码更加简洁明了。
+* 使用算法函数编写的程序，可扩展性更强，更容易维护；
+
+
+## find() 
+
+find()的函数定义相对简单, 该函数适用于所有的序列式容器
+
+值得一提的是，find() 函数的底层实现，其实就是用==运算符将 val 和 [first, last) 区域内的元素逐个进行比对。  
+这也就意味着，[first, last) 区域内的元素必须支持==运算符。  
+
+如果不支持的话应该自己重载 == 运算符  
+
+
+```cpp
+// 其中，first 和 last 为输入迭代器，[first, last) 用于指定该函数的查找范围；val 为要查找的目标元素。
+InputIterator find (InputIterator first, InputIterator last, const T& val);
+
+// 该函数会返回一个输入迭代器，当 find() 函数查找成功时，其指向的是在 [first, last) 区域内查找到的第一个目标元素；如果查找失败，则该迭代器的指向和 last 相同。
+
+
+// find() 函数除了可以作用于序列式容器，还可以作用于普通数组
+char stl[] ="http://c.biancheng.net/stl/";
+char * p = find(stl, stl + strlen(stl), 'c');
+if (p != stl + strlen(stl)) {
+  cout << p << endl;
+}
+
+
+// find() 的底层实现
+template<class InputIterator, class T>
+InputIterator find (InputIterator first, InputIterator last, const T& val)
+{
+  while (first!=last) {
+      if (*first==val) return first;
+      ++first;
+  }
+  return last;
+}
+
+
+```
