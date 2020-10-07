@@ -85,11 +85,11 @@ size_t fwrite(const void *ptr, size_t size_of_elements, size_t number_of_element
 注意, c语言的字符串头文件只有 `string.h` 一个  
 `cstring` 是 c++ 中对 `string.h`的增强实现,属于C++库,而`string` 则是原生C++库
 
-## stdlib.h
+## 1.3. stdlib.h
 
 头文件 `<stdlib.h>` 在C++中为 `<cstdlib>`  
 
-### 字符串转换成数字类型
+### 1.3.1. 字符串转换成数字类型
 
 因为是C语言库, 函数参数都是 `const char * str`  
 
@@ -135,7 +135,7 @@ long double strtold (const char* str, char** endptr);
 ```
 
 
-## 1.3. dlfcn.h  显示调用动态链接库
+## 1.4. dlfcn.h  显示调用动态链接库
 
 在 C/C++ 程序中显示调用动态链接库时，无需引入和动态链接库相关的头文件  
 

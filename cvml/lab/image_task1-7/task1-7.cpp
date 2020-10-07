@@ -14,17 +14,18 @@ int main(int argc, char const *argv[])
         output->writeAscFile("copy.pgm");
 
         // convert
-        ryu::pgm2pbm(myImage, output);
-        output->writeAscFile("pgm2pbm.ppm");
         ryu::pgm2ppm(myImage, output);
         output->writeAscFile("pgm2ppm.ppm");
+
+        ryu::pgm2pbm(myImage, output);
+        // output->writeAscFile("pgm2pbm.ppm");
 
         // vertical flip
         *output = *myImage;
         ryu::flipVertical(output);
         output->writeAscFile("vertical.ppm");
 
-        // // horizontal flip
+        //horizontal flip
         *output = *myImage;
         ryu::flipHorizontal(output);
         output->writeAscFile("horizontal.pgm");

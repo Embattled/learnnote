@@ -6,7 +6,7 @@
 #define NOTMATCH 0b00000100
 #define OUTPATHERROR 0b00001000
 #define WRITEERROR 0b00010000
-#define MEMNEWERROR 0b00100000
+#define MATMEMNEWERROR 0b00100000
 #define PROPERTYERROR 0b01000000
 
 #define RYU_MAT_SUCCESS 0
@@ -19,7 +19,7 @@ namespace ryu
     private:
         const char *cfilePath;
 
-        // 0 for format, 1 for width, 2 for high, 3 for color depth
+        // 0 for format, 1 for width, 2 for hight, 3 for color depth
         int property[4];
 
         //Property for bin and asc
@@ -45,10 +45,10 @@ namespace ryu
     public:
         unsigned int *ascContent = nullptr;
 
-        void printInfor();
+        void printInfor() const;
         int getFormat() const { return property[0]; }
         int getWidth() const { return property[1]; }
-        int getHigh() const { return property[2]; }
+        int getHight() const { return property[2]; }
         int getColordepth() const { return property[3]; }
         long long getPixelNum() const { return pixelNum; };
         long long getValueNum() const { return srcValueNumber; }
@@ -59,7 +59,7 @@ namespace ryu
         void operator=(const mat &copy);
         mat(void);
 
-        int statusCheck();
+        int statusCheck() const;
         ~mat();
     };
 } // namespace ryu

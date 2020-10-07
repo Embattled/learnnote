@@ -1,19 +1,22 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
-#define LOGICALERROR 4
 #define RYU_SUCCESS 0
 #define RYU_FAILURE 1
 
+#define FORMATERROR 1
+#define DESTMATINTERROR 2
+#define MEMNEWERROR 3
+#define MODEPROPERTYERROR 4
 namespace ryu
 {
     class mat;
 
     int pgm2ppm(const mat *source, mat *destination);
-    int pgm2pbm(const mat *source, mat *destination, int threshold = 0);
+    int pgm2pbm(const mat *source, mat *destination, unsigned int threshold = 0);
 
-    int flipVertical(mat *source);
-    int flipHorizontal(mat *source);
+    int flipVertical(mat *source, mat *destination = nullptr);
+    int flipHorizontal(mat *source, mat *destination = nullptr);
 
     int shrinkpgm(char mode, const mat *source, mat *destination, double times);
     int nearestNeighbor(const mat *source, mat *destination, double times);

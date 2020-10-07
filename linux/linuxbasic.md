@@ -89,9 +89,9 @@ init 6 # 重启
 ESC+c: 使下一个单词首  字母变大写, 同时光标前进一个单词, 如光标停留在单词的某个字母上, 如word中的o字母上, 则o字母变大写. 而不是w   
 ESC+u: 使下一个单词所有字母变大写, 同时光标前进一个单词, 同上, 如光标在o字母上, 则ord变大写, w不变.  
 ESC+l:同ESC-U, 但使之全变为小写   
-## 1.5. 系统查看
+# 2. 系统查看
 
-### 1.5.1. 查看系统版本
+## 2.1. 查看系统版本
 
 ```shell
 
@@ -107,14 +107,14 @@ $ cat /proc/version
 $ uname -a
 ```
 
-# 2. linux文件目录
+# 3. linux文件目录
 
 Linux 基金会的 FHS标准 制定了文件目录的标准  
 `（Filesystem Hierarchy Standard）`  
 
 规定了 Linux 系统中**所有**一级目录以及部分二级目录（/usr 和 /var）的用途  
 
-## 2.1. 根目录 系统级文件
+## 3.1. 根目录 系统级文件
 
 ```shell
 # 存放系统命令,所有用户都可以执行,包括单用户模式  
@@ -162,7 +162,7 @@ $ ls /sys/class/net
 
 
 ```
-## 2.2. 软件目录 /usr
+## 3.2. 软件目录 /usr
 
 注意不是 user, 全称为 `Unix Software Resource`  
 FHS 建议所有开发者，应把软件产品的数据`合理的放置在 /usr 目录下的各子目录中`  
@@ -198,14 +198,14 @@ FHS 建议所有开发者，应把软件产品的数据`合理的放置在 /usr 
 
 ```
 
-## 2.3. /var 目录 
+## 3.3. /var 目录 
 
 目录用于存储动态数据，例如缓存、日志文件、软件运行过程中产生的文件等  
 
 
-# 3. 环境配置  
+# 4. 环境配置  
 
-## 3.1. 环境变量
+## 4.1. 环境变量
 
 可以使用env和echo命令来查看linux中的所有环境变量  
 一个相同的环境变会因为用户身份的不同而具有不同的值  
@@ -235,9 +235,9 @@ FHS 建议所有开发者，应把软件产品的数据`合理的放置在 /usr 
 `export WORKDIR=/home/work1`  
 这种同样也只适用于当前shell , 关闭后即消失  
 
-## 3.2. 环境信息配置文件
+## 4.2. 环境信息配置文件
 
-### 3.2.1. 交互式shell和非交互式shell的区别
+### 4.2.1. 交互式shell和非交互式shell的区别
 首先要弄明白什么是交互式shell和非交互式shell , 即 `login shell` 和`non-login shell`
 
 * 交互式模式就是shell等待你的输入，并且执行你提交的命令。这种模式被称作交互式是因为shell与用户进行交互。
@@ -248,7 +248,7 @@ FHS 建议所有开发者，应把软件产品的数据`合理的放置在 /usr 
 * bashrc用于交互式non-loginshell
 * 而profile用于交互式login shell。
 
-### 3.2.2. 文件分布
+### 4.2.2. 文件分布
 
 * `/etc/profile` 
   * 此文件为系统的**每个用户**设置环境信息 当第一个用户登录时,该文件被执行  
@@ -273,9 +273,9 @@ FHS 建议所有开发者，应把软件产品的数据`合理的放置在 /usr 
 2. `~/.profile`可以设定本用户专有的路径，环境变量，等，它只能登入的时候执行一次
 3. `~/.bashrc` 也是某用户专有设定文档，可以设定路径，命令别名，每次shell script的执行都会使用它一次
 
-# 4. 查找字符文件
+# 5. 查找字符文件
 
-## 4.1. 通配符
+## 5.1. 通配符
 要注意通配符与正则表达式的区别  
 简单的理解为通配符只有 `*,?,[],{}` 这4种, 而正则表达式复杂多了
 
@@ -289,7 +289,7 @@ FHS 建议所有开发者，应把软件产品的数据`合理的放置在 /usr 
 | [!c1-c2]或[^c1-c2]    | 匹配不在c1-c2的任意字符                     | a[!0-9]b 如acb adb                                                                 |
 | {string1,string2,...} | 匹配 sring1 或 string2 (或更多)其一字符串   | a{abc,xyz,123}b 列出aabcb,axyzb,a123b                                              |
 
-## 4.2. 查找文件
+## 5.2. 查找文件
 
     find 命令功能非常强大,通常用来在 特定的目录下 搜索 符合条件的文件  
 `find [路径] -name "*.py"`  查找指定路径下扩展名是 .py 的文件,包括子目录
@@ -298,7 +298,7 @@ FHS 建议所有开发者，应把软件产品的数据`合理的放置在 /usr 
     如果省略路径,表示在当前文件夹下查找
     之前学习的通配符,在使用 find 命令时同时可用
 
-## 4.3. 正则表达式
+## 5.3. 正则表达式
 
 针对文件内容的文本过滤工具里,大都用到正则表达式,如vi,grep,awk,sed等  
 其他的一些编程语言,如C++（c regex,c++ regex,boost regex）,java,python等都***有自己的正则表达式库***.
@@ -339,7 +339,7 @@ FHS 建议所有开发者，应把软件产品的数据`合理的放置在 /usr 
 | {n,m} | 匹配次数在n到m之间，包括边界 |
 
 
-### 4.3.1. 字符查找 grep
+### 5.3.1. 字符查找 grep
 
  `grep `(global search regular expression(RE) and print out the line,全面搜索正则表达式并把行打印出来)  
 
@@ -350,13 +350,13 @@ FHS 建议所有开发者，应把软件产品的数据`合理的放置在 /usr 
     查找文件test中出现单词hi，并且若干字符后出现单词Jerry的行
     grep -E "\<hi\>.+\<Jerry\>" test
 
-# 5. Linux 的进程管理
+# 6. Linux 的进程管理
 在 Linux 系统中，每个进程都有一个唯一的进程号（PID）  
 启动一个进程主要有 2 种途径
 * 通过手工启动
 * 通过调度启动(事先进行设置，根据用户要求，进程可以自行启动)
 
-## 5.1. 手工启动
+## 6.1. 手工启动
 指的是由用户输入命令直接启动一个进程, 可以细分为前台启动和后台启动 2 种方式
 * 当用户输入一个命令并运行，就已经启动了一个进程，而且是一个前台的进程
   * 假如启动一个比较耗时的进程，可以把该进程挂起(放入后台并暂停运行)
@@ -364,7 +364,7 @@ FHS 建议所有开发者，应把软件产品的数据`合理的放置在 /usr 
   * 该进程非常耗时，且用户也不急着需要其运行结果的时候
   * 输入命令并运行之后，Shell 会提供给我们一个数字，此数字就是该进程的进程号
 
-## 5.2. ps 命令打印全部进程
+## 6.2. ps 命令打印全部进程
 
 在不同的 Linux 发行版上，ps 命令的语法各不相同  
 为此，Linux 采取了一个折中的方法，即融合各种不同的风格，兼顾那些已经习惯了其它系统上使用 ps  命令的用户。  
@@ -433,7 +433,7 @@ Linux的终端控制
   * tty1~tty6 是本地的字符界面终端，tty7 是图形终端
 * 虚拟终端 , 一般是远程链接的终端 , 第一个链接占用 pts/0 第二个用 pts/1
 
-## 5.3. top 动态持续监听进程
+## 6.3. top 动态持续监听进程
 
 ```shell
 # 命令格式
@@ -489,7 +489,7 @@ $ top [选项]
 | TIME+   | 该进程共占用的 CPU 时间。               |
 | COMMAND | 进程的命令名。                          |
 
-## 5.4. pstree  查看进程树
+## 6.4. pstree  查看进程树
 
 pstree 命令是以树形结构显示程序和进程之间的关系  
 
@@ -509,13 +509,13 @@ pstree 命令是以树形结构显示程序和进程之间的关系
 如果想知道某个用户都启动了哪些进程，使用 pstree 命令可以很容易实现，以 mysql 用户为例  
 `# pstree mysql`  
 
-##  lsof 列出进程正在调用或者打开的文件
+##  6.5. lsof 列出进程正在调用或者打开的文件
 `list opened files`的缩写   
 
 
 
 
-# 6. Linux 的服务管理
+# 7. Linux 的服务管理
 
 Linux 服务管理两种方式service和systemctl 
 
@@ -523,7 +523,7 @@ systemd是Linux系统**最新的初始化系统**(init),作用是提高系统的
 
 systemd对应的进程管理命令就是 `systemctl`
 
-## 6.1. service  
+## 7.1. service  
 
 service命令其实是去`/etc/init.d`目录下，去执行相关程序, 已经被淘汰
 
@@ -536,9 +536,9 @@ service redis start
 update-rc.d redis defaults
 ```
 
-## 6.2. systemctl
+## 7.2. systemctl
 
-### 6.2.1. 概念
+### 7.2.1. 概念
 
 systemctl命令兼容了service  
 
@@ -559,13 +559,13 @@ systemd 默认读取 `/etc/systemd/system `下的配置文件，该目录下的�
 主要有四种类型文件.mount,.service,.target,.wants  
 代表四种`Unit`  
 
-### 6.2.2. Unit操作命令
+### 7.2.2. Unit操作命令
 
 `systemctl –-version`  查看版本  
 
 `systemctl [command] [unit]` 命令格式  
 
-### 6.2.3. a.command综述
+### 7.2.3. a.command综述
 
 | 命令      | 功能简述                                                                   |
 | --------- | -------------------------------------------------------------------------- |
@@ -583,7 +583,7 @@ systemd 默认读取 `/etc/systemd/system `下的配置文件，该目录下的�
 | mask      | 注销 unit，注销后你就无法启动这个 unit 了。                                |
 | unmask    | 取消对 unit 的注销。                                                       |
 
-### 6.2.4. b.status 
+### 7.2.4. b.status 
 
 * 第一行是对 unit 的基本描述。  
 * 第二行中的 Loaded 描述操作系统启动时会不会启动这个服务，enabled 表示开机时启动，disabled 表示开机时不启动。  
@@ -596,7 +596,7 @@ systemd 默认读取 `/etc/systemd/system `下的配置文件，该目录下的�
 * 第四行的 Docs 提供了在线文档的地址。  
 
 
-## 6.3. 3.综合查看命令
+## 7.3. 3.综合查看命令
 
 systemctl 提供了子命令可以查看系统上的 unit，命令格式为:   
 `systemctl [command] [--type=TYPE] [--all]` 
@@ -616,7 +616,7 @@ systemd-cgls   以树形列出正在运行的进程，它可以递归显示控�
 可以过滤某个类型的 unit。  
 ` systemctl list-units --type=service `  
 
-### 6.3.1. 操作环境管理
+### 7.3.1. 操作环境管理
 通过指定 `--type=target` 就可以用 `systemctl list-units` 命令查看系统中默认有多少种 target
 
 | 操作环境          | 功能                                                                                                                                   |
@@ -640,20 +640,20 @@ systemd-cgls   以树形列出正在运行的进程，它可以递归显示控�
 我们还可以在不重新启动的情况下切换不同的 target，比如从图形界面切换到纯文本的模式：
 `systemctl isolate multi-user.target`
 
-## 6.4. Unit的编写与设置
+## 7.4. Unit的编写与设置
 
-## 6.5. Unit的基本概念
+## 7.5. Unit的基本概念
 一般都会有  
 Unit小节: 描述,启动时间与条件等等  
 
-### 6.5.1. .service
+### 7.5.1. .service
 
 .service文件定义了一个服务，分为[Unit]，[Service]，[Install]三个小节
 
 `[Unit]` 段: 启动顺序与依赖关系   
 `[Service] `段: 启动行为,如何启动，启动类型  
 `[Install]` 段: 定义如何安装这个配置文件，即怎样做到开机启动  
-### 6.5.2. .mounnt
+### 7.5.2. .mounnt
 
 .mount文件定义了一个挂载点，[Mount]节点里配置了What(名称),Where(位置),Type(类型)三个数据项
 
@@ -665,15 +665,15 @@ Type=hugetlbfs
 等于执行以下命令  
 `mount -t hugetlbfs /dev/hugepages hugetlbfs`  
 
-### 6.5.3. .target
+### 7.5.3. .target
 
 .target定义了一些基础的组件，供.service文件调用
 
-### 6.5.4. .wants文件
+### 7.5.4. .wants文件
 
 `.wants`文件定义了要执行的文件集合，每次执行，`.wants`文件夹里面的文件都会执行  
 
-## 6.6. 2.编写开机启动rc.local
+## 7.6. 2.编写开机启动rc.local
 
 查看`/lib/systemd/system/rc.local.server`,默认会缺少`Install`段,显然这样配置是无效的  
 
@@ -710,9 +710,9 @@ $ ln -s /lib/systemd/system/rc.local.service /etc/systemd/system/
 
 
 
-# 7. Shell基础  
+# 8. Shell基础  
 
-## 7.1. source 命令 
+## 8.1. source 命令 
 
 source命令也称为“点命令”，也就是一个点符号（.）,是bash的内部命令。  
 功能：使Shell读入指定的Shell程序文件并依次执行文件中的所有语句  
@@ -729,7 +729,7 @@ source命令也称为“点命令”，也就是一个点符号（.）,是bash�
 
 
 
-## 7.2. 开机自动脚本
+## 8.2. 开机自动脚本
 
 * Ubuntu18.04 默认是没有 /etc/rc.local 这个文件的，需要自己创建  
 * systemd 默认读取 `/etc/systemd/system `下的配置文件，该目录下的文件会`链接/lib/systemd/system/`下的文件。执行 `ls /lib/systemd/system `你可以看到有很多启动脚本，其中就有我们需要的 rc.local.service  

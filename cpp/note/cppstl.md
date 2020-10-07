@@ -1,3 +1,45 @@
+# C++ 标准环境
+
+## C++ 编译环境的构成
+
+一个完整的C++环境由 库和编译模块构成
+
+库中包括
+* C++标准库     即 STL, 不带`.h`的头文件, 在std命名空间
+* C语言兼容库   头文件带`.h` , 不是C++标准的内容,但是C++编译器提供商一般都会提供C的兼容库, 即编译器内置的C库
+* 编译器扩展库  每个编译器独有的拓展库 G++和VC++的拓展库就不同 如 `stdafx.h`
+编译模块
+* C++ 标准语法模块    对C++标准语法的支持
+* C++ 扩展语法模块    每个编译器独有的扩展语法的支持 
+
+## C++ 标准库
+
+C++ 标准库并不止 STL
+
+1. C标准库            首字母带C的C语言库
+2. 流库               `iostream iomanip ios sstream fstream` 以及C语言兼容的 `cstdio cwchar`
+3. 数值操作库         `complex valarray numeric cmath cstdlib`
+4. 诊断功能           `stdexcept cassert cerrno`
+5. 通用工具
+6. 国际化
+7. 语言支持功能       `cstddef limits climits cfloat cstdlib new typeinfo exception cstdarg csetjmp csginal`
+
+在此之外的则是 STL
+
+包括字符串 以及带有关联的 `算法-迭代器-容器` 
+
+8. 字符串             `string cctype cwctpye cstring cwchar cstdlib`
+9. 容器
+10. 迭代器            `iterator`
+11. 算法              `algorithm cstdlib ciso646`
+
+
+根据库中的函数是否属于类 , 标准库还有另一种分类方法
+* 标准函数库      通用的独立的,不属于类的函数组成的库,函数基本继承于C语言
+* 面向对象库      类及其相关函数的集合
+
+
+
 # 1. C++的流
 
 ## 1.1. C++ 的文件读写流 fstream
@@ -433,10 +475,157 @@ STL 提供有 3 类标准容器，分别是序列容器、排序容器和哈希�
 * multiset 	定义在` <set>` 头文件中，和 set 容器唯一的不同在于，multiset 容器中存储元素的值可以重复（一旦值重复，则意味着键也是重复的）。
 
 C++ 11 还新增了 4 种哈希容器，即 unordered_map、unordered_multimap 以及 unordered_set、unordered_multiset  
-但哈希容器底层采用的是哈希表，而不是红黑树 (无序关联式容器)  
+但哈希容器底层采用的是哈希表，而不是红黑树
+
+### 4.1.3. 自定义关联式容器的排序规则
+
+1. 使用函数对象自定义排序规则
+2. 重载关系运算符实现自定义排序
 
 
+```cpp
+//定义函数对象类
+class cmp {
+public:
+    //重载 () 运算符
+    bool operator ()(const string &a,const string &b) {
+        //按照字符串的长度，做升序排序(即存储的字符串从短到长)
+        return  (a.length() < b.length());
+    }
+};
 
+// 用struct 定义函数对象类
+struct cmp {
+  //重载 () 运算符
+  bool operator ()(const string &a, const string &b) {
+      //按照字符串的长度，做升序排序(即存储的字符串从短到长)
+      return  (a.length() < b.length());
+  }
+};
+
+// 定义函数对象模板类
+template <typename T>
+class cmp {
+public:
+    //重载 () 运算符
+    bool operator ()(const T &a, const T &b) {
+        //按照值的大小，做升序排序
+        return  a < b;
+    }
+};
+
+// 创建 set 容器，并使用自定义的 cmp 排序规则
+std::set<string, cmp>myset;
+
+```
+  
+重载关系运算符  
+在 STL 标准库中，本就包含几个可供关联式容器使用的排序规则  
+| 排序规则                | 功能                                                               |
+| ----------------------- | ------------------------------------------------------------------ |
+| `std::less<T>`          | 底层采用 < 运算符实现升序排序，各关联式容器默认采用的排序规则。    |
+| `std::greater<T>`       | 底层采用 > 运算符实现降序排序，同样适用于各个关联式容器。          |
+| `std::less_equal<T>`    | 底层采用 <= 运算符实现升序排序，多用于 multimap 和 multiset 容器。 |
+| `std::greater_equal<T>` | 底层采用 >= 运算符实现降序排序，多用于 multimap 和 multiset 容器。 |
+
+1. 当关联式容器中存储的数据类型为自定义的结构体变量或者类对象时，  
+   通过对现有排序规则中所用的关系运算符进行重载，也能实现自定义排序规则的目的  
+2. 当关联式容器中存储的元素类型为结构体指针变量或者类的指针对象时
+   只能使用函数对象的方式自定义排序规则，此方法不再适用
+
+```cpp
+//自定义类
+class myString {
+public:
+    //定义构造函数，向 myset 容器中添加元素时会用到
+    myString(string tempStr) :str(tempStr) {};
+    //获取 str 私有对象，由于会被私有对象调用，因此该成员方法也必须为 const 类型
+private:
+    string str;
+};
+
+//重载 < 运算符，参数必须都为 const 类型
+bool operator <(const myString &stra, const myString & strb) {
+    //以字符串的长度为标准比较大小
+    return stra.getStr().length() < strb.getStr().length();
+}
+
+//创建空 set 容器，仍使用默认的 less<T> 排序规则
+std::set<myString>myset;
+```
+### 4.1.4. 无序关联式容器
+
+无序容器是 C++ 11 标准才正式引入到 STL 标准库中的，这意味着如果要使用该类容器，则必须选择支持 C++ 11 标准的编译器。  
+它们常被称为 “无序容器”、“哈希容器”或者“无序关联容器”。
+
+unordered_map、unordered_multimap 以及 unordered_set、unordered_multiset   
+
+* 总的来说，实际场景中如果涉及大量遍历容器的操作，建议首选关联式容器；
+* 反之，如果更多的操作是通过键获取对应的值，则应首选无序容器。
+
+
+1. 二者的头文件不同 模板定义不同
+```cpp
+//map
+#include < map >
+//unordered_map
+#include < unordered_map >
+
+template < class Key,                        //键值对中键的类型
+            class T,                          //键值对中值的类型
+            class Hash = hash<Key>,           //容器内部存储键值对所用的哈希函数
+            class Pred = equal_to<Key>,       //判断各个键值对键相同的规则
+            class Alloc = allocator< pair<const Key,T> >  // 指定分配器对象的类型
+            > class unordered_map;
+/* 
+1. Hash = hash<Key> 指明容器在存储各个键值对时要使用的哈希函数 
+    STL 标准库提供的 hash<key> 哈希函数 只适用于基本数据类型（包括 string 类型），而不适用于自定义的结构体或者类。
+2. Pred = equal_to<Key>  容器中存储的各个键值对的键是不能相等的，而判断是否相等的规则，就由此参数指定。
+    默认情况下，使用 STL 标准库中提供的 equal_to<key> 规则，该规则仅支持可直接用 == 运算符做比较的数据类型。
+3. 当无序容器中存储键值对的键为自定义类型时，默认的哈希函数 hash 以及比较函数 equal_to 将不再适用，
+    只能自己设计适用该类型的哈希函数和比较函数，并显式传递给 Hash 参数和 Pred 参数。
+*/
+```
+
+2. 内部实现机理不同
+
+      map
+      * map内部实现了一个红黑树（红黑树是非严格平衡二叉搜索树，而AVL是严格平衡二叉搜索树）
+      * 红黑树具有自动排序的功能，因此map内部的所有元素都是有序的，红黑树的每一个节点都代表着map的一个元素
+      * 因此，对于map进行的查找，删除，添加等一系列的操作都相当于是对红黑树进行的操作
+
+      unordered_map
+      * unordered_map内部实现了一个哈希表（也叫散列表，通过把关键码值映射到Hash表中一个位置来访问记录，查找的时间复杂度可达到O(1)
+      * 其在海量数据处理中有着广泛应用）
+      * 因此，其元素的排列顺序是无序的
+  
+3. 优缺点以及适用处
+  
+**map的优点**:
+* 有序性，这是map结构最大的优点，其元素的有序性在很多应用中都会简化很多的操作
+* 红黑树，内部实现一个红黑书使得map的很多操作在lg(n)的时间复杂度下就可以实现，因此效率非常的高
+**map的缺点**:
+* 空间占用率高，因为map内部实现了红黑树，虽然提高了运行效率，但是因为每一个节点都需要额外保存父节点、孩子节点和红/黑性质，使得每一个节点都占用大量的空间
+
+**map适用处**:
+* 对于那些有顺序要求的问题，用map会更高效一些
+
+
+**unordered_map**:  
+优点:
+* 因为内部实现了哈希表，因此其查找速度非常的快
+缺点: 
+* 哈希表的建立比较耗费时间
+适用处:
+* 对于查找问题，unordered_map会更加高效一些
+* 遇到查找问题，常会考虑一下用unordered_map
+
+
+**总结**:  
+* 内存占有率的问题就转化成红黑树 VS hash表 , 还是unorder_map占用的内存要高
+* 但是unordered_map执行效率要比map高很多
+* 对于unordered_map或unordered_set容器，其遍历顺序与创建该容器时输入的顺序不一定相同，因为遍历是按照哈希表从前往后依次遍历的
+  
 
 ## 4.2. 迭代器
 
@@ -517,8 +706,67 @@ STL 标准库为每一种标准容器定义了一种迭代器类型，这意味�
 
 ## 4.3. 容器适配器
 
+```cpp
+// 假设一个代码模块 A，它的构成如下所示：
+class A{
+public:
+  void f1(){}
+  void f2(){}
+  void f3(){}
+  void f4(){}
+};
 
-### 4.3.1. pair 
+// 现在我们需要设计一个模板 B，但发现，其实只需要组合一下模块 A 中的 f1()、f2()、f3()，就可以实现模板 B 需要的功能。
+// 其中 f1() 单独使用即可，而 f2() 和 f3() 需要组合起来使用
+class B{
+private:
+    A * a;
+public:
+    void g1(){
+        a->f1();
+    }
+    void g2(){
+        a->f2();
+        a->f3();
+    }
+};
+
+// 模板 B 将不适合直接拿来用的模板 A 变得适用了，因此我们可以将模板 B 称为 B 适配器。
+```
+
+* 就是将不适用的序列式容器（包括 vector、deque 和 list）变得适用。
+* 容器适配器的底层实现和模板 A、B 的关系是完全相同的，即通过封装某个序列式容器，**并重新组合该容器中包含的成员函数**，使其满足某些特定场景的需要。
+* 容器适配器本质上还是容器，只不过此容器模板类的实现，利用了大量其它基础容器模板类中已经写好的成员函数。当然，如果必要的话，容器适配器中也可以自创新的成员函数。
+
+
+STL 提供了 3 种容器适配器, 各适配器所使用的**默认基础容器**以及 **可供用户选择的基础容器** 
+
+1. stack  默认使用的基础容器 deque
+   * empty()
+   * size()
+   * top()                    返回一个栈顶元素的引用，类型为 T&。如果栈为空，程序会报错。
+   * pop()                    弹出栈顶元素。
+   * push(const T& val)       先复制 val，再将 val 副本压入栈顶。这是通过调用底层容器的 push_back() 函数完成的
+   * push(T&& obj)            以移动元素的方式将其压入栈顶。这是通过调用底层容器的有右值引用参数的 push_back() 函数完成的。
+   * emplace(arg...)           可以是一个参数，也可以是多个参数，但它们都只用于构造一个对象，并在栈顶直接生成该对象，作为新的栈顶元素。
+   * swap(`stack<T> & other_stack`)
+2. queue  默认使用的基础容器 deque
+   * empty()
+   * size()
+   * front()
+   * back()
+   * push_back()
+   * pop_front()
+3. priority_queue  默认使用的基础容器 vector
+   * empty()
+   * size()
+   * front()
+   * push_back()
+   * pop_front()
+
+
+
+### 4.3.1. pair 例外
 
 考虑到“键值对”并不是普通类型数据，C++ STL 标准库提供了 pair 类模板  
 专门用来将 2 个普通元素 first 和 second  创建成一个新元素`<first, second>`    
@@ -526,6 +774,49 @@ STL 标准库为每一种标准容器定义了一种迭代器类型，这意味�
 pair 对象重载了 <、<=、>、>=、==、!= 这 6 的运算符，其运算规则是：对于进行比较的 2 个 pair 对象，先比较 pair.first 元素的大小，如果相等则继续比较 pair.second 元素的大小。  
 
 * 注意: pair 类模板定义在 `<utility>` 头文件中
+
+```cpp
+
+// 创建一个 pair
+std::make_pair("C语言教程",10)
+// 在初始化 map 的时候可以这么使用
+std::map<std::string, int>myMap{std::make_pair("C语言教程",10),std::make_pair("STL教程",20)};
+
+```
+
+### stack 
+
+和其他序列容器相比，stack 是一类存储机制简单、提供成员函数较少的容器  
+stack 栈适配器是一种单端开口的容器  
+实际上该容器模拟的就是栈存储结构，即无论是向里存数据还是从中取数据，都只能从这一个开口实现操作。  
+
+```cpp
+// stack 有自己的头文件
+#include <stack>
+
+// T 为存储元素的类型，Container 表示底层容器的类型
+stack<T,Container=deque<T>>
+
+// 创建一个不包含任何元素的 stack 适配器，并采用默认的 deque 基础容器： 
+std::stack<int> values;
+
+// 通过指定第二个模板类型参数，我们可以使用出 deque 容器外的其它序列式容器，
+// 只要该容器支持 empty()、size()、back()、push_back()、pop_back() 这 5 个成员函数即可
+// 序列式容器中同时包含这 5 个成员函数的，只有 vector、deque 和 list 因此，stack 适配器的基础容器可以是它们 3 个中任何一个
+std::stack<std::int, std::list<int>> values;
+
+
+// 可以用一个和 stack 底层使用的基础容器类型相同的基础容器来初始化 stack 适配器
+std::list<int> values {1, 2, 3};
+// stack 第 2 个模板参数必须显式指定为 list<int>（必须为 int 类型，和存储类型保持一致） 否则无法用 lsit 容器的内容来初始化该 stack 适配器
+std::stack<int,std::list<int>> my_stack (values);
+// 初始化后的 my_stack 适配器中，栈顶元素为 3，而不是 1
+
+
+// 还可以用一个 stack 适配器来初始化另一个 stack 适配器，只要它们存储的元素类型以及底层采用的基础容器类型相同即可
+std::stack<int, std::list<int>> my_stack2=my_stack;
+std::stack<int, std::list<int>> my_stack(my_stack1);
+```
 
 
 ## 4.4. array 升级的数组  
@@ -674,8 +965,11 @@ std::vector<int>values(array, array+2);//values 将保存{1,2}
 std::vector<int>value1{1,2,3,4,5};
 std::vector<int>value2(std::begin(value1),std::begin(value1)+3);//value2保存{1,2,3}
 
-
 ```
+
+### queue
+和 stack 栈容器适配器不同，queue 容器适配器有 2 个开口，其中一个开口专门用来输入数据，另一个专门用来输出数据
+
 ### 4.5.2. 访问修改元素
 
 1. 下标访问 (有越界可能)
@@ -871,7 +1165,9 @@ deque 容器和 vecotr 容器有很多相似之处
 3. deque 容器也擅长在序列尾部添加或删除元素（时间复杂度为O(1)），而不擅长在序列中间添加或删除元素。
 4. deque 容器也可以根据需要修改自身的容量和大小。
 
-当需要向序列两端频繁的添加或删除元素时，应首选 deque 容器。  
+当需要向序列两端频繁的添加或删除元素时，应首选 deque 容器。   
+和 vector 相比，额外增加了实现在容器头部添加和删除元素的成员函数，同时删除了 `capacity()`、`reserve()` 和 `data()` 成员函数。     
+
 
 ### 4.6.1. deque的底层实现原理
 
@@ -994,7 +1290,7 @@ d.front() = 10;
 d.back() = 20;
 ```
 
-### 4.6.5. 修改元素
+### 4.6.5. 修改元素 增删
 
 push_back()、push_front() 或者 resize() 成员函数实现向（空）deque 容器中添加元素。  
 在实际应用中，常用 emplace()、emplace_front() 和 emplace_back() 分别代替 insert()、push_front() 和 push_back()  
@@ -1021,6 +1317,8 @@ clear()     // 删除容器中所有的元素。
 ```
 
 ## 4.7. list 双向链表
+
+实际场景中，如何需要对序列进行大量添加或删除元素的操作，而直接访问元素的需求却很少，这种情况建议使用 list 容器存储序列。  
 
 1. list底层是以双向链表的形式实现的。这意味着，list 容器中的元素可以分散存储在内存空间里，而不是必须存储在一整块连续的内存空间中。  
 2. 每个元素都配备了 2 个指针，分别指向它的前一个元素和后一个元素。其中第一个元素的前向指针总为 null，因为它前面没有元素；同样，尾部元素的后向指针也总为 null。  
@@ -1056,7 +1354,7 @@ std::list<int>values(arr.begin()+2, arr.end());
 
 同理, 也是8大迭代器方法和 全局的 `begin() end()`  
 
-但是和 `array、vector、deque` 容器的迭代器，和它们相比，list 容器迭代器最大的不同在于，其配备的迭代器类型为双向迭代器，而不再是随机访问迭代器。  
+但是和 `array、vector、deque` 容器的迭代器相比，list 容器迭代器最大的不同在于，其配备的迭代器类型为双向迭代器，而不再是随机访问迭代器。  
 
 体现在:
 1. 不能通过下标访问 list 容器中指定位置处的元素。`p[i]`
@@ -1066,14 +1364,142 @@ std::list<int>values(arr.begin()+2, arr.end());
 
 
 * list 容器在进行插入（insert()）、接合（splice()）等操作时，都不会造成原有的 list 迭代器失效，甚至进行删除操作，而只有指向被删除元素的迭代器失效，其他迭代器不受任何影响。
-* 在进行插入操作之后，仍使用先前创建的迭代器遍历容器，虽然程序不会出错，但由于插入位置的不同，可能会遗漏新插入的元素。
+* 在进行插入操作之后，仍使用先前创建的迭代器遍历容器，虽然程序不会出错，但由于插入位置的不同，**可能会遗漏新插入的元素**。
 
-### 4.7.3. forward_list  C++11 单向链表
+```cpp
+for (std::list<char>::iterator it = values.begin(); it != values.end(); ++it)
+
+for (std::list<char>::reverse_iterator it = values.rbegin(); it != values.rend();++it)
+
+```
+### 4.7.3. 访问元素的方法
+
+list 容器不支持随机访问，未提供下标操作符 [] 和 at() 成员函数，也没有提供 data() 成员函数。  
+
+访问 list 容器中存储元素要么使用 front() 和 back() 成员函数，要么使用 list 容器迭代器.  
+
+```cpp
+int &first = mylist.front();
+int &last = mylist.back();
+
+//修改
+first = 10;
+last = 20;
+
+auto it = mylist.begin();
+while (it!=mylist.end())
+{
+    cout << *it << " ";
+    ++it;  
+}
+
+```
+### 4.7.4. 添加元素
+
+list 模板类中，与“添加或插入新元素”相关的成员方法有如下7个：
+单语法格式:
+* push_front()：向 list 容器首个元素前添加新元素；
+* push_back()：向 list 容器最后一个元素后添加新元素；
+* emplace_front()：在容器首个元素前直接生成新的元素；
+* emplace_back()：在容器最后一个元素后直接生成新的元素；
+* emplace(pos,value)：在容器的指定位置直接生成新的元素；
+多语法格式:
+* insert()：在指定位置插入新元素；
+  * insert(pos,elem) 	 在迭代器 pos 指定的位置之前插入一个新元素 elem，并返回表示新插入元素位置的迭代器。
+  * insert(pos,n,elem) 	在迭代器 pos 指定的位置之前插入 n 个元素 elem，并返回表示第一个新插入元素位置的迭代器。
+  * insert(pos,first,last)  	在迭代器 pos 指定的位置之前，插入其他容器中位于 [first,last) 区域的所有元素，并返回表示第一个新插入元素位置的迭代器。
+  * insert(pos,initlist) 	在迭代器 pos 指定的位置之前，插入初始化列表（用大括号 { } 括起来的多个元素，中间有逗号隔开）中所有的元素，并返回表示第一个新插入元素位置的迭代器。
+* splice()：将其他 list 容器存储的多个元素添加到当前 list 容器的指定位置处。
+  * splice (position, list& x);               将 x 容器中存储的所有元素全部移动当前 list 容器中 position 指明的位置处
+  * splice (position, list& x, i);            x 容器中 i 指向的元素移动到当前容器中 position 指明的位置处
+  * splice (position, list& x, first, last);  将 x 容器 [first, last) 范围内所有的元素移动到当前容器 position 指明的位置处。
+
+
+splice() 成员方法移动元素的方式是，将存储该元素的节点从 list 容器底层的链表中摘除，然后再链接到当前 list 容器底层的链表中。  
+这意味着，当使用 splice() 成员方法将 x 容器中的元素添加到当前容器的同时，该元素会从 x 容器中删除。  
+
+```cpp
+//创建并初始化 2 个 list 容器
+list<int> mylist1{ 1,2,3,4 }, mylist2{10,20,30};
+list<int>::iterator it = ++mylist1.begin(); //指向 mylist1 容器中的元素 2
+
+//调用第一种语法格式
+mylist1.splice(it, mylist2); // mylist1: 1 10 20 30 2 3 4
+                             // mylist2:
+                             // it 迭代器仍然指向元素 2，只不过容器变为了 mylist1
+//调用第二种语法格式，将 it 指向的元素 2 移动到 mylist2.begin() 位置处
+mylist2.splice(mylist2.begin(), mylist1, it);   // mylist1: 1 10 20 30 3 4
+                                                // mylist2: 2
+                                                // it 仍然指向元素 2
+
+//调用第三种语法格式，将 [mylist1.begin(),mylist1.end())范围内的元素移动到 mylist.begin() 位置处                  
+mylist2.splice(mylist2.begin(), mylist1, mylist1.begin(), mylist1.end());//mylist1:
+                                                                         //mylist2:1 10 20 30 3 4 2
+```
+
+### 4.7.5. 其他元素操作
+
+
+并不是所有的容器都有 `sort()`方法, 通过更改容器中元素的位置，将它们进行排序。
+* 有sort方法的容器只有, list 和 forward_list
+* 其他容器可以使用`algorithm`里的全局 sort() 函数
+
+`reverse()` 反转容器中元素的顺序。  
+
+forward_list 容器中是不提供 size() 函数的，但如果想要获取 forward_list 容器中存储元素的个数，可以使用头文件 `<iterator>` 中的 distance() 函数。
+```cpp
+#include <forward_list>
+#include <iterator>
+
+td::forward_list<int> my_words{1,2,3,4};
+int count = std::distance(std::begin(my_words), std::end(my_words));
+```
+
+
+forward_list 容器迭代器的移动除了使用` ++ `运算符单步移动，还能使用 `advance()` 函数  
+```cpp
+std::forward_list<int> values{1,2,3,4};
+auto it = values.begin();
+// 往前迭代2个位置
+advance(it, 2);
+```
+
+### 4.7.6. 删除元素 
+
+简单方法
+* pop_front() 	删除位于 list 容器头部的一个元素。
+* pop_back() 	删除位于 list 容器尾部的一个元素。
+* clear() 	删除 list 容器存储的所有元素。
+
+指定位置删除
+* erase(position) 	该成员函数既可以删除 list 容器中指定位置处的元素，也可以删除容器中某个区域内的多个元素。
+* erase(first,last) 	该成员函数既可以删除 list 容器中指定位置处的元素，也可以删除容器中某个区域内的多个元素。
+* remove(val) 	删除容器中所有等于 val 的元素。
+
+
+* unique() 	删除容器中**相邻的**重复元素，只保留一份。
+* unique(BinaryPredicate) //传入一个二元谓词函数
+
+* remove_if() 	删除容器中满足条件的元素。
+
+
+### 4.7.7. forward_list  C++11 单向链表
+
+头文件`#include <forward_list>`  
+forward_list 使用的是单链表，而 list 使用的是双向链表  
+* 存储相同个数的同类型元素，单链表耗用的内存空间更少，空间利用率更高，并且对于实现某些操作单链表的执行效率也更高。
+* 只要是 list 容器和 forward_list 容器都能实现的操作，应优先选择 forward_list 容器。
+
+
+
+forward_list 容器具有和 list 容器相同的特性，即擅长在序列的任何位置进行插入元素或删除元素的操作,  
+但是由于单链表没有双向链表那样灵活，因此相比 list 容器，forward_list 容器的功能受到了很多限制。  
+比如，由于单链表只能从前向后遍历，而不支持反向遍历，因此 forward_list 容器只提供前向迭代器，而不是双向迭代器。  
 
 
 
 
-### 4.7.4. 构造函数
+### 4.7.8. 构造函数
 
 ```cpp
 // c++ 11 标准之前
@@ -1099,7 +1525,7 @@ template<class U, class V> pair (U&& a, V&& b);
 调用 make_pair() 函数，它也是` <utility>` 头文件提供的，其功能是生成一个 pair 对象。  
 当我们将 make_pair() 函数的返回值（是一个临时对象）作为参数传递给 pair() 构造函数时，其调用的是移动构造函数，而不是拷贝构造函数。  
 
-### 4.7.5. 值修改
+### 4.7.9. 值修改
 
 通过访问 `first second` 就可以访问pair的值  
 pair类模板还提供有一个 swap() 成员函数，能够互换 2 个 pair 对象的键值对，其操作成功的前提是这 2 个 pair 对象的键和值的类型要相同  
@@ -1114,69 +1540,49 @@ pair1.swap(pair2);
 
 
 
-## 4.8. map unordered_map
+## 4.8. map multimap
 
-### 4.8.1. 与 unordered_map 的区别与关联
+* 向map容器中增添元素，insert()效率更高
+* 更新map容器中的键值对，operator[]效率更高
 
-1. 二者的头文件不同
-```cpp
-//map
-#include < map >
-//unordered_map
-#include < unordered_map >
-```
-
-2. 内部实现机理不同
-
-      map
-      * map内部实现了一个红黑树（红黑树是非严格平衡二叉搜索树，而AVL是严格平衡二叉搜索树）
-      * 红黑树具有自动排序的功能，因此map内部的所有元素都是有序的，红黑树的每一个节点都代表着map的一个元素
-      * 因此，对于map进行的查找，删除，添加等一系列的操作都相当于是对红黑树进行的操作
-
-      unordered_map
-      * unordered_map内部实现了一个哈希表（也叫散列表，通过把关键码值映射到Hash表中一个位置来访问记录，查找的时间复杂度可达到O(1)
-      * 其在海量数据处理中有着广泛应用）
-      * 因此，其元素的排列顺序是无序的
-  
-3. 优缺点以及适用处
-  
-**map的优点**:
-* 有序性，这是map结构最大的优点，其元素的有序性在很多应用中都会简化很多的操作
-* 红黑树，内部实现一个红黑书使得map的很多操作在lg(n)的时间复杂度下就可以实现，因此效率非常的高
-**map的缺点**:
-* 空间占用率高，因为map内部实现了红黑树，虽然提高了运行效率，但是因为每一个节点都需要额外保存父节点、孩子节点和红/黑性质，使得每一个节点都占用大量的空间
-
-**map适用处**:
-* 对于那些有顺序要求的问题，用map会更高效一些
-
-
-**unordered_map**:  
-优点:
-* 因为内部实现了哈希表，因此其查找速度非常的快
-缺点: 
-* 哈希表的建立比较耗费时间
-适用处:
-* 对于查找问题，unordered_map会更加高效一些
-* 遇到查找问题，常会考虑一下用unordered_map
-
-
-**总结**:  
-* 内存占有率的问题就转化成红黑树 VS hash表 , 还是unorder_map占用的内存要高
-* 但是unordered_map执行效率要比map高很多
-* 对于unordered_map或unordered_set容器，其遍历顺序与创建该容器时输入的顺序不一定相同，因为遍历是按照哈希表从前往后依次遍历的
-  
-**map和unordered_map的使用**:  
-* unordered_map的用法和map是一样的，提供了 insert，size，count等操作，并且里面的元素也是以pair类型来存贮的
-* 其底层实现是完全不同的，上方已经解释了
-* 外部使用来说却是一致的。
-
-### 4.8.2. 构造函数
+### 4.8.1. 构造函数 定义
 
 ```cpp
+// map 的定义
+template < class Key,                                     // 指定键（key）的类型
+           class T,                                       // 指定值（value）的类型
+           class Compare = less<Key>,                     // 指定排序规则
+           class Alloc = allocator<pair<const Key,T> >    // 指定分配器对象的类型
+           > class map;
+
+
+// 空 map 的建立
 map<int, string> mapStudent;
+
+// 初始化的方法 , 使用{ {,},{,} } 的方式
+std::map<std::string, int>myMap{ {"C语言教程",10},{"STL教程",20} };
+
+// map 容器中存储的键值对，其本质都是 pair 类模板创建的 pair 对象, 因此也可以
+std::map<std::string, int>myMap{std::make_pair("C语言教程",10),std::make_pair("STL教程",20)};
+std::map<std::string, int>myMap{std::pair<string,int>{"C语言教程",10},std::pair<string,int>{"STL教程",20}};
+
+
+// 拷贝构造
+std::map<std::string, int>newMap(myMap);
+
+// 移动构造 disMap()是返回一个 map 的函数
+std::map<std::string, int>newMap(disMap());
+
+// 指定区域拷贝构造
+std::map<std::string, int>myMap{ {"C语言教程",10},{"STL教程",20} };
+std::map<std::string, int>newMap(++myMap.begin(), myMap.end());
+
+
+// 指定排序规则
+std::map<std::string, int, std::greater<std::string> >myMap{ {"C语言教程",10},{"STL教程",20} };
 ```
 
-### 4.8.3. 获取值
+### 4.8.2. 获取值 迭代器
 
 map 类模板中对[ ]运算符进行了重载，这意味着，类似于借助数组下标可以直接访问数组中元素，通过指定的键，我们可以轻松获取 map 容器中该键对应的值
 1. 有当 map 容器中确实存有包含该指定键的键值对，借助重载的 [ ] 运算符才能成功获取该键对应的值
@@ -1209,7 +1615,7 @@ find 函数返回迭代器对象 , 可以使用 `->` 直接获取数据
 * lower_bound() upper_bound() equal_range()
 ```cpp
 // lower_bound() upper_bound()  返回一个迭代器, 用来指向第一个[索引值]大于参数的迭代器
-const std::map<int, const char*> m{
+const std::map<int, const char*> m{ 
   { 0, "zero" },
   { 1, "one" },
   { 2, "two" },
@@ -1228,7 +1634,7 @@ for (auto& q = p.first; q != p.second; ++q) {
 
 
 
-### 4.8.4. 元素插入
+### 4.8.3. 插入元素
 
 ```cpp
 // 定义一个map对象
@@ -1248,9 +1654,11 @@ mapStudent[456] = "student_second";
 
 // 这是 insert 函数的构造定义，返回一个pair对象
 pair<iterator,bool> insert (const value_type& val);
+
 // 要获取是否成功 , 需要建立一个对应的 pair 
 pair<map<int, string/*这里需要和原本的map对象相同*/>::iterator, bool> Insert_Pair;
 Insert_Pair = mapStudent.insert(map<int, string>::value_type (001, "student_one"));
+
 //如果插入成功的话Insert_Pair.second应该是true的，否则为false
 if(!Insert_Pair.second)cout << ""Error insert new element" << endl;
 
@@ -1259,23 +1667,70 @@ if(!Insert_Pair.second)cout << ""Error insert new element" << endl;
 若关键字已存在 , insert 会返回插入失败 
 而数组方式会直接覆盖  
 
-### 4.8.5. 删除元素 
+
+
+除此之外，insert() 方法还支持向 map 容器的指定位置插入新键值对，该方法的语法格式如下
 ```cpp
-//主要通过函数 erase() , 删除成功返回 1 , 否则返回 0
+iterator insert (const_iterator position, const value_type& val);
+// 这里 insert() 方法返回的是迭代器
+// 如果插入成功，insert() 方法会返回一个指向 map 容器中已插入键值对的迭代器；而不再是pair
+// 如果插入失败，insert() 方法同样会返回一个迭代器，该迭代器指向 map 容器中和 val 具有相同键的那个键值对。
 
-//迭代器作为参数刪除
+
+// insert() 方法还支持向当前 map 容器中插入其它 map 容器指定区域内的所有键值对，该方法的语法格式如下：
+template <class InputIterator> void insert (InputIterator first, InputIterator last);
+
+// 除了以上一种格式外，insert() 方法还允许一次向 map 容器中插入多个键值对，其语法格式为：
+// 其中，vali 都表示的是键值对变量。
+void insert ({val1, val2, ...});
+
+```
+
+emplace类函数 实现相同的插入操作，无论是用 emplace() 还是 emplace_hont()，都比 insert() 方法的效率
+
+```cpp
+// 和 insert() 方法相比，emplace() 和 emplace_hint() 方法的使用要简单很多，因为它们各自只有一种语法格式
+
+template <class... Args> pair<iterator,bool> emplace (Args&&... args);
+// 这里只需要将创建新键值对所需的数据作为参数直接传入即可，此方法可以自行利用这些数据构建出指定的键值对
+// 另外，该方法的返回值也是一个 pair 对象
+
+
+template <class... Args> iterator emplace_hint (const_iterator position, Args&&... args);
+// 和 emplace() 语法格式相比 该方法不仅要传入创建键值对所需要的数据，还需要传入一个迭代器作为第一个参数，指明要插入的位置
+// 返回值是一个迭代器，而不再是 pair 对象
+
+
+```
+
+### 4.8.4. 删除元素 
+```cpp
+iterator erase( const_iterator pos );         //(since C++11)
+iterator erase( iterator pos );               //(since C++17)
+iterator erase( const_iterator first, const_iterator last );  //(since C++11)
+size_type erase( const key_type& key );
+
+/* 
+Parameters
+pos 	- 	iterator to the element to remove
+first, last 	- 	range of elements to remove
+key 	- 	key value of the elements to remove 
+*/
+
+//迭代器作为参数刪除 , 返回指向下一个元素的迭代器
 iter = mapStudent.find("123");
-mapStudent.erase(iter);
+iter= mapStudent.erase(iter);
 
-//用关键字作为参数刪除
+//用关键字作为参数刪除 , 返回删除的元素个数
 int n = mapStudent.erase("123");
 
 //两个迭代器对象作为参数, 表示范围删除 , 下行代码表示清空 map
 mapStudent.erase(mapStudent.begin(), mapStudent.end());
+
 //等同于
 mapStudent.clear()
 ```
-### 4.8.6. 获取大小
+### 4.8.5. 获取大小
 
 ```cpp
 //函数定义
@@ -1284,21 +1739,44 @@ size_type size() const noexcept;
 //一般使用方法
 int nSize = mapStudent.size();
 ```
-### 4.8.7. 其他常用函数
+### 4.8.6. 其他常用函数
 begin()         返回指向map头部的迭代器  
 end()           返回指向map末尾的迭代器  
 rbegin()        返回一个指向map尾部的逆向迭代器  
 rend()          返回一个指向map头部的逆向迭代器
 
-count()         返回指定元素出现的次数  
-empty()         如果map为空则返回true  
-equal_range()   返回特殊条目的迭代器对  
+empty()         如果map为空则返回true
+clear()         清空    
+swap()          交换两个map的内容  
+size()          返回map中元素的个数  
+max_size()      返回可以容纳的最大元素个数 和操作系统有关, 返回值会不同    
+at()            相比于[]访问更安全的访问方法, 越界会抛出异常  
+
+count()         返回指定key出现的次数   因为key唯一, 因此返回值最大为 1  
+insert()        容器中插入键值对  
+emplace()       高效插入  
+emplace_hind()  需要一个指向位置的迭代器作为第一个参数  
+
+find(key)           返回指向键为key的双向迭代器  
+lower_bound(key)    返回指向当前容器第一个大于或等于key的双向迭代器  
+upper_bound()       返回指向当前容器第一个大于key的双向迭代器  
+equal_range()       返回一个 pair 分别包含了 lower_bound()和 equal_range() 的返回值  最多包含一个键值对    
+
 get_allocator() 返回map的配置器  
 key_comp()      返回比较元素key的函数  
-max_size()      返回可以容纳的最大元素个数  
-size()          返回map中元素的个数  
-swap()           交换两个map  
 value_comp()     返回比较元素value的函数  
+
+### 4.8.7. multimap
+
+multimap 容器中指定的键可能对应多个键值对，而不再是 1 个。  
+
+* 和 map 容器相比，multimap 未提供 at() 成员方法，也没有重载 [] 运算符。  
+* 这意味着，map 容器中通过指定键获取指定指定键值对的方式，将不再适用于 multimap 容器。
+* 但是只要是 multimap 容器提供的成员方法，map 容器都提供
+
+由于 multimap 容器可存储多个具有相同键的键值对，  
+因此表 1 中的 `lower_bound()、upper_bound()、equal_range()` 以及 `count()` 成员方法会经常用到  
+
 
 ## 4.9. set multiset 
 
@@ -1410,7 +1888,7 @@ void insert ( {E1, E2,...,En} );
 myset.insert({ "stl","python","java"});
 
 ```
-### 4.9.4. 更改元素
+### 4.9.4. 插入元素2
 
 `emplace()` 和 `emplace_hint()` 是 C++ 11 标准加入到 set 类模板中的，相比具有同样功能的 insert() 方法，完成同样的任务，emplace() 和 emplace_hint() 的效率会更高。  
 
@@ -1460,7 +1938,7 @@ iterator  erase (const_iterator first, const_iterator last);
 C++ STL 标准库中还提供有一个和 set 容器相似的关联式容器， 也定义在`<set>`头文件  `multiset` 容器可以存储多个值相同的元素。  
 唯一的差别在于，multiset 容器允许存储多个值相同的元素，而 set 容器中只能存储互不相同的元素。  
 
-虽然 multiset 容器和 set 容器拥有的成员方法完全相同，但由于 multiset 容器允许存储多个值相同的元素，因此诸如 
+虽然 multiset 容器和 set 容器拥有的成员方法**完全相同**，但由于 multiset 容器允许存储多个值相同的元素，因此诸如 
 1. count()
 2. find()
 3. lower_bound()
@@ -1468,7 +1946,7 @@ C++ STL 标准库中还提供有一个和 set 容器相似的关联式容器， 
 5. equal_range() 等方法，更常用于 multiset 容器。
 
 
-# 算法 
+# 5. 算法 
 
 使用STL算法的好处
 
@@ -1478,7 +1956,9 @@ C++ STL 标准库中还提供有一个和 set 容器相似的关联式容器， 
 * 使用算法函数编写的程序，可扩展性更强，更容易维护；
 
 
-## find() 
+## 5.1. 查找 find系列
+
+### 5.1.1. find() 基础查找
 
 find()的函数定义相对简单, 该函数适用于所有的序列式容器
 
@@ -1487,13 +1967,11 @@ find()的函数定义相对简单, 该函数适用于所有的序列式容器
 
 如果不支持的话应该自己重载 == 运算符  
 
-
 ```cpp
 // 其中，first 和 last 为输入迭代器，[first, last) 用于指定该函数的查找范围；val 为要查找的目标元素。
 InputIterator find (InputIterator first, InputIterator last, const T& val);
 
 // 该函数会返回一个输入迭代器，当 find() 函数查找成功时，其指向的是在 [first, last) 区域内查找到的第一个目标元素；如果查找失败，则该迭代器的指向和 last 相同。
-
 
 // find() 函数除了可以作用于序列式容器，还可以作用于普通数组
 char stl[] ="http://c.biancheng.net/stl/";
@@ -1514,5 +1992,209 @@ InputIterator find (InputIterator first, InputIterator last, const T& val)
   return last;
 }
 
+```
+
+## 5.2. 排序 sort 系列
+
+STL 有很多排序算法, 用于适用不同的应用场景  
+
+* `sort (first, last)`
+  * 对容器或普通数组中 [first, last) 范围内的元素进行排序，默认进行升序排序。                                                                                                                        
+  * `stable_sort (first, last)` 函数功能相似，稳定排序
+* `partial_sort (first, middle, last)`
+  * 从 [first,last) 范围内，筛选出 `muddle-first` 个最小的元素并排序存放在 [first，middle) 区间中。
+* `partial_sort_copy (first, last, result_first, result_last)`
+  * 从 [first, last) 范围内筛选出 result_last-result_first 个元素排序并存储到 [result_first, result_last) 指定的范围中。
+* `is_sorted (first, last)  `
+  * 检测 [first, last) 范围内是否已经排好序，默认检测是否按升序排序。                              
+  * `is_sorted_until (first, last)` 如果没有排好序，则该函数会返回指向首个不遵循排序规则的元素的迭代器。                   
+* `void nth_element (first, nth, last)`
+  * 找到 [first, last) 范围内按照排序规则（默认按照升序排序）应该位于第 nth 个位置处的元素，并将其放置到此位置。
+  * 同时使该位置左侧的所有元素都比其存放的元素小，该位置右侧的所有元素都比其存放的元素大。
+  * 类似于快速排序内部的单词迭代
+
+应用场景总结:
+1. 如果需要对所有元素进行排序，则选择 sort() 或者 stable_sort() 函数；
+2. 如果需要保持排序后各元素的相对位置不发生改变，就只能选择 stable_sort() 函数，而另外 3 个排序函数都无法保证这一点；
+3. 如果需要对最大（或最小）的 n 个元素进行排序，则优先选择 partial_sort() 函数；
+4. 如果只需要找到最大或最小的 n 个元素，但不要求对这 n 个元素进行排序，则优先选择 nth_element() 函数。
+
+nth_element() > partial_sort() > sort() > stable_sort()       <--从左到右，性能由高到低  
+
+
+sort 函数受到底层实现方式的限制 需要有以下三个条件才能使用
+5. 容器支持的迭代器类型必须为**随机访问迭代器**。这意味着，sort() 只对 `array、vector、deque` 这 3 个容器提供支持.
+   当操作对象为 `list` 或者 `forward_list` 序列式容器时，其容器模板类中都提供有 `sort()` 排序方法，借助此方法即可实现对容器内部元素进行排序。
+6. 如果对容器中指定区域的元素做默认升序排序，则元素类型必须支持<小于运算符；
+   同样，如果选用标准库提供的其它排序规则，元素类型也必须支持该规则底层实现所用的比较运算符；
+7. sort() 函数在实现排序时，需要交换容器中元素的存储位置。
+   如果容器中存储的是自定义的类对象，则该类的内部必须提供移动构造函数和移动赋值运算符。
+
+
+### 5.2.1. sort() 
+
+sort() 是基于快速排序实现的  复杂度:N*log2(N)    
+
+排序规则:
+1. comp 可以是 C++ STL 标准库提供的排序规则（比如 `std::greater<T>`） 或者自定义的规则
+2. 可以直接定义一个具有 2 个参数并返回 bool 类型值的函数作为排序规则
+3. 给 sort() 函数指定排序规则时，需要为其传入一个函数名,例如 `mycomp` 或者函数对象,例如 `std::greater<int>()` 或者 `mycomp2()`
+
+两种定义
+```cpp
+void sort (RandomAccessIterator first, RandomAccessIterator last);
+// 可以自定义排序规则
+void sort (RandomAccessIterator first, RandomAccessIterator last, Compare comp);
+
+
+// 普通函数作为排序规则
+bool mycomp(int i, int j) {
+    return (i < j);
+}
+//以函数对象的方式实现自定义排序规则
+class mycomp2 {
+public:
+    bool operator() (int i, int j) {
+        return (i < j);
+    }
+};
+
+
+// 使用
+std::sort(myvector.begin(), myvector.begin() + 4, std::greater<int>());
+std::sort(myvector.begin(), myvector.end(), mycomp);
+std::sort(myvector.begin(), myvector.end(), mycomp2());
 
 ```
+
+### 5.2.2. stable_sort()
+
+stable_sort() 和 sort() 具有相同的使用场景，就连语法格式也是相同的  
+
+但是 stable_sort() 是基于归并排序实现的  
+
+当可用空间足够的情况下，该函数的时间复杂度可达到`O(N*log2(N))`；反之，时间复杂度为`O(N*log2(N^2))`
+
+### 5.2.3. partial_sort()  partial_sort_copy()
+
+假设这样一种情境，有一个存有 100 万个元素的容器，但我们只想从中提取出值最小的 10 个元素  
+使用 sort() 或者 stable_sort() 排序函数, 仅仅为了提取 10 个元素，却要先对 100 万个元素进行排序，可想而知这种实现方式的效率是非常低的。  
+
+平均时间复杂度为N*log(M)，其中 N 指的是 [first, last) 范围的长度，M 指的是 [first, middle) 范围的长度。
+
+函数定义, 和普通sort一样, 拥有 有无自定义规则的两个版本
+
+```cpp
+// 定义
+void partial_sort (RandomAccessIterator first,RandomAccessIterator middle,
+                   RandomAccessIterator last);
+void partial_sort (RandomAccessIterator first,RandomAccessIterator middle,
+                   RandomAccessIterator last,Compare comp);
+      
+// 将 myvector 中最小的 4 个元素移动到开头位置并排好序
+std::partial_sort(myvector.begin(), myvector.begin() + 4, myvector.end());
+// 以指定的 mycomp2 作为排序规则，将 myvector 中最大的 4 个元素移动到开头位置并排好序
+std::partial_sort(myvector.begin(), myvector.begin() + 4, myvector.end(), mycomp2());
+
+
+// 定义
+RandomAccessIterator partial_sort_copy (InputIterator first,InputIterator last,
+                       RandomAccessIterator result_first,RandomAccessIterator result_last);
+RandomAccessIterator partial_sort_copy (InputIterator first,InputIterator last,
+                       RandomAccessIterator result_first,RandomAccessIterator result_last,
+                       Compare comp);
+
+// 值得一提的是，[first, last] 中的这 2 个迭代器类型仅限定为输入迭代器
+// 这意味着相比 partial_sort() 函数，partial_sort_copy() 函数放宽了对存储原有数据的容器类型的限制。
+// 即，partial_sort_copy() 函数还支持对 list 容器或者 forward_list 容器中存储的元素进行“部分排序”
+// 但是，介于 result_first 和 result_last 仍为随机访问迭代器
+
+
+```
+
+### 5.2.4. nth_element() 
+
+在有序序列中，我们可以称第 n 个元素为整个序列中“第 n 大”的元素  
+
+nth_element() 函数的功能，当采用默认的升序排序规则（`std::less<T>`）时  
+该函数可以从某个序列中找到第 n 小的元素 K，并将 K 移动到序列中第 n 的位置处。  
+不仅如此，整个序列经过 nth_element() 函数处理后，所有位于 K 之前的元素都比 K 小，所有位于 K 之后的元素都比 K 大。  
+
+应用场景: 如果只需要找到最大或最小的 n 个元素，但不要求对这 n 个元素进行排序，则优先选择 nth_element() 函数  
+
+```cpp
+//排序规则采用默认的升序排序
+void nth_element (RandomAccessIterator first,
+                  RandomAccessIterator nth,
+                  RandomAccessIterator last);
+//排序规则为自定义的 comp 排序规则
+void nth_element (RandomAccessIterator first,
+                  RandomAccessIterator nth,
+                  RandomAccessIterator last,
+                  Compare comp);
+
+```
+
+* first 和 last：都是随机访问迭代器，[first, last) 用于指定该函数的作用范围（即要处理哪些数据）；
+* nth：也是随机访问迭代器，其功能是令函数查找“第 nth 大”的元素，并将其移动到 nth 指向的位置；
+* comp：用于自定义排序规则。
+
+### 5.2.5. is_sorted() 和 is_sorted_until()
+
+本就是一组有序的数据，如果我们恰巧需要这样的升序序列，就没有必要再执行排序操作。  
+
+因此，当程序中涉及排序操作时，我们应该为其包裹一层判断语句  
+
+```cpp
+if (!is_sorted(mylist.begin(), mylist.end())) {
+  // 需要排序
+}
+
+if (is_sorted_until(myvector.begin(), myvector.end(),mycomp2()) != myvector.end()){
+  // 需要排序
+}
+
+// 定义
+//判断 [first, last) 区域内的数据是否符合 std::less<T> 排序规则，即是否为升序序列
+bool is_sorted (ForwardIterator first, ForwardIterator last);
+
+//判断 [first, last) 区域内的数据是否符合 comp 排序规则  
+bool is_sorted (ForwardIterator first, ForwardIterator last, Compare comp);
+
+
+//排序规则为默认的升序排序
+ForwardIterator is_sorted_until (ForwardIterator first, ForwardIterator last);
+//排序规则是自定义的 comp 规则
+ForwardIterator is_sorted_until (ForwardIterator first,
+                                 ForwardIterator last,
+                                 Compare comp);
+```
+
+* first 和 last 都为正向迭代器（这意味着该函数适用于大部分容器）
+* [first, last) 用于指定要检测的序列；
+* comp 用于指定自定义的排序规则。 
+
+### 5.2.6. 自定义排序规则的优化 
+
+数对象可以理解为伪装成函数的对象，根据以往的认知，函数对象的执行效率应该不如普通函数。但事实恰恰相反;   
+将普通函数定义为更高效的内联函数，其执行效率也无法和函数对象相比。  
+
+```cpp
+//以普通函数的方式实现自定义排序规则
+inline bool mycomp(int i, int j) {
+    return (i < j);
+}
+//以函数对象的方式实现自定义排序规则
+class mycomp2 {
+public:
+    bool operator() (int i, int j) {
+        return (i < j);
+    }
+};
+```
+以 mycomp2() 函数对象为例，其 mycomp2::operator() 也是一个内联函数，  
+编译器在对 sort() 函数进行实例化时会将该函数直接展开，这也就意味着，展开后的 sort() 函数内部不包含任何函数调用。  
+
+而如果使用 mycomp 作为参数来调用 sort() 函数，情形则大不相同。要知道，C++ 并不能真正地将一个函数作为参数传递给另一个函数，  
+换句话说，如果我们试图将一个函数作为参数进行传递，编译器会隐式地将它转换成一个指向该函数的指针，并将该指针传递过去。  
+

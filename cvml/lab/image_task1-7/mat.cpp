@@ -27,10 +27,10 @@ mat::mat(const ryu::mat &copymat)
     srcValueNumber = copymat.srcValueNumber;
 
     delete[] ascContent;
-    ascContent = new (std::nothrow) int[srcValueNumber];
+    ascContent = new (std::nothrow) unsigned int[srcValueNumber];
     if (ascContent == nullptr)
     {
-        status = status | MEMNEWERROR;
+        status = status | MATMEMNEWERROR;
     }
     else
     {
@@ -49,10 +49,10 @@ void mat::operator=(const mat &copymat)
     srcValueNumber = copymat.srcValueNumber;
 
     delete[] ascContent;
-    ascContent = new (std::nothrow) int[srcValueNumber];
+    ascContent = new (std::nothrow) unsigned int[srcValueNumber];
     if (ascContent == nullptr)
     {
-        status = status | MEMNEWERROR;
+        status = status | MATMEMNEWERROR;
     }
     else
     {
@@ -95,11 +95,15 @@ int mat::initialize(int format, int width, int high, int colordepth)
     srcValueNumber = pixelNum * colorNum;
 
     delete[] ascContent;
-    ascContent = new int[srcValueNumber]{0};
-
-    return 0;
+    ascContent = new (std::nothrow) unsigned int[srcValueNumber]{0};
+    if (ascContent == nullptr)
+    {
+        status = status | MATMEMNEWERROR;
+        return RYU_MAT_FAILURE;
+    }
+    return RYU_MAT_SUCCESS;
 }
-void mat::printInfor()
+void mat::printInfor() const
 {
     std::cout << "This image is P" << property[0] << " Image" << std::endl;
     std::cout << property[1] << "x" << property[2] << std::endl;
@@ -179,10 +183,10 @@ int mat::readFile()
     colorNum = property[0] == 3 || property[0] == 6 ? 3 : 1;
     srcValueNumber = pixelNum * colorNum;
 
-    ascContent = new int[srcValueNumber];
+    ascContent = new unsigned int[srcValueNumber];
     if (ascContent == nullptr)
     {
-        status = status | MEMNEWERROR;
+        status = status | MATMEMNEWERROR;
         return RYU_MAT_FAILURE;
     }
     // For binary file.
@@ -253,7 +257,7 @@ int mat::readFile()
     }
     else // For asc file.
     {
-        ascContent = new int[srcValueNumber];
+        ascContent = new unsigned int[srcValueNumber];
         long long index = 0;
         while (!fileStream.eof() && index < srcValueNumber)
         {
@@ -277,7 +281,22 @@ int mat::writeAscFile(const char *inoutputPath)
     //default output file name
     if (inoutputPath == nullptr)
     {
-        outputpath = "output.pgm";
+        outputpath = "output.";
+        switch (property[0])
+        {
+        case 1:
+        case 4:
+            outputpath += "pbm";
+            break;
+        case 2:
+        case 5:
+            outputpath += "pgm";
+            break;
+        case 3:
+        case 6:
+            outputpath += "ppm";
+            break;
+        }
     }
     else
     {
@@ -322,14 +341,14 @@ int mat::writeAscFile(const char *inoutputPath)
         status = status | WRITEERROR;
         return RYU_MAT_FAILURE;
     }
-    if (statusCheck() != 0)
+    if (statusCheck() != RYU_MAT_SUCCESS)
     {
         exit(0);
     }
     return RYU_MAT_SUCCESS;
 }
 
-int mat::statusCheck()
+int mat::statusCheck() const
 {
     if (status == 0)
     {
@@ -347,7 +366,7 @@ int mat::statusCheck()
         std::cout << "Output destination path error." << std::endl;
     if ((status & WRITEERROR) != 0)
         std::cout << "Write process error." << std::endl;
-    if ((status & MEMNEWERROR) != 0)
+    if ((status & MATMEMNEWERROR) != 0)
         std::cout << "Memory allocation error." << std::endl;
     if ((status & PROPERTYERROR) != 0)
         std::cout << "Initialize property error." << std::endl;
