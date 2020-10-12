@@ -1,6 +1,6 @@
-# C++ 标准环境
+# 1. C++ 标准环境
 
-## C++ 编译环境的构成
+## 1.1. C++ 编译环境的构成
 
 一个完整的C++环境由 库和编译模块构成
 
@@ -12,7 +12,7 @@
 * C++ 标准语法模块    对C++标准语法的支持
 * C++ 扩展语法模块    每个编译器独有的扩展语法的支持 
 
-## C++ 标准库
+## 1.2. C++ 标准库
 
 C++ 标准库并不止 STL
 
@@ -40,9 +40,9 @@ C++ 标准库并不止 STL
 
 
 
-# 1. C++的流
+# 2. C++的流
 
-## 1.1. C++ 的文件读写流 fstream
+## 2.1. C++ 的文件读写流 fstream
 iostream 标准库,它提供了 cin 和 cout 方法分别用于从标准输入读取流和向标准输出写入流.  
 从文件读取流和向文件写入流,这就需要用到 C++ 中另一个标准库 `fstream`  
 
@@ -55,7 +55,7 @@ iostream 标准库,它提供了 cin 和 cout 方法分别用于从标准输入�
 
 要在 C++ 中进行文件处理, 必须在 C++ 源代码文件中包含头文件 `iostream` 和 `fstream`
 
-### 1.1.1. 文件打开与关闭
+### 2.1.1. 文件打开与关闭
 
 `ofstream` 和 `fstream` 对象都可以用来打开文件进行***写操作***, 如果**只需要打开文件进行读操作**, 则使用 `ifstream` 对象
 
@@ -75,7 +75,7 @@ myfile.close();
 | ios::trunc  | 如果该文件已经存在, 其内容将在打开文件之前被截断, 即把文件长度设为 0。 |
 | ios::binary | 二进制模式打开.                                                        |
 
-### 1.1.2. 文件读写
+### 2.1.2. 文件读写
 
 **对于字符文件**  
 对`ofstream` 或 `fstream` 对象,使用流插入运算符`（ << ）`向文件写入信息  
@@ -97,7 +97,7 @@ putback(char);// Puts the character ch back to the input stream so the next extr
 //功能是一样的，最大的区别在参数上 unget没有参数，是把已经从流读取出来的那个字符放回去，下次读取的时候可以读到这个字符 而putback是把参数c放入流中
 peek(); //reads the next character without extracting it 
 ```
-### 1.1.3. 检查函数
+### 2.1.3. 检查函数
 每一个流对象都有一个 `flag` 用于保存操作时的各种状态  
 使用 `clear()` 来清除`flag`
 
@@ -109,7 +109,7 @@ peek(); //reads the next character without extracting it
 | eof()  | 检查是否到了文件末尾.                      |
 | 1.3.   | 1.3.                                       | 1.3.                                                             | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | good() | 最常用的函数, 对上面所有函数返回`true`的时候,返回`false` | `good()`与`bad()`不是对立函数,good一次检查更多的flag |
 
-### 1.1.4. 文件位置指针操作
+### 2.1.4. 文件位置指针操作
 tellp() —— 与tellg()有同样的功能，但它用于写文件时。
 * 当我们读取一个文件，并要知道内置指针的当前位置时，应该使用tellg()
 * 当我们写入一个文件，并要知道内置指针的当前位置时，应该使用tellp()
@@ -154,7 +154,7 @@ int main () {
   return 0;
 ```
 
-## 1.2. 字符串流 sstream
+## 2.2. 字符串流 sstream
 
 头文件 `<sstream>`  
 * stringstream  同时可以支持C风格的串流的输入输出操作 stringstream则是从iostream(输入输出流类)和和stringstreambase（c++字符串流基类）派生而来
@@ -185,7 +185,7 @@ ostringstream::str();//返回的是std::string类型的字符串
 当然如果为了保持和C的兼容，使用strstream也是不错的选择  
 
 
-### 1.2.1. 从string中读取字符
+### 2.2.1. 从string中读取字符
 
 stringstream对象可以绑定一行字符串，然后以空格为分隔符把该行分隔开来
 ```cpp
@@ -204,7 +204,7 @@ do
 } while (is);
 
 ```
-### 1.2.2. 用来进行数据类型转换
+### 2.2.2. 用来进行数据类型转换
 
 传入参数和目标对象的类型会被自动推导出来，所以不存在错误的格式化符的问题。相比c库的数据类型转换，sstream更加安全、自动和直接  
 
@@ -219,7 +219,7 @@ sstream << nValue;
 sstream >> strResult;
 
 ```
-### 1.2.3. 字符串流的高级操作
+### 2.2.3. 字符串流的高级操作
 
 * 清空字符串流的方式 `sstream.str("")`  `clear()`
 * 使用 `str()` 方法，将stringstream类型转换为string类型
@@ -237,8 +237,8 @@ sstream.str("");
 
 
 
-# 2. 工程要点
-## 2.1. 後藤先生からのアドバイス
+# 3. 工程要点
+## 3.1. 後藤先生からのアドバイス
 
 1. 功能函数和用户界面应该分开， 例如标准信息输出不应该出现在用户处理函数中
 2. 凡是涉及到分配内存的功能都应该检查是否成功
@@ -248,7 +248,7 @@ sstream.str("");
 6. 在内存限制不严重的情况下， 不要用float类型
 7. 
 
-## 2.2. 关于 new 的检查
+## 3.2. 关于 new 的检查
 
 通常来说，new 使用 try catch 来捕捉异常  
 抛出的异常为 `std::bad_alloc` 类  
@@ -273,7 +273,7 @@ if (p == nullptr) {
 }
 ```
 
-# 3. string 字符串操作
+# 4. string 字符串操作
 
 字符串实际上是使用 null 字符 `'\0'` 终止的一维字符数组.因此, 一个以 null 结尾的字符串, 包含了组成字符串的字符.
 
@@ -282,9 +282,10 @@ C++ 中，独立的几个 string 对象可以占据也可以不占据各自特�
 只有当字符串被修改的时候才创建各自的拷贝，这种实现方式称为写时复制（copy-on-write）策略。当字符串只是作为值参数（value parameter）或在其他只读情形下使用，这种方法能够节省时间和空间。
   
 
-## 3.1. C++string 的定义使用
+## 4.1. C++string 的定义使用
 
 
+### 4.1.1. 定义
 ```cpp
 
 //----------定义:
@@ -302,21 +303,38 @@ FILE *fp = fopen(path.c_str(), "rt");
 //使用流对字符串进行输入的时候, 会把空格作为输入结束  
 string s;
 cin>>s;
+```
+### 4.1.2. 数据访问
 
-//-------访问字符串中的字符
+同容器一样, string 类型也有多种类似的访问数据的方法
+
+```cpp
+//访问字符串中的字符
+
 //string 可以通过下标来访问字符串中的字符
 for(int i=0,len=s.length(); i<len; i++){
     cout<<s[i]<<" ";
 }
+
+// 通过 at 函数 越界时会抛出异常
+try {
+  // throw, even if capacity allowed to access element
+  s.at(3) = 'x';
+}
+catch (std::out_of_range const& exc) {
+  std::cout << exc.what() << '\n';
+}
+
+// 通过 front 和 back C++11
+std::string s("Exemplary");
+char& f = s.front();
+
+
+// 通过 data()
+data() + i == std::addressof(operator[](i)) for every i in [0, size()]. //(since C++11)
 ```
 
-**字符串拼接**  使用 `+` 和 `+=`  
-1.  两边可以都是 string 字符串
-2.  一个 string 字符串和一个C风格的字符串
-3.  一个 string 字符串和一个字符数组
-4.  一个 string 字符串和一个单独的字符
-
-
+### 4.1.3. 迭代器
 **基础8种迭代函数**  
 返回对应的迭代器
 ```cpp
@@ -327,9 +345,17 @@ for(int i=0,len=s.length(); i<len; i++){
 .cr*();    //顺序为cr
 ```
 
-## 3.2. 实用操作函数
+### 使用基本运算符操作 string
 
-### 3.2.1. 关于子字符串的操作
+**字符串拼接**  使用 `+` 和 `+=`  
+1.  两边可以都是 string 字符串
+2.  一个 string 字符串和一个C风格的字符串
+3.  一个 string 字符串和一个字符数组
+4.  一个 string 字符串和一个单独的字符
+
+## 4.2. 实用操作函数
+
+### 4.2.1. 关于子字符串的操作
 ```cpp
 //获得子函数, pos 开始位置, 默认截取到字符串尾
 string substr (size_t pos = 0, size_t len = npos) const;
@@ -341,7 +367,7 @@ string& erase (size_t pos = 0, size_t len = npos);
 //第一个参入要注意不能越界, 否则会抛出异常
 string& insert (size_t pos, const string& str);
 ```
-### 3.2.2. 查找
+### 4.2.2. 查找
 
 ```cpp
 //查询函数, pos 表开始位置, 无视pos之前的匹配项
@@ -358,9 +384,18 @@ int index = s1.rfind(s2,6);
 //注意是任意一个共有的字符首次出现的位置
 constexpr size_type find_first_of( const basic_string& str,size_type pos = 0 ) const noexcept;
 
+
+// 其他函数
+find
+rfind
+find_first_of
+find_first_not_of
+find_last_of
+find_last_not_of
+
 ```
 
-## 3.3. **从C继承的基础的字符串操作**  
+## 4.3. **从C继承的基础的字符串操作**  
 
 以下函数为c原生函数,包含在`<string.h>`头文件中, 在C++中也在 `<cstring>`中  
 使用`<string.h>` 不需要在函数名前加`std::`  
@@ -395,9 +430,9 @@ constexpr size_type find_first_of( const basic_string& str,size_type pos = 0 ) c
 * 若LC_COLLATE为"POSIX"或"C"，则strcoll()与strcmp()作用完全相同 
 * 按照 C94 及 C99 标准的规定，程序在启动时设置 locale 为 "C"。在 "C" locale 下，字符串的比较就是按照内码一个字节一个字节地进行，这时 strcoll 与 strcmp 函数没有区别。在其他 locale 下，字符串的比较方式则不同了，例如在简体中文 locale 下，strcmp 仍然按内码比较，而 strcoll 对于汉字则是按拼音进行的（这也跟操作系统有关，Windows 还支持按笔划排序，可以在“区域和语言设置”里面修改
   
-## 3.4. string 与数字类型的转换
+## 4.4. string 与数字类型的转换
 
-### 3.4.1. 字符串转为数字
+### 4.4.1. 字符串转为数字
 
 除了使用C语言风格的函数 `ato*()` 和 `strto*` C++风格的函数为 `sto*()`
 
@@ -415,7 +450,7 @@ double stod (const string&  str, size_t* idx = 0);
 long double stold (const string&  str, size_t* idx = 0);
 
 ```
-### 3.4.2. 数字转成字符串
+### 4.4.2. 数字转成字符串
 
 ```cpp
 //  to_string 函数。将 val 解释为 string，并返回转换结果
@@ -435,9 +470,9 @@ wstring to_wstring (int val);
 
 ```
 
-# 4. STL容器
+# 5. STL容器
 
-## 4.1. 容器种类  
+## 5.1. 容器种类  
 STL 提供有 3 类标准容器，分别是序列容器、排序容器和哈希容器  其中后两类容器有时也统称为关联容器  
 * 序列容器，是因为元素在容
 * 器中的位置同元素的值无关，即容器不是排序的。将元素插入容器时，指定在什么位置，元素就会位于什么位置
@@ -449,7 +484,7 @@ STL 提供有 3 类标准容器，分别是序列容器、排序容器和哈希�
 | 排序容器 | 包括 set 集合容器、multiset多重集合容器、map映射容器以及 multimap 多重映射容器。                                                                           |
 | 哈希容器 | C++ 11 新加入 4 种关联式容器，分别是 unordered_set 哈希集合、unordered_multiset 哈希多重集合、unordered_map 哈希映射以及 unordered_multimap 哈希多重映射。 |
 
-### 4.1.1. 序列式容器  
+### 5.1.1. 序列式容器  
 
 
 * `array<T,N>`（数组容器）：表示可以存储 N 个 T 类型的元素，是 C++ 本身提供的一种容器。此类容器一旦建立，其长度就是固定不变的，这意味着不能增加或删除元素，只能改变某个元素的值；
@@ -461,7 +496,7 @@ STL 提供有 3 类标准容器，分别是序列容器、排序容器和哈希�
     `stack<T> `和 `queue<T>` 本质上也属于序列容器，只不过它们都是在 deque 容器的基础上改头换面而成，通常更习惯称它们为容器适配器
 
 
-### 4.1.2. 关联式容器
+### 5.1.2. 关联式容器
 
 关联式容器在存储元素值的同时，还会为各元素额外再配备一个值（又称为“键”，其本质也是一个 C++ 基础数据类型或自定义类型的元素）  
 它的功能是在使用关联式容器的过程中，如果已知目标元素的键的值，则直接通过该键就可以找到目标元素，而无需再通过遍历整个容器的方式。   
@@ -477,7 +512,7 @@ STL 提供有 3 类标准容器，分别是序列容器、排序容器和哈希�
 C++ 11 还新增了 4 种哈希容器，即 unordered_map、unordered_multimap 以及 unordered_set、unordered_multiset  
 但哈希容器底层采用的是哈希表，而不是红黑树
 
-### 4.1.3. 自定义关联式容器的排序规则
+### 5.1.3. 自定义关联式容器的排序规则
 
 1. 使用函数对象自定义排序规则
 2. 重载关系运算符实现自定义排序
@@ -553,7 +588,7 @@ bool operator <(const myString &stra, const myString & strb) {
 //创建空 set 容器，仍使用默认的 less<T> 排序规则
 std::set<myString>myset;
 ```
-### 4.1.4. 无序关联式容器
+### 5.1.4. 无序关联式容器
 
 无序容器是 C++ 11 标准才正式引入到 STL 标准库中的，这意味着如果要使用该类容器，则必须选择支持 C++ 11 标准的编译器。  
 它们常被称为 “无序容器”、“哈希容器”或者“无序关联容器”。
@@ -627,11 +662,11 @@ template < class Key,                        //键值对中键的类型
 * 对于unordered_map或unordered_set容器，其遍历顺序与创建该容器时输入的顺序不一定相同，因为遍历是按照哈希表从前往后依次遍历的
   
 
-## 4.2. 迭代器
+## 5.2. 迭代器
 
 泛型思维发展的必然结果，类似中介的装置，它除了要具有对容器进行遍历读写数据的能力之外，还要能对外隐藏容器的内部差异，从而以统一的界面向算法传送数据。  
 
-### 4.2.1. 迭代器的种类
+### 5.2.1. 迭代器的种类
 
 STL 标准库为每一种标准容器定义了一种迭代器类型，这意味着，不同容器的迭代器也不同，其功能强弱也有所不同。  
 
@@ -672,7 +707,7 @@ STL 标准库为每一种标准容器定义了一种迭代器类型，这意味�
 | stack                              | 不支持迭代器     |
 | queue                              | 不支持迭代器     |
 
-### 4.2.2. 定义中迭代器的种类  
+### 5.2.2. 定义中迭代器的种类  
 
 迭代器的 4 种定义方式
 | 迭代器定义方式 | 具体格式                                    |
@@ -689,7 +724,7 @@ STL 标准库为每一种标准容器定义了一种迭代器类型，这意味�
 有一部分容器同时支持以上 4 种方式，比如 `array、deque、vector`；  
 而有些容器只支持其中部分的定义方式，例如 `forward_list` 容器只支持定义正向迭代器，不支持定义反向迭代器。  
 
-### 4.2.3. 和迭代器有关的成员函数  
+### 5.2.3. 和迭代器有关的成员函数  
 
 | 函数成员  | 函数功能                                                                          |
 | --------- | --------------------------------------------------------------------------------- |
@@ -704,7 +739,7 @@ STL 标准库为每一种标准容器定义了一种迭代器类型，这意味�
 
 以上函数在实际使用时，其返回值类型都可以使用 auto 关键字代替，编译器可以自行判断出该迭代器的类型。
 
-## 4.3. 容器适配器
+## 5.3. 容器适配器
 
 ```cpp
 // 假设一个代码模块 A，它的构成如下所示：
@@ -737,6 +772,7 @@ public:
 * 就是将不适用的序列式容器（包括 vector、deque 和 list）变得适用。
 * 容器适配器的底层实现和模板 A、B 的关系是完全相同的，即通过封装某个序列式容器，**并重新组合该容器中包含的成员函数**，使其满足某些特定场景的需要。
 * 容器适配器本质上还是容器，只不过此容器模板类的实现，利用了大量其它基础容器模板类中已经写好的成员函数。当然，如果必要的话，容器适配器中也可以自创新的成员函数。
+* 容器适配器没有迭代器, 访问元素只能遍历容器
 
 
 STL 提供了 3 种容器适配器, 各适配器所使用的**默认基础容器**以及 **可供用户选择的基础容器** 
@@ -755,8 +791,8 @@ STL 提供了 3 种容器适配器, 各适配器所使用的**默认基础容器
    * size()
    * front()
    * back()
-   * push_back()
-   * pop_front()
+   * push()
+   * pop()
 3. priority_queue  默认使用的基础容器 vector
    * empty()
    * size()
@@ -766,7 +802,7 @@ STL 提供了 3 种容器适配器, 各适配器所使用的**默认基础容器
 
 
 
-### 4.3.1. pair 例外
+### 5.3.1. pair 例外
 
 考虑到“键值对”并不是普通类型数据，C++ STL 标准库提供了 pair 类模板  
 专门用来将 2 个普通元素 first 和 second  创建成一个新元素`<first, second>`    
@@ -784,7 +820,7 @@ std::map<std::string, int>myMap{std::make_pair("C语言教程",10),std::make_pai
 
 ```
 
-### stack 
+### 5.3.2. stack 
 
 和其他序列容器相比，stack 是一类存储机制简单、提供成员函数较少的容器  
 stack 栈适配器是一种单端开口的容器  
@@ -818,8 +854,79 @@ std::stack<int, std::list<int>> my_stack2=my_stack;
 std::stack<int, std::list<int>> my_stack(my_stack1);
 ```
 
+### queue
 
-## 4.4. array 升级的数组  
+和 stack 栈容器适配器不同，queue 容器适配器有 2 个开口，其中一个开口专门用来输入数据，另一个专门用来输出数据  
+最先进入 queue 的元素，也可以最先从 queue 中出来，  
+即用此容器适配器存储数据具有“先进先出（简称 "FIFO" ）”的特点，因此 queue 又称为队列适配器。  
+
+```cpp
+
+// queue 也有自己的头文件
+#include <queue>
+
+
+// 可以指定底层采用的基础容器类型
+// queue 容器适配器底层容器可以选择 deque (默认) 和 list。
+std::queue<int, std::list<int>> values;
+
+// 用基础容器来初始化 queue 容器适配器 
+std::deque<int> values{1,2,3};
+std::queue<int> my_queue(values);
+
+
+// 成员函数
+empty();
+size();
+front();
+back();
+
+push()
+emplace()
+pop()
+swap()
+
+while (!my_queue.empty())
+{
+    cout << my_queue.front() << endl;
+    //访问过的元素出队列
+    my_queue.pop();
+}
+```
+
+### priority_queue
+
+和queue有几点不同
+1. 只能访问 priority_queue 中位于队头的元素
+2. 只能“从一端进（称为队尾），从另一端出（称为队头）
+3. 不是 “First in,First out”（先入先出）原则，而是“First in，Largest out”原则
+
+```cpp
+// T：指定存储元素的具体类型
+// Container：指定 priority_queue 底层使用的基础容器，vector(默认) 和 deque 可以使用
+// 
+template <typename T,
+      typename Container=std::vector<T>,
+      typename Compare=std::less<T> >
+class priority_queue{
+  //......
+}
+
+// 初始化的数组或容器中的数据不需要有序，priority_queue 会自动对它们进行排序。
+std::priority_queue<int> values;
+
+empty()
+size()
+top()
+push()
+emplace()
+pop()
+swap()
+
+```
+
+
+## 5.4. array 升级的数组  
 
 rray 容器是 C++ 11 标准中新增的序列容器，它就是在 C++ 普通数组的基础上，添加了一些成员函数和全局函数。  
 在使用上，它比普通数组更安全，且效率并没有因此变差。  
@@ -839,7 +946,7 @@ std::array<double, 10> values {0.5,1.0,1.5,,2.0};
 //剩余的元素都会被初始化为 0.0
 
 ```
-### 4.4.1. 安全的访问  
+### 5.4.1. 安全的访问  
 
 1. begin() end()
     C++ 11 标准库还新增加了 begin() 和 end() 这 2 个函数，和 array 容器包含的 begin() 和 end() 成员函数不同的是，标准库提供的这 2 个函数的操作对象，既可以是容器，还可以是普通数组。  
@@ -875,7 +982,7 @@ int main()
 
 
 ```
-### 4.4.2. array使用方法总结  
+### 5.4.2. array使用方法总结  
 
 访问array容器中单个元素
 1. 可以通过容器名[]的方式直接访问和使用容器中的元素，这和 C++ 标准数组访问元素的方式相同
@@ -904,7 +1011,7 @@ else
     std::cout << "The container has "<< values.size()<<"elements.\n";
 ```
 
-## 4.5. vector 向量容器
+## 5.5. vector 向量容器
 
 它和 array 容器非常类似，都可以看做是对 C++ 普通数组的“升级版”。不同之处在于，array 实现的是静态数组（容量固定的数组），而 vector 实现的是一个动态数组，即可以进行元素的插入和删除，在此过程中，vector 会动态调整所占用的内存空间，整个过程无需人工干预  
 
@@ -936,7 +1043,7 @@ protected:
 vector 容器扩容时，不同的编译器申请更多内存空间的量是不同的。以 VS 为例，它会扩容现有容器容量的 50%。  
 
 
-### 4.5.1. 创建
+### 5.5.1. 创建
 
 ```cpp
 // 最基础的定义
@@ -967,10 +1074,10 @@ std::vector<int>value2(std::begin(value1),std::begin(value1)+3);//value2保存{1
 
 ```
 
-### queue
+### 5.5.2. queue
 和 stack 栈容器适配器不同，queue 容器适配器有 2 个开口，其中一个开口专门用来输入数据，另一个专门用来输出数据
 
-### 4.5.2. 访问修改元素
+### 5.5.3. 访问修改元素
 
 1. 下标访问 (有越界可能)
 2. at() 访问(抛出 std::out_of_range 异常)
@@ -991,7 +1098,7 @@ d.back() = 20;
 cout << *(values.data() + 2) << endl;
 ```
 
-### 4.5.3. 添加元素
+### 5.5.4. 添加元素
 
 1. push_back() 和 emplace_back() 插入尾部
    * push_back() 向容器尾部添加元素时，首先会创建这个元素，然后再将这个元素拷贝或者移动到容器中（如果是拷贝的话，事后会自行销毁先前创建的这个元素）
@@ -1033,7 +1140,7 @@ demo.insert(demo.end(), { 10,11 });//{1,3,2,5,5,7,8,9,10,11}
 demo1.emplace(demo1.begin(), 3);
 ```
 
-### 4.5.4. 删除元素
+### 5.5.5. 删除元素
 
 成员函数  
 * pop_back()     | 删除 vector 容器中最后一个元素，该容器的大小（size）会减 1，但容量（capacity）不会发生改变。
@@ -1063,7 +1170,7 @@ swap() 函数在头文件 `<algorithm>` 和 `<utility>` 中都有定义，使用
 * swap(beg)、pop_back() |先调用 swap() 函数交换要删除的目标元素和容器最后一个元素的位置，然后使用 pop_back() 删除该目标元素。
 
 
-### 4.5.5. 迭代器
+### 5.5.6. 迭代器
 
 1. 8大迭代器生成函数, 使用auto接受返回的迭代器很方便, begin和end()配合迭代全部元素
 2. 可以使用全局的 begin(vector) 和 end(vector) 获取迭代器  
@@ -1109,7 +1216,7 @@ auto cap = value.capacity();
 auto size = value.size();
 ```
 
-### 4.5.6. vector 的容量高级操作
+### 5.5.7. vector 的容量高级操作
 
 vector 容器的扩容过程是非常耗时的，并且当容器进行扩容后，之前和该容器相关的所有指针、迭代器以及引用都会失效。因此在使用 vector 容器过程中，我们应尽量避免执行不必要的扩容操作。
 1. 分配一块大小是当前 vector 容量几倍的新存储空间。注意，多数 STL 版本中的 vector 容器，其容器都会以 2 的倍数增长，也就是说，每次 vector 容器扩容，它们的容量都会提高到之前的 2 倍；
@@ -1128,7 +1235,7 @@ reserve(n) 	强制 vector 容器的容量至少为 n。注意，如果 n 比当�
 * 避免 vector 容器执行不必要的扩容操作的关键在于，在使用 vector 容器初期，就要将其容量设为足够大的值
 * 在 vector 容器刚刚构造出来的那一刻，就应该借助 reserve() 成员方法为其扩充足够大的容量。
 
-### 4.5.7. vector 的容量 fit
+### 5.5.8. vector 的容量 fit
 
 
 ```cpp
@@ -1155,7 +1262,7 @@ swap()成员函数的执行流程:
 经过以上步骤，就成功的将 myvector 容器的容量由 100 缩减至 10。  
 
 
-## 4.6. deque 双端队列
+## 5.6. deque 双端队列
 
 deque 容器和 vecotr 容器有很多相似之处
 
@@ -1169,7 +1276,7 @@ deque 容器和 vecotr 容器有很多相似之处
 和 vector 相比，额外增加了实现在容器头部添加和删除元素的成员函数，同时删除了 `capacity()`、`reserve()` 和 `data()` 成员函数。     
 
 
-### 4.6.1. deque的底层实现原理
+### 5.6.1. deque的底层实现原理
 
 和 vector 容器采用连续的线性空间不同!!  
 
@@ -1235,7 +1342,7 @@ protected:
 }
 ```
 
-### 4.6.2. 定义deque
+### 5.6.2. 定义deque
 
 ```cpp
 // 空队列
@@ -1255,7 +1362,7 @@ std::array<int, 5>arr{ 11,12,13,14,15 };
 std::deque<int>d(arr.begin()+2, arr.end()); //13,14,15
 ```
 
-### 4.6.3. 迭代器
+### 5.6.3. 迭代器
 
 八大迭代器方法, 不多说  
 begin();  end();    
@@ -1269,7 +1376,7 @@ for (auto i = d.begin(); i < d.end(); i++)
 for (auto i = begin(d); i < end(d); i++)
 ```
 
-### 4.6.4. 访问元素
+### 5.6.4. 访问元素
 
 基本同 vector 一致  
 
@@ -1290,7 +1397,7 @@ d.front() = 10;
 d.back() = 20;
 ```
 
-### 4.6.5. 修改元素 增删
+### 5.6.5. 修改元素 增删
 
 push_back()、push_front() 或者 resize() 成员函数实现向（空）deque 容器中添加元素。  
 在实际应用中，常用 emplace()、emplace_front() 和 emplace_back() 分别代替 insert()、push_front() 和 push_back()  
@@ -1316,7 +1423,7 @@ clear()     // 删除容器中所有的元素。
 
 ```
 
-## 4.7. list 双向链表
+## 5.7. list 双向链表
 
 实际场景中，如何需要对序列进行大量添加或删除元素的操作，而直接访问元素的需求却很少，这种情况建议使用 list 容器存储序列。  
 
@@ -1327,7 +1434,7 @@ clear()     // 删除容器中所有的元素。
 
 头文件: `#include <list>`  
 
-### 4.7.1. 定义  
+### 5.7.1. 定义  
 ```cpp
 
 // 空
@@ -1350,7 +1457,7 @@ std::array<int, 5>arr{ 11,12,13,14,15 };
 std::list<int>values(arr.begin()+2, arr.end());
 ```
 
-### 4.7.2. 迭代器
+### 5.7.2. 迭代器
 
 同理, 也是8大迭代器方法和 全局的 `begin() end()`  
 
@@ -1372,7 +1479,7 @@ for (std::list<char>::iterator it = values.begin(); it != values.end(); ++it)
 for (std::list<char>::reverse_iterator it = values.rbegin(); it != values.rend();++it)
 
 ```
-### 4.7.3. 访问元素的方法
+### 5.7.3. 访问元素的方法
 
 list 容器不支持随机访问，未提供下标操作符 [] 和 at() 成员函数，也没有提供 data() 成员函数。  
 
@@ -1394,7 +1501,7 @@ while (it!=mylist.end())
 }
 
 ```
-### 4.7.4. 添加元素
+### 5.7.4. 添加元素
 
 list 模板类中，与“添加或插入新元素”相关的成员方法有如下7个：
 单语法格式:
@@ -1437,7 +1544,7 @@ mylist2.splice(mylist2.begin(), mylist1, mylist1.begin(), mylist1.end());//mylis
                                                                          //mylist2:1 10 20 30 3 4 2
 ```
 
-### 4.7.5. 其他元素操作
+### 5.7.5. 其他元素操作
 
 
 并不是所有的容器都有 `sort()`方法, 通过更改容器中元素的位置，将它们进行排序。
@@ -1464,7 +1571,7 @@ auto it = values.begin();
 advance(it, 2);
 ```
 
-### 4.7.6. 删除元素 
+### 5.7.6. 删除元素 
 
 简单方法
 * pop_front() 	删除位于 list 容器头部的一个元素。
@@ -1483,7 +1590,7 @@ advance(it, 2);
 * remove_if() 	删除容器中满足条件的元素。
 
 
-### 4.7.7. forward_list  C++11 单向链表
+### 5.7.7. forward_list  C++11 单向链表
 
 头文件`#include <forward_list>`  
 forward_list 使用的是单链表，而 list 使用的是双向链表  
@@ -1499,7 +1606,7 @@ forward_list 容器具有和 list 容器相同的特性，即擅长在序列的�
 
 
 
-### 4.7.8. 构造函数
+### 5.7.8. 构造函数
 
 ```cpp
 // c++ 11 标准之前
@@ -1525,7 +1632,7 @@ template<class U, class V> pair (U&& a, V&& b);
 调用 make_pair() 函数，它也是` <utility>` 头文件提供的，其功能是生成一个 pair 对象。  
 当我们将 make_pair() 函数的返回值（是一个临时对象）作为参数传递给 pair() 构造函数时，其调用的是移动构造函数，而不是拷贝构造函数。  
 
-### 4.7.9. 值修改
+### 5.7.9. 值修改
 
 通过访问 `first second` 就可以访问pair的值  
 pair类模板还提供有一个 swap() 成员函数，能够互换 2 个 pair 对象的键值对，其操作成功的前提是这 2 个 pair 对象的键和值的类型要相同  
@@ -1540,12 +1647,12 @@ pair1.swap(pair2);
 
 
 
-## 4.8. map multimap
+## 5.8. map multimap
 
 * 向map容器中增添元素，insert()效率更高
 * 更新map容器中的键值对，operator[]效率更高
 
-### 4.8.1. 构造函数 定义
+### 5.8.1. 构造函数 定义
 
 ```cpp
 // map 的定义
@@ -1582,7 +1689,7 @@ std::map<std::string, int>newMap(++myMap.begin(), myMap.end());
 std::map<std::string, int, std::greater<std::string> >myMap{ {"C语言教程",10},{"STL教程",20} };
 ```
 
-### 4.8.2. 获取值 迭代器
+### 5.8.2. 获取值 迭代器
 
 map 类模板中对[ ]运算符进行了重载，这意味着，类似于借助数组下标可以直接访问数组中元素，通过指定的键，我们可以轻松获取 map 容器中该键对应的值
 1. 有当 map 容器中确实存有包含该指定键的键值对，借助重载的 [ ] 运算符才能成功获取该键对应的值
@@ -1634,7 +1741,7 @@ for (auto& q = p.first; q != p.second; ++q) {
 
 
 
-### 4.8.3. 插入元素
+### 5.8.3. 插入元素
 
 ```cpp
 // 定义一个map对象
@@ -1703,7 +1810,7 @@ template <class... Args> iterator emplace_hint (const_iterator position, Args&&.
 
 ```
 
-### 4.8.4. 删除元素 
+### 5.8.4. 删除元素 
 ```cpp
 iterator erase( const_iterator pos );         //(since C++11)
 iterator erase( iterator pos );               //(since C++17)
@@ -1730,7 +1837,7 @@ mapStudent.erase(mapStudent.begin(), mapStudent.end());
 //等同于
 mapStudent.clear()
 ```
-### 4.8.5. 获取大小
+### 5.8.5. 获取大小
 
 ```cpp
 //函数定义
@@ -1739,7 +1846,7 @@ size_type size() const noexcept;
 //一般使用方法
 int nSize = mapStudent.size();
 ```
-### 4.8.6. 其他常用函数
+### 5.8.6. 其他常用函数
 begin()         返回指向map头部的迭代器  
 end()           返回指向map末尾的迭代器  
 rbegin()        返回一个指向map尾部的逆向迭代器  
@@ -1766,7 +1873,7 @@ get_allocator() 返回map的配置器
 key_comp()      返回比较元素key的函数  
 value_comp()     返回比较元素value的函数  
 
-### 4.8.7. multimap
+### 5.8.7. multimap
 
 multimap 容器中指定的键可能对应多个键值对，而不再是 1 个。  
 
@@ -1778,7 +1885,7 @@ multimap 容器中指定的键可能对应多个键值对，而不再是 1 个�
 因此表 1 中的 `lower_bound()、upper_bound()、equal_range()` 以及 `count()` 成员方法会经常用到  
 
 
-## 4.9. set multiset 
+## 5.9. set multiset 
 
 set 容器定义于`<set>`头文件  
 
@@ -1791,7 +1898,7 @@ set 容器定义于`<set>`头文件
 * 切勿尝试直接修改 set 容器中已存储元素的值，这很有可能破坏 set 容器中元素的有序性，
 * 最正确的修改 set 容器中元素值的做法是：先删除该元素，然后再添加一个修改后的元素。
 
-### 4.9.1. 创建set
+### 5.9.1. 创建set
 
 定义对象
 ```cpp
@@ -1829,7 +1936,7 @@ std::set<std::string,std::greater<string> > myset{"java","stl","python"};
 
 ```
 
-### 4.9.2. 迭代器
+### 5.9.2. 迭代器
 
 1. C++ STL 中的 set 容器类模板中未提供 at() 成员函数，也未对 [] 运算符进行重载。因此，要想访问 set 容器中存储的元素，只能借助 set 容器的迭代器。  
 2.  set 容器配置的迭代器类型为双向迭代器。这意味着，假设 p 为此类型的迭代器，则其只能进行 ++p、p++、--p、p--、*p 操作，并且 2 个双向迭代器之间做比较，也只能使用 == 或者 != 运算符。
@@ -1850,7 +1957,7 @@ std::set<std::string,std::greater<string> > myset{"java","stl","python"};
   
 虽然 C++ STL 标准中，set 类模板中包含 lower_bound()、upper_bound()、equal_range() 这 3 个成员函数，但它们更适用于 `multiset` 容器，几乎不会用于操作 set 容器。  
 
-### 4.9.3. 插入元素
+### 5.9.3. 插入元素
 
 `.insert()` 方法 val 表示要添加的新元素，该方法的返回值为 pair 类型  
 插入单个元素
@@ -1888,7 +1995,7 @@ void insert ( {E1, E2,...,En} );
 myset.insert({ "stl","python","java"});
 
 ```
-### 4.9.4. 插入元素2
+### 5.9.4. 插入元素2
 
 `emplace()` 和 `emplace_hint()` 是 C++ 11 标准加入到 set 类模板中的，相比具有同样功能的 insert() 方法，完成同样的任务，emplace() 和 emplace_hint() 的效率会更高。  
 
@@ -1910,7 +2017,7 @@ pair<set<string, string>::iterator, bool> ret = myset.emplace("http://c.bianchen
 * 返回值是一个迭代器，而不再是 pair 对象。当成功添加元素时，返回的迭代器指向新添加的元素；反之，如果添加失败，则迭代器就指向 set 容器和要添加元素的值相同的元素。
 
 
-### 4.9.5. 删除元素
+### 5.9.5. 删除元素
 
 
 set也是使用 `erase` 删除元素  `clear()`;
@@ -1928,7 +2035,7 @@ iterator  erase (const_iterator first, const_iterator last);
 * 后 2 种格式的 erase() 方法，返回值都是迭代器，其指向的是 set 容器中删除元素之后的第一个元素
 * 如果要删除的元素就是 set 容器最后一个元素，则 erase() 方法返回的迭代器等价于 end() 方法返回的迭代器。
 
-### 4.9.6. multiset
+### 5.9.6. multiset
 回忆一下，set 容器具有以下几个特性：
 * 不再以键值对的方式存储数据，因为 set 容器专门用于存储键和值相等的键值对，因此该容器中真正存储的是各个键值对的值（value）；
 * set 容器在存储数据时，会根据各元素值的大小对存储的元素进行排序（默认做升序排序）；
@@ -1946,7 +2053,7 @@ C++ STL 标准库中还提供有一个和 set 容器相似的关联式容器， 
 5. equal_range() 等方法，更常用于 multiset 容器。
 
 
-# 5. 算法 
+# 6. 算法 
 
 使用STL算法的好处
 
@@ -1956,9 +2063,9 @@ C++ STL 标准库中还提供有一个和 set 容器相似的关联式容器， 
 * 使用算法函数编写的程序，可扩展性更强，更容易维护；
 
 
-## 5.1. 查找 find系列
+## 6.1. 查找 find系列
 
-### 5.1.1. find() 基础查找
+### 6.1.1. find() 基础查找
 
 find()的函数定义相对简单, 该函数适用于所有的序列式容器
 
@@ -1994,7 +2101,7 @@ InputIterator find (InputIterator first, InputIterator last, const T& val)
 
 ```
 
-## 5.2. 排序 sort 系列
+## 6.2. 排序 sort 系列
 
 STL 有很多排序算法, 用于适用不同的应用场景  
 
@@ -2031,7 +2138,7 @@ sort 函数受到底层实现方式的限制 需要有以下三个条件才能�
    如果容器中存储的是自定义的类对象，则该类的内部必须提供移动构造函数和移动赋值运算符。
 
 
-### 5.2.1. sort() 
+### 6.2.1. sort() 
 
 sort() 是基于快速排序实现的  复杂度:N*log2(N)    
 
@@ -2067,7 +2174,7 @@ std::sort(myvector.begin(), myvector.end(), mycomp2());
 
 ```
 
-### 5.2.2. stable_sort()
+### 6.2.2. stable_sort()
 
 stable_sort() 和 sort() 具有相同的使用场景，就连语法格式也是相同的  
 
@@ -2075,7 +2182,7 @@ stable_sort() 和 sort() 具有相同的使用场景，就连语法格式也是�
 
 当可用空间足够的情况下，该函数的时间复杂度可达到`O(N*log2(N))`；反之，时间复杂度为`O(N*log2(N^2))`
 
-### 5.2.3. partial_sort()  partial_sort_copy()
+### 6.2.3. partial_sort()  partial_sort_copy()
 
 假设这样一种情境，有一个存有 100 万个元素的容器，但我们只想从中提取出值最小的 10 个元素  
 使用 sort() 或者 stable_sort() 排序函数, 仅仅为了提取 10 个元素，却要先对 100 万个元素进行排序，可想而知这种实现方式的效率是非常低的。  
@@ -2112,7 +2219,7 @@ RandomAccessIterator partial_sort_copy (InputIterator first,InputIterator last,
 
 ```
 
-### 5.2.4. nth_element() 
+### 6.2.4. nth_element() 
 
 在有序序列中，我们可以称第 n 个元素为整个序列中“第 n 大”的元素  
 
@@ -2139,7 +2246,7 @@ void nth_element (RandomAccessIterator first,
 * nth：也是随机访问迭代器，其功能是令函数查找“第 nth 大”的元素，并将其移动到 nth 指向的位置；
 * comp：用于自定义排序规则。
 
-### 5.2.5. is_sorted() 和 is_sorted_until()
+### 6.2.5. is_sorted() 和 is_sorted_until()
 
 本就是一组有序的数据，如果我们恰巧需要这样的升序序列，就没有必要再执行排序操作。  
 
@@ -2174,7 +2281,7 @@ ForwardIterator is_sorted_until (ForwardIterator first,
 * [first, last) 用于指定要检测的序列；
 * comp 用于指定自定义的排序规则。 
 
-### 5.2.6. 自定义排序规则的优化 
+### 6.2.6. 自定义排序规则的优化 
 
 数对象可以理解为伪装成函数的对象，根据以往的认知，函数对象的执行效率应该不如普通函数。但事实恰恰相反;   
 将普通函数定义为更高效的内联函数，其执行效率也无法和函数对象相比。  

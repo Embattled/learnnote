@@ -67,6 +67,8 @@ gcc hello.c -lm -L /usr/lib -l /usr/include
 
 ### 1.3.1. 分步编译
 
+事实上，从源代码生成可执行文件可以分为四个步骤，分别是预处理（Preprocessing）、编译（Compilation）、汇编（Assembly）和链接（Linking）  
+
 1. 预处理  `-E`
    `g++ -E demo.cpp -o demo.i`  
    必须使用 -o 选项将该结果输出到指定的 demo.i 文件  
