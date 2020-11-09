@@ -1,6 +1,22 @@
-# 1. SSH的基本操作
+# 1. Secure Shell  (ssh) 
 
-## 1.1. 安装  
+SSH 为 Secure Shell 的缩写，由 IETF 的网络小组（Network Working Group）所制定；  
+SSH 为建立在应用层基础上的安全协议。SSH 是较可靠，专为远程登录会话和其他网络服务提供安全性的协议。  
+
+ssh服务端由2部分组成： openssh(提供ssh服务)    openssl(提供加密的程序)  
+ssh的客户端可以用 XSHELL，Securecrt, Mobaxterm等工具进行连接  
+
+1. SSH是安全的加密协议，用于远程连接Linux服务器               
+2. SSH的默认端口是22，安全协议版本是SSH2               
+3. SSH服务器端主要包含2个服务功能SSH连接和SFTP服务器               
+4. SSH客户端包含ssh连接命令和远程拷贝scp命令等 
+
+
+## 1.1. linux 下的使用
+
+SSH(远程连接工具)连接原理：ssh服务是一个守护进程(demon)，系统后台监听客户端的连接，   
+ssh服务端的进程名为sshd,负责实时监听客户端的请求(IP 22端口)，包括公共秘钥等交换等信息。  
+
 
 ```shell
 # 查看是否安装以及版本 ubuntu上默认只安装了openssh-client
@@ -51,6 +67,23 @@ Host 别名
     Port 端口
     User 用户名
 ```
+
+## ProxyCommand 跳板
+
+很多环境都有一台统一登录跳板机,我们需要先登录跳板机,然后再登录自己的目标机器.  
+ProxyCommand是openssh的特性,如果使用putty,xshell,那么是没有这个功能的  
+
+在windows下面,推荐使用`mobaxterm`,其基于cgywin,里面移植了一个完整版本的openssh实现  
+在linux和macos里面直接就是openssh了  
+
+
+`ProxyCommand ssh -q -x -W %h:%p tiaoban`  
+* -q : 
+* -W : 将client过来的标准输入和输出forward到host和port指定的地方.
+* %h:%p : 表示要连接的目标机端口,可以直接写死固定值,但是使用%h和%p可以保证在Hostname和Port变化的情况下ProxyCommand这行不用跟着变化.
+
+
+
 
 
 ## 1.3. SHA1 支持

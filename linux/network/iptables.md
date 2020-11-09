@@ -24,13 +24,13 @@ iptables/netfilter 组成了linux平台下的包过滤防火墙
 
 **五链**  
 五链是指内核中控制网络的`NetFilter`定义的五个规则链，分别为
-名称|拥有的表
--|-
-PREROUTING, 路由前| raw mangle nat
-INPUT, 数据包流入口| mangle nat filter
-FORWARD, 转发管卡| mangle filter 
-OUTPUT, 数据包出口| raw mangle nat filter
-POSTROUTING, 路由后| mangle nat
+| 名称                | 拥有的表              |
+| ------------------- | --------------------- |
+| PREROUTING, 路由前  | raw mangle nat        |
+| INPUT, 数据包流入口 | mangle nat filter     |
+| FORWARD, 转发管卡   | mangle filter         |
+| OUTPUT, 数据包出口  | raw mangle nat filter |
+| POSTROUTING, 路由后 | mangle nat            |
 
 **堵通策略**  
 是指对数据包所做的操作，一般有两种操作——“通（`ACCEPT`）”、“堵（`DROP`）”，还有一种操作很常见`REJECT`.
@@ -50,15 +50,15 @@ ACTION,操作动作
 
 ### a.查看命令  
 
-| 查看规则                 | 细则                                   |
-| ------------------------ | -------------------------------------- |
-| -L, --list [chain]       | 列出规则,最主要的命令                             |
-| -v, --verbose            | 详细信息；                             |
-| -vv， -vvv               | 更加详细的信息                         |
-| -n, --numeric            | 数字格式显示主机地址和端口号,不解析地址,执行速度更快         |
-| -x, --exact              | 显示计数器的精确值；                   |
-| --line-numbers           | 列出规则时，显示其在链上的相应的编号,没有短命令 |
-| -S, --list-rules [chain] | 显示指定链的所有规则                 |
+| 查看规则                 | 细则                                                 |
+| ------------------------ | ---------------------------------------------------- |
+| -L, --list [chain]       | 列出规则,最主要的命令                                |
+| -v, --verbose            | 详细信息；                                           |
+| -vv， -vvv               | 更加详细的信息                                       |
+| -n, --numeric            | 数字格式显示主机地址和端口号,不解析地址,执行速度更快 |
+| -x, --exact              | 显示计数器的精确值；                                 |
+| --line-numbers           | 列出规则时，显示其在链上的相应的编号,没有短命令      |
+| -S, --list-rules [chain] | 显示指定链的所有规则                                 |
 
 例:查看 filter表的规则列表  
 `iptables -nL`
@@ -79,8 +79,8 @@ destination:规则对应的目标地址
 | -------- | --------------------------------------------------------------------------------------- |
 | -A       | --append chain rule-specification：追加新规则于指定链的尾部；                           |
 | -I       | --insert chain `rulenum` rule-specification：插入新规则于指定链的指定位置，默认为首部； |
-| -R       | --replace chain `rulenum` rule-specification：替换指定的规则为新的规则；                  |
-| -D       | --delete chain `rulenum` :根据规则编号删除规则；                                          |
+| -R       | --replace chain `rulenum` rule-specification：替换指定的规则为新的规则；                |
+| -D       | --delete chain `rulenum` :根据规则编号删除规则；                                        |
 
 例: 路由转发的规则  
 `iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE`  

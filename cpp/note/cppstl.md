@@ -1,5 +1,7 @@
 # 1. C++ 标准环境
 
+STL是Standard Template Library 的简称  
+
 ## 1.1. C++ 编译环境的构成
 
 一个完整的C++环境由 库和编译模块构成
@@ -14,7 +16,9 @@
 
 ## 1.2. C++ 标准库
 
-C++ 标准库并不止 STL
+C++ 标准库并不止 容器库
+
+
 
 1. C标准库            首字母带C的C语言库
 2. 流库               `iostream iomanip ios sstream fstream` 以及C语言兼容的 `cstdio cwchar`
@@ -24,7 +28,7 @@ C++ 标准库并不止 STL
 6. 国际化
 7. 语言支持功能       `cstddef limits climits cfloat cstdlib new typeinfo exception cstdarg csetjmp csginal`
 
-在此之外的则是 STL
+在此之外的则是 STL容器库
 
 包括字符串 以及带有关联的 `算法-迭代器-容器` 
 
@@ -38,11 +42,187 @@ C++ 标准库并不止 STL
 * 标准函数库      通用的独立的,不属于类的函数组成的库,函数基本继承于C语言
 * 面向对象库      类及其相关函数的集合
 
+## 1.3. cppreference.com  的C++标准库
 
+从网站上拷贝的最标准的库
 
-# 2. C++的流
+1. Language Support
 
-## 2.1. C++ 的文件读写流 fstream
+```cpp
+#include <cstddef>
+#include <cstdlib>
+#include <version>
+#include <limits>
+#include <climits>
+#include <cfloat>
+#include <cstdint>
+#include <new>
+#include <typeinfo>
+#include <source_location>
+#include <exception>
+#include <initializer_list>
+#include <compare>
+#include <coroutine>
+#include <csignal>
+#include <csetjmp>
+#include <cstdarg>
+```
+
+2. Concepts
+`#include <concepts>`  
+
+3. Diagnostics
+```cpp
+#include <stdexcept>
+#include <cassert>
+#include <cerrno>
+#include <system_error>
+```
+
+4. General utilities
+
+```cpp
+#include <utility>
+#include <memory>
+#include <memory_resource>
+#include <scoped_allocator>    
+#include <bitset>
+#include <tuple>
+#include <optional>
+#include <any>
+#include <variant>
+#include <type_traits>
+#include <ratio>
+#include <chrono>
+#include <typeindex>
+#include <functional>
+#include <ctime>
+```
+
+5. Strings
+
+```cpp
+#include <string>
+#include <string_view>
+#include <cstring>
+#include <charconv>
+#include <format>
+#include <cctype>
+#include <cwctype>
+#include <cwchar>
+#include <cuchar>
+```
+6. Localization
+
+```cpp
+#include <locale>
+#include <codecvt>
+#include <clocale>
+```
+7.  Containers
+
+```cpp
+#include <span>
+#include <array>
+#include <vector>
+#include <deque>
+#include <forward_list>
+#include <list>
+#include <map>
+#include <set>
+#include <queue>
+#include <unordered_map>
+#include <unordered_set>
+#include <stack>
+```
+
+8. Iterators
+```cpp
+#include <iterator>
+```
+
+9. Ranges
+```cpp
+#include <ranges>
+```
+
+10. Algorithms
+
+```cpp
+#include <algorithm>
+#include <execution>
+```
+
+11. Numerics
+
+```cpp
+#include <complex>
+#include <random>
+#include <valarray>
+#include <numeric>
+#include <bit>
+#include <numbers>
+#include <cfenv>
+#include <cmath>
+```
+
+12. Input/Output
+
+```cpp
+#include <iosfwd>
+#include <ios>
+#include <iomanip>
+#include <streambuf>
+#include <istream>
+#include <ostream>
+#include <iostream>
+#include <sstream>
+#include <fstream>
+#include <syncstream>
+#include <cstdio>
+#include <cinttypes>
+#include <strstream>
+```
+
+13. Regular expressions
+
+```cpp
+#include <regex>
+```
+
+14. Filesystem support
+
+```cpp
+#include <filesystem>
+```
+
+15. Thread support
+
+```cpp
+#include <thread>
+#include <atomic>
+#include <mutex>
+#include <shared_mutex>
+#include <condition_variable>
+#include <future>
+#include <stop_token>
+#include <semaphore>
+#include <latch>
+#include <barrier>
+```
+16. C compatibility
+```cpp
+#include <ciso646>
+#include <cstdalign>
+#include <cstdbool>
+#include <ccomplex>
+#include <ctgmath>
+```
+ 
+# 2. C++的流 Input/Output
+
+## 2.1. fstream C++ 的文件读写流 
+
 iostream 标准库,它提供了 cin 和 cout 方法分别用于从标准输入读取流和向标准输出写入流.  
 从文件读取流和向文件写入流,这就需要用到 C++ 中另一个标准库 `fstream`  
 
@@ -154,7 +334,7 @@ int main () {
   return 0;
 ```
 
-## 2.2. 字符串流 sstream
+## 2.2. sstream 字符串流 
 
 头文件 `<sstream>`  
 * stringstream  同时可以支持C风格的串流的输入输出操作 stringstream则是从iostream(输入输出流类)和和stringstreambase（c++字符串流基类）派生而来
@@ -345,7 +525,7 @@ data() + i == std::addressof(operator[](i)) for every i in [0, size()]. //(since
 .cr*();    //顺序为cr
 ```
 
-### 使用基本运算符操作 string
+### 4.1.4. 使用基本运算符操作 string
 
 **字符串拼接**  使用 `+` 和 `+=`  
 1.  两边可以都是 string 字符串
@@ -470,7 +650,22 @@ wstring to_wstring (int val);
 
 ```
 
-# 5. STL容器
+# 5. 容器 Containers
+
+```cpp
+#include <span>
+#include <array>
+#include <vector>
+#include <deque>
+#include <forward_list>
+#include <list>
+#include <map>
+#include <set>
+#include <queue>
+#include <unordered_map>
+#include <unordered_set>
+#include <stack>
+```
 
 ## 5.1. 容器种类  
 STL 提供有 3 类标准容器，分别是序列容器、排序容器和哈希容器  其中后两类容器有时也统称为关联容器  
@@ -854,7 +1049,7 @@ std::stack<int, std::list<int>> my_stack2=my_stack;
 std::stack<int, std::list<int>> my_stack(my_stack1);
 ```
 
-### queue
+### 5.3.3. queue
 
 和 stack 栈容器适配器不同，queue 容器适配器有 2 个开口，其中一个开口专门用来输入数据，另一个专门用来输出数据  
 最先进入 queue 的元素，也可以最先从 queue 中出来，  
@@ -894,7 +1089,7 @@ while (!my_queue.empty())
 }
 ```
 
-### priority_queue
+### 5.3.4. priority_queue
 
 和queue有几点不同
 1. 只能访问 priority_queue 中位于队头的元素
@@ -2052,8 +2247,216 @@ C++ STL 标准库中还提供有一个和 set 容器相似的关联式容器， 
 4. upper_bound()
 5. equal_range() 等方法，更常用于 multiset 容器。
 
+# 6. 数值库 Numerics
 
-# 6. 算法 
+```cpp
+#include <complex>
+#include <random>
+#include <valarray>
+#include <numeric>
+#include <bit>
+#include <numbers>
+#include <cfenv>
+#include <cmath>
+```
+
+标准C++数值库包含了常规数学函数以及类型， 以及一些特殊化的数列和随机数生成。
+包括了一系列的头文件  
+
+## 6.1. cmath 通用数学函数
+
+包括了从 C语言继承来的一些 通用数学运算  
+
+### 基础运算函数
+
+
+
+### 三角函数
+
+### 指数函数
+
+### 对数函数
+
+
+###
+
+
+## 6.2. numeric 数学运算库
+
+### 6.2.1. iota 自动生成加1数列 since C++11
+
+
+```cpp
+// until c++20
+template< class ForwardIt, class T >
+void iota( ForwardIt first, ForwardIt last, T value )
+
+// since c++20
+template< class ForwardIt, class T >
+constexpr void iota( ForwardIt first, ForwardIt last, T value );
+
+// Fills the range [first, last) with sequentially increasing values, starting with value and repetitively evaluating ++value. 
+// 只能生成加1数列, 不能其他等比数列
+
+// 由于内部是用 value++ 实现的, 因此可以自加的数据类型都可以作为 value 输入 
+
+
+// 给 list 赋值 -4 到 5
+    std::list<int> l(10);
+    std::iota(l.begin(), l.end(), -4);
+ 
+// 自动将list的每个值的地址存到 vector 中 
+    std::vector<std::list<int>::iterator> v(l.size());
+    std::iota(v.begin(), v.end(), l.begin());
+```
+### 6.2.2. gcd lcm 最大公约数 最小公倍数 since c++17
+
+```cpp
+// greatest common divisor
+template< class M, class N>
+constexpr std::common_type_t<M, N> gcd(M m, N n);
+// If either |m| or |n| is not representable as a value of type std::common_type_t<M, N>, the behavior is undefined.
+
+// least common multiple
+template< class M, class N>
+constexpr std::common_type_t<M, N> lcm(M m, N n);
+// The behavior is undefined if |m|, |n|, or the least common multiple of |m| and |n| is not representable as a value of type std::common_type_t<M, N>. 
+
+// 这两个函数都是 如果 m和n 都是 0 ， 则返回 0
+// If either M or N is not an integer type, or if either is (possibly cv-qualified) bool, the program is ill-formed.
+
+```
+### 6.2.3. accumulate 
+
+自动累加 first 到 last 之间的元素  
+
+```cpp
+
+// 使用 operator+ 来进行相加
+template< class InputIt, class T >
+constexpr T accumulate( InputIt first, InputIt last, T init );
+
+// uses the given binary function op
+template< class InputIt, class T, class BinaryOperation >
+constexpr T accumulate( InputIt first, InputIt last, T init,BinaryOperation op );
+
+/* 
+first, last 	- 	the range of elements to sum
+init 	        - 	initial value of the sum
+op 	          - 	binary operation function object that will be applied. The binary operator takes the current a    
+                  ccumulation value a (initialized to init) and the value of the current element b. 
+
+
+The signature of the function should be equivalent to the following:
+  Ret fun(const Type1 &a, const Type2 &b);
+
+The signature does not need to have const &.
+The type Type1 must be such that an object of type T can be implicitly converted to Type1. The type Type2 must be such that an object of type InputIt can be dereferenced and then implicitly converted to Type2. The type Ret must be such that an object of type T can be assigned a value of type Ret. ​ 
+
+*/
+
+// 返回值
+// Return value
+// 1) The sum of the given value and elements in the given range.
+// 2) The result of left fold of the given range over op
+
+/* 
+Notes:
+std::accumulate performs a left fold. In order to perform a right fold, 
+one must reverse the order of the arguments to the binary operator, and use reverse iterators. 
+*/
+
+
+// 两个版本的内部实现(可能的)
+template<class InputIt, class T>
+constexpr // since C++20
+T accumulate(InputIt first, InputIt last, T init)
+{
+    for (; first != last; ++first) {
+        init = std::move(init) + *first; // std::move since C++20
+    }
+    return init;
+}
+
+template<class InputIt, class T, class BinaryOperation>
+constexpr // since C++20
+T accumulate(InputIt first, InputIt last, T init, 
+             BinaryOperation op)
+{
+    for (; first != last; ++first) {
+        init = op(std::move(init), *first); // std::move since C++20
+    }
+    return init;
+}
+
+
+// e.g.
+
+int main()
+{
+   std::vector<int> v{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+   int sum = std::accumulate(v.begin(), v.end(), 0);
+   //  sum: 55
+
+   int product = std::accumulate(v.begin(), v.end(), 1, std::multiplies<int>());
+  //  product: 3628800
+
+  
+
+
+}
+```
+
+### 6.2.4. midpoint since c++20
+
+Computes the midpoint of the integers, floating-points, or pointers a and b.   
+计算中点  
+
+```cpp
+
+template< class T >
+constexpr T midpoint(T a, T b) noexcept;
+template< class T >
+constexpr T* midpoint(T* a, T* b);
+
+// a, b 	- 	integers, floating-points, or pointer values
+// 如果是指针的话, a和b 必须是同一个序列的指针
+/* 
+Return:
+1) Half the sum of a and b. No overflow occurs. 
+  If a and b have integer type and the sum is odd, the result is rounded towards a. 
+  If a and b have floating-point type, at most one inexact operation occurs.
+  如果 a 和 b 的差是奇数, 则返回的值偏向 a 
+
+2) If a and b point to, respectively, x[i] and x[j] of the same array object x (for the purpose of pointer arithmetic), returns a pointer to x[i+(j-i)/2] (or, equivalently x[std::midpoint(i, j)]) where the division rounds towards zero. 
+  If a and b do not point to elements of the same array object, the behavior is undefined.
+*/
+
+
+// 可以无溢出的计算 a和b 的中值
+int main()
+{
+    std::uint32_t a = std::numeric_limits<std::uint32_t>::max();
+    std::uint32_t b = std::numeric_limits<std::uint32_t>::max() - 2;
+    // a: 4294967295
+    // b: 4294967293
+    std::cout << "Incorrect (overflow and wrapping): " << (a + b) / 2 << '\n'
+              << "Correct: " << std::midpoint(a, b) << "\n\n";
+    // Incorrect (overflow and wrapping): 2147483646
+    // Correct: 4294967294
+}
+
+```
+
+## 6.3. number 数学常量
+
+## 6.4. complex 复数运算
+
+
+
+
+
+# 7. algorithm 算法库 
 
 使用STL算法的好处
 
@@ -2063,9 +2466,9 @@ C++ STL 标准库中还提供有一个和 set 容器相似的关联式容器， 
 * 使用算法函数编写的程序，可扩展性更强，更容易维护；
 
 
-## 6.1. 查找 find系列
+## 7.1. 查找 find系列
 
-### 6.1.1. find() 基础查找
+### 7.1.1. find() 基础查找
 
 find()的函数定义相对简单, 该函数适用于所有的序列式容器
 
@@ -2101,7 +2504,7 @@ InputIterator find (InputIterator first, InputIterator last, const T& val)
 
 ```
 
-## 6.2. 排序 sort 系列
+## 7.2. 排序 sort 系列
 
 STL 有很多排序算法, 用于适用不同的应用场景  
 
@@ -2138,7 +2541,7 @@ sort 函数受到底层实现方式的限制 需要有以下三个条件才能�
    如果容器中存储的是自定义的类对象，则该类的内部必须提供移动构造函数和移动赋值运算符。
 
 
-### 6.2.1. sort() 
+### 7.2.1. sort() 
 
 sort() 是基于快速排序实现的  复杂度:N*log2(N)    
 
@@ -2174,7 +2577,7 @@ std::sort(myvector.begin(), myvector.end(), mycomp2());
 
 ```
 
-### 6.2.2. stable_sort()
+### 7.2.2. stable_sort()
 
 stable_sort() 和 sort() 具有相同的使用场景，就连语法格式也是相同的  
 
@@ -2182,7 +2585,7 @@ stable_sort() 和 sort() 具有相同的使用场景，就连语法格式也是�
 
 当可用空间足够的情况下，该函数的时间复杂度可达到`O(N*log2(N))`；反之，时间复杂度为`O(N*log2(N^2))`
 
-### 6.2.3. partial_sort()  partial_sort_copy()
+### 7.2.3. partial_sort()  partial_sort_copy()
 
 假设这样一种情境，有一个存有 100 万个元素的容器，但我们只想从中提取出值最小的 10 个元素  
 使用 sort() 或者 stable_sort() 排序函数, 仅仅为了提取 10 个元素，却要先对 100 万个元素进行排序，可想而知这种实现方式的效率是非常低的。  
@@ -2219,7 +2622,7 @@ RandomAccessIterator partial_sort_copy (InputIterator first,InputIterator last,
 
 ```
 
-### 6.2.4. nth_element() 
+### 7.2.4. nth_element() 
 
 在有序序列中，我们可以称第 n 个元素为整个序列中“第 n 大”的元素  
 
@@ -2246,7 +2649,7 @@ void nth_element (RandomAccessIterator first,
 * nth：也是随机访问迭代器，其功能是令函数查找“第 nth 大”的元素，并将其移动到 nth 指向的位置；
 * comp：用于自定义排序规则。
 
-### 6.2.5. is_sorted() 和 is_sorted_until()
+### 7.2.5. is_sorted() 和 is_sorted_until()
 
 本就是一组有序的数据，如果我们恰巧需要这样的升序序列，就没有必要再执行排序操作。  
 
@@ -2281,7 +2684,7 @@ ForwardIterator is_sorted_until (ForwardIterator first,
 * [first, last) 用于指定要检测的序列；
 * comp 用于指定自定义的排序规则。 
 
-### 6.2.6. 自定义排序规则的优化 
+### 7.2.6. 自定义排序规则的优化 
 
 数对象可以理解为伪装成函数的对象，根据以往的认知，函数对象的执行效率应该不如普通函数。但事实恰恰相反;   
 将普通函数定义为更高效的内联函数，其执行效率也无法和函数对象相比。  
@@ -2305,3 +2708,134 @@ public:
 而如果使用 mycomp 作为参数来调用 sort() 函数，情形则大不相同。要知道，C++ 并不能真正地将一个函数作为参数传递给另一个函数，  
 换句话说，如果我们试图将一个函数作为参数进行传递，编译器会隐式地将它转换成一个指向该函数的指针，并将该指针传递过去。  
 
+
+## 7.3. 自动填充函数
+
+### 7.3.1. fill 为序列填充同一数值
+
+fill() 和 fill_n() 算法提供了一种为元素序列填入给定值的简单方式
+* fill() 会填充整个序列
+* fill_n() 则以给定的迭代器为起始位置，为指定个数的元素设置值
+
+```cpp
+
+// fill
+template< class ForwardIt, class T >
+constexpr void fill( ForwardIt first, ForwardIt last, const T& value );
+
+template< class ExecutionPolicy, class ForwardIt, class T >
+void fill( ExecutionPolicy&& policy, ForwardIt first, ForwardIt last, const T& value );
+
+// 函数输入的迭代器必须是正向迭代器
+
+// 函数 Complexity: Exactly last - first assignments. 
+
+// (可能的)实现方法
+void fill(ForwardIt first, ForwardIt last, const T& value)
+{
+    for (; first != last; ++first) {
+        *first = value;
+    }
+}
+
+// Container has 12 elements
+std::vector<string> data {12}; 
+// 给整个vector 赋值字符串 "none"
+std::fill (std::begin (data), std::end (data), "none"); 
+
+
+
+// fill_n
+
+template< class OutputIt, class Size, class T >
+constexpr OutputIt fill_n( OutputIt first, Size count, const T& value );
+
+template< class ExecutionPolicy, class ForwardIt, class Size, class T >
+ForwardIt fill_n( ExecutionPolicy&& policy, ForwardIt first, Size count, const T& value );
+
+// 从first 开始 给 count 个值赋值 value
+// Complexity: Exactly count assignments, for count > 0. 
+// 返回值 : 最后一个操作的对象的迭代器的的下一个  类似于 容器的end()
+
+
+std::vector<int> v1{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}; 
+std::fill_n(v1.begin(), 5, -1);
+std::copy(begin(v1), end(v1), std::ostream_iterator<int>(std::cout, " "));
+// Output: -1 -1 -1 -1 -1 5 6 7 8 9
+
+```
+
+### 7.3.2. generate 为序列填充同一函数调用值
+
+generate 和 generate_n  
+
+```cpp
+
+// generate
+
+template< class ForwardIt, class Generator >
+constexpr void generate( ForwardIt first, ForwardIt last, Generator g );
+template< class ExecutionPolicy, class ForwardIt, class Generator >
+void generate( ExecutionPolicy&& policy, ForwardIt first, ForwardIt last, Generator g );
+
+
+/* 
+first, last 	- 	the range of elements to generate
+policy       	- 	the execution policy to use. See execution policy for details.
+g            	- 	generator function object that will be called.
+
+The signature of the function should be equivalent to the following:  Ret fun();
+The type Ret must be such that an object of type ForwardIt can be dereferenced and assigned a value of type Ret. ​ 
+ForwardIt must meet the requirements of LegacyForwardIterator. 
+
+*/
+
+// 可能的实现方法:
+template<class ForwardIt, class Generator>
+void generate(ForwardIt first, ForwardIt last, Generator g)
+{
+    while (first != last) {
+        *first++ = g();
+    }
+}
+
+
+// e.g.
+
+int f()
+{ 
+    static int i = 1;
+    return i++;
+}
+int main()
+{
+    std::vector<int> v(5);
+    std::generate(v.begin(), v.end(), f);
+    // v: 1 2 3 4 5
+
+    // 直接给函数传入 lambda 函数
+    // 该调用相当于 numeric 里的 iota(v.begin(), v.end(), 0)
+    std::generate(v.begin(), v.end(), [n = 0] () mutable { return n++; });
+    // v: 0 1 2 3 4
+}
+
+
+// generate_n
+template< class OutputIt, class Size, class Generator >
+constexpr OutputIt generate_n( OutputIt first, Size count, Generator g );
+template< class ExecutionPolicy, class ForwardIt , class Size, class Generator >
+ForwardIt generate_n( ExecutionPolicy&& policy, ForwardIt first, Size count, Generator g );
+
+// return value : Iterator one past the last element assigned if count>0, first otherwise.
+
+// 同理 也是将 last 替换成要填入的值的个数, 返回最后一个填入值的下一个位置的迭代器
+
+int main()
+{
+    std::mt19937 rng; // default constructed, seeded with fixed seed
+    std::generate_n(std::ostream_iterator<std::mt19937::result_type>(std::cout, " "),
+                    5, std::ref(rng));
+    // Output: 3499211612 581869302 3890346734 3586334585 545404204
+}
+
+```
