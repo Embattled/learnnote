@@ -1,5 +1,12 @@
 # 1. Hign Performance Compute
 
+
+
+**Embarrassingly Parallel** : 完全并行问题, 子问题之间没有任何的冲突  
+
+**Cyclic(or interleaved) allocation** : 隔行分配, 如果有p个处理器, 则任务k被分配到 (k mod p) 号处理器执行
+
+
 # 2. MPI programming
 
 Message Passing Interface (MPI): parallel programs with *message passing*  
@@ -10,9 +17,6 @@ Message Passing Interface (MPI): parallel programs with *message passing*
 * MPI 只定义了接口, 没有实现
 
 
-**Embarrassingly Parallel** : 完全并行问题, 子问题之间没有任何的冲突  
-
-**Cyclic(or interleaved) allocation** : 隔行分配, 如果有p个处理器, 则任务k被分配到 (k mod p) 号处理器执行
 
 **SPMD - Single Program Multiple Data**
 * 一个程序通过多个MPI进程来执行, 每个MPI进程有自己的ID, 称作 `MPI rank`
@@ -148,7 +152,7 @@ Reduction Operator
 | MPI_PROD   | Product                   |
 | MPI_SUM    | Sum                       |
 
-### p2p 通信
+### 2.2.3. p2p 通信
 
 最基础的线程对线程通信
 
@@ -178,7 +182,7 @@ MPI_Recv(&j,1,MPI_INT,src,0,MPI_COMM_WORLD,&status);
 
 ```
 
-### Benchmarking 函数
+### 2.2.4. Benchmarking 函数
 
 * MPI_Wtime   用于返回执行时间, 一般通过执行两次然后计算差来代表运行时间
 * MPI_Wtick   返回 MPI_Wtick 的精度
@@ -195,7 +199,7 @@ etime=-MPI_Wtime();
 etime+=MPI_Wtime();
 
 ```
-### MPI_Barrier 同步函数
+### 2.2.5. MPI_Barrier 同步函数
 
 Barrier synchronization  
 只有同一组的所有进程都执行到该函数时, 才会返回, 用于同步进程的进度
@@ -217,7 +221,7 @@ etime+=MPI_Wtime();
 ```
 
 
-### 其他的通信方法
+### 2.2.6. 其他的通信方法
 
 * 将每个线程的相同名称的变量进行处理
   * Reduce      : A single process finally has the result of reduction op.
@@ -232,3 +236,338 @@ etime+=MPI_Wtime();
 * 发送数据给其他线程
   * Broadcast   : One MPI process sends the **same data** to the others.
   * Scatter     : One MPI process sends **different data** to each of the others.
+
+
+# 3. OpenMP programming
+
+OpenMP is used to specify how to execute a block.   
+
+* process : When a program is launched, OS reserves a set of some computing resources for the execution.
+  * CPU time
+  * Memory space
+  * File descriptors
+* thread  : A thread is created inside a process, an execution flow
+  * CPU time is assigned to each thread
+  * The other resources are shared with the other threads of the process.
+
+## 3.1. OpenMP 编译和运行
+
+* Environmental Variable OMP_NUM_THREADS
+```shell
+
+# configure the number of threads for running the program
+# B shell
+export OMP_NUM_THREADS=4
+# C shell
+set OMP_NUM_THREADS 4
+```
+
+compile:  
+`g++ -fopenmp sample.c`   
+
+## 3.2. scalability
+
+* A small part of the code consumes a large part of the execution time.
+* Ts: Single Execution Time
+* Tp: Parallel Execution Time
+
+ratio=Ts/Tp
+
+## 3.3. OpenMP 编程基础
+
+### 3.3.1. Directives 命令格式
+
+Compiler Directive的基本格式如下：  
+
+`#pragma omp directive-name  [clause [ [, clause]...]`
+
+
+* 旧版的OpenMP中, directive-name共11个:
+* 有 clause 选项的: `parallel, for, sections, single`
+* 无 clause 选项的: `atomic, barrier, critical, flush, master, ordered, threadprivate`
+
+* clause（子句） 相当于是Directive的修饰，定义一些Directive的参数什么的
+  * `copyin(variable-list),`
+  * `copyprivate(variable-list),`
+  * `default(shared | none)`
+  * `firstprivate(variable-list)`
+  * `if(expression)`                          : 为 clause 的实效添加表达式
+  * `lastprivate(variable-list)`
+  * `nowait`
+  * `num_threads(num)`
+  * `ordered, private(variable-list)`
+  * `reduction(operation: variable-list)`
+  * `schedule(type[,size])`                   : 设置C++ for的多次迭代如何在多个线程间划分
+  * `shared(variable-list)`
+
+* 4.0 的OpenMP中的新 directive-name:
+* 有 clause 的:
+  * simd 三命令:
+    * `simd`  : Applied to a loop to indicate that the loop 可以被转换成 simd loop
+    * `declare simd` : 和simd 配套的 , 不懂
+    * `loop simd` : 不懂
+  * target 三命令:
+    * `target` : 指定执行代码的目标设备
+    * `target update`
+    * `declare target`
+  * `teams` : 创建一个线程 league
+  * `distribute` 
+  * 太多了不看了
+
+
+### 3.3.2. GPU Programming with OpenMP
+
+
+Target Directives
+* `#pragma omp target`
+* `#pragma omp target data` (Defining only data mapping)
+  * New features of OpenMP 4.0 or later
+  * The block specified by the target directive can be offloaded to another processor such as GPU.
+  * A map clause is used to send/retrieve data to/from the GPU.
+* `#pragma omp target teams distribute` : Create a league of teams
+* `#pragma omp parallel`                : Creates a team of (synchronizable) threads.
+
+```cpp
+
+/* Aray Anew is created, and A is transferred from/to GPU */
+#pragma omp target map(alloc:Anew) map(tofrom:A)
+{
+  #pragma omp parallel
+  for(i=;i<N;i++){
+    /* time-consuming data-parallel computation */
+  }
+}
+
+
+#pragma omp target data map (alloc:Anew) map(tofrom:A)
+{
+  #pragma omp target teams distribute
+  for(j=0;j<M;j++){
+    #pragma omp parallel
+    for(i=;i<N;i++){
+      /* time-consuming data-parallel computation */
+    }
+  }
+}
+```
+
+
+
+
+
+
+
+
+## 3.4. directive 
+
+### 3.4.1. parallel 有 clause
+
+
+OpenMP 以 block 为单位并行运算, 即每个Compiler Directive 只作用于其后的语句, 所以用{}来代表一个复合语句    
+
+Work-sharing by inserting directives into a sequential code.  
+
+`#pragma omp parallel` 表示其后语句将被多个线程并行执行，线程个数由系统预设,一般等于逻辑处理器个数;  
+`#pragma omp parallel num_threads(4)`  指定线程数为4  
+
+最基础的语句  
+
+
+### 3.4.2. for  有 clause
+
+C++ for循环需要一些限制从而能在执行C++ for之前确定循环次数，例如C++ for中不应含有break等。OpenMP for作用于其后的第一层C++ for循环  
+
+
+```cpp
+// C code
+for(i=0;i<10;i++)
+  a[i] = b[i]*f + c[i];
+
+
+// OpenMP code
+
+#pragma omp parallel
+{
+#pragma omp for
+  for(i=0;i<10;i++)
+    a[i] = b[i]*f + c[i];
+  // 01234 在 cpu0 ，56789 在cpu1 , 顺序分配
+}
+
+// parallel region中只包含一个for directive作用的语句. 此时可以将parallel和for “缩写”
+#pragma omp parallel for
+for(int i=0; i<size; ++i)
+    data[i] = 123;
+
+```
+### 3.4.3. section  有 clause
+
+如果说for directive用作数据并行，那么sections directive用于任务并行，它指示后面的代码块包含将被多个线程并行执行的section块  
+
+```cpp
+
+#pragma omp parallel
+{
+  // 如果一个 block 中有许多个可以并行的区块
+  #pragma omp sections
+  {
+    #pragma omp section
+    {
+      // 代码 A
+    }
+    #pragma omp section
+    {
+      // 代码 B
+    }
+  //  A 和 B 将会并行执行  
+  }
+}
+
+```
+
+### 3.4.4. single 有 clause
+
+指示代码将仅被一个线程执行,即只执行一次, 具体是哪个线程不确定
+
+```cpp
+#pragma omp parallel num_threads(4)
+{
+    #pragma omp single
+    std::cout << omp_get_thread_num();
+    std::cout << "-";
+}
+// 输出 0---- 一个0 和四个- 
+```
+
+### 3.4.5. master
+
+指示代码将仅被主线程执行，功能类似于single directive，但single directive时具体是哪个线程不确定（有可能是当时闲的那个）。
+
+### 3.4.6. critical
+
+定义一个临界区，保证同一时刻只有一个线程访问临界区  
+```cpp
+
+// Each thread holds a unique value in tmp.
+#pragma omp parallel private (tmp)
+{
+  tmp = 0;
+  #pragma omp for
+  for(i=0;i<10;i++)
+    if(tmp < a[i]) tmp = a[i];
+
+
+  // Once a thread enters the critical section, the others cannot enter it.
+  // 防止同时访问max
+  #pragma omp critical
+  {
+    if(max<tmp) max = tmp;
+  }
+}
+```
+
+### 3.4.7. barrier 
+
+定义一个同步，所有线程都执行到该行后，所有线程才继续执行后面的代码  
+
+
+```cpp
+
+#pragma omp parallel num_threads(3)
+{
+    #pragma omp critical
+    std::cout << omp_get_thread_num() << " ";
+    #pragma omp barrier
+    #pragma omp critical
+    std::cout << omp_get_thread_num()+10 << " ";
+
+    // 输出 0 2 1 10 12 11   一位数数字打印完了才开始打印两位数数字
+}
+
+```
+## 3.5. clauses 
+
+### 3.5.1. if
+
+可以用if clause条件地进行并行化，用num_threads clause覆盖默认线程数  
+
+
+```cpp
+
+int a = 0;
+#pragma omp parallel if(a) num_threads(6)
+{
+    // 因为 a 为0 , 所以没有指定多线程
+    std::cout << omp_get_thread_num();
+}
+// 输出为0
+
+
+
+int a = 7;
+#pragma omp parallel if(a) num_threads(6)
+{
+  // 6 个线程执行
+    std::cout << omp_get_thread_num();
+}
+// 输出 0512346
+
+
+
+```
+
+### 3.5.2. reduction 
+
+reduction clause用于归约，如下是一个并行求和的例子：
+
+```cpp
+
+int sum=0;
+std::cout << omp_get_thread_num() << ":" << &sum << std::endl << std::endl;
+
+#pragma omp parallel num_threads(8) reduction(+:sum)
+{
+    #pragma omp critical
+
+    std::cout << omp_get_thread_num() << ":" << &sum << std::endl;
+
+    #pragma omp for
+    for(int i=1; i<=10000; ++i){
+        // 每个线程用自己的sum求一部分和
+        sum += i;
+    }
+}
+// 最后将所有线程的私有sum加起来赋值给共享版本的sum
+
+std::cout << "sum's valuse: " << sum << std::endl; 
+// 50005000
+```
+
+### 3.5.3. Clauses and Critical Section
+
+Threads share a single memory space.  All data are shared by threads by default.  
+
+To create private variables, use clasuses
+* shared (default)
+  * The variables are shared by threads
+* private
+  * private/firstprivate/lastprivate/copyprivate
+  * The variables can have different values for different threads.
+  * The value can be copied from/to the outside of the block.
+
+### nowait
+
+
+* Each thread does not wait for the others at the end of the block.
+
+
+
+
+### 3.5.4. 主要block命令总结
+
+* `#pragma omp parallel`    : directs parallelizing the following block
+* `#pragma omp for`         : directs work-sharing the following for loop
+* `#pragma omp sections`    : directs the following block is a set of parallel sections
+* `#pragma omp section`     : directs the following block is a section
+* `#pragma omp critical`    : directs the following block is a critical section. Just one thread can enter it
+
