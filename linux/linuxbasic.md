@@ -92,23 +92,93 @@ ESC+l:同ESC-U, 但使之全变为小写
 
 ## 1.5. 系统查看
 
-### 1.5.1. 查看系统版本
+Linux查看系统信息的一些命令
+
+### 1.5.1. cat 系统信息文件打印
+
+好多信息可以通过 cat 打印某一个文件来显示  
 
 ```shell
+# 查看CPU信息
+$ cat /proc/cpuinfo      
 
-# 列出所有版本信息
-$ lsb_release -a
+# 查看系统负载
+$ cat /proc/loadavg      
 
+# 查看内核/操作系统/CPU信息
+$ cat /proc/version 
+
+# 查看内存信息
+$ cat /proc/meminfo
+
+# 查看系统负载
+$ cat /proc/loadavg      
 
 # 打印发行版信息
 $ cat /etc/issue
 
-# 打印linux内核信息
-$ cat /proc/version 
-$ uname -a
+```
+### 1.5.2. 查看系统版本命令
+
+```shell
+
+# 查看内核/操作系统/CPU信息
+$ uname -a               
+
+# 查看计算机名
+$ hostname               
+
+
+# 列出所有PCI设备  t 表示显示总线树 v 表示增加信息丰富度
+$ lspci -tv              
+# 列出所有USB设备
+$ lsusb -tv              
+# 列出加载的内核模块
+$ lsmod                  
+# 列出所有版本信息
+$ lsb_release -a
+
+# 查看环境变量
+$ env                    
+
+```
+### 1.5.3. 查看资源和磁盘
+
+```shell
+# 查看资源
+
+# 查看内存使用量和交换区使用量
+$ free -m                
+
+# 查看各分区使用情况
+$ df -h                  
+
+# 查看指定目录的大小
+$ du -sh <目录名>        
+
+# 查看系统运行时间、用户数、负载
+$ uptime                 
+
+
+# 查看磁盘和分区
+
+# 查看挂接的分区状态
+$ mount | column -t      
+
+# 查看所有分区
+$ fdisk -l               
+
+# 查看所有交换分区
+$ swapon -s              
+
+# 查看磁盘参数(仅适用于IDE设备)
+$ hdparm -i /dev/hda     
+
+# 查看启动时IDE设备检测状况
+$ dmesg | grep IDE       
 ```
 
-## linux 启动流程
+## 1.6. linux 启动流程
 
 Linux系统的启动过程并不复杂，其过程可以分为5个阶段：
 1. 内核的引导
@@ -148,7 +218,7 @@ Linux系统的启动过程并不复杂，其过程可以分为5个阶段：
 
 
 
-# 2. linux 工作管理
+# 2. Linux 工作管理
 
 工作管理指的是在单个登录终端（也就是登录的 Shell 界面）同时管理多个工作的行为.  
 把命令放入后台,然后把命令恢复到前台,或者让命令恢复到后台执行,这些管理操作就是工作管理。  
@@ -161,198 +231,55 @@ Linux系统的启动过程并不复杂，其过程可以分为5个阶段：
    1. 比如 vi 命令只能放入后台暂停,而不能执行,因为 vi 命令需要前台输入信息；
    2. top 命令也不能放入后台执行,而只能放入后台暂停,因为 top 命令需要和前台交互。
 
+## 2.1. jobs 工作查看命令
 
-# 3. Linux 的服务管理
-
-Linux 服务管理两种方式service和systemctl 
-
-systemd是Linux系统**最新的初始化系统**(init),作用是提高系统的启动速度,尽可能启动较少的进程,尽可能更多进程并发启动。
-
-systemd对应的进程管理命令就是 `systemctl`
-
-## 3.1. service  
-
-service命令其实是去`/etc/init.d`目录下,去执行相关程序, 已经被淘汰
-
-```shell
-# service命令启动redis脚本
-service redis start
-# 直接启动redis脚本
-/etc/init.d/redis start
-# 开机自启动
-update-rc.d redis defaults
-```
-
-## 3.2. systemctl
-
-### 3.2.1. 概念
-
-systemctl命令兼容了service  
-
-即systemctl也会去`/etc/init.d`目录下,查看,执行相关程序  
-
-```shell
-# 开机自启动某个服务
-systemctl enable redis
-```
-
-通过 `Unit` 作为单位管理进程
-
-`/usr/lib/systemd/system(Centos)`  
-`/etc/systemd/system(Ubuntu)`  
-
-systemd 默认读取 `/etc/systemd/system `下的配置文件,该目录下的文件会链接/lib/systemd/system/下的文件。执行 ls /lib/systemd/system 你可以看到有很多启动脚本,其中就有最初用来定义开机脚本的 `rc.local.service`
-
-主要有四种类型文件.mount,.service,.target,.wants  
-代表四种`Unit`  
-
-
-
-
-### 3.2.2. 命令综述
-
-`systemctl –-version`  查看版本  
-
-systemctl 提供了子命令可以查看系统上的 unit,命令格式为:   
-
-`systemctl [command] [unit]` 命令格式  
-`systemctl [command] [--type=TYPE] [--all]` 
-
-1. 不带任何参数执行 `systemctl` 命令会列出所有已启动的 unit  
-   等同于`systemctl list-units`  
-2. 如果添加 `-all` 选项会同时列出没有启动的 unit。    
-3. `systemctl list-unit-files`: 根据 /lib/systemd/system/ 目录内的文件列出所有的 unit
-   即列出所有已安装的服务    
-4. `systemd-cgls`  以树形列出正在运行的进程,它可以递归显示控制组内容
-
-
-**--type=TYPE**  
-可以在综合查看unit时只指定某个类型的 unit。  
-` systemctl list-units --type=service ` 
-
-| 命令      | 功能简述                                                                  |
-| --------- | ------------------------------------------------------------------------- |
-| start     | 立刻启动后面接的 unit。                                                   |
-| stop      | 立刻关闭后面接的 unit。                                                   |
-| restart   | 立刻关闭后启动后面接的 unit,亦即执行 stop 再 start 的意思。               |
-| reload    | 不关闭 unit 的情况下,重新载入配置文件,让设置生效。                        |
-| enable    | 设置下次开机时,后面接的 unit 会被启动。                                   |
-| disable   | 设置下次开机时,后面接的 unit 不会被启动。                                 |
-| show      | 列出 unit 的配置。                                                        |
-| status    | 目前后面接的这个 unit 的状态,会列出有没有正在执行、开机时是否启动等信息。 |
-| is-active | 目前有没有正在运行中。                                                    |
-| is-enable | 开机时有没有默认要启用这个 unit。                                         |
-| kill      | 不要被 kill 这个名字吓着了,它其实是向运行 unit 的进程发送信号。           |
-| mask      | 注销 unit,注销后你就无法启动这个 unit 了。                                |
-| unmask    | 取消对 unit 的注销。                                                      |
-
-### 3.2.3. status 命令
-
-执行 `systemctl status [unit]`   
-
-* 第一行是对 unit 的基本描述。  
-* 第二行中的 Loaded 描述操作系统启动时会不会启动这个服务,enabled 表示开机时启动,disabled 表示开机时不启动。  
-  * 关于 unit 的启动状态,除了 enable 和 disable 之外还有:  
-  *   static:这个 unit 不可以自己启动,不过可能会被其它的 enabled 的服务来唤醒。
-  * mask:这个 unit 无论如何都无法被启动！因为已经被强制注销。可通过 systemctl unmask 改回原来的状态。
-* 第三行 中的 Active 描述服务当前的状态,active (running) 表示服务正在运行中。如果是 inactive (dead) 则表示服务当前没有运行。 
-  * active (exited)：仅执行一次就正常结束的服务,目前并没有任何程序在系统中执行。
-  * active (waiting)：正在执行当中,不过还再等待其他的事件才能继续处理。 
-* 第四行的 Docs 提供了在线文档的地址。  
-
-### 3.2.4. 操作环境管理
-通过指定 `--type=target` 就可以用 `systemctl list-units` 命令查看系统中默认有多少种 target
-
-| 操作环境          | 功能                                                                                                                                 |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| graphical.target  | 就是文字界面再加上图形界面,这个 target 已经包含了下面的 multi-user.target。                                                          |
-| multi-user.target | 纯文本模式！                                                                                                                         |
-| rescue.target     | 在无法使用 root 登陆的情况下,systemd 在开机时会多加一个额外的临时系统,与你原本的系统无关。这时你可以取得 root 的权限来维护你的系统。 |
-| emergency.target  | 紧急处理系统的错误,在无法使用 rescue.target 时,可以尝试使用这种模式！                                                                |
-| shutdown.target   | 就是执行关机。                                                                                                                       |
-| getty.target      | 可以设置 tty 的配置。                                                                                                                |
-
-正常的模式是` multi-user.target `和 `graphical.target `两个,救援方面的模式主要是 `rescue.target` 以及更严重的 `emergency.target`。如果要修改可提供登陆的 tty 数量,则修改 getty.target。
-
-
-| 命令        | 功能                                     |
-| ----------- | ---------------------------------------- |
-| get-default | 取得目前的 target。                      |
-| set-default | 设置后面接的 target 成为默认的操作模式。 |
-| isolate     | 切换到后面接的模式。                     |
-
-我们还可以在不重新启动的情况下切换不同的 target,比如从图形界面切换到纯文本的模式：
-`systemctl isolate multi-user.target`
-
-## 3.3. Unit的编写与设置
-
-### 3.3.1. Unit的基本概念
-一般都会有  
-Unit小节: 描述,启动时间与条件等等  
-
-### 3.3.2. .service
-
-.service文件定义了一个服务,分为[Unit],[Service],[Install]三个小节
-
-`[Unit]` 段: 启动顺序与依赖关系   
-`[Service] `段: 启动行为,如何启动,启动类型  
-`[Install]` 段: 定义如何安装这个配置文件,即怎样做到开机启动  
-### 3.3.3. .mounnt
-
-.mount文件定义了一个挂载点,[Mount]节点里配置了What(名称),Where(位置),Type(类型)三个数据项
+| 选项           | 含义                                   |
+| -------------- | -------------------------------------- |
+| -l（L 的小写） | 列出进程的 PID 号。                    |
+| -n             | 只列出上次发出通知后改变了状态的进程。 |
+| -p             | 只列出进程的 PID 号。                  |
+| -r             | 只列出运行中的进程。                   |
+| -s             | 只列出已停止的进程。                   |
 
 ```
-What=hugetlbfs
-Where=/dev/hugepages
-Type=hugetlbfs
-```
-等于执行以下命令  
-`mount -t hugetlbfs /dev/hugepages hugetlbfs`  
-
-### 3.3.4. .target
-
-.target定义了一些基础的组件,供.service文件调用
-
-### 3.3.5. .wants文件
-
-`.wants`文件定义了要执行的文件集合,每次执行,`.wants`文件夹里面的文件都会执行  
-
-### 3.3.6. 编写开机启动rc.local
-
-查看`/lib/systemd/system/rc.local.server`,默认会缺少`Install`段,显然这样配置是无效的  
-
-```shell
-# rc.local.server的Unit段, 可以看到会执行 /etc/rc.local
-[Unit]
-Description=/etc/rc.local Compatibility
-Documentation=man:systemd-rc-local-generator(8)
-ConditionFileIsExecutable=/etc/rc.local
-After=network.target
-
-
-#修改文件进行配置  
-[Install]  
-WantedBy=multi-user.target  
-
-
-#之后再在/etc/目录下面创建rc.local文件,赋予执行权限
-
-$ touch /etc/rc.local
-$ chmod +x /etc/rc.local
-
-# 在rc.local里面写入
-# 注意：'#!/bin/sh' 这一行一定要加
-
-#!/bin/sh
-exit 0
-
-# 最后将/lib/systemd/system/rc.local.service 链接到/etc/systemd/system目录
-
-$ ln -s /lib/systemd/system/rc.local.service /etc/systemd/system/
+[1]- 2023 Stopped top
+[2]+ 2034 Stopped tar -zcf etc.tar.gz /etc
 ```
 
+* 1 2     : 工作号
+* 2023    : PID
+* `-+`    : 最后一个放入后台的工作是 `+` , 倒数第二个放入后台的是 `-` , 再往前就没有标志了
+* Stopped : 工作已暂停
 
-# 4. Linux 的进程管理
+## 2.2. 恢复前台  fg
+
+`fg %[工作号]`  
+* 如果不带工作号和`%`  则恢复的是带 `+` 号的进程  
+
+
+## 2.3. 存入终端后台
+
+1.  `命令 &`  在命令后 加入一个 `空格` 然后 `&`  直接将命令放入后台执行
+2.  按键  `Ctrl+Z `  就算不和前台有交互，能在后台执行，也处于暂停状态，因为 Ctrl+Z 快捷键就是暂停的快捷键
+    * 暂停存入后台后可以使用 `bg %[工作号]` 命令让该进程恢复后台运行
+    * 和 `fg` 一样, 省略参数的时候默认恢复 `+` 号进程运行
+
+这里的后台，其实指的是当前登陆终端的后台。  
+当我们以远程管理服务器的方式，在远程终端执行后台命令，如果在命令尚未执行完毕时就退出登陆， 此命令的执行会被中断  
+
+
+  
+## 2.4. 存入系统后台  nohup 
+
+在执行命令时, 在命令前加上 `nohup` 让后台工作在离开操作终端时，也能够正确地在后台执行  
+
+`nohup [命令] &`  
+`&` 表示此命令会立即终端后台工作 如果没有 `&` 则执行后此命令会在终端前台执行  
+
+
+
+# 3. Linux 的进程管理
+
 在 Linux 系统中,每个进程都有一个唯一的进程号（PID）  
 启动一个进程主要有 2 种途径
 * 通过手工启动
@@ -360,7 +287,7 @@ $ ln -s /lib/systemd/system/rc.local.service /etc/systemd/system/
 
 对进程来说,每一个从终端开始运行的进程都会依附于这个终端,这个终端就称为这些进程的控制终端,当控制终端被关闭时,相应的进程都会自动关闭。
 
-## 4.1. 手工启动
+## 3.1. 手工启动
 指的是由用户输入命令直接启动一个进程, 可以细分为前台启动和后台启动 2 种方式
 * 当用户输入一个命令并运行,就已经启动了一个进程,而且是一个前台的进程
   * 假如启动一个比较耗时的进程,可以把该进程挂起(放入后台并暂停运行)
@@ -368,7 +295,7 @@ $ ln -s /lib/systemd/system/rc.local.service /etc/systemd/system/
   * 该进程非常耗时,且用户也不急着需要其运行结果的时候
   * 输入命令并运行之后,Shell 会提供给我们一个数字,此数字就是该进程的进程号
 
-## 4.2. daemon进程 守护进程
+## 3.2. daemon进程 守护进程
 
 1. 守护进程（Daemon Process）,也就是通常说的 Daemon 进程（精灵进程）,是 Linux 中的后台服务进程。
 2. 是一个生存期较长的进程,通常独立于控制终端并且周期性地执行某种任务或等待处理某些发生的事件。
@@ -379,7 +306,7 @@ $ ln -s /lib/systemd/system/rc.local.service /etc/systemd/system/
 2. 没有控制终端（ TTY 为 ？）
 3. 终端进程组 ID 为 -1 （ TPGID 表示终端进程组 ID）
 
-## 4.3. ps 命令打印全部进程
+## 3.3. ps 命令打印全部进程
 
 在不同的 Linux 发行版上,ps 命令的语法各不相同  
 为此,Linux 采取了一个折中的方法,即融合各种不同的风格,兼顾那些已经习惯了其它系统上使用 ps  命令的用户。  
@@ -450,7 +377,7 @@ Linux的终端控制
   * tty1~tty6 是本地的字符界面终端,tty7 是图形终端
 * 虚拟终端 , 一般是远程链接的终端 , 第一个链接占用 pts/0 第二个用 pts/1
 
-## 4.4. top 动态持续监听进程
+## 3.4. top 动态持续监听进程
 
 ```shell
 # 命令格式
@@ -506,7 +433,7 @@ $ top [选项]
 | TIME+   | 该进程共占用的 CPU 时间。              |
 | COMMAND | 进程的命令名。                         |
 
-## 4.5. pstree  查看进程树
+## 3.5. pstree  查看进程树
 
 pstree 命令是以树形结构显示程序和进程之间的关系  
 
@@ -526,24 +453,218 @@ pstree 命令是以树形结构显示程序和进程之间的关系
 如果想知道某个用户都启动了哪些进程,使用 pstree 命令可以很容易实现,以 mysql 用户为例  
 `# pstree mysql`  
 
-##  4.6. lsof 列出进程正在调用或者打开的文件
+##  3.6. lsof 列出进程正在调用或者打开的文件
 `list opened files`的缩写   
 
 
+# 4. Linux 的服务管理
+
+Linux 服务管理两种方式service和systemctl 
+
+systemd是Linux系统**最新的初始化系统**(init),作用是提高系统的启动速度,尽可能启动较少的进程,尽可能更多进程并发启动。
+
+systemd对应的进程管理命令就是 `systemctl`
+
+## 4.1. service  
+
+service命令其实是去`/etc/init.d`目录下,去执行相关程序, 已经被淘汰
+
+```shell
+# service命令启动redis脚本
+service redis start
+# 直接启动redis脚本
+/etc/init.d/redis start
+# 开机自启动
+update-rc.d redis defaults
+```
+
+## 4.2. systemctl
+
+### 4.2.1. 概念
+
+systemctl命令兼容了service  
+
+即systemctl也会去`/etc/init.d`目录下,查看,执行相关程序  
+
+```shell
+# 开机自启动某个服务
+systemctl enable redis
+```
+
+通过 `Unit` 作为单位管理进程
+
+`/usr/lib/systemd/system(Centos)`  
+`/etc/systemd/system(Ubuntu)`  
+
+systemd 默认读取 `/etc/systemd/system `下的配置文件,该目录下的文件会链接/lib/systemd/system/下的文件。执行 ls /lib/systemd/system 你可以看到有很多启动脚本,其中就有最初用来定义开机脚本的 `rc.local.service`
+
+主要有四种类型文件.mount,.service,.target,.wants  
+代表四种`Unit`  
 
 
 
 
-# 5. linux文件目录
+### 4.2.2. 命令综述
+
+`systemctl –-version`  查看版本  
+
+systemctl 提供了子命令可以查看系统上的 unit,命令格式为:   
+
+`systemctl [command] [unit]` 命令格式  
+`systemctl [command] [--type=TYPE] [--all]` 
+
+1. 不带任何参数执行 `systemctl` 命令会列出所有已启动的 unit  
+   等同于`systemctl list-units`  
+2. 如果添加 `-all` 选项会同时列出没有启动的 unit。    
+3. `systemctl list-unit-files`: 根据 /lib/systemd/system/ 目录内的文件列出所有的 unit
+   即列出所有已安装的服务    
+4. `systemd-cgls`  以树形列出正在运行的进程,它可以递归显示控制组内容
+
+
+**--type=TYPE**  
+可以在综合查看unit时只指定某个类型的 unit。  
+` systemctl list-units --type=service ` 
+
+| 命令      | 功能简述                                                                  |
+| --------- | ------------------------------------------------------------------------- |
+| start     | 立刻启动后面接的 unit。                                                   |
+| stop      | 立刻关闭后面接的 unit。                                                   |
+| restart   | 立刻关闭后启动后面接的 unit,亦即执行 stop 再 start 的意思。               |
+| reload    | 不关闭 unit 的情况下,重新载入配置文件,让设置生效。                        |
+| enable    | 设置下次开机时,后面接的 unit 会被启动。                                   |
+| disable   | 设置下次开机时,后面接的 unit 不会被启动。                                 |
+| show      | 列出 unit 的配置。                                                        |
+| status    | 目前后面接的这个 unit 的状态,会列出有没有正在执行、开机时是否启动等信息。 |
+| is-active | 目前有没有正在运行中。                                                    |
+| is-enable | 开机时有没有默认要启用这个 unit。                                         |
+| kill      | 不要被 kill 这个名字吓着了,它其实是向运行 unit 的进程发送信号。           |
+| mask      | 注销 unit,注销后你就无法启动这个 unit 了。                                |
+| unmask    | 取消对 unit 的注销。                                                      |
+
+### 4.2.3. status 命令
+
+执行 `systemctl status [unit]`   
+
+* 第一行是对 unit 的基本描述。  
+* 第二行中的 Loaded 描述操作系统启动时会不会启动这个服务,enabled 表示开机时启动,disabled 表示开机时不启动。  
+  * 关于 unit 的启动状态,除了 enable 和 disable 之外还有:  
+  *   static:这个 unit 不可以自己启动,不过可能会被其它的 enabled 的服务来唤醒。
+  * mask:这个 unit 无论如何都无法被启动！因为已经被强制注销。可通过 systemctl unmask 改回原来的状态。
+* 第三行 中的 Active 描述服务当前的状态,active (running) 表示服务正在运行中。如果是 inactive (dead) 则表示服务当前没有运行。 
+  * active (exited)：仅执行一次就正常结束的服务,目前并没有任何程序在系统中执行。
+  * active (waiting)：正在执行当中,不过还再等待其他的事件才能继续处理。 
+* 第四行的 Docs 提供了在线文档的地址。  
+
+### 4.2.4. 操作环境管理
+通过指定 `--type=target` 就可以用 `systemctl list-units` 命令查看系统中默认有多少种 target
+
+| 操作环境          | 功能                                                                                                                                 |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| graphical.target  | 就是文字界面再加上图形界面,这个 target 已经包含了下面的 multi-user.target。                                                          |
+| multi-user.target | 纯文本模式！                                                                                                                         |
+| rescue.target     | 在无法使用 root 登陆的情况下,systemd 在开机时会多加一个额外的临时系统,与你原本的系统无关。这时你可以取得 root 的权限来维护你的系统。 |
+| emergency.target  | 紧急处理系统的错误,在无法使用 rescue.target 时,可以尝试使用这种模式！                                                                |
+| shutdown.target   | 就是执行关机。                                                                                                                       |
+| getty.target      | 可以设置 tty 的配置。                                                                                                                |
+
+正常的模式是` multi-user.target `和 `graphical.target `两个,救援方面的模式主要是 `rescue.target` 以及更严重的 `emergency.target`。如果要修改可提供登陆的 tty 数量,则修改 getty.target。
+
+
+| 命令        | 功能                                     |
+| ----------- | ---------------------------------------- |
+| get-default | 取得目前的 target。                      |
+| set-default | 设置后面接的 target 成为默认的操作模式。 |
+| isolate     | 切换到后面接的模式。                     |
+
+我们还可以在不重新启动的情况下切换不同的 target,比如从图形界面切换到纯文本的模式：
+`systemctl isolate multi-user.target`
+
+## 4.3. Unit的编写与设置
+
+### 4.3.1. Unit的基本概念
+一般都会有  
+Unit小节: 描述,启动时间与条件等等  
+
+### 4.3.2. .service
+
+.service文件定义了一个服务,分为[Unit],[Service],[Install]三个小节
+
+`[Unit]` 段: 启动顺序与依赖关系   
+`[Service] `段: 启动行为,如何启动,启动类型  
+`[Install]` 段: 定义如何安装这个配置文件,即怎样做到开机启动  
+### 4.3.3. .mounnt
+
+.mount文件定义了一个挂载点,[Mount]节点里配置了What(名称),Where(位置),Type(类型)三个数据项
+
+```
+What=hugetlbfs
+Where=/dev/hugepages
+Type=hugetlbfs
+```
+等于执行以下命令  
+`mount -t hugetlbfs /dev/hugepages hugetlbfs`  
+
+### 4.3.4. .target
+
+.target定义了一些基础的组件,供.service文件调用
+
+### 4.3.5. .wants文件
+
+`.wants`文件定义了要执行的文件集合,每次执行,`.wants`文件夹里面的文件都会执行  
+
+### 4.3.6. 编写开机启动rc.local
+
+查看`/lib/systemd/system/rc.local.server`,默认会缺少`Install`段,显然这样配置是无效的  
+
+```shell
+# rc.local.server的Unit段, 可以看到会执行 /etc/rc.local
+[Unit]
+Description=/etc/rc.local Compatibility
+Documentation=man:systemd-rc-local-generator(8)
+ConditionFileIsExecutable=/etc/rc.local
+After=network.target
+
+
+#修改文件进行配置  
+[Install]  
+WantedBy=multi-user.target  
+
+
+#之后再在/etc/目录下面创建rc.local文件,赋予执行权限
+
+$ touch /etc/rc.local
+$ chmod +x /etc/rc.local
+
+# 在rc.local里面写入
+# 注意：'#!/bin/sh' 这一行一定要加
+
+#!/bin/sh
+exit 0
+
+# 最后将/lib/systemd/system/rc.local.service 链接到/etc/systemd/system目录
+
+$ ln -s /lib/systemd/system/rc.local.service /etc/systemd/system/
+```
+
+
+
+
+
+
+
+# 5. Linux 的文件和目录管理
+
+## 5.1. Linux的目录详解
 
 Linux 基金会的 FHS标准 制定了文件目录的标准  
 `（Filesystem Hierarchy Standard）`  
 
 规定了 Linux 系统中**所有**一级目录以及部分二级目录（/usr 和 /var）的用途  
 
-## 5.1. 根目录 系统级文件
+### 5.1.1. 根目录 系统级文件
 
 ```shell
+
 # 存放系统命令,所有用户都可以执行,包括单用户模式  
 # 放置一些系统的必备执行档例如： cat、cp、chmod df、dmesg、gzip、kill、ls、mkdir、more、mount、rm、su、tar等
 /bin/
@@ -557,9 +678,10 @@ Linux 基金会的 FHS标准 制定了文件目录的标准
 /boot/
 
 # 设备文件  
-/dev/ 
 # ** 注意 /dev 下的文件是真实的设备 由UDEV在运行时创建
 # udev 是Linux kernel 2.6系列的设备管理器。它主要的功能是管理/dev目录底下的设备节点
+/dev/ 
+
 # /sys/class 是由kernel在运行时导出的,目的是通过文件系统暴露出硬件的层级关系
 /sys/class
 # 使用示例 查看网络接口的名称
@@ -592,7 +714,7 @@ $ ls /sys/class/net
 
 
 ```
-## 5.2. 软件目录 /usr
+### 5.1.2. 软件目录 /usr
 
 注意不是 user, 全称为 `Unix Software Resource`  
 FHS 建议所有开发者,应把软件产品的数据`合理的放置在 /usr 目录下的各子目录中`  
@@ -604,7 +726,7 @@ FHS 建议所有开发者,应把软件产品的数据`合理的放置在 /usr �
 # 主要放置一些应用软体工具的必备执行档例如： c++、g++、gcc、chdrv、diff、dig、du、eject、elm、free、gnome*、 gzip、htpasswd、kfm、ktop、last、less、locale、m4、make、man、mcopy、ncftp、 newaliases、nslookup passwd、quota、smb*、wget等
 /usr/bin/
 
-# 同样是根文件系统不需要的系统管理命令,只有root
+# 同样是根文件系统不需要的系统管理命令,只有root可以执行
 # 放置一些网路管理的必备程式例如： dhcpd、httpd、imap、in.*d、inetd、lpd、named、netconfig、nmbd、samba、sendmail、squid、swap、tcpd、tcpdump等
 /usr/sbin/
 
@@ -630,14 +752,124 @@ FHS 建议所有开发者,应把软件产品的数据`合理的放置在 /usr �
 
 ```
 
-## 5.3. /var 目录 
+### 5.1.3. /var 目录 
 
 目录用于存储动态数据,例如缓存、日志文件、软件运行过程中产生的文件等  
 
+## 5.2. 软硬链接文件 ln 命令
 
-# 6. 环境配置  
 
-## 6.1. 环境变量
+**ext4 文件系统**
+1. 小部分用于保存文件的 inode (i 节点）信息,inode 的默认大小为 128 Byte
+   1. 记录文件的权限（r、w、x）
+   2. 文件的所有者和属组
+   3. 文件的大小
+   4. 文件的状态改变时间（ctime）
+   5. 文件的最近一次读取时间（atime）
+   6. 文件的最近一次修改时间（mtime）
+   7. 文件的数据真正保存的 block 编号
+   8. 每个文件需要占用一个 inode。
+   9. inode 中是不记录文件名的，文件名记录在文件所在目录的 block 中。
+2. 大部分用于保存 block 信息, 大小可以是 1KB、2KB、4KB，默认为 4KB
+   1. 如果一个 block 放不下数据，则可以占用多个 block
+   2. 有一个 10KB 的文件需要存储，则会占用 3 个 block
+   3. 虽然最后一个 block 不能占满，但也不能再放入其他文件的数据
+   4. 这 3 个 block 有可能是连续的，也有可能是分散的。
+3. 目录的 block 中记录的是这个目录下所有一级子文件和子目录的文件名及 inode 的对应
+4. 文件的 block 中记录的才是文件实际的数据
+
+
+**ln 命令** 
+1. 软链接: 也称作符号链接, 类似于 Windows 系统中给文件创建快捷方式，即产生一个特殊的文件，该文件用来指向另一个文件，此链接方式同样适用于目录
+   1. 软链接的源文件必须写绝对路径，否则建立的软链接文件就会报错
+   2. 权限位中"l"表示这是一个软链接文件；其次，在文件的后面通过 "->" 显示出源文件的完整名字
+   3. 软链接可以链接目录，也可以跨分区来建立软链接
+   4. 不论源文件还是软链接文件，数据都发生改变
+   5. 删除软链接文件，源文件不受影响。而删除原文件，软链接文件将找不到实际的数据，从而显示文件不存在
+2. 硬链接: 指的就是给一个文件的 inode 分配多个文件名，通过任何一个文件名，都可以找到此文件的 inode，从而读取该文件的数据信息
+   1. 修改源文件（test 文件），还是修改硬链接文件（test-hard 文件），另一个文件中的数据都会发生改变
+   2. 删除源文件，还是删除硬链接文件，只要还有一个文件存在，这个文件（inode 号是 262147 的文件）都可以被访问
+   3. 硬链接不会建立新的 inode 信息，也不会更改 inode 的总数
+   4. 硬链接不能跨文件系统（分区）建立，因为在不同的文件系统中，inode 号是重新计算的
+   5. 硬链接不能链接目录，因为如果给目录建立硬链接，那么不仅目录本身需要重新建立，目录下所有的子文件，包括子目录中的所有子文件都需要建立硬链接，这对当前的 Linux 来讲过于复杂
+   6. 硬链接的限制比较多，既不能跨文件系统，也不能链接目录，而且源文件和硬链接文件之间除 inode 号是一样的之外，没有其他明显的特征
+   
+
+```shell
+
+ln [选项] 源文件 目标文件 
+
+# -f：强制。如果目标文件已经存在，则删除目标文件后再建立链接文件；
+# -s：建立软链接文件, 默认建立硬链接
+
+touch cangls
+ln /root/cangls /tmp
+
+
+# 软链接文件的源文件必须写成绝对路径，而不能写成相对路径（硬链接没有这样的要求）
+In -s /root/bols /tmp
+```
+
+# 6. Linux 的用户管理
+
+Linux 是多用户多任务操作系统，换句话说，Linux 系统支持多个用户在同一时间内登陆，不同用户可以执行不同的任务，并且互不影响。  
+* 用户都有唯一的用户名和密码。在登录系统时，只有正确输入用户名和密码，才能进入系统和自己的主目录
+* 用户组是具有相同特征用户的逻辑集合, 通过定义用户组，很多程序上简化了对用户的管理工作。 一个用户可以属于不同的多个组, 拥有所有组的各自权限
+
+
+Linux 系统中，每个用户的 ID 细分为 2 种，分别是用户 ID（User ID，简称 UID）和组 ID Group ID，简称 GID
+Linux 系统将所有用户的名称与 ID 的对应关系都存储在 `/etc/passwd`  
+
+## 6.1. /etc/passwd
+
+是系统用户配置文件，存储了系统中所有用户的基本信息，并且所有用户都可以对此文件执行读操作  
+
+文件用户中的绝大多数是系统或服务正常运行所必需的用户，这种用户通常称为 `系统用户` 或 `伪用户`  
+系统用户无法用来登录系统，但也不能删除，因为一旦删除，依赖这些用户运行的服务或程序就不能正常执行，会导致系统问题。  
+
+
+信息格式, 每行用户信息都以 "：" 作为分隔符，划分为 7 个字段:   
+`用户名：密码：UID（用户ID）：GID（初始组ID）：描述性信息：主目录：默认Shell`   
+* 用户名 就是一串代表用户身份的字符串 和 UID GID 进行匹配
+* 密码   "x" 表示此用户设有密码，但不是真正的密码，真正的密码保存在 `/etc/shadow`
+
+**UID**
+0             : 超级用户。UID 为 0 就代表这个账号是管理员账号  
+1~499         : 系统用户（伪用户）。也就是说，此范围的 UID 保留给系统使用。其中，1~99 用于系统自行创建的账号；100~499 分配给有系统账号需求的用户。  
+500~65535     : 普通用户   
+
+**GID**
+* 初始组      : 指用户登陆时就拥有这个用户组的相关权限。每个用户的初始组只能有一个  
+* 附加组      : 指用户可以加入多个其他的用户组，并拥有这些组的权限  
+初始组和附加组的身份是可以修改的，但是我们在工作中不修改初始组，只修改附加组，因为修改了初始组有时会让管理员逻辑混乱  
+
+
+
+## 6.2. 文件权限
+
+每个文件都有自己的拥有者 ID 和群组 ID，当显示文件属性时，系统会根据 `/etc/passwd` 和 `/etc/group` 文件中的内容，分别找到 UID 和 GID 对应的用户名和群组名，然后显示出来  
+对任意一个文件（Linux下一切皆文件，包括目录、CPU内存等设备） 使用 `ls -l` 可以查看文件的类型和权限
+
+输出: (d|-)rwxrwxrwx
+* d表示目录,-表示普通文件,s套接字，l链接文件
+* 9列，每3列一组，总共3组，对应文件属主(owner)、属主组员(group)和其他用户(other)对该文件的权限
+* rwx。rwx是读(read)，写(write)和执行(execute)三种权限的缩写
+
+
+* root用户是bug，电脑上所有的文件都是它的，权限位设置对其无效。
+* 非root用户默认 只对 自己的 `home` 目录有完全的控制权限，对 `/tmp` 目录有读写的权限
+* `/var、/usr、/bin、/opt` 等常见文件夹及子目录，几乎所有用户都能访问其中的文件和内容，执行可执行程序，但只有root用户和属主有写入的权限
+
+## 6.3. 软件安装
+
+大部分软件默认安装路径是 `/usr/bin` 或 `/usr/local/bin`  
+普通用户没有目录的写权限，于是提示无权限导致安装失败  
+
+
+
+# 7. 环境配置  
+
+## 7.1. 环境变量
 
 可以使用env和echo命令来查看linux中的所有环境变量  
 一个相同的环境变会因为用户身份的不同而具有不同的值  
@@ -667,9 +899,10 @@ FHS 建议所有开发者,应把软件产品的数据`合理的放置在 /usr �
 `export WORKDIR=/home/work1`  
 这种同样也只适用于当前shell , 关闭后即消失  
 
-## 6.2. 环境信息配置文件
 
-### 6.2.1. 交互式shell和非交互式shell的区别
+## 7.2. 环境信息配置文件
+
+### 7.2.1. 交互式shell和非交互式shell的区别
 首先要弄明白什么是交互式shell和非交互式shell , 即 `login shell` 和`non-login shell`
 
 * 交互式模式就是shell等待你的输入,并且执行你提交的命令。这种模式被称作交互式是因为shell与用户进行交互。
@@ -680,7 +913,7 @@ FHS 建议所有开发者,应把软件产品的数据`合理的放置在 /usr �
 * bashrc用于交互式non-loginshell
 * 而profile用于交互式login shell。
 
-### 6.2.2. 文件分布
+### 7.2.2. 文件分布
 
 * `/etc/profile` 
   * 此文件为系统的**每个用户**设置环境信息 当第一个用户登录时,该文件被执行  
@@ -705,9 +938,9 @@ FHS 建议所有开发者,应把软件产品的数据`合理的放置在 /usr �
 2. `~/.profile`可以设定本用户专有的路径,环境变量,等,它只能登入的时候执行一次
 3. `~/.bashrc` 也是某用户专有设定文档,可以设定路径,命令别名,每次shell script的执行都会使用它一次
 
-# 7. 查找字符文件
+# 8. 查找字符文件
 
-## 7.1. 通配符
+## 8.1. 通配符
 要注意通配符与正则表达式的区别  
 简单的理解为通配符只有 `*,?,[],{}` 这4种, 而正则表达式复杂多了
 
@@ -721,7 +954,7 @@ FHS 建议所有开发者,应把软件产品的数据`合理的放置在 /usr �
 | [!c1-c2]或[^c1-c2]    | 匹配不在c1-c2的任意字符                     | a[!0-9]b 如acb adb                                                                 |
 | {string1,string2,...} | 匹配 sring1 或 string2 (或更多)其一字符串   | a{abc,xyz,123}b 列出aabcb,axyzb,a123b                                              |
 
-## 7.2. 查找文件
+## 8.2. 查找文件
 
     find 命令功能非常强大,通常用来在 特定的目录下 搜索 符合条件的文件  
 `find [路径] -name "*.py"`  查找指定路径下扩展名是 .py 的文件,包括子目录
@@ -730,7 +963,7 @@ FHS 建议所有开发者,应把软件产品的数据`合理的放置在 /usr �
     如果省略路径,表示在当前文件夹下查找
     之前学习的通配符,在使用 find 命令时同时可用
 
-## 7.3. 正则表达式
+## 8.3. 正则表达式
 
 针对文件内容的文本过滤工具里,大都用到正则表达式,如vi,grep,awk,sed等  
 其他的一些编程语言,如C++（c regex,c++ regex,boost regex）,java,python等都***有自己的正则表达式库***.
@@ -771,7 +1004,7 @@ FHS 建议所有开发者,应把软件产品的数据`合理的放置在 /usr �
 | {n,m} | 匹配次数在n到m之间,包括边界 |
 
 
-### 7.3.1. 字符查找 grep
+### 8.3.1. 字符查找 grep
 
  `grep `(global search regular expression(RE) and print out the line,全面搜索正则表达式并把行打印出来)  
 
@@ -783,11 +1016,11 @@ FHS 建议所有开发者,应把软件产品的数据`合理的放置在 /usr �
     grep -E "\<hi\>.+\<Jerry\>" test
 
 
-# 8. Shell基础  
+# 9. Shell基础  
 
 
 
-## 8.1. source 命令 
+## 9.1. source 命令 
 
 source命令也称为“点命令”,也就是一个点符号（.）,是bash的内部命令。  
 功能：使Shell读入指定的Shell程序文件并依次执行文件中的所有语句  
@@ -804,7 +1037,7 @@ source命令也称为“点命令”,也就是一个点符号（.）,是bash的�
 
 
 
-## 8.2. Ubuntu开机自动脚本
+## 9.2. Ubuntu开机自动脚本
 
 * Ubuntu18.04以后的版本 默认是没有 /etc/rc.local 这个文件的,需要自己创建  
 * Ubuntu执行开机任务的流程
@@ -834,9 +1067,9 @@ GuessMainPID=no
 剩下的内容在service.md里写了  
 
 
-## 8.3. 脚本文件
+## 9.3. 脚本文件
 
-### 8.3.1. 脚本文件格式
+### 9.3.1. 脚本文件格式
 
 1. 脚本第一行必须写`#!/bin/sh`, shell脚本是用 `#` 来作为注释,但是对 `#!/bin/sh`不是
    *  `#!` 是一个特殊的表示符 指定了该脚本被执行的 shell的路径

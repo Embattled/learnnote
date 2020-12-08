@@ -1,48 +1,43 @@
 # 1. Anaconda 的安装和使用
 
-# 2. conda 包管理和环境管理
+* 开源
+* 安装过程简单
+* 高性能使用Python和R语言
+* 免费的社区支持
 
-conda 是 anaconda 下包管理和环境管理的工具  
-类似于 pip 和 vitualenv 的组合体
+Anaconda是一个包含180+的科学包及其依赖项的发行版本。其包含的科学包包括：conda, numpy, scipy, ipython notebook等  
 
-##  2.1. conda 的环境管理 
+## 1.1. 在linux 下安装
 
-```shell
-#创建虚拟环境
-#基于python3.8创建一个名字为python36的环境
-conda create --name python36 python=3.8
+1. 在官方下载页面下载好 用 bash 运行  除非被要求使用root权限，否则均选择  Install Anaconda as a user  
+2. `bash ~/Anaconda3-5.0.1-Linux-x86_64.sh`  
+3. 跟随终端文字提示下一步即可  
+4. "你希望安装器添加Anaconda安装路径在 `/home/<user>/.bashrc` 文件中吗"  建议输入“yes  
+5. 输入 `source ~/.bashrc`  更新用户环境变量
+6. 验证安装
+   1. `conda --version` 输出 `conda` 版本  
+   2. 终端中输入命令 `condal list` ，如果Anaconda被成功安装，则会显示已经安装的包名和版本号。
+   3. 在终端中输入 `python` 如果Anaconda被成功安装并且可以运行，则将会在Python版本号的右边显示 "Anaconda custom (64-bit)"
+   4. 在终端中输入 `anaconda-navigator` 。如果Anaconda被成功安装，则Anaconda Navigator将会被启动
 
-#激活虚拟环境
-activate python36   # windows 平台
-source activate python36 # linux/mac 平台
+管理 base 环境:  
+* 可以设定是否对所有 shell 连接默认进入 base 环境
+* `conda config --set auto_activate_base False` or True  
 
-#退出当前虚拟环境
-deactivate python36 
 
-#删除虚拟环境
-conda remove -n python36 --all
-# 或者 
-conda env remove  -n python36
-
-#查看所有已安装的虚拟环境
-conda info -e
-python36              *  D:\Programs\Anaconda3\envs\python36
-root                     D:\Programs\Anaconda3
-```
-
-## 2.2. conda 的包管理
-
-conda 的包管理功能可 pip 是一样的，当然你选择 pip 来安装包也是没问题的。  
+## 1.2. 升级
 
 ```shell
-# 安装 matplotlib 
-conda install matplotlib
-# 查看已安装的包
-conda list 
-# 包更新
-conda update matplotlib
-# 删除包
-conda remove matplotlib
+
+conda update conda
+conda update anaconda=VersionNumber
+
+# 升级所有 , 包括包以及依赖, 让所有东西都尽可能的新
+# 只会升级你当前所选择的环境
+conda update --all
+# 如果要指定别的环境升级, 用 -n 指定名称
+conda update -n myenv --all
+
 
 # 在 conda 中 anything is a package。conda 本身可以看作是一个包，python 环境可以看作是一个包
 # anaconda 也可以看作是一个包，因此除了普通的第三方包支持更新之外，这3个包也支持。比如：
@@ -54,20 +49,119 @@ conda update anaconda
 # 更新python，假设当前python环境是3.6.1，而最新版本是3.6.2，那么就会升级到3.6.2
 conda update python
 ```
+## 1.3. 卸载
+
+
+**简单卸载**
+直接 `rm -rf ~/anaconda3`  即可  可以在 bashrc 中删除 conda 的相关环境变量  
+
+**程序卸载** 必须在简单卸载之前执行   
+```shell
+# 安装卸载工具
+conda install anaconda-clean
+# 带确认窗口的删除
+anaconda-clean
+# 不带确认窗口的删除
+anaconda-clean --yes
+
+```
+
+
+# 2. conda 包管理和环境管理
+
+conda 是 anaconda 下包管理和环境管理的工具  
+类似于 pip 和 vitualenv 的组合体
+
+适用语言：Python, R, Ruby, Lua, Scala, Java, JavaScript, C/C++, FORTRAN。   
+conda为Python项目而创造，但可适用于上述的多种语言。  
+
+对比差距:  
+pip：
+    不一定会展示所需其他依赖包。
+    安装包时或许会直接忽略依赖项而安装，仅在结果中提示错误。
+    在系统自带Python中包的**更新/回退版本/卸载将影响其他程序。
+conda：
+    列出所需其他依赖包。
+    安装包时自动安装其依赖项。
+    可以便捷地在包的不同版本中自由切换。
+    不会影响系统自带Python。
+
+
+##  2.1. conda 的环境管理 
+
+### 2.1.1. 创建
+```shell
+#创建虚拟环境 conda create --name <env_name> <package_names>
+#基于python3.8创建一个名字为python36的环境
+conda create --name python36 python=3.8
+# 加入多个包
+conda create -n python3 python=3.5 numpy pandas
+# 不指定python版本的话则会安装 anaconda　版本相同的　python 版本
+
+
+# 复制一个环境
+conda create --name <new_env_name> --clone <copied_env_name>
+
+```
+
+### 2.1.2. 使用
+```shell
+#激活虚拟环境
+activate python36   # windows 平台
+source activate python36 # linux/mac 平台
+
+#退出当前虚拟环境
+deactivate python36 
+
+```
+
+### 2.1.3. 管理
+
+```sh
+#查看所有已安装的虚拟环境
+conda info -e
+python36              *  D:\Programs\Anaconda3\envs\python36
+root                     D:\Programs\Anaconda3
+
+
+#删除虚拟环境
+conda remove -n python36 --all
+# 或者 
+conda env remove  -n python36
+
+```
+
+## 2.2. conda 的包管理
+
+conda 的包管理功能可 pip 是一样的，当然你选择 pip 来安装包也是没问题的。  
+
+```shell
+
+# 查看已安装的包
+conda list 
+
+# 安装 matplotlib 
+conda install matplotlib
+# 包更新
+conda update matplotlib
+# 删除包
+conda remove matplotlib
+
+```
 
 # 3. Jupyter Notebook
 
 Files: 显示当前 Notebook工作文件夹 中所有文件和文件夹
 Running : 列出所有正在运行的 notebook
 
-## Google Colab
+## 3.1. Google Colab
 
 Colab 笔记本是由 Google 托管的 Jupyter 笔记,   
 可以将可执行代码、富文本以及图像、HTML、LaTeX 等内容合入 1 个文档中   
 
 Colab的代码区默认是python代码  
 
-### 插入表单
+### 3.1.1. 插入表单
 
 在代码区右键可以插入表格   
 
@@ -84,7 +178,7 @@ text_and_dropdown = 'value' #@param ["1st option", "2nd option", "3rd option"] {
 
 
 
-### 安装非默认python库 指定TF版本
+### 3.1.2. 安装非默认python库 指定TF版本
 
 You can use `!pip install` or `!apt-get install`.  
 来安装默认库环境里没有的包  
@@ -119,7 +213,7 @@ import cartopy
 ```
 
 
-### 执行系统命令
+### 3.1.3. 执行系统命令
 
 在代码区使用 "!" 可以执行shell命令
 
@@ -132,7 +226,7 @@ foo = !echo -e '$message\n$message'
 
 ```
 
-### 执行html文本
+### 3.1.4. 执行html文本
 
 使用 %%html可以将代码区变成 html文本  
 
@@ -141,7 +235,7 @@ foo = !echo -e '$message\n$message'
 <marquee style='width: 10%; color: blue;'><b>Whee!</b></marquee>
 ```
 
-### 连接Github
+### 3.1.5. 连接Github
 
 Colab 可以整合的连接Github  包括从Github读取笔记本和把笔记本存到Github
 

@@ -94,7 +94,7 @@ clean:
 逻辑:
 1. 命令行输入 make ，将默认执行 all 这个 target
 2. 而 all 这个 target 依赖于 hello，hello 在当前目录下并不存在，于是程序开始往下读取命令..……终于找到了 `hello` 这个 `target`
-3. 正待执行 `hello` 这个 target 的时候，却发现它依赖于 `main.o`，function1.o，function2.o 这三个文件，而它们在当前目录下都不存在，于是程序继续向下执行
+3. 正待执行 `hello` 这个 target 的时候，却发现它依赖于 `main.o`，`function1.o`，`function2.o` 这三个文件，而它们在当前目录下都不存在，于是程序继续向下执行
 4. 遇到 main.o target，它依赖于 main.cpp。而 main.cpp 是当前目录下存在的文件，终于可以编译了，生成 main.o 对象文件。后面两个函数以此类推，都编译好之后，再回到 hello target，连接各种二进制文件，生成 hello 文件。
 
 第一次编译的时候，命令行会输出：
@@ -117,8 +117,9 @@ g++ main.o function1.o function2.o -o hello
 `clean`:没有被第一个目标文件直接或间接关联，那么它后面所定义的命令将不会**被自动执行**  
 我们可以显式执行make。即命令—— `make clean` ，以此来清除所有的目标文件，以便重编译  
 
+# 2. makefile 变量
 
-## 1.6. 变量
+## 2.1. 变量
 我们希望将需要反复输入的命令整合成变量，用到它们时直接用对应的变量替代，这样如果将来需要修改这些命令，则在定义它的位置改一行代码即可  
 
 ```makefile
@@ -155,7 +156,7 @@ clean :
 如果有新的 .o 文件加入，我们只需简单地修改一下 objects 变量就可以了
 
 
-## 1.7. 特殊的简化符号
+## 2.2. 特殊的简化符号
 
 `$@` `$<` `$^`  
 对于存在的一个段 `all: library.cpp main.cpp`  
@@ -170,10 +171,10 @@ hello: main.o function1.o function2.o
 
 # 使用特殊符号简化后
 hello: main.o function1.o function2.o
-        $(CC) $(LFLAGS) $^ -o $@
+        $(CC) $(LFLAGS) $^ -o $@        
 ```
 
-## 1.8. 自动检测目录
+## 2.3. 自动检测目录
 自动检测目录下所有的 cpp 文件呢？此外 main.cpp 和 main.o 只差一个后缀，能不能自动生成对象文件的名字，将其设置为源文件名字后缀换成 .o 的形式
 
 `wildcard` 用于获取符合特定规则的文件名  
@@ -198,7 +199,7 @@ target:
         @echo $(OBJS)
 ```
 
-## 1.9. 自动推导(简化makefile代码)
+## 2.4. 自动推导(简化makefile代码)
 
 Static Pattern Rule  
 `targets: target-pattern: prereq-patterns`  
@@ -217,7 +218,7 @@ $(OBJS):%.o:%.cpp
 
 ```
 
-## 1.10. 特殊target
+## 2.5. 特殊target
 
 对于`clean`, 因为没有依赖文件,所以不会被自动执行,但有更稳妥的书写格式  
 
@@ -234,9 +235,9 @@ clean :
 ```
 而在 rm 命令前面加了一个小减号的意思就是，也许某些文件出现问题，但不要管，继续做后面的事  
 
-# 2. 高级操作
+# 3. 高级操作
 
-## 多makefile处理
+## 3.1. 多makefile处理
 
 在Makefile使用 include 关键字可以把别的Makefile包含进来，这很像C语言的 `#include`  
 
