@@ -1866,36 +1866,3 @@ C++ STL 标准库中还提供有一个和 set 容器相似的关联式容器， 
 4. upper_bound()
 5. equal_range() 等方法，更常用于 multiset 容器。
 
-# 6. 数值库 Numerics
-
-```cpp
-#include <complex>
-#include <random>
-#include <valarray>
-#include <numeric>
-#include <bit>
-#include <numbers>
-#include <cfenv>
-#include <cmath>
-```
-
-标准C++数值库包含了常规数学函数以及类型， 以及一些特殊化的数列和随机数生成。
-包括了一系列的头文件  
-
-## 6.1. cmath 通用数学函数
-
-包括了从 C语言继承来的一些 通用数学运算  
-
-### 基础运算函数
-
-
-
-### 三角函数
-
-### 指数函数
-
-### 对数函数
-
-## 6.3. number 数学常量
-
-## 6.4. complex 复数运算

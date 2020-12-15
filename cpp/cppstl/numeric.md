@@ -1,50 +1,44 @@
-
-# 1. numeric 数学运算库
-
-### 1.1. iota 自动生成加1数列 since C++11
-
+# 1. 数值库 Numerics
 
 ```cpp
-// until c++20
-template< class ForwardIt, class T >
-void iota( ForwardIt first, ForwardIt last, T value )
-
-// since c++20
-template< class ForwardIt, class T >
-constexpr void iota( ForwardIt first, ForwardIt last, T value );
-
-// Fills the range [first, last) with sequentially increasing values, starting with value and repetitively evaluating ++value. 
-// 只能生成加1数列, 不能其他等比数列
-
-// 由于内部是用 value++ 实现的, 因此可以自加的数据类型都可以作为 value 输入 
-
-
-// 给 list 赋值 -4 到 5
-    std::list<int> l(10);
-    std::iota(l.begin(), l.end(), -4);
- 
-// 自动将list的每个值的地址存到 vector 中 
-    std::vector<std::list<int>::iterator> v(l.size());
-    std::iota(v.begin(), v.end(), l.begin());
+#include <complex>
+#include <random>
+#include <valarray>
+#include <numeric>
+#include <bit>
+#include <numbers>
+#include <cfenv>
+#include <cmath>
 ```
-### 1.2. gcd lcm 最大公约数 最小公倍数 since c++17
 
-```cpp
-// greatest common divisor
-template< class M, class N>
-constexpr std::common_type_t<M, N> gcd(M m, N n);
-// If either |m| or |n| is not representable as a value of type std::common_type_t<M, N>, the behavior is undefined.
+标准C++数值库包含了常规数学函数以及类型， 以及一些特殊化的数列和随机数生成。
+包括了一系列的头文件  稍微有点多  
 
-// least common multiple
-template< class M, class N>
-constexpr std::common_type_t<M, N> lcm(M m, N n);
-// The behavior is undefined if |m|, |n|, or the least common multiple of |m| and |n| is not representable as a value of type std::common_type_t<M, N>. 
+# 1.1. <cmath> 通用数学函数
 
-// 这两个函数都是 如果 m和n 都是 0 ， 则返回 0
-// If either M or N is not an integer type, or if either is (possibly cv-qualified) bool, the program is ill-formed.
+包括了从 C语言继承来的一些 通用数学运算  
 
-```
-### 1.3. accumulate 
+
+## 
+## 1.1.1. 基础运算函数
+
+
+
+## 1.1.2. 三角函数
+
+## 1.1.3. 指数函数
+
+## 1.1.4. 对数函数
+
+## 1.2. number 数学常量
+
+## 1.3. complex 复数运算
+
+
+# 2. <numeric> 数学运算库
+
+
+## 2.1. accumulate 
 
 自动累加 first 到 last 之间的元素  
 
@@ -57,6 +51,7 @@ constexpr T accumulate( InputIt first, InputIt last, T init );
 // uses the given binary function op
 template< class InputIt, class T, class BinaryOperation >
 constexpr T accumulate( InputIt first, InputIt last, T init,BinaryOperation op );
+
 
 /* 
 first, last 	- 	the range of elements to sum
@@ -84,8 +79,7 @@ std::accumulate performs a left fold. In order to perform a right fold,
 one must reverse the order of the arguments to the binary operator, and use reverse iterators. 
 */
 
-
-// 两个版本的内部实现(可能的)
+// 两个版本的内部实现(可能的) 其一
 template<class InputIt, class T>
 constexpr // since C++20
 T accumulate(InputIt first, InputIt last, T init)
@@ -95,6 +89,8 @@ T accumulate(InputIt first, InputIt last, T init)
     }
     return init;
 }
+
+// 其二
 
 template<class InputIt, class T, class BinaryOperation>
 constexpr // since C++20
@@ -119,13 +115,112 @@ int main()
    int product = std::accumulate(v.begin(), v.end(), 1, std::multiplies<int>());
   //  product: 3628800
 
-  
-
-
 }
+
 ```
 
-### 1.4. midpoint since c++20
+## inner_product
+
+内积, 类似于向量点乘  
+
+使用方法:
+```cpp
+
+int main()
+{
+    std::vector<int> a{0, 1, 2, 3, 4};
+    std::vector<int> b{5, 4, 2, 3, 1};
+ 
+    int r1 = std::inner_product(a.begin(), a.end(), b.begin(), 0);
+
+    int r2 = std::inner_product(a.begin(), a.end(), b.begin(), 0, std::plus<>(), std::equal_to<>());
+
+}
+
+```
+
+函数定义: 
+```cpp
+
+template< class InputIt1, class InputIt2, class T >
+constexpr T inner_product( InputIt1 first1, InputIt1 last1,
+                           InputIt2 first2, T init );
+
+// 自定义操作函数的版本
+template<class InputIt1, class InputIt2, class T,class BinaryOperation1, class BinaryOperation2>
+constexpr T inner_product( InputIt1 first1, InputIt1 last1,
+                           InputIt2 first2, T init,
+                           BinaryOperation1 op1,
+                           BinaryOperation2 op2 );
+
+```
+
+## 2.2. gcd lcm since c++17
+
+C++17 才加入的新函数   
+不会抛出异常  
+
+```cpp
+// greatest common divisor
+template< class M, class N>
+constexpr std::common_type_t<M, N> gcd(M m, N n);
+
+// least common multiple
+template< class M, class N>
+constexpr std::common_type_t<M, N> lcm(M m, N n);
+
+
+/* 
+Return value : 
+
+gcd:  如果 m和n 都是0, 返回0, 否则正常返回 |m|和|n|的gcd
+lcm:  如果 m和n 中有一个是0, 则返回0, 否则正常返回绝对值的 lcm
+*/
+
+/* 
+Rmark:
+
+gcd:
+    1. 如果 m和n 不全是整数, 则该程序是 ill-formed.
+    2.  If either |m| or |n| is not representable as a value of type std::common_type_t<M, N>, the behavior is undefined.
+
+lcm: 
+    1. 如果 m和n 不全是整数, 则该程序是 ill-formed.
+    2. The behavior is undefined if |m|, |n|, or the least common multiple of |m| and |n| is not representable as a value of type std::common_type_t<M, N>. 
+
+
+*/
+```
+
+## 2.3. iota  since C++11
+
+自动生成加1数列  
+
+
+```cpp
+// until c++20
+template< class ForwardIt, class T >
+void iota( ForwardIt first, ForwardIt last, T value )
+
+// since c++20
+template< class ForwardIt, class T >
+constexpr void iota( ForwardIt first, ForwardIt last, T value );
+
+// Fills the range [first, last) with sequentially increasing values, starting with value and repetitively evaluating ++value. 
+// 只能生成加1数列, 不能其他等比数列
+
+// 由于内部是用 value++ 实现的, 因此可以自加的数据类型都可以作为 value 输入 
+
+
+// 给 list 赋值 -4 到 5
+    std::list<int> l(10);
+    std::iota(l.begin(), l.end(), -4);
+ 
+// 自动将list的每个值的地址存到 vector 中 
+    std::vector<std::list<int>::iterator> v(l.size());
+    std::iota(v.begin(), v.end(), l.begin());
+```
+### 2.3.1. midpoint since c++20
 
 Computes the midpoint of the integers, floating-points, or pointers a and b.   
 计算中点  

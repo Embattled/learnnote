@@ -64,7 +64,7 @@ namespace pmr {
 除此之外该10个类型还有分别的 std::hash 版本  
 
 
-## 2.3. 元素访问成员函数
+### 2.2.1. 元素访问成员函数
 
 * at
 * operator[]
@@ -76,7 +76,7 @@ namespace pmr {
 除了最后一个都很熟悉
 
 
-## 2.4. 操作函数
+### 2.2.2. 操作函数
 
 
 同容器一样, string 类型也有多种类似的访问数据的方法
@@ -114,11 +114,12 @@ data() + i == std::addressof(operator[](i)) for every i in [0, size()]. //(since
 4.  一个 string 字符串和一个单独的字符
 
 
-## 2.5. 容量函数
+
+### 2.2.3. 容量函数
 
 注意 string 是有 size 和 length 两个函数的  
 
-## 2.6. 构造函数
+### 2.2.4. 构造函数
 
 ```cpp
 //----------定义:
@@ -140,7 +141,7 @@ cin>>s;
 
 	
 
-## 2.7. char 转变成字符串的方法 
+### 2.2.5. char 转变成字符串的方法 
 
 char 不能直接转成 string
 
@@ -187,8 +188,56 @@ const char* str=&c;
 string s10(str,1);
 ```
 
+## 2.3. Numeric Conversions 数字转换函数
 
-## 2.8. 关于子字符串的操作
+* stio stol stoll stoul stoull
+* stof stod stold
+* to_string to_wstring
+
+### 2.3.1. 字符串转整数
+
+和C语言风格的函数 `ato*()` 和 `strto*`  不同  
+C++风格的函数为 `sto*()`   
+
+```cpp
+#include <string> //string 头文件
+
+// idx不是空指针，则该函数还将idx的值设置为该数字后str中第一个字符的位置。
+int stoi (const string&  str, size_t* idx = 0, int base = 10);
+long stol (const string&  str, size_t* idx = 0, int base = 10);
+unsigned long stoul (const string&  str, size_t* idx = 0, int base = 10);
+long long stoll (const string&  str, size_t* idx = 0, int base = 10);
+unsigned long long stoull (const string&  str, size_t* idx = 0, int base = 10);
+float stof (const string&  str, size_t* idx = 0);
+double stod (const string&  str, size_t* idx = 0);
+long double stold (const string&  str, size_t* idx = 0);
+
+```
+
+
+### 2.3.2. 数字转成字符串
+
+```cpp
+//  to_string 函数。将 val 解释为 string，并返回转换结果
+string to_string (int val);
+string to_string (long val);
+string to_string (long long val);
+string to_string (unsigned val);
+string to_string (unsigned long val);
+string to_string (unsigned long long val);
+string to_string (float val);
+string to_string (double val);
+string to_string (long double val);
+
+// 同样的参数还有 to_wstring()
+wstring to_wstring (int val);
+
+
+```
+
+
+stio stol stoll stoul stoull
+## 2.4. 关于子字符串的操作
 ```cpp
 //获得子函数, pos 开始位置, 默认截取到字符串尾
 string substr (size_t pos = 0, size_t len = npos) const;
@@ -200,7 +249,7 @@ string& erase (size_t pos = 0, size_t len = npos);
 //第一个参入要注意不能越界, 否则会抛出异常
 string& insert (size_t pos, const string& str);
 ```
-## 2.9. 查找
+## 2.5. 查找
 
 ```cpp
 //查询函数, pos 表开始位置, 无视pos之前的匹配项
@@ -261,43 +310,4 @@ find_last_not_of
 
 * 若LC_COLLATE为"POSIX"或"C"，则strcoll()与strcmp()作用完全相同 
 * 按照 C94 及 C99 标准的规定，程序在启动时设置 locale 为 "C"。在 "C" locale 下，字符串的比较就是按照内码一个字节一个字节地进行，这时 strcoll 与 strcmp 函数没有区别。在其他 locale 下，字符串的比较方式则不同了，例如在简体中文 locale 下，strcmp 仍然按内码比较，而 strcoll 对于汉字则是按拼音进行的（这也跟操作系统有关，Windows 还支持按笔划排序，可以在“区域和语言设置”里面修改
-  
-## 3.1. string 与数字类型的转换
-
-### 3.1.1. 字符串转为数字
-
-除了使用C语言风格的函数 `ato*()` 和 `strto*` C++风格的函数为 `sto*()`
-
-```cpp
-#include <string> //string 头文件
-
-// idx不是空指针，则该函数还将idx的值设置为该数字后str中第一个字符的位置。
-int stoi (const string&  str, size_t* idx = 0, int base = 10);
-long stol (const string&  str, size_t* idx = 0, int base = 10);
-unsigned long stoul (const string&  str, size_t* idx = 0, int base = 10);
-long long stoll (const string&  str, size_t* idx = 0, int base = 10);
-unsigned long long stoull (const string&  str, size_t* idx = 0, int base = 10);
-float stof (const string&  str, size_t* idx = 0);
-double stod (const string&  str, size_t* idx = 0);
-long double stold (const string&  str, size_t* idx = 0);
-
-```
-### 3.1.2. 数字转成字符串
-
-```cpp
-//  to_string 函数。将 val 解释为 string，并返回转换结果
-string to_string (int val);
-string to_string (long val);
-string to_string (long long val);
-string to_string (unsigned val);
-string to_string (unsigned long val);
-string to_string (unsigned long long val);
-string to_string (float val);
-string to_string (double val);
-string to_string (long double val);
-
-// 同样的参数还有 to_wstring()
-wstring to_wstring (int val);
-
-
-```
+ 

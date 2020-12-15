@@ -72,8 +72,11 @@ anaconda-clean --yes
 conda 是 anaconda 下包管理和环境管理的工具  
 类似于 pip 和 vitualenv 的组合体
 
+
 适用语言：Python, R, Ruby, Lua, Scala, Java, JavaScript, C/C++, FORTRAN。   
 conda为Python项目而创造，但可适用于上述的多种语言。  
+对比于python自建的环境管理包 `Pipenv` 或者 `Poetry` 包   
+conda的环境管理更底层, 因为 python 本身就是 conda 的一个包  
 
 对比差距:  
 pip：
@@ -87,16 +90,123 @@ conda：
     不会影响系统自带Python。
 
 
-##  2.1. conda 的环境管理 
+conda 的操作主要通过 `conda` 命令来实现  
+1. 快速的查找所有 anaconda 包以及当前已安装的包
+2. 创建环境
+3. 修改环境中的包 (安装和升级)
 
-### 2.1.1. 创建
+```sh
+# conda 支持命令简写 -- 双横线的命令可以使用单横线加首字母的形式运行
+conda --name
+conda -n
+
+conda --envs
+conda -e
+```
+
+## 2.1. conda 格式
+
+### 2.1.1. conda package
+
+conda package 是一个压缩包 (.tar.bz2) 或者 .conda 文件  
+.conda 文件是 conda 4.7 新加入的, 相比压缩包更轻量化更快  
+
+包中包括:  
+* 系统及的库 system-level libraries
+* Python 或者其他模组 
+* 可执行程序以及其他组件
+* info/ 目录下的 metadata
+* 一组直接安装的 install 文件
+      .
+      ├── bin
+      │   └── pyflakes
+      ├── info
+      │   ├── LICENSE.txt
+      │   ├── files
+      │   ├── index.json
+      │   ├── paths.json
+      │   └── recipe
+      └── lib
+         └── python3.5
+* bin : 包相关的二进制文件
+* lib : 包相关的库文件
+* info: 包的 metadata
+
+### 2.1.2. conda 的目录结构
+
+* /pkgs  : 保存了已被解压的包, 可以直接被链接到一个 conda 环境  
+* /bin /include /lib/ share 都是 base 环境的内容
+* /envs  : 用于保存额外的环境 即(base)环境之外的环境, 子目录下的内容和上条相同
+
+## 2.2. conda channel
+
+channel 是一个包目录的 url , 用于检索conda 包  
+
+默认的channel 是 `https://repo.anaconda.com/pkgs/`  
+
+除此之外有名为 `Conda-forge` 的社区型 conda 索引库  
+
+
+```sh
+# 查看当前环境的 conda 所有配置信息
+conda config --show
+# 查看当前 channel
+conda config --show channels
+
+# 通过指定 channel 安装 scipy
+conda install scipy --channel conda-forge
+
+# 同时指定多个channel 优先级从左到右
+conda install scipy --channel conda-forge --channel bioconda
+
+# 使用 --override-channels 来指定只使用指定的 channel 安装  
+conda search scipy --channel conda-forge --override-channels
+```
+
+
+### 2.2.1. channel priority
+
+为了解决不同 channel 之间的冲突, 高优先级的 channel 会覆盖低优先级的  
+不管低优先级的 channel 中包的版本是否更加新  
+* 当默认通道中没有想要的包时, 可以安全的将新的通道放在最下层优先级  
+* 如果想要 conda 只安装最新的版本 通过命令修改 config 
+  * `conda config --set channel_priority false`
+  * 这样总会安装版本号更新的python
+
+
+### channel 管理
+
+增加新的 channel 应该明确优先级
+
+```sh
+# 放在顶部, 拥有最高优先级
+conda config --add channels new_channel
+conda config --prepend channels new_channel
+
+# 追加在 list 底部 最低优先级
+conda config --append channels new_channel
+
+# 删除一个旧的channel
+conda config --remove channels old_channel
+```
+
+##  2.3. conda 的环境管理 
+conda environment 是一个目录, 保存了对该环境安装了的 conda packages.  
+
+通过 `environment.yaml` 可以轻松的分享运行环境  
+
+`conda info --envs`  查看当前系统所拥有的环境  
+
+### 2.3.1. 创建
 ```shell
+
 #创建虚拟环境 conda create --name <env_name> <package_names>
 #基于python3.8创建一个名字为python36的环境
-conda create --name python36 python=3.8
+conda create --name python38 python=3.8
+
 # 加入多个包
 conda create -n python3 python=3.5 numpy pandas
-# 不指定python版本的话则会安装 anaconda　版本相同的　python 版本
+# 不指定python版本的话则会安装与 anaconda　版本相同的　python 版本
 
 
 # 复制一个环境
@@ -104,7 +214,7 @@ conda create --name <new_env_name> --clone <copied_env_name>
 
 ```
 
-### 2.1.2. 使用
+### 2.3.2. 使用
 ```shell
 #激活虚拟环境
 activate python36   # windows 平台
@@ -115,7 +225,7 @@ deactivate python36
 
 ```
 
-### 2.1.3. 管理
+### 2.3.3. 管理
 
 ```sh
 #查看所有已安装的虚拟环境
@@ -131,22 +241,33 @@ conda env remove  -n python36
 
 ```
 
-## 2.2. conda 的包管理
+## 2.4. conda 的包管理
 
 conda 的包管理功能可 pip 是一样的，当然你选择 pip 来安装包也是没问题的。  
 
 ```shell
 
 # 查看已安装的包
+# Check to see if the newly installed program is in this environment:
 conda list 
 
-# 安装 matplotlib 
+# 搜索一个包 获取所有的版本的信息
+conda search scipy
+
+# 安装 matplotlib 到当前环境
 conda install matplotlib
 # 包更新
 conda update matplotlib
+
+# conda updata 不会跨大版本升级 same major version number
+# conda install 则可以指定任意安装版本 默认安装或者更新到最新版
+conda install python=3 
+
 # 删除包
 conda remove matplotlib
 
+# 在安装了 conda-build 后 还可以直接通过源文件安装一个包
+conda build my_fun_package
 ```
 
 # 3. Jupyter Notebook

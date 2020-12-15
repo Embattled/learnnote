@@ -1,4 +1,4 @@
-# Docker 
+# 1. Docker 
 
 * Docker 是一个开源的应用容器引擎，基于 Go 语言 并遵从 Apache2.0 协议开源
 * 适合运维工程师及后端开发人员, 用于开发，交付和运行应用程序的开放平台。
@@ -6,7 +6,7 @@
 * 容器是完全使用沙箱机制，相互之间不会有任何接口（类似 iPhone 的 app）,更重要的是容器性能开销极低
 
 
-## 基本介绍
+## 1.1. 基本介绍
 应用场景:
 1. Web 应用的自动化打包和发布。
 2. 自动化测试和持续集成、发布。
@@ -24,7 +24,7 @@
 4. 测试完成后，将修补程序推送给生产环境，就像将更新的镜像推送到生产环境一样简单
 
 
-## Docker 架构基本概念
+## 1.2. Docker 架构基本概念
 
 * 镜像（Image）：Docker 本身的镜像（Image），就相当于是一个 root 文件系统。
 * 容器（Container）：镜像是静态的定义，容器是镜像运行时的实体。容器可以被创建、启动、停止、删除、暂停等。
@@ -42,17 +42,16 @@
 2. 使用远程API来管理和创建Docker容器
 3. Docker 容器通过 Docker 镜像来创建
 
-## 安装
+## 1.3. 安装
 
 * apt 里能搜到的 `docker.io` 是旧版本, 不要安装
 
 官方安装步骤:  
 1. 卸载已有的版本 `$ sudo apt-get remove docker docker-engine docker.io containerd runc` 
 2. docker 的文件库是 `/var/lib/docker/`  如果想清洁安装的话可以删除掉该文件夹
-3. 
-  
 
-## storage driver
+
+## 1.4. storage driver
 
 storage driver 和 file system 不是同一个东西. 存储驱动是在文件系统之上创建的, 可以使用的存储驱动和文件系统有关:  
     例: `btrfs` 只能在文件系统为 `btrfs` 上的主机上使用
