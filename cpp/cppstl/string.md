@@ -276,10 +276,21 @@ find_last_of
 find_last_not_of
 
 ```
-# 3. header <cstring> "string.h"
+# 3. null-terminated string
+
+
+## 3.1. <cstring> "string.h"
 
 以下函数为c原生函数,包含在`<string.h>`头文件中, 在C++中也在 `<cstring>`中  
 使用`<string.h>` 不需要在函数名前加`std::`  
+
+按照功能可以分成三类:
+1. 字符串操作函数
+2. 字符串非操作函数
+3. 内存操作函数
+
+### 3.1.1. string manipulation
+
 | 函数名                   | 功能                                                                                                     |
 | ------------------------ | -------------------------------------------------------------------------------------------------------- |
 | 字符串操作函数           |                                                                                                          |
@@ -301,13 +312,62 @@ find_last_not_of
 | `strspn(dest,scr)`       | scr指向的字符串作为合法字典,返回一个长度值,dest从起始开始的合法字符的长度                                |
 | `strcspn(dest,scr)`      | scr指向的字符串作为不合法字符字典,返回一个长度值,dest从起始开始出现不合法字符的第一个位置度              |
 | `strpbrk(dest,breakset)` | breakset作为终止字典, 返回dest第一次出现终止字符的位,没找到就返回`NULL`                                  |
-| 内存操作函数             |                                                                                                          |
-| `memchr (ptr,ch,count)`  | 找字符第一次出现的位置, 没找到就返回`NULL`                                                               |
-| `memcmp (lhs,rhs,count)` | 与字符串比较类似                                                                                         |
-| `memset (dest,ch,count)` | 注意 `int ch`                                                                                            |
-| `memcpy (dest,scr,c)`    | copies one buffer to another                                                                             |
-| `memmove(dest,scr,c)`    | 函数的功能同memcpy基本一致，但是memmove先创建temp内存,当src区域和dst内存区域重叠时, 可以安全拷贝         |
 
 * 若LC_COLLATE为"POSIX"或"C"，则strcoll()与strcmp()作用完全相同 
 * 按照 C94 及 C99 标准的规定，程序在启动时设置 locale 为 "C"。在 "C" locale 下，字符串的比较就是按照内码一个字节一个字节地进行，这时 strcoll 与 strcmp 函数没有区别。在其他 locale 下，字符串的比较方式则不同了，例如在简体中文 locale 下，strcmp 仍然按内码比较，而 strcoll 对于汉字则是按拼音进行的（这也跟操作系统有关，Windows 还支持按笔划排序，可以在“区域和语言设置”里面修改
- 
+
+### character array manipulation
+
+
+| `memchr (ptr,ch,count)`  | 找字符第一次出现的位置, 没找到就返回`NULL`|
+| `memcmp (lhs,rhs,count)` | 与字符串比较类似|
+| `memset (dest,ch,count)` | 注意 `int ch`|
+| `memcpy (dest,scr,c)`    | copies one buffer to another|
+| `memmove(dest,scr,c)`    | 函数的功能同memcpy基本一致|
+
+move和cpy的区别:
+* memmove先创建temp内存,当src区域和dst内存区域重叠时, 可以安全拷贝
+
+
+
+## 3.2. <cctype> "ctype.h"
+
+该头文件只包含了一些字符分类函数还有大小写转换函数 总共14个   非常简单  
+
+
+| 函数名称       | 功能                                             |
+| -------------- | ------------------------------------------------ |
+| isalnum        | checks if a character is alphanumeric            |
+| isalpha        | checks if a character is alphabetic              |
+| islower        | checks if a character is lowercase               |
+| isupper        | checks if a character is an uppercase character  |
+| isdigit        | checks if a character is a digit                 |
+| isxdigit       | checks if a character is a hexadecimal character |
+| iscntrl        | checks if a character is a control character     |
+| isgraph        | checks if a character is a graphical character   |
+| isspace        | checks if a character is a space character       |
+| isblank(C++11) | checks if a character is a blank character       |
+| isprint        | checks if a character is a printing character    |
+| ispunct        | checks if a character is a punctuation character |
+| tolower        | converts a character to lowercase                |
+| toupper        | converts a character to uppercase                |
+
+函数特点：
+1. is* 系列函数的函数定义中, 参数和返回值都是整形, 但是没有指定值, 直接用真假判定即可
+2. to* 系列函数只会对特定的26个字母起作用, 如果输入其他字母则 **不做改变的返回输入值**
+
+函数名称解释
+* alnum       : 10个数字和52个大小写字母
+* alpha       : 52个大小写字母
+* lower       : 26个小写字母
+* upper       : 26个大写字母
+* digit       : 10个数字
+* xdigit      : 十六进制数字 包括10个数字和12个abcdef的大小写字母
+* cntrl       : control 字符 和 print函数 互为全部字符的补集
+* print       : 所有能打印出来的字符, 和 cntrl 互为全部字符的补集
+* space       : 全部空白字符 包括 `' ', '\f', '\n', '\r', '\t', '\v'`, 注意这里除了空格其他都是控制字符
+* blank(C++11): 和 space 有点不一样, 只包括了用于分割单词的两个字符 `'\t', ' '`
+* graph       : 所有有形状的字符, print 减去 空格字符 就是 graph
+* punct       : 所有特殊字符, graph 减去 alnum 就是 punct
+
+## 3.3. 

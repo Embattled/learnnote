@@ -144,7 +144,7 @@ apt-cache policy <packagename>
 ```
 
 
-# update-alternatives 版本控制
+# 3. update-alternatives 版本控制
 
 用于处理linux系统中软件版本的切换，在各个linux发行版中均提供了该命令，命令参数略有区别，但大致是一样的  
 
