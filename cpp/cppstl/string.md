@@ -1,4 +1,4 @@
-# 1. c++ string
+# 1. string 的类别
 
 在最新标准的C++中, string 指代 3种数据类型
 1. std::basic_string        一个模板类被设计用来处理任何字符的字符串
@@ -14,7 +14,7 @@ C++ 中，独立的几个 string 对象可以占据也可以不占据各自特�
 
 
 
-# 2. header <string>
+# 2. C++ string <string>
 
 This header is part of the strings library. 
 
@@ -276,13 +276,16 @@ find_last_of
 find_last_not_of
 
 ```
-# 3. null-terminated string
 
+# 3. C string null-terminated string
 
 ## 3.1. <cstring> "string.h"
 
 以下函数为c原生函数,包含在`<string.h>`头文件中, 在C++中也在 `<cstring>`中  
 使用`<string.h>` 不需要在函数名前加`std::`  
+
+
+该头文件定义了 `NULL` 空指针和 `size_t` 数据大小类型  
 
 按照功能可以分成三类:
 1. 字符串操作函数
@@ -291,18 +294,23 @@ find_last_not_of
 
 ### 3.1.1. string manipulation
 
-| 函数名                   | 功能                                                                                                     |
-| ------------------------ | -------------------------------------------------------------------------------------------------------- |
-| 字符串操作函数           |                                                                                                          |
-| `strcpy(s1, s2);`        | 复制字符串 s2 到字符串 s1。                                                                              |
-| `strncpy(s1, s2, n);`    | 复制s1特定数量的字符到s2,若n大于s1的长度,不足的部分补`\0`,若n小于s1的长度,则s2是一个非`\0`结尾的字符数组 |
-| `strcat(s1, s2);`        | 连接字符串 s2 到字符串 s1 的末尾。                                                                       |
-| `strncat(s1, s2, n);`    | 连接字符串 s2 的 n 个字符 到字符串 s1 的末尾。                                                           |
+**字符串操作函数**  
+
+1. `strcpy(dest, src);`         复制字符串 src 到字符串 dest
+2. `strncpy(dest, src, n);`     复制特定数量的字符 若n大于src的长度, 不足的部分补`\0`, 若n小于src的长度, 则dest是一个非`\0`结尾的字符数组
+3. `strcat(dest, src);`         连接字符串 src 到字符串 dest 的末尾, src会替换掉 dest原本末尾的`\0`  
+4. `strncat(dest, src, n);`     连接字符串 src 的 n 个字符 到字符串 dest 的末尾
+5. `strxfrm(dest, src, n);`     根据程序当前的区域选项中的 `LC_COLLATE` 来转换字符串 src 的前 n 个字符，并把它们放置在字符串 dest 中, 算是另一种形式的 `strncpy`
+
+### 3.1.2. string examination
+
+**字符串检验函数**  
+
 | `strtok(str, delim)`     | 根据字符delim分隔字符串str,该函数返回被分解的第一个子字符串，如果没有可检索的字符串，则返回一个`空指针`  |
 | 字符串验证函数           |                                                                                                          |
 | `strlen(s1);    `        | 返回字符串 s1 的长度。                                                                                   |
-| `strcmp(s1, s2);`        | 如果 s1 和 s2 是相同的，则返回 0；如果 s1\<s2 则返回值小于 0；如果 s1\>s2 则返回值大于 0。               |
-| `strncmp(s1, s2);`       | 如果 s1 和 s2 的前n个字符是相同的，则返回 0；如果 s1\<s2 则返回值小于 0；如果 s1\>s2 则返回值大于 0。    |
+| `strcmp(s1, s2);`        | 如果 s1 和 s2 是相同的，则返回 0；如果 `s1<s2` 则返回值小于 0；如果 `s1>s2` 则返回值大于 0。               |
+| `strncmp(s1, s2);`       | 如果 s1 和 s2 的前n个字符是相同的，则返回 0；如果 `s1<s2` 则返回值小于 0；如果 `s1>s2` 则返回值大于 0。    |
 | `strcoll(s1,s2)`     \*  | 功能和来strcmp类似,用法也一样,但是strcoll()会依环境变量LC_COLLATE所指定的文字排列次序来比较              |
 | 字符串查找函数           |                                                                                                          |
 | `strchr(s1, ch);`        | 返回一个char指针，指向字符串 s1 中字符 ch 的第一次出现的位置。                                           |
@@ -316,7 +324,7 @@ find_last_not_of
 * 若LC_COLLATE为"POSIX"或"C"，则strcoll()与strcmp()作用完全相同 
 * 按照 C94 及 C99 标准的规定，程序在启动时设置 locale 为 "C"。在 "C" locale 下，字符串的比较就是按照内码一个字节一个字节地进行，这时 strcoll 与 strcmp 函数没有区别。在其他 locale 下，字符串的比较方式则不同了，例如在简体中文 locale 下，strcmp 仍然按内码比较，而 strcoll 对于汉字则是按拼音进行的（这也跟操作系统有关，Windows 还支持按笔划排序，可以在“区域和语言设置”里面修改
 
-### character array manipulation
+### 3.1.3. character array manipulation
 
 
 | `memchr (ptr,ch,count)`  | 找字符第一次出现的位置, 没找到就返回`NULL`|
