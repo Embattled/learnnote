@@ -1,17 +1,33 @@
-# 1. Pytorch建模
+# 1. Pytorch
 
-Pytorch实现神经网络模型的一般流程包括：
-1. 准备数据
-2. 定义模型
-3. 训练模型
-4. 评估模型
-5. 使用模型
-6. 保存模型
+## 1.1. install 
 
-其中对于新手, 准备数据是最困难的过程   
-实践中通常会遇到的数据类型包括结构化数据，图片数据，文本数据，时间序列数  
+可通过 conda 或者 pip 方便安装
 
-## 1.1. Model Authoring
+```sh
+
+# 选择自己系统对应的 CUDA 版本进行安装
+conda install pytorch torchvision torchaudio cpuonly -c pytorch
+conda install pytorch torchvision torchaudio cudatoolkit=11.0 -c pytorch
+conda install pytorch torchvision torchaudio cudatoolkit=10.2 -c pytorch
+conda install pytorch torchvision torchaudio cudatoolkit=10.1 -c pytorch
+
+# pip 相对更复杂
+pip install torch==1.7.1+cpu torchvision==0.8.2+cpu torchaudio==0.7.2 -f https://download.pytorch.org/whl/torch_stable.html
+pip install torch==1.7.1+cu110 torchvision==0.8.2+cu110 torchaudio===0.7.2 -f https://download.pytorch.org/whl/torch_stable.html
+pip install torch torchvision  # 这是当前默认的针对 CUDA 10.2
+```
+
+## verification
+
+```py
+import torch
+x = torch.rand(5, 3)
+print(x)
+```
+
+# 2. 建模
+## 2.1. Model Authoring
 
 A `Module` is the basic unit of composition in PyTorch.
   1. A constructor, which prepares the module for invocation.
@@ -78,7 +94,7 @@ print(my_cell(x, h))
 3. 定义 `forward` 函数, 
 
 
-# 2. API
+# 3. API
 
 至2020年11月  
 torch 最新版是 1.7  
@@ -91,19 +107,19 @@ print(torch.__version__)
 
 ```
 
-## 2.1. torch
+## 3.1. torch
 
 作为最基础的包, torch 包括了tensors的数据格式以及对应的数学操作. 还提供了许多工具来高效的序列化 tensors以及其他任意数据格式   
 该包有 CUDA 对应  
 
 
 
-## 2.2. torch.nn
+## 3.2. torch.nn
 
 These are the basic building block for graphs  
 用于定义网络中的各个层  
 
-### 2.2.1. Module
+### 3.2.1. Module
 
 * `class torch.nn.Module  `
   * 所有神经网络模块的基类 Base class for all neural network modules.
@@ -149,7 +165,7 @@ net.eval()
 net.train()
 ```
 
-### 2.2.2. Convolution Layers 卷积层 
+### 3.2.2. Convolution Layers 卷积层 
 
 用于在神经网络中定义卷积层  
 
@@ -198,7 +214,7 @@ print(net.conv1.bias)
 
 
 ```
-### 2.2.3. Normalization Layers 归一化层
+### 3.2.3. Normalization Layers 归一化层
 
 用于定义网络的归一化层  
 
@@ -230,7 +246,7 @@ class LeNet(nn.Module):
     self.bn2 = nn.BatchNorm2d(50)
 
 ```
-### 2.2.4. Pooling layers 池化层
+### 3.2.4. Pooling layers 池化层
 
 * 最大化池
   * nn.MaxPool1d
@@ -256,7 +272,7 @@ class LeNet(nn.Module):
 
 
 
-### 2.2.5. Linear Layers  线性层
+### 3.2.5. Linear Layers  线性层
 
 用于构筑网络的全连接层  
 
@@ -279,7 +295,7 @@ class torch.nn.Linear(in_features, out_features, bias=True)
     self.fc2 = nn.Linear(500, num_class)
 
 ```
-### 2.2.6. 非线性激活函数
+### 3.2.6. 非线性激活函数
 
 * 加权和，非线性
   * nn.ELU
@@ -321,7 +337,7 @@ class torch.nn.Linear(in_features, out_features, bias=True)
 ```
 
 
-### 2.2.7. Loss Function 损失函数
+### 3.2.7. Loss Function 损失函数
 
 pytorch 的损失函数直接定义在了 torch.nn 中
 
@@ -351,14 +367,14 @@ loss_func = nn.CrossEntropyLoss()
 ```
 
 
-## 2.3. torch.nn.functional
+## 3.3. torch.nn.functional
 
 不是直接定义层, 而是把各个网络层的运算抽出来的包  
 因为pooling运算没有参数, 所以定义在了这里  
 
-## 2.4. torch.utils.data
+## 3.4. torch.utils.data
 
-### 2.4.1. torch.utils.data.DataLoader
+### 3.4.1. torch.utils.data.DataLoader
 Pytorch的核心数据读取器     :  `torch.utils.data.DataLoader`   是一个可迭代的数据装载器  包括了功能
 * map-style and iterable-style datasets,
 * customizing data loading order,
@@ -406,10 +422,10 @@ print(labels)
 # 打印labels
 ```
 
-### 2.4.2. torch.utils.data.Dataset
+### 3.4.2. torch.utils.data.Dataset
 表示数据集的抽象类          :  `torch.utils.data.Dataset`  
 
-## 2.5. torch.optim
+## 3.5. torch.optim
 
 是一个实现各种优化算法的包。已经支持最常用的方法，并且界面足够通用，因此将来可以轻松集成更复杂的方法。  
 
@@ -428,7 +444,7 @@ optimizer = optim.Adam([var1, var2], lr = 0.0001)
 
 ```
 
-### 2.5.1. per-parameter options
+### 3.5.1. per-parameter options
 
 To do this, instead of passing an iterable of `Variable` s, pass in an iterable of `dict` s.    
 * dict 中指定了不同的 parameter group, 并且需要使用 `params` 关键字
@@ -442,7 +458,7 @@ optim.SGD([
                 {'params': model.classifier.parameters(), 'lr': 1e-3}
             ], lr=1e-2, momentum=0.9)
 ```
-### 2.5.2. optimization step
+### 3.5.2. optimization step
 
 重点: 所有 optimizers 必须实现 step 方法, 用来更新要优化的参数  
 
@@ -485,7 +501,7 @@ for input, target in dataset:
     optimizer.step(closure)
 
 ```
-### 2.5.3. Algorithm
+### 3.5.3. Algorithm
 
 `class torch.optim.Optimizer(params, defaults)` 是所有优化器的基类, 定义了优化器的必须操作  
 * 参数
@@ -516,7 +532,7 @@ for input, target in dataset:
 * Rprop
 * **SGD**
 
-### 2.5.4. 动态 Learn Rate
+### 3.5.4. 动态 Learn Rate
 
 `torch.optim.lr_scheduler` 提供了一些方法用来根据 epoch 或者其他计算来调整学习速率
 
@@ -531,11 +547,11 @@ for epoch in range(100):
 
 
 
-## 2.6. torchivision
+## 3.6. torchivision
 
 包含用于计算机视觉的流行数据集，模型架构和常见图像转换  
 
-### 2.6.1. torchvision.datasets
+### 3.6.1. torchvision.datasets
 
 主流的数据集：  
 
@@ -565,7 +581,7 @@ for epoch in range(100):
     UCF101
 
 
-### 2.6.2. torchvision.transforms
+### 3.6.2. torchvision.transforms
 
 1. transforms包含了一些常用的图像变换，这些变换能够用 `Compose` 串联组合起来  
 2. `torchvision.transforms.functional` 模块供了一些更加精细的变换，用于搭建复杂的变换流水线(例如分割任务）  
@@ -585,7 +601,7 @@ for epoch in range(100):
 * Batch of Tensor Images is a tensor of (B, C, H, W) shape, where B is a number of images in the batch. 
 
 
-#### 2.6.2.1. Scrpit and Compositions
+#### 3.6.2.1. Scrpit and Compositions
 
 
 ```py
@@ -610,7 +626,7 @@ transforms.Compose( [  transforms.CenterCrop(10), transforms.ToTensor(),  ])
 
 ```
 
-#### 2.6.2.2. Transforms on PIL Image and torch.*Tensor 通用变换函数
+#### 3.6.2.2. Transforms on PIL Image and torch.*Tensor 通用变换函数
 
 * class torchvision.transforms.CenterCrop(size)
 * class torchvision.transforms.ColorJitter(brightness=0, contrast=0, saturation=0, hue=0)
@@ -632,7 +648,7 @@ transforms.Compose( [  transforms.CenterCrop(10), transforms.ToTensor(),  ])
 * class torchvision.transforms.GaussianBlur(kernel_size, sigma=(0.1, 2.0))
   
 
-#### 2.6.2.3. Transforms on only 特定函数
+#### 3.6.2.3. Transforms on only 特定函数
 
 
 **Transforms on PIL Image Only**
@@ -646,7 +662,7 @@ transforms.Compose( [  transforms.CenterCrop(10), transforms.ToTensor(),  ])
 * class torchvision.transforms.ConvertImageDtype(dtype: torch.dtype)
 
 
-#### 2.6.2.4. Conversion and Generic Transforms 格式转换 和 通用变化
+#### 3.6.2.4. Conversion and Generic Transforms 格式转换 和 通用变化
 
 * class torchvision.transforms.ToPILImage(mode=None)
 * class torchvision.transforms.ToTensor
@@ -658,12 +674,12 @@ transforms.Compose( [  transforms.CenterCrop(10), transforms.ToTensor(),  ])
 
 
 
-#### 2.6.2.5. Functional Transforms 用于更精细化的变换
+#### 3.6.2.5. Functional Transforms 用于更精细化的变换
 
 `import torchvision.transforms.functional as TF`  函数名称省略前缀  
 
 
-# 3. TorchScript
+# 4. TorchScript
 
 
 对于一个从Pytorch创建的一个可优化和串行的模型, 使其可以运行在其他非Python的平台上  
@@ -678,7 +694,7 @@ TorchScript provides tools to capture the definition of your model, even in ligh
 4. TorchScript 可以允许与许多后端设备运行接口, 这些运行环境往往需要比单独的操作器更广泛的程序视野.
 
 
-## 3.1. Tracing Modules
+## 4.1. Tracing Modules
 
 Trace:
 1. invoked the Module
@@ -749,7 +765,7 @@ def forward(self,
 
 ```
 
-## 3.2. Convert Modules
+## 4.2. Convert Modules
 
 * 对于一个带有控制流的子模型, 直接使用 Trace 不能正确的捕捉整个程序流程  
 * 使用 `script compiler` 即可, 可以直接分析Python 源代码来导出 TorchScript
@@ -819,7 +835,7 @@ my_cell(x,h)
 
 ```
 
-## 3.3. Mixing Scripting and Tracing
+## 4.3. Mixing Scripting and Tracing
 
 混合 Script 和 Trace
 
@@ -885,7 +901,7 @@ def forward(self,
 
 ```
 
-## 3.4. Saving and Loading models
+## 4.4. Saving and Loading models
 
 save and load TorchScript modules  
 这种形式的存储 包括了代码,参数,性质还有Debug信息
@@ -901,7 +917,7 @@ print(loaded.code)
 
 ```
 
-## 3.5. API torch.jit
+## 4.5. API torch.jit
 
 * script(obj[, optimize, _frames_up, _rcb])
 * trace(func, example_inputs[, optimize, …])
@@ -915,17 +931,17 @@ print(loaded.code)
 * ignore([drop])
 * unused(fn)
 
-# 4. Pytorch C++ API
+# 5. Pytorch C++ API
 
-## 4.1. ATen
-
-
-
-# 5. 例程
+## 5.1. ATen
 
 
-## 5.1. MNIST LeNet 例程
-### 5.1.1. Network structure
+
+# 6. 例程
+
+
+## 6.1. MNIST LeNet 例程
+### 6.1.1. Network structure
 ```py
 
 class LeNet(nn.Module):
@@ -1002,7 +1018,7 @@ print(net)
 ```
 
 
-### 5.1.2. dataset
+### 6.1.2. dataset
 
 
 ```py
@@ -1058,7 +1074,7 @@ show_imgs = torchvision.utils.make_grid(images, nrow=10).numpy().transpose((1,2,
 plt.imshow(show_imgs)
 
 ```
-### 5.1.3. iteration
+### 6.1.3. iteration
 
 ```py
 
@@ -1135,7 +1151,7 @@ for iteration, data in enumerate(trainloader):
 
 
 
-### 5.1.4. evaluate
+### 6.1.4. evaluate
 
 ```py
 
@@ -1187,9 +1203,9 @@ def evaluate_model():
 
 ```
 
-## 5.2. MINST GAN 例程
+## 6.2. MINST GAN 例程
 
-### 5.2.1. dataset
+### 6.2.1. dataset
 
 ```py
 # Define transform func.
@@ -1209,7 +1225,7 @@ train_loader  = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=bc
 test_loader   = torch.utils.data.DataLoader(dataset= test_dataset, batch_size=bch_size, shuffle=False)
 ```
 
-### 5.2.2. 网络
+### 6.2.2. 网络
 
 ```py
 # 训练 epoch
@@ -1277,7 +1293,7 @@ G_optimizer = optim.Adam(G.parameters(), lr = base_lr)
 D_optimizer = optim.Adam(D.parameters(), lr = base_lr)
 ```
 
-### 5.2.3. G 训练
+### 6.2.3. G 训练
 
 ```py
 # Code for training the generator
@@ -1302,7 +1318,7 @@ def G_train(bch_size, z_dim, G_optimizer):
 
 ```
 
-### 5.2.4. D 训练
+### 6.2.4. D 训练
 对于每次 D 训练, 先输入一组 real image 再输入一组 fake image 作为一次训练流程  
 
 ```py
@@ -1342,7 +1358,7 @@ def D_train(x, D_optimizer):
     return  D_loss.data.item()
 ```
 
-### 5.2.5. iteration
+### 6.2.5. iteration
 
 ```py
 
@@ -1408,9 +1424,9 @@ def Logging(images, G_loss, D_loss):
         
 ```
 
-## MINST USPS adversarial examples
+## 6.3. MINST USPS adversarial examples
 
-### dataset
+### 6.3.1. dataset
 
 ```py
 # Make MINIST dataloaders
@@ -1430,7 +1446,7 @@ usps_testloader  = utils.data.DataLoader(usps_test,  batch_size=1,  shuffle=Fals
 
 ```
 
-### general train and evaluate
+### 6.3.2. general train and evaluate
 
 ```py
 # Script for training a network

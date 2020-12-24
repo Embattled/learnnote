@@ -1,3 +1,18 @@
+# make
+
+GNU Make
+
+## 命令
+
+* `-j [N], --jobs[=N]`
+    * Allow N jobs at once; infinite jobs with no arg.
+    * 允许并行编译
+    * 不指定数字的时候自动探测最大的可用CPU
+
+
+
+# 1. makefile入门
+
 Makefile
 
 无论是C、C++、还是pas，首先要把源文件编译成中间代码文件，在Windows下也就是 .obj 文件，UNIX下是 .o 文件，即 Object File，这个动作叫做编译（compile）。然后再把大量的Object File合成执行文件，这个动作叫作链接（link）
@@ -5,9 +20,6 @@ Makefile
 一般来说，每个源文件都应该对应于一个中间目标文件（O文件或是OBJ文件）。 
 
 给中间目标文件打个包，在Windows下这种包叫“库文件”（Library File)，也就是 .lib 文件，在UNIX下，是Archive File，也就是 .a 文件
-
-
-# 1. makefile入门
 ## 1.1. GCC
 
 ```

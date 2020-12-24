@@ -27,7 +27,7 @@ ssh服务端的进程名为sshd,负责实时监听客户端的请求(IP 22端口
 `$ service ssh start`  
 ssh的客户端可以用 XSHELL，Securecrt, Mobaxterm等工具进行连接  
 
-## 1.1. ssh 
+# 2. ssh 
 
 积累的常用命令笔记  
 ```shell
@@ -40,9 +40,8 @@ ssh的客户端可以用 XSHELL，Securecrt, Mobaxterm等工具进行连接
 # Requests that standard input and output on the client be forwarded to _host_ on _port_ over the secure channel.
 # 用于写在 ProxyCommand 中进行跳板  
 -W host:port
-
 ```
-## 1.2. ssh_config
+## 2.1. ssh_config
 
 通过配置文件保存密码
 
@@ -55,15 +54,36 @@ ssh username@hostname -p port
 ssh 别名
 
 
-# 配置方法 在.ssh/config中配置，如果没有config，创建一个即可  
+# 配置方法 在.ssh/config中配置，如果没有config，创建一个即可
+# 这里是用户的ssh配置  
 Host 别名
     Hostname 主机名
     Port 端口
     User 用户名
 ```
 
+### 2.1.1. 防止自动断开
 
-### 1.2.1. ProxyCommand 跳板
+用ssh链接服务端，一段时间不操作或屏幕没输出（比如复制文件）的时候，会自动断开  
+
+两种方法, 配置客户端或者配置服务端
+
+```sh
+# 客户端配置方法
+# 在系统的ssh配置文件中添加设置
+vi  /etc/ssh/ssh_config
+Host *
+    ServerAliveInterval 30
+# 或者在ssh连接中加入选项
+ssh -o ServerAliveInterval=30 hostname
+
+# 服务端配置方法
+vi /etc/ssh/sshd_config
+ClientAliveInterval 60
+ClientAliveCountMax 1
+```
+
+### 2.1.2. ProxyCommand 跳板
 
 很多环境都有一台统一登录跳板机,我们需要先登录跳板机,然后再登录自己的目标机器.  
 ProxyCommand是openssh的特性,如果使用putty,xshell,那么是没有这个功能的  
@@ -76,7 +96,7 @@ ProxyCommand是openssh的特性,如果使用putty,xshell,那么是没有这个�
 * %h:%p : 表示要连接的目标机端口,可以直接写死固定值,但是使用%h和%p可以保证在Hostname和Port变化的情况下ProxyCommand这行不用跟着变化.
 
 
-### 1.2.2. SHA1 支持
+### 2.1.3. SHA1 支持
 
 新版Openssh中认为SHA1这种hash散列算法过于薄弱，已经不再支持，所以我们需要手动去enable对于SHA1的支持
 
@@ -92,7 +112,7 @@ KexAlgorithms +diffie-hellman-group1-sha1
 ```
 
 
-## 1.3. SCP(secure copy )远程拷贝文件与文件夹
+## 2.2. SCP(secure copy )远程拷贝文件与文件夹
 
 scp 是 linux 系统下基于 ssh 登陆进行安全的远程文件拷贝命令。  
 scp 是加密的，rcp 是不加密的，scp 是 rcp 的加强版。  
@@ -156,10 +176,10 @@ scp -r www.runoob.com:/home/root/others/ /home/space/music/
 ```
 
 
-# 2. 应用示例
-## 2.1. 登录及配置文件
+# 3. 应用示例
+## 3.1. 登录及配置文件
 
-### 2.1.1. 公钥免密登录
+### 3.1.1. 公钥免密登录
 用户将自己的公钥储存在远程主机上,直接允许登录shell，不再要求密码。
 ```shell
 #用户必须提供公钥，如果没有公钥，可以生成一个  
