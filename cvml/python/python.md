@@ -112,6 +112,8 @@ import keyword
 keyword.kwlist
 ```
 
+True False  : bool类型的值  
+
 and  
 as  
 assert  
@@ -126,7 +128,6 @@ except
 finally  
 for
 from  
-False  
 global  
 if  
 import  
@@ -141,12 +142,11 @@ pass
 raise  
 return  
 try  
-True  
 while
 with  
 yield 	  
 
-## 2.4. 内置函数
+# 3. 内置函数
 
 可以直接使用, 不需要导入某个模块, 解释器自带的函数叫做内置函数  
 
@@ -157,8 +157,127 @@ yield
 * type() : 输出变量或者表达式的类型
 
 
+* ord() : 字符转化成 Unicode 码
+* chr() : 数字的Unicode 码 转化成字符
 
-# 3. Python的操作符与变量
+* id()  : 获取变量或者对象的内存地址
+
+其他内置函数
+```
+abs() 	delattr() 	hash() 	memoryview() 	set()
+all() 	dict() 	help() 	min() 	setattr()
+any() 	dir() 	hex() 	next() 	slicea()
+ascii() 	divmod()  	object() 	sorted()
+bin() 	enumerate() 	oct() 	staticmethod()
+ 	eval() 	 	open() 	str()
+breakpoint() 	exec() 	isinstance()  	sum()
+bytearray() 	filter() 	issubclass() 	pow() 	super()
+bytes() 	 	iter() 	tuple()
+callable() 	format() 	len() 	property() 	type()
+frozenset() 	list() 	range() 	vars()
+classmethod() 	getattr() 	locals() 	repr() 	zip()
+compile() 	globals() 	map() 	reversed() 	__import__()
+complex() 	hasattr() 	max() 	round()
+```
+
+## 3.1. print()
+
+`print (value,...,sep=' ',end='\n',file=sys.stdout,flush=False)`  
+
+* value 参数可以接受任意多个变量或值，因此 print() 函数可以输出多个值
+* `end` 参数的默认值是 `\n`
+* `sep` 参数的默认值是 ` ` 空格
+* `file` 参数的默认值为 sys.stdout, 代表标准输出, 即屏幕输出  
+* `flush` 参数用于控制输出缓存，该参数一般保持为 `False` 即可，这样可以获得较好的性能
+
+
+```py
+print("读者名：",user_name,"年龄：",user_age)
+
+#打开文件
+f = open("demo.txt","w")
+print('123456',file=f)
+```
+
+### 3.1.1. 格式化输出
+
+类似于C语言的格式化输出, print() 函数提供了类似的功能
+
+* 在 print() 函数中，由引号包围的是格式化字符串，它相当于一个字符串模板
+* 格式化字符串中的`%` 是转换说明符（Conversion Specifier）只是一个占位符
+* 转换说明符会被后面表达式替代
+* `%` 也被用作分隔符, 格式化字符串后接一个`%` 再接输出的表达式
+* 格式化字符串中可以包含多个转换说明符, 这个时候也得提供多个表达式, 此时多个表达式必须使用小括号( )包围起来
+
+```py
+name = "C语言中文网"
+age = 8
+url = "http://c.biancheng.net/"
+print("%s已经%d岁了，它的网址是%s。" % (name, age, url))
+```
+
+转换说明符的各种格式和C语言基本一致
+| 转换符 | 解释方法                               |
+| ------ | -------------------------------------- |
+| %d、%i | 转换为带符号的十进制整数               |
+| %o     | 转换为带符号的八进制整数               |
+| %x、%X | 转换为带符号的十六进制整数             |
+| %e     | 转化为科学计数法表示的浮点数（e 小写） |
+| %E     | 转化为科学计数法表示的浮点数（E 大写） |
+| %f、%F | 转化为十进制浮点数                     |
+| %g     | 智能选择使用 %f 或 %e 格式             |
+| %G     | 智能选择使用 %F 或 %E 格式             |
+| %c     | 格式化字符及其 ASCII 码                |
+| %r     | 使用 repr() 函数将表达式转换为字符串   |
+| %s     | 使用 str() 函数将表达式转换为字符串    |
+
+
+### 控制输出方式
+
+转换说明符的`%`和类型字符中间可以加入控制内容
+* 数字指定最小输出宽度  `%10d`
+  * 当数据的实际宽度小于指定宽度时，会在左侧以空格补齐
+  * 当数据的实际宽度大于指定宽度时，会按照数据的实际宽度输出, 不会裁剪
+* 对齐标志指定对齐方法, 加在`数字之前`, 默认是左侧补空格, 数据靠右边
+  * `-` 指定左对齐, 
+  * `+` 指定数字数据带正负号 `+-`, 只对数字数据生效
+  * `0` 指定数据用 0 代替空格补足, 只对数字数据生效
+    * 左对齐时因为右侧补零会改变整数的数值, 因此左对齐时不对整数生效
+* 对小数指定精度, 放在`最小宽度数据之后, 用点号隔开`  
+  * `%m.nf` `m` 表示最小宽度，`n` 表示输出精度，`.`是必须存在的, f表示小数输出
+
+
+```py
+n = 1234567
+print("%10d." % n)
+print("%5d." % n)
+
+f = 3.141592653
+# 最小宽度为8，小数点后保留3位
+print("%8.3f" % f)
+# 最小宽度为8，小数点后保留3位，左边补0
+print("%08.3f" % f)
+# 最小宽度为8，小数点后保留3位，左边补0，带符号
+print("%+08.3f" % f)
+
+
+```
+
+## 3.2. input()
+字符串形式接受用户输入  
+
+`str = input(tipmsg)`  
+* str   : 表示输入存入的变量
+* tipmsg: 表示在控制台中输出的提示信息, 提示输入什么内容
+
+## 3.3. 类型转换函数
+
+因为 input() 输入的内容都被识别为字符串, 因此需要类型转换
+* int()
+* bool()
+* float()
+
+# 4. Python的操作符与变量
 
 
 Python是弱类型语言
@@ -166,9 +285,9 @@ Python是弱类型语言
 * 变量的数据类型可以随时改变
 * 使用 type() 内置函数类检测某个变量或者表达式的类型
 
-## 基础类型
+## 4.1. 基础类型
 
-整数, 浮点数, 复数, 字符串, 布尔    
+整数, 浮点数, 复数, 字符串, bytes, 布尔    
 
 * 整数不分类型, Python 整数的取值范围是无限的
   * 当所用数值超过计算机自身的计算能力时，Python 会自动转用高精度计算（大数计算）
@@ -191,12 +310,21 @@ Python是弱类型语言
   * 使用三个单引号或者双引号其实是 Python 长字符串的写法
     * 所谓长字符串，就是可以直接换行, 可以在字符串中放置任何内容，包括单引号和双引号
     * 长字符串中的换行、空格、缩进等空白符都会原样输出
+* bytes 类型用来表示一个二进制序列, 类似于无类型的指针
+  * 只负责以字节序列的形式（二进制形式）来存储数据，至于这些数据到底表示什么内容, 完全由程序的解析方式决定
+  * bytes 只是简单地记录内存中的原始数据，至于如何使用这些数据，bytes 并不在意
+  * bytes 是一个类，调用它的构造方法，也就是 bytes(), 可以将指定内容转化成字节串
+  * 如果字符串的内容都是 ASCII 字符，那么直接在字符串前面添加b前缀就可以将字符串转换成 bytes
+* 字符串有一个 encode()  将字符串转换成bytes()
+* bytes 有一个 decode() 将字节串转换成字符串
+* bool 类型用来表示真或者假, 真假都是python的保留字
+  * True 
+  * False 
 
 
 
 
-
-## 运算符
+## 4.2. 运算符
 
 * `+ - * / % `与C语言相同
 * `== != > < >= <=` 都与C语言相同
@@ -211,7 +339,7 @@ Python是弱类型语言
 
 
 
-### 3.1.1. `if` 表达式
+### 4.2.1. `if` 表达式
 ```python
 if 表达式:
   pass #内容
@@ -220,12 +348,12 @@ elif 表达式:
 else:
   pass
 ```
-### 3.1.2. `while` 表达式
+### 4.2.2. `while` 表达式
 内容同样不需要括号
 
 `break`和`continue` 同C语言是一样的
 
-### 3.1.3. `for` 表达式
+### 4.2.3. `for` 表达式
 
 ```python
 for target_list in expression_list:
@@ -239,7 +367,7 @@ range(12,16)   #代表从12开始
 #range(<start>,<end>,<stepWidth>)
 range(12,16,2) #设置间隔，步长可以为负数
 ```
-### 3.1.4. 列表推导式（又称列表解析式） 
+### 4.2.4. 列表推导式（又称列表解析式） 
 
 它的结构是在一个中括号里包含一个表达式，然后是一个for语句，然后是 0 个或多个 for 或者 if 语句  
 可以在列表中放入任意类型的对象  
@@ -260,14 +388,14 @@ for x in range(1,5):
 ```
 
 
-## 3.2. python的包的导入
+## 4.3. python的包的导入
 
 使用 `import <name>` 来导入一个包,可以使用其中的函数  
 在使用的时候要加上包名 `name.function()`  
 使用 `from <name> import *` 可以只单独导入一个函数,这时包中函数不再需要包名   
 使用 `as <alias>` 来为导入的包或者包中函数添加别名, 使得调用更方便  
 
-### 3.2.1. 常用的包
+### 4.3.1. 常用的包
 * 包的下载 , 使用pip来下载及管理包
   * `pip install ModuleName` 下载一个包  
   * `pip install -u ModuleName` 下载一个已经安装包的更新版本  
@@ -277,9 +405,9 @@ for x in range(1,5):
   * `sys.exit()` 提前结束程序
 
 
-## 3.3. python的函数及作用域
+## 4.4. python的函数及作用域
 
-### 3.3.1. 定义
+### 4.4.1. 定义
 ```python
 def functionName(): #python的函数参数不需要类型`
 """ 关于函数的注释放在三个双引号中 """
@@ -287,7 +415,7 @@ def functionName(): #python的函数参数不需要类型`
   return None
   # python的所有函数都需要返回值,就算不手动写出也会在幕后给没有 return 的函数添加 return None
 ```
-### 3.3.2. 参数
+### 4.4.2. 参数
 * 第一种是位置识别,同C语言一样
 * 第二种是**关键字参数**,根据`调用时`加在参数前面的关键字来识别,通常用于可选参数
   * 例如`print()` 函数的`end`和`sep`用来指定参数末尾打印什么,参数之间打印什么
@@ -295,7 +423,7 @@ def functionName(): #python的函数参数不需要类型`
   * `print('a','b','c')` 在参数之间会默认隔一个空格
   * `print('a','b','c',seq=',')` 会输出 **a,b,c** 
   
-### 3.3.3. 作用域
+### 4.4.3. 作用域
 
 同C语言 全局和局部的覆盖原则也相同  
 函数中引用外部变量 使用`global` 关键字
@@ -325,7 +453,7 @@ def spam():
   #在这里出错
 ```
 
-## 3.4. 函数的异常处理
+## 4.5. 函数的异常处理
 
 如果 `try` 子句中的代码发生了错误，则程序立即到 `except` 中的代码去执行  
 
@@ -344,9 +472,9 @@ python有很多的error类:
 `ValueError` 对于输入数据的类型不符    
 `FileNotFoundError` 打开文件的路径不对, 文件不存在  
 
-# 4. python 的列表和元组
+# 5. python 的列表和元组
 
-## 4.1. 列表类型
+## 5.1. 列表类型
 
 * 列表值: 指的是列表本身,可以作为值保存在变量中,或者传递给函数
 * 表项:   指的是列表内的值,用逗号分隔
@@ -360,7 +488,7 @@ python有很多的error类:
 * `*` 给予一个整数,可以复制列表,效果同字符串
 * ` del spam[2]` 删除列表中的下标值,后面所有值的下标都会往前移动一个
   
-## 4.2. 列表的使用
+## 5.2. 列表的使用
 python的列表总是动态的:
 ```python
 catName=[]
@@ -370,10 +498,10 @@ for name in catName:
     print(name)
 ```
 
-### 4.2.1. 列表的循环
+### 5.2.1. 列表的循环
 ` for i in range(len(someList))`
 
-### 4.2.2. 列表的查找
+### 5.2.2. 列表的查找
 `in `和 `not in` 操作符  
 可以确定一个值是否在列表中
 ```python
@@ -381,13 +509,13 @@ for name in catName:
 返回值为 True 或者 False
 ```
 
-### 4.2.3. 列表的赋值
+### 5.2.3. 列表的赋值
 使用列表可以同时为多个变量赋值  
 `size,color,dispo=cat`  
 变量的数目和列表的长度必须相等,否则报错  
 `cat=['fat','black','loud']`
 
-### 4.2.4. 增强的赋值操作
+### 5.2.4. 增强的赋值操作
 针对`+、-、*、/、% `操作符  
 有`+=、-=、*=、/=、%=  `意义同C语言
 ```python
@@ -405,7 +533,7 @@ bacon=['zon']
 bacon*=3
 ```
 
-### 4.2.5. 列表类型的方法
+### 5.2.5. 列表类型的方法
 
 * `index()` : `spam.index('hello')` 传入一个值,若该值存在于列表中,返回**第一次出现的下标**
 * `append()` :`spam.append('hello') ` 将值添加到列表末尾
@@ -422,8 +550,8 @@ bacon*=3
 * 函数`sorted()`
   * 可以返回一个排序的值,但是不会影响原本的值 `ab=sorted(spam)`
 
-## 4.3. 字符串和元组
-### 4.3.1. 字符串类型
+## 5.3. 字符串和元组
+### 5.3.1. 字符串类型
 字符串和元组都类似于列表
 包括:  
 * 下标取值
@@ -437,7 +565,7 @@ bacon*=3
 改变一个字符串,可以使用切片+连接的方法  
 `newName=name[:7]+'the'+name[8:]`
 
-### 4.3.2. 元组数据类型 
+### 5.3.2. 元组数据类型 
 元组与列表几乎一样,除了两点  
 1. 元组输入时使用`()`而不是`[]` 例:`eggs=('hello',42,0.5)`
 2. 元组属于不可变类型，同字符串一致,即值不能增改,字符串属于元组的一种
@@ -454,7 +582,7 @@ bacon*=3
 * `list()` 和 `tuple()`
 * `list('dog')` 结果输出 `['d','o','g']`
 
-## 4.4. 关于引用
+## 5.4. 关于引用
 对于变量保存字符串和整数值，变量保存的是值本身  
 对于列表，变量保存的是列表引用，类似于指针  
 
@@ -467,8 +595,8 @@ cheese=spam
    * `spam=['A','B','C']`
    * `cheese=copy.copy(spam)`
 
-# 5. 字典和结构化数据
-## 5.1. 字典
+# 6. 字典和结构化数据
+## 6.1. 字典
 同列表一样,字典是许多值的集合,但不同于列表的下标,字典的索引使用许多不同的数据类型,不只是整数
 
 字典的定义使用花括号 `{}`
@@ -484,7 +612,7 @@ myCat={ 'size':'fat','color':'gray','disposition':'loud' }
 加入一个新的键值对: ` ice_cream_1['flavor'] = 'vanilla' `  
 删除一个键值对 ` del ice_cream_1['flavor'] `  
 
-## 5.2. 字典的使用
+## 6.2. 字典的使用
 字典有三个打印方法
 * `keys()`  :返回键值
 * `values()`:具体值
@@ -493,14 +621,14 @@ myCat={ 'size':'fat','color':'gray','disposition':'loud' }
 
 可以使用 `list(spam.keys())` 将返回的值转换为列表
 
-### 5.2.1. get() 方法
+### 6.2.1. get() 方法
 使用`spam.get('索引',备用值)`可以安全的通过索引访问一个值,当这个索引在字典中不存在时返回备用值  
 若不使用`get`方法则会报错
 
-### 5.2.2. setdefault() 方法
+### 6.2.2. setdefault() 方法
 `setdefault('索引',值)` 可以安全的初始化一个键,当该键存在则返回键值,键不存在则设定为第二个参数
 
-### 5.2.3. 字典的优化打印
+### 6.2.3. 字典的优化打印
 自带的`print()`函数会把字典打印在一行  
 使用`pprint`模块,可以优化打印
 ```python
@@ -510,7 +638,7 @@ string=pprint.pformat(someDictionary) #返回一个和 上一行打印内容相�
 print(string) # 效果和第一行相同
 ```
 
-## 5.3. 集合的使用
+## 6.3. 集合的使用
 集合（set）是一个无序的**不重复元素**序列。  
 可以使用大括号` { } `或者` set() `函数创建集合  
 注意: 创建一个空集合必须用` set()` 而不是 `{ }`，因为` { } `是用来创建一个空字典  
@@ -524,9 +652,9 @@ print(string) # 效果和第一行相同
 * 清空集合 `s.clear()`
 * ` pop()`	随机移除元素
 
-# 6. 字符串操作
+# 7. 字符串操作
 
-## 6.1. 字符串的输入
+## 7.1. 字符串的输入
 * python的字符串使用 `''` 单引号输入  
 * 也可以使用 `"" `双引号输入,区别在于使用双引号时字符串中可以包括单引号  
 * 转义字符,使用`\` 反斜杠来输入特殊字符,  `\t` 制表位, `\n` 换行符, `\\` 反斜杠
@@ -554,9 +682,9 @@ string with multiline.
 ```
 字符串可以使用切片以及 `in `  `not in` 操作符,用来比较前一个字符串是否在后一个字符串中间
   
-## 6.2. 常用的字符串方法
+## 7.2. 常用的字符串方法
 
-### 6.2.1. 大小写及内容检测方法
+### 7.2.1. 大小写及内容检测方法
    * `upper()` 和 `lower()` 返回一个**新字符串**,将原本字符串中所有字母转变为大写/小写
    * `name.title()`  标题方法, 将字符串的单词第一个字母大写  
    * `isupper()` 和 `islower()` 返回布尔值,如果这个字符串不为空且全部字符为大写/小写则返回`True`
@@ -566,11 +694,11 @@ string with multiline.
      * isdecimal() 非空且只包含数字字符
      * isspace()  非空且只包含空格,制表符,换行
      * istitle()  非空且只包含以大写字母开头,后面都是小写字母的 `单词` 及可以包含空格及数字
-### 6.2.2. 开头结尾检测方法  
+### 7.2.2. 开头结尾检测方法  
    startswith() 和 endswith()
    以传入的字符串为开始/结尾,则返回True
 
-### 6.2.3. 组合与切割方法  
+### 7.2.3. 组合与切割方法  
    join() 和 split()    
     join()是将一个字符串列表连接起来的方法,并在字符串中间插入调用`join`的字符串  
     `','.join(['a','b','c'])`   返回 ` 'a,b,c' `  
@@ -578,7 +706,7 @@ string with multiline.
     `'My name is'.split()`   返回 `['My','name','is']`  
     常被用来分割多行字符串  ` spam.split('\n')`
 
-### 6.2.4. 对齐方法  
+### 7.2.4. 对齐方法  
    rjust()  ljust()  center()
    在一个字符串上调用,传入希望得到的字符串的长度,将返回一个以空格填充的字符串  
    分别代表左对齐,右对齐  
@@ -587,14 +715,14 @@ string with multiline.
    可以输入第二个参数改变填充字符  
    `'a'.ljust(5,'*')`  返回  `'a****'`
 
-### 6.2.5. 清除对齐方法  
+### 7.2.5. 清除对齐方法  
    `strip()  rstrip() lstrip()  `  
    在左右删除空白字符  
    传入参数指定需要删除的字符  注:这里第二个参数无视字符出现顺序  
    `'abcccba'.strip('ab')` 与
    `'abcccba'.strip('ba')` 作用相同
 
-### 6.2.6. 识别转换方法 **str.extract()**
+### 7.2.6. 识别转换方法 **str.extract()**
 和pandas组合使用,拆解字符串
 ```py
 
@@ -608,7 +736,7 @@ stats_ext = df['stats'].str.extract('(\w{1})_(\d{2})years',expand=True)
 stats_ext.columns = ['sex', 'age']
 ```
    
-### 6.2.7. str.get_dummies()
+### 7.2.7. str.get_dummies()
 
 为了对数据进行统计,例如多个学生选择了多种科目,科目可能会重复,这种统计  
 
@@ -635,7 +763,7 @@ print(course_dummy_var)
 ```
 
 
-# 7. Python 的类
+# 8. Python 的类
 
 python 的类通过`class`定义 , python的类名一般以大写字母开头
 
@@ -643,9 +771,9 @@ python 的类通过`class`定义 , python的类名一般以大写字母开头
 `def __init__(self,<other parameter>):`  
 `__init__` 是保留的构造函数名, `self` 是保留的参数, 类的所有方法都需要有`self`参数  
 
-# 8. Python 的文件操作 
+# 9. Python 的文件操作 
 
-## 8.1. 打开文件
+## 9.1. 打开文件
 
 `with`关键字  
 `open('路径')`  
@@ -668,7 +796,7 @@ for line in lines:  #可以在block外读取文件内容
 
 ```
 
-## 8.2. 写入文件
+## 9.2. 写入文件
 
 要想写入文件,需要在文件对象创建的时候指定`'w'`参数,或者`'a'`参数    
 ```python
@@ -681,7 +809,7 @@ with open(filename, 'a') as file_object:
 
 ```
 
-## 8.3. 结构化读取文件
+## 9.3. 结构化读取文件
 使用 enumerate 可以按行获取文件内容  
 `for j, data in enumerate(openfile) `
 
@@ -692,14 +820,14 @@ with open('animal.txt', 'r') as openfile:
       print(f'Line number {str(j)}. Content: {data}')
 ```
 
-# 9. 正则表达式 re包 
+# 10. 正则表达式 re包 
 
 要在python中使用正则表达式, 需要导入`re`包  
 `import  re`  
 
 官方文档[https://docs.python.org/3/library/re.html]
 
-## 9.1. 使用正则表达式的基础函数
+## 10.1. 使用正则表达式的基础函数
 
 ```python
 # 基础search函数,用来查找表达式第一次出现的位置
@@ -719,7 +847,7 @@ x = re.sub('被替换的字符串', '填充的字符串', text)
 
 ```
 
-## 9.2. 正则表达式-单字符
+## 10.2. 正则表达式-单字符
 
 ```python
 # 使用[]来代表一个单字符的可选列表
@@ -762,7 +890,7 @@ re.search(r'\bst', 'first strike')
 re.search(r'\Bst\B', 'strike first estimate')
 ```
 
-## 9.3. 正则表达式-多次匹配
+## 10.3. 正则表达式-多次匹配
 
 ```python
 #  * 代表任意次  + 代表至少1次 ,? 代表0或者1次
@@ -788,14 +916,14 @@ re.search('(bar)+', 'foo barbarbar baz')
 
 ```
 
-# 10. Python 的包 环境管理 
+# 11. Python 的包 环境管理 
 
 [官方推荐文档]<https://packaging.python.org/guides/tool-recommendations/>  
 
-## 10.1. Python的包管理
+## 11.1. Python的包管理
 包管理工具有很多
 
-### 10.1.1. distutils 和 setuptools
+### 11.1.1. distutils 和 setuptools
 
 distutils是 python 标准库的一部分  
 用于方便的打包和安装模块  是常用的 setup.py 的实现模块  
@@ -823,7 +951,7 @@ setup(
 
 
 
-### 10.1.2. pip 
+### 11.1.2. pip 
 
 pip是目前最流行的Python包管理工具，它被当作easy_install的替代品，但是仍有大量的功能建立在setuptools之上。  
 
@@ -842,7 +970,7 @@ pip的使用非常简单，并支持从任意能够通过 VCS 或浏览器访问
   * `pip install -r requirements.txt`
 
 
-## 10.2. 环境管理
+## 11.2. 环境管理
 
 在开发Python应用程序的时候，系统安装的Python3只有一个版本：3.4。所有第三方的包都会被pip安装到Python3的site-packages目录下。
 
@@ -851,7 +979,7 @@ pip的使用非常简单，并支持从任意能够通过 VCS 或浏览器访问
 
 有多种虚拟环境配置方法  
 
-### 10.2.1. venv  
+### 11.2.1. venv  
 
 Source code: Lib/venv/  
 一般已经安装在了较新的 python 版本中了  因为是从 3.3 版本开始自带的，这个工具也仅仅支持 python 3.3 和以后版本  
@@ -870,7 +998,7 @@ source tutorial-env/bin/activate
 
 ```
 
-### 10.2.2. virtualenv
+### 11.2.2. virtualenv
 
 virtualenv 是目前最流行的 python 虚拟环境配置工具
 * 同时支持 python2 和 python3
@@ -897,7 +1025,7 @@ source my_project_env/bin/activate
 deactivate
 ```
 
-### 10.2.3. virtualenvwrapper
+### 11.2.3. virtualenvwrapper
 
 `pip install virtualenv virtualenvwrapper`  
 
