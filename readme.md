@@ -1,6 +1,6 @@
 # 1. Overview
 
-This project is established for store learn note written by Yongzhen Long, all contents in English or Chinese.   
+This project is established for storing learn note written by Yongzhen Long, all contents in English or Chinese.   
 Most of the content is copied or translated from Internet resources, without identifying the source.  
 Most of the content comes from the official doc and http://c.biancheng.net.  
 
