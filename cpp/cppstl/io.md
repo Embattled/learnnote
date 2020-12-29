@@ -18,14 +18,166 @@ complete non-array object type, capable of uniquely specifying a position in a f
 
 ## 1.2. 常量
 
-`EOF`       : 用来表示已经到达文件结束的负整数,在读写时发生错误也会返回这个宏值  
-`FOPEN_MAX` : 用来表示该系统中可以同时打开的文件个数  
+C语言stdio定义了文件流控制相关的一些常量以及三个标准流
+* `NULL`            : C语言好多头文件都定义了, 没啥好说的
+* `EOF`             : 用来表示已经到达文件结束的负整数,在读写时发生错误也会返回这个宏值  
+* `FOPEN_MAX`       : 用来表示该系统中可以同时打开的文件个数  
+* `FILENAME_MAX`    : 用来表示该系统支持的最长的文件名, 可以用该常量来分配存储文件名的字符串空间
+* `BUFSIZ`          : `std::setbuf` 使用的缓存大小
+* `TMP_MAX`         : 通过 `std::tmpnam` 可以生成的唯一文件名的最大个数, 有点特殊的常量
+* `L_tmpnam`        : 通过 `std::tmpnam` 生成的文件名的长度, 用该常量来初始化字符串
 
 
-## 1.3. File access 文件访问  
+### 1.2.1. 标准流
+
+这三个文件流在程序运行的时候就已经被隐式的打开,但是事实上他们是标准输出输入, 并不是文件  
+
+* stdin       fully buffered
+* stdout      fully buffered
+* stderr      not fully buffered
+* 可以通过对这三个流的读写来实现自己定义的 printf 函数
+```cpp
+#define stdin  /* implementation-defined */
+#define stdout /* implementation-defined */
+#define stderr /* implementation-defined */
 
 
-### 1.3.1. fopen 文件打开
+#include <cstdarg>
+#include <cstdio>
+ 
+int my_printf(const char * fmt, ...)
+{
+    std::va_list vl;
+    va_start(vl, fmt);
+    int ret = std::vfprintf(stdout, fmt, vl);
+    va_end(vl);
+    return ret;
+}
+ 
+int main()
+{
+    my_printf("Rounding:\t%f %.0f %.32f\n", 1.5, 1.5, 1.3);
+    my_printf("Padding:\t%05.2f %.2f %5.2f\n", 1.5, 1.5, 1.5);
+    my_printf("Scientific:\t%E %e\n", 1.5, 1.5);
+    my_printf("Hexadecimal:\t%a %A\n", 1.5, 1.5);
+}
+```
+### 1.2.2. SEEK 常量
+
+作为 fseek 函数可以接受的第三个输入参数  
+
+
+
+## 1.3. 标准输入输出
+
+* scanf   reads formatted input from stdin, a file stream or a buffer 
+* printf  prints formatted output to stdout, a file stream or a buffer 
+
+### 1.3.1. 输入 scanf
+
+返回值:
+* non-zero  : Number of receiving arguments successfully assigned
+* zero      : matching failure occurred before the first receiving argument was assigned
+* EOF       : input failure occurs before the first receiving argument was assigned. 
+  
+```c
+// Reads the data from stdin
+int scanf( const char* format, ... );
+
+// Reads the data from file stream stream
+int fscanf( std::FILE* stream, const char* format, ... );
+
+// Reads the data from null-terminated character string buffer
+int sscanf( const char* buffer, const char* format, ... );
+
+```
+
+
+### 1.3.2. 输出 printf
+
+输出同样有返回值:  
+1. 成功时   : 输出的字符个数
+2. 出错时   : 负数
+3. 对于输出到字符串, null character 不统计在返回值中
+4. 对于 snprintf , 成功时的返回值一定是小于 buf_size 的
+5. 对于 snprintf , 注意 buf_size 为0 时的特殊返回值
+```cpp
+// 标准输出  输出到 stdout
+int printf( const char* format, ... );
+
+// 输出到文件
+int fprintf( std::FILE* stream, const char* format, ... );
+
+// 输出到字符串
+int sprintf( char* buffer, const char* format, ... );
+
+// (since C++11) At most buf_size - 1 characters are written
+// 指定最大输出大小的 输出到字符串  最后一个字符会设置成 '/0'
+// 如果 buf_size 是 0 , 注意
+// the return value (number of bytes that would be written not including the null terminator) is still calculated and returned.
+int snprintf( char* buffer, std::size_t buf_size, const char* format, ... );
+
+
+// 可以用 snprintf 来计算必要的缓存大小, 因为对于数字数据来说, 并不确定字符长度
+const char *fmt = "sqrt(2) = %f";
+int sz = std::snprintf(nullptr, 0, fmt, std::sqrt(2));
+// note +1 for null terminator
+std::vector<char> buf(sz + 1); 
+std::snprintf(&buf[0], buf.size(), fmt, std::sqrt(2));
+```
+
+### 1.3.3. variable argument list
+
+
+
+## 1.4. format string
+
+a null-terminated character string specifying how to read the input.
+格式化输入输出的核心  
+
+由三部分组成
+1. 非空格的所有字符(除了`%`)
+2. 空格字符 包括 `'\n', ' ', '\t' `
+   * 在scanf中, format string 的空格' '可以接受并消耗流中所有连续的空白字符
+3. conversion specifications  输入时和输出时的可选参数是不同的
+
+### 1.4.1. scanf
+conversion specifications 
+   * introductory % character 
+   * (可选) assignment-suppressing character *
+   * (可选)integer number (greater than zero) , 定义输入或输出最大位宽, 输入时定义该转义符在进行数据转换时可以消耗掉的流中字符的最大值
+   * (可选)length modifier that specifies the size of the receiving argument
+   * conversion format specifier 
+   
+### 1.4.2. printf
+
+## 1.5. conversion specifiers
+
+
+空格字符的特殊化处理示例
+```cpp
+std::scanf("%d", &a);
+std::scanf("%d", &b);
+/* 
+    对于两个连续的整数输入, 输入时两个整数可以在不同行输入或者隔一个空格(tab也算)输入
+    这是因为 %d 会消耗掉前方所有的空白字符, 直到接收到整数或者不匹配的字符报错
+*/
+
+std::scanf("%d", &a);
+std::scanf(" %c", &c);
+/* 
+    对于其他不会消耗空白字符的 conversion specifiers, 比如说 %c
+    可以在 %c 前面加一个空格, 利用该空格消耗掉流中前部的所有连续空白字符, 确保正确接收到
+    如果不加的化 c 会直接接收到 %d 遗留下来的换行符
+*/
+
+```
+
+
+## 1.6. File access 文件访问  
+
+
+### 1.6.1. fopen 文件打开
 
 控制流打开返回一个 `FILE` 对象, 创建一个新的文件或者打开一个已有的文件  
 `FILE *fopen( const char * filename, const char * mode );`  
@@ -48,7 +200,7 @@ if(!fp) {
 }
 ```
 
-### 1.3.2. fclose 关闭文件
+### 1.6.2. fclose 关闭文件
 
 `int fclose( FILE *fp );`    
 关闭流stream,会清空缓冲区中的数据,关闭文件,并释放用于该文件的所有内存  
@@ -56,19 +208,104 @@ if(!fp) {
 * 成功关闭文件, 返回 `0` 
 * 关闭错误, 返回 `EOF`
 
-### 1.3.3. 文件增删改
+## 1.7. File operation
 
-创建一个文件用文件流打开的函数 `fopen` 即可完成
+分两部分
+1. 删除和重命名文件 `remove rename`
+   * stl 中 algorithm 头文件也有 remove 函数 , 不过不是同一个东西
+2. 自动生成的文件名 `tmpfile tmpnam`
+   * `tmpfile` 直接就返回了一个文件流, 包含了 tmpnam 的功能
+   * `tmpnam`  只是返回了自动生成的文件名 **文件名里包含了 /tmp/ 路径**
+```cpp
+// 删除一个文件
+int remove(const char *filename);
+// 如果要删除的文件正在被使用
+// POSIX systems unlink the file name
+// Windows does not allow the file to be deleted
+// return 0 表示成功,  非0 表示失败
 
-删除文件  
-`int remove(const char *filename)`  
+// 重命名一个文件
+int rename(const char *old_filename, const char *new_filename)
+// return 0 表示成功,  非0 表示错误
+// If new_filename exists, the behavior is implementation-defined. 
 
-重命名或者移动文件  
-`int rename(const char *old_filename, const char *new_filename)`  
 
-这两个函数如果成功,则返回零。如果错误,则返回 -1,并设置 errno  
+// Creates a unique filename that does not name a currently existing file
+char* tmpnam( char* filename );
+// return value: 
+// 如果 已经没有文件名可以生成, 返回 NULL
+// 如果 指针filename 是空指针, 则生成的文件名作为返回值返回, 是一个内部的静态缓存地址
+// 如果 指针filename 不是空指针至少且有 L_tmpnam 大小, 文件名就存在filename 且返回值就是filename
 
-## 1.4. Unformatted io
+// --------------例子
+std::string name1 = std::tmpnam(nullptr);
+// /tmp/fileDjwifs   文件名示例
+
+
+// Creates and opens a temporary file with a unique auto-generated filename. 
+std::FILE* tmpfile();
+// 打开方式: by std::fopen with access mode "wb+"
+// 可能生成的文件名当然是和 tmpnam 共享的
+// 返回值 : 失败时返回 NULL 
+// Linux系统下  : 因为是 tmp file , 所以该文件不能和其他程序或者进程共享
+// Windows下    : 该函数需要申请文件读写权限 
+	
+// --------------例子
+// Linux-specific method to display the tmpfile name
+#include <filesystem>
+namespace fs = std::filesystem;
+std::FILE* tmpf = std::tmpfile();
+std::cout << fs::read_symlink(
+                fs::path("/proc/self/fd") / std::to_string(fileno(tmpf))
+            ) << '\n';
+
+```
+
+## 1.8. File positioning
+
+文件读取过程中读头位置相关函数  
+1. ftell        : 返回值获取当前位置, long 类型
+2. fseek        : long 类型指定文件读头位置
+3. fgetpos      : 指针写入获取当前位置, fpos_t 类型
+4. 
+5. rewind       : 文件读头返回到文件开始
+
+
+```cpp
+// 如果文件是二进制打开的, 该值表示  the number of bytes from the beginning of the file. 
+// 如果是文本模式打开的, 则没有任何实际意义, 只能作为参数输入到 std::fseek
+long ftell( std::FILE* stream );
+// return -1L if failure occurs. Also sets errno on failure
+
+
+// origin : position to which offset is added. 
+// 是一个预定义量 包括  SEEK_SET, SEEK_CUR, SEEK_END
+int fseek( std::FILE* stream, long offset, int origin );
+
+
+// pos : pointer to a fpos_t object to store the file position indicator to 
+// return 0 upon success, nonzero value otherwise. Also sets errno on failure. 
+// 注意这个 pos 的值只能作为参数输入 std::fsetpos
+int fgetpos( std::FILE* stream, std::fpos_t* pos );
+
+
+// pos 只能是 fgetpos 获取的, 只能作用于相同的文件上  
+int fsetpos( std::FILE* stream, const std::fpos_t* pos );
+
+
+// 最简单的函数
+// 相当于  std::fseek(stream, 0, SEEK_SET);
+// 而且会清除文件结尾和错误的 符号位
+void rewind( std::FILE* stream );
+	
+```
+## error handling
+
+文件读写中会发生很多错误, 比如文件读取到末尾就算其中之一  
+
+
+
+## 1.9. Unformatted io
 
 `int fputc(int char, FILE *stream)`  
 把参数 char 指定的字符（一个无符号字符）写入到指定的流 stream 中,并把位置标识符往前移动  
@@ -82,16 +319,9 @@ fgetc() 函数从 fp 所指向的输入文件中读取一个字符。返回值�
 从输入流中读入 ***n - 1*** 个字符,并在最后追加一个 null 字符来终止字符串, 总计 n 个字符  
 如果这个函数在读取最后一个字符之前就遇到一个换行符 '\n' 或文件的末尾 EOF,则只会返回读取到的字符,包括换行符
 
-## 1.5. Formatted io
-
-`int fscanf(FILE *stream, const char *format, ...)`  
-
-`int fprintf(FILE *stream, const char *format, ...)`
-
-与普通的 `print scanf` 类似的输入,只不过前面加入了文件流参数  
 
 
-## 1.6. Direct io 二进制读写
+## 1.11. Direct io 二进制读写
 
 用于存储块的读写 - 通常是数组或结构体
 ```cpp
@@ -104,7 +334,7 @@ size_t fwrite(const void *ptr, size_t size_of_elements, size_t number_of_element
 
 
 
-### 1.6.1. 1.3 C 文件流的指针操作
+### 1.11.1. 1.3 C 文件流的指针操作
 
 **判断文件指针是否到末尾**
 `int feof(FILE *stream)`  当已经读到末尾时返回一个非零值  
@@ -112,6 +342,8 @@ size_t fwrite(const void *ptr, size_t size_of_elements, size_t number_of_element
 
 
 # 2. C++的流 Input/Output
+
+C++的流以及流控制分散在了多个头文件中
 
 ## 2.1. fstream C++ 的文件读写流 
 

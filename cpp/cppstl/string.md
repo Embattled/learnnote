@@ -343,22 +343,22 @@ move和cpy的区别:
 该头文件只包含了一些字符分类函数还有大小写转换函数 总共14个   非常简单  
 
 
-| 函数名称       | 功能                                             |
-| -------------- | ------------------------------------------------ |
-| isalnum        | checks if a character is alphanumeric            |
-| isalpha        | checks if a character is alphabetic              |
-| islower        | checks if a character is lowercase               |
-| isupper        | checks if a character is an uppercase character  |
-| isdigit        | checks if a character is a digit                 |
-| isxdigit       | checks if a character is a hexadecimal character |
-| iscntrl        | checks if a character is a control character     |
-| isgraph        | checks if a character is a graphical character   |
-| isspace        | checks if a character is a space character       |
-| isblank(C++11) | checks if a character is a blank character       |
-| isprint        | checks if a character is a printing character    |
-| ispunct        | checks if a character is a punctuation character |
-| tolower        | converts a character to lowercase                |
-| toupper        | converts a character to uppercase                |
+| 函数名称         | 功能                                             |
+| ---------------- | ------------------------------------------------ |
+| `isalnum`        | checks if a character is alphanumeric            |
+| `isalpha`        | checks if a character is alphabetic              |
+| `islower`        | checks if a character is lowercase               |
+| `isupper`        | checks if a character is an uppercase character  |
+| `isdigit`        | checks if a character is a digit                 |
+| `isxdigit`       | checks if a character is a hexadecimal character |
+| `iscntrl`        | checks if a character is a control character     |
+| `isgraph`        | checks if a character is a graphical character   |
+| `isspace`        | checks if a character is a space character       |
+| `isblank`(C++11) | checks if a character is a blank character       |
+| `isprint`        | checks if a character is a printing character    |
+| `ispunct`        | checks if a character is a punctuation character |
+| `tolower`        | converts a character to lowercase                |
+| `toupper`        | converts a character to uppercase                |
 
 函数特点：
 1. is* 系列函数的函数定义中, 参数和返回值都是整形, 但是没有指定值, 直接用真假判定即可

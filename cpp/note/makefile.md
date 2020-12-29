@@ -1,26 +1,27 @@
-# make
+# 1. make introduction
 
 GNU Make
 
-## 命令
+## 1.1. 命令
 
 * `-j [N], --jobs[=N]`
     * Allow N jobs at once; infinite jobs with no arg.
     * 允许并行编译
     * 不指定数字的时候自动探测最大的可用CPU
+* `-f, --file` 
+    * 当 makefile 文件不是默认的时候, 用该参数来指定要执行的 makefile 文件
 
 
 
-# 1. makefile入门
+# 2. makefile
 
-Makefile
 
 无论是C、C++、还是pas，首先要把源文件编译成中间代码文件，在Windows下也就是 .obj 文件，UNIX下是 .o 文件，即 Object File，这个动作叫做编译（compile）。然后再把大量的Object File合成执行文件，这个动作叫作链接（link）
 
 一般来说，每个源文件都应该对应于一个中间目标文件（O文件或是OBJ文件）。 
 
 给中间目标文件打个包，在Windows下这种包叫“库文件”（Library File)，也就是 .lib 文件，在UNIX下，是Archive File，也就是 .a 文件
-## 1.1. GCC
+## 2.1. GCC
 
 ```
 -c           编译和汇编，但不要链接。
@@ -42,14 +43,14 @@ g++ -c main.cpp
 g++ -o hello main.o function1.o function2.o
 ```
 
-## 1.2. Makefile 入门
+## 2.2. Makefile 入门
 
 makefile文件最好直接命名为`makefile`或`Makefile`
 在该目录下直接输入命令 `make` 来使用  
 
 当然，你可以使用别的文件名来书写Makefile，比如：“Make.Linux”，“Make.Solaris”，“Make.AIX”等，如果要指定特定的Makefile，你可以使用make的 -f 和 --file 参数，如： make -f Make.Linux 或 make --file Make.AIX
  
-## 1.3. 基本概念
+## 2.3. 基本概念
 
 target也就是一个目标文件，可以是Object File，也可以是执行文件。还可以是一个标签（Label），对于标签这种特性，在后续的“伪目标”章节中会有叙述。
 
@@ -67,7 +68,7 @@ target ... : prerequisites ...
 ```
 后续的那一行`command`定义了如何生成目标文件的操作系统命令，一定要以一个 Tab 键作为开头  
 
-## 1.4. target
+## 2.4. target
 
 ```
 all:
@@ -85,7 +86,7 @@ clean:
 这个 Makefile 虽然可以省去敲命令的痛苦，却无法选择性编译源码。因为我们把所有源文件都一股脑塞进了一条命令，每次都要编译整个工程，很浪费时间。
 
 
-## 1.5. prerequisites
+## 2.5. prerequisites
 `target ... : prerequisites ...`  
 目标:目标依赖的文件  
 
@@ -129,9 +130,9 @@ g++ main.o function1.o function2.o -o hello
 `clean`:没有被第一个目标文件直接或间接关联，那么它后面所定义的命令将不会**被自动执行**  
 我们可以显式执行make。即命令—— `make clean` ，以此来清除所有的目标文件，以便重编译  
 
-# 2. makefile 变量
+# 3. makefile 变量
 
-## 2.1. 变量
+## 3.1. 变量
 我们希望将需要反复输入的命令整合成变量，用到它们时直接用对应的变量替代，这样如果将来需要修改这些命令，则在定义它的位置改一行代码即可  
 
 ```makefile
@@ -168,7 +169,7 @@ clean :
 如果有新的 .o 文件加入，我们只需简单地修改一下 objects 变量就可以了
 
 
-## 2.2. 特殊的简化符号
+## 3.2. 特殊的简化符号
 
 `$@` `$<` `$^`  
 对于存在的一个段 `all: library.cpp main.cpp`  
@@ -186,7 +187,7 @@ hello: main.o function1.o function2.o
         $(CC) $(LFLAGS) $^ -o $@        
 ```
 
-## 2.3. 自动检测目录
+## 3.3. 自动检测目录
 自动检测目录下所有的 cpp 文件呢？此外 main.cpp 和 main.o 只差一个后缀，能不能自动生成对象文件的名字，将其设置为源文件名字后缀换成 .o 的形式
 
 `wildcard` 用于获取符合特定规则的文件名  
@@ -211,7 +212,7 @@ target:
         @echo $(OBJS)
 ```
 
-## 2.4. 自动推导(简化makefile代码)
+## 3.4. 自动推导(简化makefile代码)
 
 Static Pattern Rule  
 `targets: target-pattern: prereq-patterns`  
@@ -230,7 +231,7 @@ $(OBJS):%.o:%.cpp
 
 ```
 
-## 2.5. 特殊target
+## 3.5. 特殊target
 
 对于`clean`, 因为没有依赖文件,所以不会被自动执行,但有更稳妥的书写格式  
 
@@ -247,9 +248,9 @@ clean :
 ```
 而在 rm 命令前面加了一个小减号的意思就是，也许某些文件出现问题，但不要管，继续做后面的事  
 
-# 3. 高级操作
+# 4. 高级操作
 
-## 3.1. 多makefile处理
+## 4.1. 多makefile处理
 
 在Makefile使用 include 关键字可以把别的Makefile包含进来，这很像C语言的 `#include`  
 
