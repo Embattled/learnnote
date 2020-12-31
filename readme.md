@@ -8,11 +8,17 @@ Most of the content comes from the official doc and http://c.biancheng.net.
 绝大部分内容复制或者翻译自互联网资源, 没有在内容中标明来源, 不做商业用途.  
 大部分内容来源于项目官方文档和[C语言中文网](http://c.biancheng.net).  
 
-# 2. C/CPP
+
+# 2. Basic knowledge of development
+
+1. [Markdown](markdown.md)  : Markdown's syntax.
+2. [Git](gitbasic.md)       : Basic usage of git.
+
+# 3. C/CPP
 
 C/CPP的语言知识, 官方STL和第三方库.
 
-## 2.1. STL
+## 3.1. STL
 
 C++STL的学习笔记, 包括了C++ STL库和 C 兼容库
 
@@ -23,7 +29,7 @@ C++STL的学习笔记, 包括了C++ STL库和 C 兼容库
 5. [IO](/cpp/cppstl/io.md)  : Input and output header of C/CPP, like stream or *FILE.
 6. [Algorithm](cpp/cppstl/algorithm.md) : Cpp's algorithm header, like sort or find function.
 
-## 2.2. C++ knowledge
+## 3.2. C++ knowledge
 
 C 和 C++ 的基础知识以及编译器知识
 
@@ -32,36 +38,36 @@ C 和 C++ 的基础知识以及编译器知识
 3. [GCC and GDB](/cpp/note/gccgdb.md)   : The usage of gcc compiler and gdb debugger.
 4. [HPC](cpp/note/hpc.md)   : The basic knowledge of openmp and mpi.
 
-## 2.3. Third-Party Libary
+## 3.3. Third-Party Libary
 
 1. [OpenCV C++](/cpp/library/opencv.md) : The C++ part of opencv.
 
-## 2.4. Compile
+## 3.4. Compile
 
 1. [GCC](cpp/note/gcc.md)   : First step to develop on linux.
 2. [GDB](cpp/note/gdb.md)   : Use command line to debug a program.
 3. [Clang](cpp/note/clang.md)   : Another popular compiler.
 
-# 3. CVML
+# 4. CVML
 
 Python以及机器学习框架笔记
 
-## 3.1. Python and tools
+## 4.1. Python and tools
 1. [Python](cvml/python/python.md)  : Python syntax and feature note.
 2. [anaconda](cvml/python/anaconda.md)  : The usage of anaconda suit, includes conda, jupyter noot.
 
-## 3.2. Modual
+## 4.2. Modual
 
 1. [Pandas](cvml/pymodual/pandas.md)    : The usage of pandas.
 2. [Numpy](cvml/pymodual/numpy.md)  : Numpy is a really basic modual.
 
-## 3.3. Framework
+## 4.3. Framework
 
 1. [Pytorch](cvml/framework/pytorch.md) 
 2. [TensorFlow](cvml/framework/tensorflow.md)
 3. [Chainer](cvml/framework/chainer.md)
 
-# 4. Linux
+# 5. Linux
 
 Linux笔记以及相关软件使用笔记.
 
