@@ -3,7 +3,6 @@
 *.exe
 *.pdf
 *.o
-*.ppm
-*.pgm
-*.pbm
-/cvml/lab/image_task1-7/task
+
+*.csv
+test.*

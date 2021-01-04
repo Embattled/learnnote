@@ -1,6 +1,6 @@
 # 1. numpy 
 
-python数值包
+python数值包 最基础的列表处理包  
 
 ## 1.1. 
 
