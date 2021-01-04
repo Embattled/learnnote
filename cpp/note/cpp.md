@@ -1039,22 +1039,44 @@ int main()
    注意`nullptr`是在C++11中引入的  
    nullptr可以转化为任意的指针和布尔值, 但是不能转变为整数  
 
-## 5.2. C++11 的for循环
+## 5.2. C++11 的for循环 Range-based for loop
 
 ### 5.2.1. 语法和使用方法
-C++ 11标准之前（C++ 98/03 标准），如果要用 for 循环语句遍历一个数组或者容器，只能套用如下结构
+
+* C++ 11标准之前（C++ 98/03 标准），如果要用 for 循环语句遍历一个数组或者容器，只能套用如下结构
 ```cpp
 for(表达式 1; 表达式 2; 表达式 3){
     //循环体
 }
 ```
 
-而C++11 引用了新的语法结构, 类似于其他脚本语言的for循环
+* 而C++11 引用了新的语法结构, 类似于其他脚本语言的for循环
 ```cpp
 // 语法
 for (declaration : expression){
     //循环体
 }
+
+// In cppreference
+// (until C++20)
+attr(optional) for ( range_declaration : range_expression ) loop_statement 		
+// (since C++20)
+attr(optional) for ( init-statement(optional)range_declaration : range_expression )loop_statement
+
+/* 
+attr 	- 	any number of attributes
+init-statement(C++20) 	- 	either 
+range_declaration   范围变量声明
+range_expression    范围表达式
+*/
+
+
+// range_declaration may be a structured binding declaration
+// structured binding declaration 是 C++17 的特性, 可用来直接绑定 map
+for (auto&& [first,second] : mymap) {
+    // use first and second
+}
+
 
 // 遍历容器
 vector<char>myvector(arc, arc + 23);
@@ -1066,6 +1088,7 @@ for (auto ch : myvector) {
 for (int num : {1, 2, 3, 4, 5}) {
   cout << num << " ";
 }
+
 ```
 * declaration : 表示此处要定义一个变量，该变量的类型为要遍历序列中存储元素的类型
   * declaration参数处定义的变量类型可以用 auto 关键字表示
@@ -1369,4 +1392,11 @@ lambda 源自希腊字母表中第 11 位的 λ，在计算机科学领域，它
 []{}
 
 ```
+
+
+# C++17
+
+## Structured binding declaration
+
+中文名 : 结构化绑定声明  
 

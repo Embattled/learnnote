@@ -82,3 +82,21 @@ docker支持许多存储驱动, 在 `Ubuntu`下支持 : `overlay2, aufs, btrfs`
   * 但它还很年轻，在成产环境中使用要谨慎。
 
 
+■参加条件
+- 学生であること (学部/修士/博士)
+- 学校やアルバイト、趣味などでプログラミングの経験があること
+- ハンズオン受講までにDockerの初歩的なコマンド、Dockerfileの
+　役割・書き方について概要を理解できていること
+-　参考文献はこちらです:
+- [公式チュートリアルサイト](https://docs.docker.com/get-started/)
+- 英語で書かれていますが、取り組みづらい場合はやってみた系の記事が
+　Google検索できます
+- [Play with Docker](https://labs.play-with-docker.com/)
+- ブラウザでDockerを試せるサイトです
+　※Dockerへユーザ登録が必要ですが無料で登録可能です
+- https://hub.docker.com/signup/ ※ユーザ登録はこちらから可能です
+- [おすすめ書籍 イラストでわかる DockerとKubernetes]　　　　
+　(https://gihyo.jp/book/2020/978-4-297-11837-2)
+- [おすすめ書籍 Kubernetes完全ガイド]
+　(https://book.impress.co.jp/books/1118101055)
+- Google検索で"Dockerとは" "k8sとは"と検索する， などなど

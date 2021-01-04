@@ -307,6 +307,7 @@ double      log2 ( IntegralType arg );
 
 # 6. <numeric> 数学运算库
 
+numerics library 的一部分， 包含一些特殊的常用函数，可以简化编程流程  
 
 ## 6.1. accumulate 
 
@@ -425,7 +426,7 @@ constexpr T inner_product( InputIt1 first1, InputIt1 last1,
 
 ```
 
-## 6.3. gcd lcm since c++17
+## 6.3. gcd lcm 公倍数 公约数 since c++17
 
 C++17 才加入的新函数   
 不会抛出异常  
@@ -531,3 +532,34 @@ int main()
 
 ```
 
+## 6.5. partial_sum
+
+累加数列的生成  
+
+```cpp
+template< class InputIt, class OutputIt >
+constexpr OutputIt partial_sum( InputIt first, InputIt last, OutputIt d_first );
+
+// 自定义操作版本
+template< class InputIt, class OutputIt, class BinaryOperation >
+constexpr OutputIt partial_sum( InputIt first, InputIt last, OutputIt d_first,
+                                BinaryOperation op );
+
+/* 
+range ：[first, last)
+
+*(d_first)   = *first;
+*(d_first+1) = *first + *(first+1);
+*(d_first+2) = *first + *(first+1) + *(first+2);
+*(d_first+3) = *first + *(first+1) + *(first+2) + *(first+3);
+...
+ */
+
+// 注意这里的 d_first 不一定是原本的数列位置
+
+std::vector<int> v = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
+std::partial_sum(v.begin(), v.end(), std::ostream_iterator<int>(std::cout, " "))
+
+// 自定义操作，改成累乘
+std::partial_sum(v.begin(), v.end(), v.begin(), std::multiplies<int>());
+```
