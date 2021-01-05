@@ -1,9 +1,9 @@
-# Extending and Embedding the Python Interpreter
+# 1. Extending and Embedding the Python Interpreter
 
 主要面向C/C++的Python解释器扩展和嵌入  
 
 
-# Write Module In C/C++
+# 2. Write Module In C/C++
 
 1.  You must include Python.h before any standard headers are included.
 2.  在Python调用和 C函数中存在名称转换
@@ -27,7 +27,7 @@ static PyObject * spam_system(PyObject *self, PyObject *args)
 ```
 
 
-## Python.h
+## 2.1. Python.h
 
 All user-visible symbols defined by Python.h have a prefix of `Py` or `PY`.
 

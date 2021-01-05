@@ -128,10 +128,10 @@ keyword.kwlist
 其他保留字:  
 as  
 class  
-def
+def  
 del  
 except  
-finally  
+finally   
 from  
 global  
 import  
@@ -156,6 +156,11 @@ yield
 * id()  : 获取变量或者对象的内存地址
 * help(): 输出用户定义参数对象的说明文档
 
+
+执行一个字符串形式的 Python 代码:  
+* exec(source, globals=None, locals=None, /) : 执行完不返回结果
+* eval(source, globals=None, locals=None, /) : 执行完要返回结果
+
 其他内置函数
 ```
 abs() 	delattr() 	hash() 	memoryview() 	set()
@@ -163,8 +168,8 @@ all() 	dict() 	 	min() 	setattr()
 any() 	dir() 	 	next() 	slicea()
 ascii() 	divmod()  	object() 	
 bin() 	enumerate() 	 	staticmethod()
- 	eval() 	 	open() 	
-breakpoint() 	exec() 	isinstance()  	sum()
+ 		 	open() 	
+breakpoint() 	 	isinstance()  	sum()
 bytearray() 	filter() 	issubclass() 	pow() 	super()
 bytes() 	 	iter() 	tuple()
 callable() 	format() 	len() 	property() 
@@ -828,7 +833,7 @@ for x in range(1,5):
         x*y
 ```
 
-# python 的函数
+# 8. python 的函数
 
 ```py
 def 函数名(参数列表):
@@ -838,7 +843,7 @@ def 函数名(参数列表):
     # [return [返回值]]
 ```
 
-## 函数的文档
+## 8.1. 函数的文档
 
 通过在合理的地方放置多行注释, python 可以方便的将其作为函数说明文档输出
 
@@ -858,21 +863,146 @@ help(str_max)
 print(str_max.__doc__)
 
 ```
-# python 的类
+
+## 8.2. lambda 表达式 匿名函数
+
+lambda 表达式，又称匿名函数，常用来表示内部仅包含 1 行表达式的函数.  
+如果一个函数的函数体仅有 1 行表达式，则该函数就可以用 lambda 表达式来代替。  
+
+语法:    
+`name = lambda [list] : 表达式`  
+* `lambda` 是保留字
+* `list` 作为可选参数，等同于定义函数指定的参数列表
+* `name`   该表达式的名称
+等同于:
+```py
+def name(list):
+    return 表达式
+name(list)
+```
+
+
+# 9. python 的类
 
 类同C++无太大区别  
 
-## 定义
+* python可以动态的给类添加变量和方法
+  * 添加使用正常赋值
+  * 删除使用 `del` 保留字
+## 9.1. 定义
+python 的类通过`class`定义 , python的类名一般以大写字母开头的驼峰式  
+
+```py
+class TheFirstDemo:
+    '''这是一个学习Python定义的第一个类'''
+
+    # 定义类的构造函数  
+    def __init__(self,<other parameter>):
+        pass
+
+    # 下面定义了一个类属性
+    add = 'http://c.biancheng.net'
+
+    # 下面定义了一个say方法
+    def say(self, content):
+        print(content)
 
 
-# 8. python的包
+```
+
+1. 同理在定义下方第一行可以写类的文档
+2. `__init__` 是保留的构造函数名, 可以不写构造函数, 会隐式的定义默认的构造函数
+3. `self` 是保留的参数, 类的所有方法都需要有`self`参数, 但是该参数不需要真的传参
+
+## 9.2. self
+
+同C++一样, 指向方法的调用者  
+
+* self 只是约定俗成, 实际上只要该参数在第一个位置, 名字随意
+* 动态给对象添加的方法不能自动绑定 `self` 参数, 需要传参
+
+```py
+# 先定义一个函数
+def info(self):
+    print("---info函数---", self)
+# 使用info对clanguage的foo方法赋值（动态绑定方法）
+clanguage.foo = info
+
+# 调用的时候需要传参
+clanguage.foo(clanguage)
+
+# 使用lambda表达式为clanguage对象的bar方法赋值（动态绑定方法）
+clanguage.bar = lambda self: print('--lambda表达式--', self)
+# 同理调用的时候需要传参
+clanguage.bar(clanguage)
+```
+
+## 9.3. 类的变量
+
+1. 类变量: 类变量指的是在类中，但在各个类方法外定义的变量。
+   * 所有类的实例化对象都同时共享类变量, 在所有实例化对象中是作为公用资源存在的
+   * 既可以使用类名直接调用，也可以使用类的实例化对象调用
+2. 实例变量: 在任意类方法内部，以`self.变量名`的方式定义的变量
+   * 只作用于调用方法的对象。
+   * 只能通过对象名访问，无法通过类名访问。
+3. 局部变量 : 类方法中普通方法定义
+   * 函数执行完成后，局部变量也会被销毁。
+
+## 9.4. 类的方法
+
+1. `@classmethod` 修饰的方法为类方法
+2. `@staticmethod` 修饰的方法为静态方法
+3. 不用任何修改的方法为实例方法
+4. `@classmethod` 和 `@staticmethod` 都是函数装饰器
+
+* 实例方法
+  * 通常通过对象访问, 最少包含一个 `self` 参数
+  * 通过类名访问, 需要提供对象参数 `CLanguage.say(clang)`
+  * 用类的实例对象访问类成员的方式称为绑定方法，而用类名调用类成员的方式称为非绑定方法。
+
+
+* 在实际编程中，几乎不会用到类方法和静态方法
+* 特殊的场景中（例如工厂模式中），使用类方法和静态方法也是很不错的选择。
+
+```py
+class CLanguage:
+    #类构造方法，也属于实例方法
+    def __init__(self):
+        self.name = "C语言中文网"
+        self.add = "http://c.biancheng.net"
+
+    # 类方法需要使用＠classmethod修饰符进行修饰
+    #下面定义了一个类方法
+    @classmethod
+    def info(cls):
+        print("正在调用类方法",cls)
+
+    @staticmethod
+    def infos(name,add):
+        print(name,add)
+
+
+
+
+# 类方法也要包含一个参数，通常将其命名为 cls
+# Python 会自动将类本身绑定给 cls 参数
+
+# 类方法推荐使用类名直接调用，当然也可以使用实例对象来调用（不推荐）
+CLanguage.info()
+
+# 类的静态方法中无法调用任何类属性和类方法, 所以能用静态方法完成的工作都可以用普通函数完成
+CLanguage.infos("C语言中文网","http://c.biancheng.net")
+
+```
+
+# 10. python的包
 
 使用 `import <name>` 来导入一个包,可以使用其中的函数  
 在使用的时候要加上包名 `name.function()`  
 使用 `from <name> import *` 可以只单独导入一个函数,这时包中函数不再需要包名   
 使用 `as <alias>` 来为导入的包或者包中函数添加别名, 使得调用更方便  
 
-### 8.0.1. 常用的包
+### 10.0.1. 常用的包
 * 包的下载 , 使用pip来下载及管理包
   * `pip install ModuleName` 下载一个包  
   * `pip install -u ModuleName` 下载一个已经安装包的更新版本  
@@ -882,9 +1012,10 @@ print(str_max.__doc__)
   * `sys.exit()` 提前结束程序
 
 
-## 8.1. python的函数及作用域
 
-### 8.1.1. 定义
+## 10.1. python的函数及作用域
+
+### 10.1.1. 定义
 ```python
 def functionName(): #python的函数参数不需要类型`
 """ 关于函数的注释放在三个双引号中 """
@@ -892,7 +1023,7 @@ def functionName(): #python的函数参数不需要类型`
   return None
   # python的所有函数都需要返回值,就算不手动写出也会在幕后给没有 return 的函数添加 return None
 ```
-### 8.1.2. 参数
+### 10.1.2. 参数
 * 第一种是位置识别,同C语言一样
 * 第二种是**关键字参数**,根据`调用时`加在参数前面的关键字来识别,通常用于可选参数
   * 例如`print()` 函数的`end`和`sep`用来指定参数末尾打印什么,参数之间打印什么
@@ -900,7 +1031,7 @@ def functionName(): #python的函数参数不需要类型`
   * `print('a','b','c')` 在参数之间会默认隔一个空格
   * `print('a','b','c',seq=',')` 会输出 **a,b,c** 
   
-### 8.1.3. 作用域
+### 10.1.3. 作用域
 
 同C语言 全局和局部的覆盖原则也相同  
 函数中引用外部变量 使用`global` 关键字
@@ -930,7 +1061,7 @@ def spam():
   #在这里出错
 ```
 
-## 8.2. 函数的异常处理
+## 10.2. 函数的异常处理
 
 如果 `try` 子句中的代码发生了错误，则程序立即到 `except` 中的代码去执行  
 
@@ -950,9 +1081,9 @@ python有很多的error类:
 `FileNotFoundError` 打开文件的路径不对, 文件不存在  
 
 
-# 9. 字符串操作
+# 11. 字符串操作
 
-## 9.1. 字符串的输入
+## 11.1. 字符串的输入
 * python的字符串使用 `''` 单引号输入  
 * 也可以使用 `"" `双引号输入,区别在于使用双引号时字符串中可以包括单引号  
 * 转义字符,使用`\` 反斜杠来输入特殊字符,  `\t` 制表位, `\n` 换行符, `\\` 反斜杠
@@ -980,9 +1111,9 @@ string with multiline.
 ```
 字符串可以使用切片以及 `in `  `not in` 操作符,用来比较前一个字符串是否在后一个字符串中间
   
-## 9.2. 常用的字符串方法
+## 11.2. 常用的字符串方法
 
-### 9.2.1. 大小写及内容检测方法
+### 11.2.1. 大小写及内容检测方法
    * `upper()` 和 `lower()` 返回一个**新字符串**,将原本字符串中所有字母转变为大写/小写
    * `name.title()`  标题方法, 将字符串的单词第一个字母大写  
    * `isupper()` 和 `islower()` 返回布尔值,如果这个字符串不为空且全部字符为大写/小写则返回`True`
@@ -992,11 +1123,11 @@ string with multiline.
      * isdecimal() 非空且只包含数字字符
      * isspace()  非空且只包含空格,制表符,换行
      * istitle()  非空且只包含以大写字母开头,后面都是小写字母的 `单词` 及可以包含空格及数字
-### 9.2.2. 开头结尾检测方法  
+### 11.2.2. 开头结尾检测方法  
    startswith() 和 endswith()
    以传入的字符串为开始/结尾,则返回True
 
-### 9.2.3. 组合与切割方法  
+### 11.2.3. 组合与切割方法  
    join() 和 split()    
     join()是将一个字符串列表连接起来的方法,并在字符串中间插入调用`join`的字符串  
     `','.join(['a','b','c'])`   返回 ` 'a,b,c' `  
@@ -1004,7 +1135,7 @@ string with multiline.
     `'My name is'.split()`   返回 `['My','name','is']`  
     常被用来分割多行字符串  ` spam.split('\n')`
 
-### 9.2.4. 对齐方法  
+### 11.2.4. 对齐方法  
    rjust()  ljust()  center()
    在一个字符串上调用,传入希望得到的字符串的长度,将返回一个以空格填充的字符串  
    分别代表左对齐,右对齐  
@@ -1013,14 +1144,14 @@ string with multiline.
    可以输入第二个参数改变填充字符  
    `'a'.ljust(5,'*')`  返回  `'a****'`
 
-### 9.2.5. 清除对齐方法  
+### 11.2.5. 清除对齐方法  
    `strip()  rstrip() lstrip()  `  
    在左右删除空白字符  
    传入参数指定需要删除的字符  注:这里第二个参数无视字符出现顺序  
    `'abcccba'.strip('ab')` 与
    `'abcccba'.strip('ba')` 作用相同
 
-### 9.2.6. 识别转换方法 **str.extract()**
+### 11.2.6. 识别转换方法 **str.extract()**
 和pandas组合使用,拆解字符串
 ```py
 
@@ -1034,7 +1165,7 @@ stats_ext = df['stats'].str.extract('(\w{1})_(\d{2})years',expand=True)
 stats_ext.columns = ['sex', 'age']
 ```
    
-### 9.2.7. str.get_dummies()
+### 11.2.7. str.get_dummies()
 
 为了对数据进行统计,例如多个学生选择了多种科目,科目可能会重复,这种统计  
 
@@ -1061,17 +1192,11 @@ print(course_dummy_var)
 ```
 
 
-# 10. Python 的类
 
-python 的类通过`class`定义 , python的类名一般以大写字母开头
 
-类的构造函数  
-`def __init__(self,<other parameter>):`  
-`__init__` 是保留的构造函数名, `self` 是保留的参数, 类的所有方法都需要有`self`参数  
+# 12. Python 的文件操作 
 
-# 11. Python 的文件操作 
-
-## 11.1. 打开文件
+## 12.1. 打开文件
 
 `with`关键字  
 `open('路径')`  
@@ -1094,7 +1219,7 @@ for line in lines:  #可以在block外读取文件内容
 
 ```
 
-## 11.2. 写入文件
+## 12.2. 写入文件
 
 要想写入文件,需要在文件对象创建的时候指定`'w'`参数,或者`'a'`参数    
 ```python
@@ -1107,7 +1232,7 @@ with open(filename, 'a') as file_object:
 
 ```
 
-## 11.3. 结构化读取文件
+## 12.3. 结构化读取文件
 使用 enumerate 可以按行获取文件内容  
 `for j, data in enumerate(openfile) `
 
@@ -1118,14 +1243,14 @@ with open('animal.txt', 'r') as openfile:
       print(f'Line number {str(j)}. Content: {data}')
 ```
 
-# 12. 正则表达式 re包 
+# 13. 正则表达式 re包 
 
 要在python中使用正则表达式, 需要导入`re`包  
 `import  re`  
 
 官方文档[https://docs.python.org/3/library/re.html]
 
-## 12.1. 使用正则表达式的基础函数
+## 13.1. 使用正则表达式的基础函数
 
 ```python
 # 基础search函数,用来查找表达式第一次出现的位置
@@ -1145,7 +1270,7 @@ x = re.sub('被替换的字符串', '填充的字符串', text)
 
 ```
 
-## 12.2. 正则表达式-单字符
+## 13.2. 正则表达式-单字符
 
 ```python
 # 使用[]来代表一个单字符的可选列表
@@ -1188,7 +1313,7 @@ re.search(r'\bst', 'first strike')
 re.search(r'\Bst\B', 'strike first estimate')
 ```
 
-## 12.3. 正则表达式-多次匹配
+## 13.3. 正则表达式-多次匹配
 
 ```python
 #  * 代表任意次  + 代表至少1次 ,? 代表0或者1次
@@ -1214,14 +1339,14 @@ re.search('(bar)+', 'foo barbarbar baz')
 
 ```
 
-# 13. Python 的包 环境管理 
+# 14. Python 的包 环境管理 
 
 [官方推荐文档]<https://packaging.python.org/guides/tool-recommendations/>  
 
-## 13.1. Python的包管理
+## 14.1. Python的包管理
 包管理工具有很多
 
-### 13.1.1. distutils 和 setuptools
+### 14.1.1. distutils 和 setuptools
 
 distutils是 python 标准库的一部分  
 用于方便的打包和安装模块  是常用的 setup.py 的实现模块  
@@ -1249,7 +1374,7 @@ setup(
 
 
 
-### 13.1.2. pip 
+### 14.1.2. pip 
 
 pip是目前最流行的Python包管理工具，它被当作easy_install的替代品，但是仍有大量的功能建立在setuptools之上。  
 
@@ -1268,7 +1393,7 @@ pip的使用非常简单，并支持从任意能够通过 VCS 或浏览器访问
   * `pip install -r requirements.txt`
 
 
-## 13.2. 环境管理
+## 14.2. 环境管理
 
 在开发Python应用程序的时候，系统安装的Python3只有一个版本：3.4。所有第三方的包都会被pip安装到Python3的site-packages目录下。
 
@@ -1277,7 +1402,7 @@ pip的使用非常简单，并支持从任意能够通过 VCS 或浏览器访问
 
 有多种虚拟环境配置方法  
 
-### 13.2.1. venv  
+### 14.2.1. venv  
 
 Source code: Lib/venv/  
 一般已经安装在了较新的 python 版本中了  因为是从 3.3 版本开始自带的，这个工具也仅仅支持 python 3.3 和以后版本  
@@ -1296,7 +1421,7 @@ source tutorial-env/bin/activate
 
 ```
 
-### 13.2.2. virtualenv
+### 14.2.2. virtualenv
 
 virtualenv 是目前最流行的 python 虚拟环境配置工具
 * 同时支持 python2 和 python3
@@ -1323,7 +1448,7 @@ source my_project_env/bin/activate
 deactivate
 ```
 
-### 13.2.3. virtualenvwrapper
+### 14.2.3. virtualenvwrapper
 
 `pip install virtualenv virtualenvwrapper`  
 

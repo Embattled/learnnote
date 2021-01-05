@@ -48,15 +48,16 @@ init 6 # 重启
 
 ## 1.3. 最基础的命令
 
-| 序号          | 命令                 | 对应英文                | 作用 |
-| ------------- | -------------------- | ----------------------- | ---- |
-| ls            | list                 | 查看当前文件夹下的内容  |
-| pwd           | print work directory | 查看当前所在文件夹      |
-| cd[目录名]    | changge directory    | 切换文件夹              |
-| touch[文件名] | touch                | 如果文件不存在,新建文件 |
-| mkdir[目录名] | make directory       | 创建目录                |
-| rm[文件名]    | remove               | 删除指定文件            |
-| clear         | clear                | 清屏                    |
+| 序号          | 命令                 | 功能                         |
+| ------------- | -------------------- | ---------------------------- |  |
+| ls            | list                 | 查看当前文件夹下的内容       |
+| pwd           | print work directory | 查看当前所在文件夹           |
+| cd[目录名]    | changge directory    | 切换文件夹                   |
+| touch[文件名] | touch                | 如果文件不存在,新建文件      |
+| mkdir[目录名] | make directory       | 创建目录                     |
+| rm[文件名]    | remove               | 删除指定文件                 |
+| clear         | clear                | 清屏                         |
+| which         | which directory      | 查找某个命令的可执行文件位置 |
 
 
     输入 man [内容] 来打开指定内容的手册, f 键前进一页, b 键后退一页, q 键退出

@@ -1,21 +1,15 @@
-
 # 1. 数据处理pandas包
 
 pandas 是一种列存数据分析 API。它是用于处理和分析输入数据的强大工具，很多机器学习框架都支持将 pandas 数据结构作为输入。   
 虽然全方位介绍 pandas API 会占据很长篇幅，但它的核心概念非常简单  
 
-
-## 1.1. 基础介绍
-
 ```py
-
 # 导入pandas并且输出版本
 import pandas as pd
 pd.__version__
-
 ```
-学习pandas的目标
 
+学习pandas的目标
 
 * 大致了解 pandas 库的 DataFrame 和 Series 数据结构
 * 存取和处理 DataFrame 和 Series 中的数据
@@ -27,10 +21,13 @@ pandas 中的主要数据结构被实现为以下两类：
 2. DataFrame，您可以将它想象成一个关系型数据表格，其中包含多个行和已命名的列。
 3. DataFrame 中包含一个或多个 Series，每个 Series 均有一个名称。
 
-## 1.2. Series 
+# 2. Series 
 
-### 1.2.1. 创建Series
+* 最基础的数据类型, 和 numpy.array 有些类似  
+* Series 可用作大多数 NumPy 函数的参数
 
+
+## 2.1. 创建
 ```py
 
 # 创建一个Series
@@ -38,17 +35,16 @@ pandas 中的主要数据结构被实现为以下两类：
 pd.Series(['San Francisco', 'San Jose', 'Sacramento'])
 
 ```
-### 1.2.2. 操纵数据
+## 2.2. 操纵数据
 
 ```py
 import numpy as np
 
-# pandas Series 可用作大多数 NumPy 函数的参数
+# pandas 
 np.log(population)
 
 # 对 Series应用python的基本运算 
 population / 1000.
-
 
 # 创建了一个指明 population 是否超过 100 万的新 Series
 population.apply(lambda val: val > 1000000)
@@ -58,19 +54,19 @@ population.apply(lambda val: val > 1000000)
 # dtype: bool
 
 ```
-### 1.2.3. index
+## 2.3. index
 
 * 在输出 `Series`的时候会先输出输出内容,再输出内容的类型 `Name: Year, dtype: int64` , 只有单列  
 * 对`Series`使用重建索引`reset_index()`会将其转换成`DataFream`并且旧的索引会变成 `Index`列
 
-## 1.3. DataFrame
+# 3. DataFrame
 
-### 1.3.1. 创建DF和访问数据
+`import pandas as pd`  
+
+
+## 3.1. 创建DF和访问数据
 
 ```py
-import pandas as pd
-
-
 # 从Series创建, 需要赋予每个Series列名称
 # 如果 Series 在长度上不一致，系统会用特殊的 NA/NaN 值填充缺失的值
 city_names = pd.Series(['San Francisco', 'San Jose', 'Sacramento'])
@@ -124,36 +120,40 @@ cities['City name'][1]
 
 
 
-### 1.3.2. 读取
+## 3.2. 读取文件
 
+### read_table
+
+有多种参数  
 ```py
+# 对于没有列名的数据,需要自己指定列名
+header = ['id', 'username', 'name','score']
+# 提前指定好列数据的类型, 可以在之后方便处理
+dtype_dic = {'id': object, 'username': object,'name': object, 'score': float}
 
 # 直接从文件读取读取 , 指定索引  , 指定源文件中的分隔符
-cars=pd.read_csv("cars.csv",sep=';',index_col='Car')
+cars=pd.read_csv("cars.csv",sep=';',index_col='Car',names=header, dtype=dtype_dic)
 
-# read_table 将文件中的数据以一个表排列的字符串读入
-animal_table = pd.read_table("animal.txt")
+# 此时的数据属于 DataFrame  的格式 , 可以通过字段名提取整列数据, 提取的类型为 Series
+cities_data = city_table['City'] 
 
 
 # A CSV file provides more formatting than a simple text file. 
 # Its header defines each of the fields. The entries are usually separated by comma.
 city_table = pd.io.parsers.read_csv("cities.csv")
-
-# 此时的数据属于 DataFrame  的格式 , 可以通过字段名提取整列数据
-cities_data = city_table['City'] 
+```
 
 
-# 对于没有列名的数据,需要自己指定列名
-header = ['id', 'username', 'name','score']
-# 提前指定好列数据的类型, 可以在之后方便处理
-dtype_dic = {'id': object, 'username': object,'name': object, 'score': float}
-# 做好准备后再读取
-df = pd.read_csv('data.csv', names=header, dtype=dtype_dic)
+### read_csv
+```py
+# read_table 将文件中的数据以一个表排列的字符串读入
+animal_table = pd.read_table("animal.txt")
+
 
 ```
 
 
-### 1.3.3. 描述.绘图
+## 3.3. 描述.绘图
 
 ```py
 
@@ -168,7 +168,7 @@ california_housing_dataframe.hist('housing_median_age')
 
 ```
 
-### 1.3.4. 添加修改内容
+## 3.4. 添加修改内容
 
 对于df类型, 直接使用标签即可添加修改内容
 ```py
@@ -205,7 +205,7 @@ for i in birthday:
 tanjoubi['年齢']=age
 ```
 
-### 1.3.5. DF切片
+## 3.5. DF切片
 
 * DataFrame是个结构化数据　`<class 'pandas.core.frame.DataFrame'>`  
 * 在输出 `DataFrame`的时候会输出表头 , 再输出内容   `print(car_year)`  
@@ -215,7 +215,7 @@ tanjoubi['年齢']=age
 `homes_table[:10]`  
 
 
-### 1.3.6. 合并 join  concat  append
+## 3.6. 合并 join  concat  append
 ```py
 # 对于读取到的两个文件, 可以很方便的将他们链接, 记得要重新排列索引
 h_table = h1_table.append(h2_table)
@@ -240,13 +240,13 @@ df.set_index('key').join(other.set_index('key'))
 
 
 
-### 1.3.7. values
+## 3.7. values
 使用`DataFrame.values` 获取到的类型为 `<class 'numpy.ndarray'>`, 为双方括号形式, 没有索引 , `[ [第一整行内容] [第二整行内容]... ]  `  
 再使用`DataFrame.values.flatten()`  类型仍为`<class 'numpy.ndarray'>` , 但是变为单方括号 `[  第一整行内容  第二整行内容 ... ]`
 `.flatten()` 是 `ndarray`的方法  
 使用`Series.values` 获取到的类型同样为 `<class 'numpy.ndarray'>`, 直接就是单方括号形式, `[ 第一个值  第二个值 ... ]  `  
 
-### 1.3.8. index
+## 3.8. index
 
 使用`DataFrame.index`可以获取一个类数组的索引列表,依据数据的不同有多种形式    
 
@@ -260,7 +260,7 @@ df.set_index('key').join(other.set_index('key'))
 更改DF的索引, 将会替换原本索引,并且通过values获取数据时该列数据将不再出现  
 df = df.set_index("Country")
 
-### 1.3.9. 排序 sort_values sort_index
+## 3.9. 排序 sort_values sort_index
 
 ```py
 
@@ -269,7 +269,7 @@ DataFrame.sort_index(ascending = False)
 DataFrame.sort_values(by='mean_rating',)
 
 ```
-### 1.3.10. .loc 按标签提取 laber 
+## 3.10. .loc 按标签提取 laber 
 
 
 `.loc ` 是一个很严格的类型, 如果输入的切片是整数而且不能转化成原本DF的Index,会报类型错误  
@@ -288,7 +288,7 @@ dfl.loc['20130102':'20130104']
 ```
 
 
-#### 1.3.10.1. 使用下标切片
+#### 3.10.0.1. 使用下标切片
 ```
 按具体数值来切片  
 df1 = pd.DataFrame(np.random.randn(6, 4),index=list('abcdef'),columns=list('ABCD'))
@@ -323,7 +323,7 @@ f -1.281247 -0.727707 -0.121306
 ```
 
 
-#### 1.3.10.2. 
+#### 3.10.0.2. 
 按照具体值来切
 ```py
 
@@ -335,7 +335,7 @@ df.loc[['a','b']]> 0
 data.loc[data['State']=="CA"]
 ```
 
-#### 1.3.10.3. .reindex ()
+#### 3.10.0.3. .reindex ()
 
 pandas有一个类似 .loc的方法, 为 reindex() , 会检查内容的有无并返回对应的数值  
 缺点是代码长, 不简洁 ,必须要指定 `index` 和 `columns`参数  
@@ -345,9 +345,9 @@ print("\nChecking rows ['f','g','h','i'] and column ['D','E']")
 print(df.reindex(index=['f','g','h','i'],columns=['D','E']))
 ```
 
-## 1.4. pandas.Categorical 
+# 4. pandas.Categorical 
 
-### 1.4.1. 创建 categorical
+## 4.1. 创建 categorical
 Categoricals can only take on only a limited, and usually fixed, number of possible values (categories).  
 
 
@@ -391,11 +391,11 @@ Categories (3, object): [c < b < a]
 
 
 
-## 1.5. pandas.Timestamp 
+# 5. pandas.Timestamp 
 Both Python and pandas each have a timedelta object that is useful when doing date addition/substraction.
 
 
-### 1.5.1. Timestamp 
+## 5.1. Timestamp 
 ```py
 print(pd.to_datetime('2020-6-12'))
 print(pd.to_datetime('2020 / 6 / 12'))
@@ -424,7 +424,7 @@ ts_list1 = [ts.year, ts.month, ts.day, ts.hour, ts.minute, ts.second]
 #  [4, 164, 30]
 ts_list2 = [ts.dayofweek, ts.dayofyear, ts.daysinmonth]
 ```
-### 1.5.2. Timedelta
+## 5.2. Timedelta
 represent an amount of time.
 
 
@@ -452,7 +452,7 @@ print(td.total_seconds())
 
 ```
 
-### 1.5.3. 计算
+## 5.3. 计算
 可以方便的进行计算
 ```py
 
@@ -467,7 +467,7 @@ print(ts1 - td2)
 print(td1 / td2)
 
 ```
-### 1.5.4. DatetimeIndex
+## 5.4. DatetimeIndex
 读取数据后, 可以将时间类型作为索引
 
 ```py
@@ -499,7 +499,7 @@ month_data = room_data.index.month
 print(month_data.value_counts().sort_index())
 ```
 
-### 1.5.5. 使用时间索引来切片
+## 5.5. 使用时间索引来切片
 ```py
 # 利用时间索引来进行 .loc 切片
 # "Data on Feb 4, 2015"
@@ -518,7 +518,7 @@ slice3 = room_data.loc['2015-02-03 15']
 slice4 = room_data.loc['2015-02-03 15:30':'2015-02-03 16:00']
 
 ```
-#### 1.5.5.1. 基于时间索引的统计  resample
+### 5.5.1. 基于时间索引的统计  resample
 ```py
 # The Number of Data per hour"
 # 按小时分组并统计
@@ -536,15 +536,15 @@ print(group3[['Humid.','CO2']])
 
 ```
 
-## 1.6. 写
+## 5.6. 写
 
 
   data.to_csv(write_file,index=False)
 
     
-## 1.7. 处理数据
+## 5.7. 处理数据
 
-###  1.7.1. Drop数据
+###  5.7.1. Drop数据
 
 ```py
 data=data.drop(data.loc[data['State']=="CA"].index)
@@ -553,7 +553,7 @@ data=data.drop(data.loc[data['State']=="CA"].index)
 ```
 
 
-#### 1.7.1.1. 根据重复内容删除行
+#### 5.7.1.1. 根据重复内容删除行
 
 
 ```py
@@ -582,7 +582,7 @@ print(df.drop_duplicates())
       * New in version 1.0.0.
 
 
-#### 1.7.1.2. 根据缺失字段删除整行
+#### 5.7.1.2. 根据缺失字段删除整行
 
 
 * pandas.DataFrame.dropna (Python method, in pandas.DataFrame.dropna)
@@ -602,7 +602,7 @@ table=table.dropna(thresh=7)
 
 
 
-### 1.7.2. sort 重新排列
+### 5.7.2. sort 重新排列
 
 * Index
   * pandas.DataFrame.sort_index (Python method, in pandas.DataFrame.sort_index)
@@ -644,7 +644,7 @@ table=table.dropna(thresh=7)
 
 
 
-### 1.7.3. groupby
+### 5.7.3. groupby
 ```py
 
 # 可以使用 groupby来分类数据 , 并使用 describe() 来生成一个默认模板的数据分析结果
@@ -672,11 +672,11 @@ homes_table =homes_table.reset_index()
 
 
 ```
-## 1.8. 统计数据
+## 5.8. 统计数据
 
 使用统计方法将会使得数据对象降维  DF->Series   Series->numpy
 
-### 1.8.1. 基础寻值
+### 5.8.1. 基础寻值
 * 平均 .mean()
 * 标准差 .std()
 * 最大最小值中值 .max() .min() .median()
@@ -700,16 +700,16 @@ print("\nRange")
 print(player_table.max(numeric_only=True) -player_table.min(numeric_only=True))
 ```
 
-### 1.8.2. 基于数值统计
+### 5.8.2. 基于数值统计
 
-#### 1.8.2.1. Series.value_counts()
+#### 5.8.2.1. Series.value_counts()
 ```py
 # 对Series使用value_count来进行数据统计, 统计的按照相同数据来进行统计  
 # 得到的返回值仍是一个 Series
 car_table['Year'].value_counts() 
 ```
 
-#### 1.8.2.2. .sum()
+#### 5.8.2.2. .sum()
 
 ```py
 # 对一个DataFrame使用 得到的结果是一个 Series
@@ -722,7 +722,7 @@ hurr_table_sum = pd.DataFrame(hurr_table.sum())
 s_percentage = (s/sum(s)*100).round(2)
 ```
 
-#### 1.8.2.3. cut与qcut
+#### 5.8.2.3. cut与qcut
 
 分组数据  
 
@@ -731,7 +731,7 @@ s_percentage = (s/sum(s)*100).round(2)
 * pandas.qcut(x, q, labels=None, retbins: bool = False, precision: int = 3, duplicates: str = 'raise')  
   * Quantile-based discretization function.
 
-#### 1.8.2.4. crosstab
+#### 5.8.2.4. crosstab
 分析数据关联性  
 By matching different categorical frequency distributions,   
 you can display the relationship between qualitative variables.    
@@ -756,7 +756,7 @@ position_vs_ages = pd.crosstab(player_table["Position"],binned_ages,normalize='c
 
 
 
-### 1.8.3. 基于统计学的数值
+### 5.8.3. 基于统计学的数值
 
 
 
@@ -789,7 +789,7 @@ table.corr()
 
 
 ```
-#### 1.8.3.1. Variance 方差
+#### 5.8.3.1. Variance 方差
 
 可以通过Series获取方差  
 
