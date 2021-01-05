@@ -66,7 +66,9 @@ anaconda-clean --yes
 
 ```
 
+## 1.4. 降级
 
+conda config --set allow_conda_downgrades true
 # 2. conda 包管理和环境管理
 
 conda 是 anaconda 下包管理和环境管理的工具  
@@ -172,9 +174,13 @@ conda search scipy --channel conda-forge --override-channels
 * 如果想要 conda 只安装最新的版本 通过命令修改 config 
   * `conda config --set channel_priority false`
   * 这样总会安装版本号更新的python
+* `conda config --set channel_priority flexible` 
+  * 灵活
 
 
-### channel 管理
+
+
+### 2.2.2. channel 管理
 
 增加新的 channel 应该明确优先级
 

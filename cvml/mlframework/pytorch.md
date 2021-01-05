@@ -18,7 +18,7 @@ pip install torch==1.7.1+cu110 torchvision==0.8.2+cu110 torchaudio===0.7.2 -f ht
 pip install torch torchvision  # 这是当前默认的针对 CUDA 10.2
 ```
 
-## verification
+## 1.2. verification
 
 ```py
 import torch
