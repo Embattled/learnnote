@@ -28,7 +28,7 @@ C++STL的学习笔记, 包括了C++ STL库和 C 兼容库
 4. [Time](/cpp/cppstl/time.md)  : Time class defined by C and C++.
 5. [IO](/cpp/cppstl/io.md)  : Input and output header of C/CPP, like stream or *FILE.
 6. [Algorithm](cpp/cppstl/algorithm.md) : Cpp's algorithm header, like sort or find function.
-
+7. [Thread](cpp/cppstl/thread.md) : Thread support libraries, include `<thread>`
 ## 3.2. C++ knowledge
 
 C 和 C++ 的基础知识以及编译器知识

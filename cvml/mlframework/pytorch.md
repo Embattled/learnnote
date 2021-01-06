@@ -112,8 +112,6 @@ print(torch.__version__)
 作为最基础的包, torch 包括了tensors的数据格式以及对应的数学操作. 还提供了许多工具来高效的序列化 tensors以及其他任意数据格式   
 该包有 CUDA 对应  
 
-
-
 ## 3.2. torch.nn
 
 These are the basic building block for graphs  

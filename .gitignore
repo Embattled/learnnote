@@ -1,8 +1,13 @@
 /.vscode
 /.venv
-*.exe
 *.pdf
-*.o
 
-*.csv
+# Dont track demo files
 test.*
+/data
+
+# Don't track c source files
+*.cpp
+*.c
+*.exe
+*.o
