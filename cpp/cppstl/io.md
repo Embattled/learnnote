@@ -299,13 +299,13 @@ int fsetpos( std::FILE* stream, const std::fpos_t* pos );
 void rewind( std::FILE* stream );
 	
 ```
-## error handling
+## 1.9. error handling
 
 文件读写中会发生很多错误, 比如文件读取到末尾就算其中之一  
 
 
 
-## 1.9. Unformatted io
+## 1.10. Unformatted io
 
 `int fputc(int char, FILE *stream)`  
 把参数 char 指定的字符（一个无符号字符）写入到指定的流 stream 中,并把位置标识符往前移动  
@@ -343,9 +343,193 @@ size_t fwrite(const void *ptr, size_t size_of_elements, size_t number_of_element
 
 # 2. C++的流 Input/Output
 
-C++的流以及流控制分散在了多个头文件中
+* C++的流以及流控制分散在了多个头文件中, 而且有分级的继承关系  
+* C++流的操作是将文件读写, 内存读写以及其他输出抽象成虚拟设备, 可以用同一套代码进行输入输出  
 
-## 2.1. fstream C++ 的文件读写流 
+
+类的层级结构:
+* ios_base
+  * basic_ios
+    * basic_ostream
+      * basic_ostringstream
+      * basic_ofstream
+    * basic_istream
+      * basic_istringstream
+      * basic_ifstream
+    * 二者组合的 basic_iostream
+      * basic_stringstream
+      * basic_fstream
+
+# 3. 基础层 <ios>
+
+* 定义了 C++ 流的所有基类
+* 该头文件的类函数基本适用于所有C++流对象
+
+## 3.1. class ios_base
+
+**所有** io 流类的基类, 保存的数据有:
+1. 流的状态, stream status flags
+2. 控制信息, flags that control formatting of both input and output sequences and the imbued locale
+3. 私有存储, 是一个可拓展索引的指针, 支持 long and void* members, 可用来存储流的私有数据
+4. callbacks: arbitrary number of user-defined functions to be called from `imbue(), copyfmt(), and ~ios_base()`
+
+### 3.1.1. flags成员变量
+
+四个基础控制flags变量, 都是 bitmap 格式  
+
+1. `std::ios_base::openmode`  available file open flags
+   BitmaskType, 可以进行或运算
+     * app    追加, 在写入操作执行之前将文件指针放到文件末尾
+     * ate    追加, 打开文件时立即将文件指针放到文件末尾
+     * binary 二进制模式
+     * in     允许读
+     * out    允许写
+
+2. `std::ios_base::fmtflags`  available formatting flags
+   同样是 BitmaskType 
+     * dec          use decimal base for integer I/O: see std::dec
+     * oct          use octal base for integer I/O: see std::oct
+     * hex          use hexadecimal base for integer I/O: see std::hex
+     * basefield 	dec|oct|hex. Useful for masking operations
+     * left         left adjustment (adds fill characters to the right): see std::left
+     * right        right adjustment (adds fill characters to the left): see std::right
+     * internal 	internal adjustment (adds fill characters to the internal designated point): see std::internal
+     * adjustfield 	left|right|internal. Useful for masking operations
+     * scientific 	generate floating point types using scientific notation, or hex notation if combined with fixed: see std::scientific
+     * fixed 	    generate floating point types using fixed notation, or hex notation if combined with scientific: see std::fixed
+     * floatfield 	scientific|fixed. Useful for masking operations
+     * boolalpha 	insert and extract bool type in alphanumeric format: see std::boolalpha
+     * showbase 	generate a prefix indicating the numeric base for integer output, require the currency indicator in monetary I/O: see std::showbase
+     * showpoint 	generate a decimal-point character unconditionally for floating-point number output: see std::showpoint
+     * showpos 	    generate a + character for non-negative numeric output: see std::showpos
+     * skipws 	    skip leading whitespace before certain input operations: see std::skipws
+     * unitbuf 	    flush the output after each output operation: see std::unitbuf
+     * uppercase 	replace certain lowercase letters with their uppercase , equivalents  in certain output operations: see std::uppercase
+
+3. `std::ios_base::iostate`  stream state flags.
+   BitmaskType 总共就4种状态  但是相关的测试函数没有定义在 `ios_base` 中  
+    * goodbit
+    * badbit
+    * failbit
+    * eofbit
+
+4. `std::ios_base::seekdir` file seeking direction type
+   专门用来指定 seekg 和 seekp 的搜索方法
+   * beg 从流的开头搜索
+   * end 从末尾开始搜索
+   * cur 从当前位置开始搜索 
+
+### 3.1.2. format flags 操作函数
+
+1. .setf
+2. .flags
+3. .unsetf
+```cpp
+// std::ios_base::flags
+// 返回当前的 flags
+fmtflags flags() const;  
+// 替代的方式设置新 flags
+fmtflags flags( fmtflags flags ); 
+
+// std::ios_base::setf
+// 在现有格式fl上添加参数 flags , fl = fl | flags
+fmtflags setf( fmtflags flags ); 
+// 用mask选定更新的位  fl = (fl & ~mask) | (flags & mask)
+fmtflags setf( fmtflags flags, fmtflags mask );
+
+// std::ios_base::unsetf
+// 清除 flags 所定义的所有位, 反向赋值
+void unsetf( fmtflags flags );
+	
+
+int num = 150;
+// flags的值可以使用所有子类的域, 还可以使用对象
+std::cout.setf(std::ios_base::hex, std::ios_base::basefield);
+std::cout.setf (std::ios::hex , std::ios::basefield);
+std::cout.setf(std::cout.hex, std::cout.basefield);
+
+// using fmtflags type  获取 fmtflags 修改后再赋值进去
+std::ios_base::fmtflags ff;
+ff = std::cout.flags();
+ff &= ~std::cout.basefield;   // unset basefield bits
+ff |= std::cout.hex;          // set hex
+ff |= std::cout.showbase;     // set showbase
+std::cout.flags(ff);
+```
+
+### 3.1.3. width precision 宽度和精度控制
+
+控制精度和宽度
+* The default precision, as established by std::basic_ios::init, is 6
+* width 是严格控制最小和最大位宽的设置  
+
+```cpp
+// std::ios_base::precision
+// 返回当前输出的浮点数精度
+streamsize precision() const;
+// 设置浮点数精度, 返回旧的精度
+streamsize precision( streamsize new_precision );
+
+// std::ios_base::width
+// 返回当前的位宽
+streamsize width() const;
+// 设置新位宽, 返回旧位宽
+streamsize width( streamsize new_width );
+
+
+double d = 1.2345678901234;
+std::cout << std::cout.precision()<<endl; // 6
+std::cout<< d <<endl; // 1.23457
+std::cout.precision(12);
+std::cout<< d <<endl; // 23456789012
+```
+
+### 3.1.4. 地区?字符集 设置 imbue
+
+* imbue   设置 locale
+* getloc  返回当前 locale
+
+这个部分不太懂, 和宽字符有关  
+locale 要参照 `<locale>` 头文件  
+
+```cpp
+// std::ios_base::imbue
+// 设置新 locale , 返回旧的 locale
+std::locale imbue( const std::locale& loc );
+
+// std::ios_base::getloc
+// 返回当前 locale
+std::locale getloc() const;
+```
+
+
+## 3.2. std::basic_ios 公有继承 ios_base
+
+```cpp
+template<
+    class CharT,
+    class Traits = std::char_traits<CharT>
+> class basic_ios : public std::ios_base
+```
+* basic_ios 提供了和 std::basic_streambuf 对象的接口  
+* 多个 basic_ios 对象可以指向同一个 std::basic_streambuf 对象
+* `std::basic_streambuf` 是 abstracts a raw device 
+
+
+### 3.2.1. state flags 函数
+
+
+使用 `clear()` 来清除`flag`
+
+对特定状态的检查函数,返回值都是布尔类型
+|        |                                            |                                                                  |
+| ------ | ------------------------------------------ | ---------------------------------------------------------------- |
+| bad()  | Returns true 如果有读写失败                | 例如对一个没有以写入标志打开的流执行写入或者写入的磁盘已没有空间 |
+| fail() | Returns true 在`bad()`的基础上检查格式问题 | 例如文件读出来的是字符但是传输给了一个整数变量                   |
+| eof()  | 检查是否到了文件末尾.                      |
+
+
+# 4. <fstream> C++ 的文件读写流 
 
 iostream 标准库,它提供了 cin 和 cout 方法分别用于从标准输入读取流和向标准输出写入流.  
 从文件读取流和向文件写入流,这就需要用到 C++ 中另一个标准库 `fstream`  
@@ -359,7 +543,9 @@ iostream 标准库,它提供了 cin 和 cout 方法分别用于从标准输入�
 
 要在 C++ 中进行文件处理, 必须在 C++ 源代码文件中包含头文件 `iostream` 和 `fstream`
 
-### 2.1.1. 文件打开与关闭
+要实现以二进制形式读写文件，<< 和 >> 将不再适用，需要使用 C++ 标准库专门提供的 read() 和 write() 成员方法。其中，read() 方法用于以二进制形式从文件中读取数据；write() 方法用于以二进制形式将数据写入文件。 
+
+### 4.0.1. 文件打开与关闭
 
 `ofstream` 和 `fstream` 对象都可以用来打开文件进行***写操作***, 如果**只需要打开文件进行读操作**, 则使用 `ifstream` 对象
 
@@ -379,7 +565,7 @@ myfile.close();
 | ios::trunc  | 如果该文件已经存在, 其内容将在打开文件之前被截断, 即把文件长度设为 0。 |
 | ios::binary | 二进制模式打开.                                                        |
 
-### 2.1.2. 文件读写
+### 4.0.2. 文件读写
 
 **对于字符文件**  
 对`ofstream` 或 `fstream` 对象,使用流插入运算符`（ << ）`向文件写入信息  
@@ -401,19 +587,9 @@ putback(char);// Puts the character ch back to the input stream so the next extr
 //功能是一样的，最大的区别在参数上 unget没有参数，是把已经从流读取出来的那个字符放回去，下次读取的时候可以读到这个字符 而putback是把参数c放入流中
 peek(); //reads the next character without extracting it 
 ```
-### 2.1.3. 检查函数
-每一个流对象都有一个 `flag` 用于保存操作时的各种状态  
-使用 `clear()` 来清除`flag`
 
-对特定状态的检查函数,返回值都是布尔类型
-|        |                                            |                                                                  |
-| ------ | ------------------------------------------ | ---------------------------------------------------------------- |
-| bad()  | Returns true 如果有读写失败                | 例如对一个没有以写入标志打开的流执行写入或者写入的磁盘已没有空间 |
-| fail() | Returns true 在`bad()`的基础上检查格式问题 | 例如文件读出来的是字符但是传输给了一个整数变量                   |
-| eof()  | 检查是否到了文件末尾.                      |
-| 1.3.   | 1.3.                                       | 1.3.                                                             | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.2. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | 1.4. | good() | 最常用的函数, 对上面所有函数返回`true`的时候,返回`false` | `good()`与`bad()`不是对立函数,good一次检查更多的flag |
 
-### 2.1.4. 文件位置指针操作
+### 4.0.3. 文件位置指针操作
 tellp() —— 与tellg()有同样的功能，但它用于写文件时。
 * 当我们读取一个文件，并要知道内置指针的当前位置时，应该使用tellg()
 * 当我们写入一个文件，并要知道内置指针的当前位置时，应该使用tellp()
@@ -458,7 +634,7 @@ int main () {
   return 0;
 ```
 
-## 2.2. sstream 字符串流 
+# 5. <sstream> 字符串流 
 
 头文件 `<sstream>`  
 * stringstream  同时可以支持C风格的串流的输入输出操作 stringstream则是从  `iostream` (输入输出流类)和和 `stringstreambase` （c++字符串流基类）派生而来
@@ -489,7 +665,7 @@ ostringstream::str();//返回的是std::string类型的字符串
 当然如果为了保持和C的兼容，使用strstream也是不错的选择  
 
 
-### 2.2.1. 从string中读取字符
+### 5.0.1. 从string中读取字符
 
 stringstream对象可以绑定一行字符串，然后以空格为分隔符把该行分隔开来
 ```cpp
@@ -508,7 +684,7 @@ do
 } while (is);
 
 ```
-### 2.2.2. 用来进行数据类型转换
+### 5.0.2. 用来进行数据类型转换
 
 传入参数和目标对象的类型会被自动推导出来，所以不存在错误的格式化符的问题。相比c库的数据类型转换，sstream更加安全、自动和直接  
 
@@ -523,7 +699,7 @@ sstream << nValue;
 sstream >> strResult;
 
 ```
-### 2.2.3. 字符串流的高级操作
+### 5.0.3. 字符串流的高级操作
 
 * 清空字符串流的方式 `sstream.str("")`  `clear()`
 * 使用 `str()` 方法，将stringstream类型转换为string类型
@@ -538,3 +714,7 @@ cout<< sstream.str() << endl;
 sstream.str("");
 
 ```
+# 6. <iomanip> 流格式控制
+
+该头文件里只有函数, 均是用于控制流格式的函数  
+
