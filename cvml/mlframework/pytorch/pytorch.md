@@ -372,6 +372,9 @@ loss_func = nn.CrossEntropyLoss()
 
 ## 3.4. torch.utils.data
 
+* pytorch 核心的数据装载工具,  `torch.utils.data.DataLoader`  
+* It represents a Python iterable over a dataset
+
 ### 3.4.1. torch.utils.data.DataLoader
 Pytorch的核心数据读取器     :  `torch.utils.data.DataLoader`   是一个可迭代的数据装载器  包括了功能
 * map-style and iterable-style datasets,

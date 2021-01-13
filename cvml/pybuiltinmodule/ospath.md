@@ -1,14 +1,14 @@
 # 1. File System
 
 os, glob,  shutil
-## 1.1. pathlib
+# 2. pathlib
 The pathlib module was introduced in Python 3.4 to deal with these challenges. It gathers the necessary functionality in one place and makes it available through methods and properties on an easy-to-use Path object.  
 
-### 1.1.1. pathlib.Path
+### 2.0.1. pathlib.Path
 The best way to construct a path is to join the parts of the path using the special operator `/`.
 
 
-#### 1.1.1.1. 使用Path来定义路径
+#### 2.0.1.1. 使用Path来定义路径
 You can use `Path.cwd()` or `Path('.') `to refer to your currently working directory.
 
 ```py
@@ -20,7 +20,7 @@ print(path1)
 
 ```
 
-#### 1.1.1.2. 使用Path来获取路径的属性
+#### 2.0.1.2. 使用Path来获取路径的属性
 
 .name, .parent, .stem, .suffix, .anchor 
 
@@ -33,7 +33,7 @@ print([path1, path1.name, path1.stem, path1.suffix, path1.parent, path1.parent.p
 
 ```
 
-#### 1.1.1.3. 获取文件列表
+#### 2.0.1.3. 获取文件列表
 
 Using `.iterdir()` you can get all the files in a folder.   
 By list comprehension, you can convert this into a list object.  
@@ -51,7 +51,7 @@ print(f'Number of files: {len(path_list)}')
 
 ```
 
-#### 1.1.1.4. Path 的有用方法
+#### 2.0.1.4. Path 的有用方法
 
 ```py
 
@@ -102,3 +102,5 @@ dir_path.replace(dir_path.parent / dir_path2)
 # Path.rmdir()
 # Removes a path pointing to a file or directory. The directory must be empty, otherwise, OSError is raised.
 ```
+
+# 3. os.path
