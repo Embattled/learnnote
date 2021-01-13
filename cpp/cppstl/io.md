@@ -261,7 +261,7 @@ std::cout << fs::read_symlink(
 
 ```
 
-## 1.8. File positioning
+## 1.8. File positionin
 
 文件读取过程中读头位置相关函数  
 1. ftell        : 返回值获取当前位置, long 类型
