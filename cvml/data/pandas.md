@@ -122,7 +122,7 @@ cities['City name'][1]
 
 ## 3.2. 读取文件
 
-### read_table
+### 3.2.1. read_table
 
 有多种参数  
 ```py
@@ -144,7 +144,7 @@ city_table = pd.io.parsers.read_csv("cities.csv")
 ```
 
 
-### read_csv
+### 3.2.2. read_csv
 ```py
 # read_table 将文件中的数据以一个表排列的字符串读入
 animal_table = pd.read_table("animal.txt")
