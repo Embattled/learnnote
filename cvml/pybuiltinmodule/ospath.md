@@ -1,16 +1,75 @@
 # 1. File System
 
-os, glob,  shutil
-## 1.1. pathlib
-The pathlib module was introduced in Python 3.4 to deal with these challenges. It gathers the necessary functionality in one place and makes it available through methods and properties on an easy-to-use Path object.  
+用于处理文件路径  
 
-### 1.1.1. pathlib.Path
+# 2. pathlib
+
+* The pathlib module was introduced in Python 3.4 .
+包含了一些类, 操作对象是各种操作系统中使用的路径  
+
+## 2.1. pathlib.PurePath
+
+pathlib模块中的基类, 将路径看作普通的字符串
+* 将多个指定的字符串拼接成适用于当前操作系统的路径格式
+* 判断两个路径是否相等
+
+
+PurePath作为该模块的基类, 提供了最基础的构造方法和实例属性
+1. 创建路径时, 直接创建 PurePath 对象即可, 解释器会自动根据操作系统返回 PurePosixPath或者 PureWindowsPath
+2. 创建好后可以通过 str() 转换成字符串
+
+### 2.1.1. 创建路径
+
+* 在创建对象时,传入多个字符串, 自动生成对应系统的路径  
+* 如果不传入参数, 等同于只传入 `'.'`   表示当前路径
+* 构造函数具有鲁棒性, 多余的点或者斜杠会被忽略
+
+```py
+path = PurePath('http:','c.biancheng.net','python')
+# http:\c.biancheng.net\python  windows 下
+# http:/c.biancheng.net/python  linux 下
+print(path)
+```
+
+### 2.1.2. 提取路径成分
+
+全部都是`PurePath.` 的方法
+
+| 方法名   | 功能                                                                       |
+| -------- | -------------------------------------------------------------------------- |
+| parts    | 返回路径字符串中所包含的各部分。                                           |
+| drive    | 返回路径字符串中的驱动器盘符。                                             |
+| root     | 返回路径字符串中的根路径。                                                 |
+| anchor   | 返回路径字符串中的盘符和根路径。                                           |
+| parents  | 返回当前路径的全部父路径。                                                 |
+| parent   | 返回当前路径的上一级路径，相当于 `parents[0]` 的返回值。                     |
+| name     | 返回当前路径中的文件名。                                                   |
+| suffixes | 返回当前路径中的文件所有后缀名。                                           |
+| suffix   | 返回当前路径中的文件后缀名。相当于 suffixes 属性返回的列表的最后一个元素。 |
+| stem     | 返回当前路径中的主文件名。                                                 |
+
+```py
+
+path1 = Path('.') / 'folder1' / 'text1.txt'
+print([path1, path1.name, path1.stem, path1.suffix, path1.parent, path1.parent.parent, path1.anchor])
+# [PosixPath('folder1/text1.txt'), 'text1.txt', 'text1', '.txt', PosixPath('folder1'), PosixPath('.'), '']
+```
+## 2.2. pathlib.Path
+
+* Path类是PurePath的子类, 因此继承的方法不多赘述
+* Path类的路径必须是真实有效的
+
+提供的方法 :
+* 判断路径是否真实存在
+* 判断该路径对应的是文件还是文件夹
+* 如果是文件，还支持对文件进行读写等操作
+
 The best way to construct a path is to join the parts of the path using the special operator `/`.
 
 
-#### 1.1.1.1. 使用Path来定义路径
-You can use `Path.cwd()` or `Path('.') `to refer to your currently working directory.
+### 2.2.1. 定义路径
 
+You can use `Path.cwd()` or `Path('.') `to refer to your currently working directory.
 ```py
 from pathlib import Path
 
@@ -20,24 +79,10 @@ print(path1)
 
 ```
 
-#### 1.1.1.2. 使用Path来获取路径的属性
-
-.name, .parent, .stem, .suffix, .anchor 
-
-The pathlib.Path is represented by either a `WindowsPath` or a `PosixPath`.
-
-```py
-path1 = Path('.') / 'folder1' / 'text1.txt'
-print([path1, path1.name, path1.stem, path1.suffix, path1.parent, path1.parent.parent, path1.anchor])
-# [PosixPath('folder1/text1.txt'), 'text1.txt', 'text1', '.txt', PosixPath('folder1'), PosixPath('.'), '']
-
-```
-
-#### 1.1.1.3. 获取文件列表
+### 2.2.1.2. 获取文件列表
 
 Using `.iterdir()` you can get all the files in a folder.   
 By list comprehension, you can convert this into a list object.  
-
 
 ```py
 path2 = Path('.') / 'folder1'
@@ -51,7 +96,7 @@ print(f'Number of files: {len(path_list)}')
 
 ```
 
-#### 1.1.1.4. Path 的有用方法
+### 2.2.1.3. Path 的有用方法
 
 ```py
 
@@ -102,3 +147,15 @@ dir_path.replace(dir_path.parent / dir_path2)
 # Path.rmdir()
 # Removes a path pointing to a file or directory. The directory must be empty, otherwise, OSError is raised.
 ```
+## 2.3. PosixPath WindowsPath
+
+* PurePosixPath PureWindowsPath 继承自PurePath
+* PosixPath WindowsPath 各自继承Pure*和Path类
+作为实例化的类, 一般不需要手动定义, 解释器会自动根据系统将Path和PurePath实例化成对应的类
+
+# os.path
+
+`os.path` 是一整个模块名, 不存在名为 `os` 的模块
+* 提供了一些操作路径字符串的方法
+* 还包含一些或者指定文件属性的一些方法
+
