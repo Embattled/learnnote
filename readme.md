@@ -29,6 +29,9 @@ C++STL的学习笔记, 包括了C++ STL库和 C 兼容库
 5. [IO](/cpp/cppstl/io.md)  : Input and output header of C/CPP, like stream or *FILE.
 6. [Algorithm](cpp/cppstl/algorithm.md) : Cpp's algorithm header, like sort or find function.
 7. [Thread](cpp/cppstl/thread.md) : Thread support libraries, include `<thread>`
+8. [Numeric](cpp/cppstl/numeric.md) : All numeric header, cmath, float, numberic, etc.
+
+
 ## 3.2. C++ knowledge
 
 C 和 C++ 的基础知识以及编译器知识
@@ -56,16 +59,16 @@ Python以及机器学习框架笔记
 1. [Python](cvml/python/python.md)  : Python syntax and feature note.
 2. [anaconda](cvml/python/anaconda.md)  : The usage of anaconda suit, includes conda, jupyter noot.
 
-## 4.2. Modual
+## 4.2. Data Modual
 
-1. [Pandas](cvml/pymodual/pandas.md)    : The usage of pandas.
-2. [Numpy](cvml/pymodual/numpy.md)  : Numpy is a really basic modual.
+1. [Pandas](/cvml/data/pandas.md)    : The usage of pandas.
+2. [Numpy](/cvml/data/numpy.md)  : Numpy is a really basic modual.
 
-## 4.3. Framework
+## 4.3. ML Framework
 
-1. [Pytorch](cvml/framework/pytorch.md) 
-2. [TensorFlow](cvml/framework/tensorflow.md)
-3. [Chainer](cvml/framework/chainer.md)
+1. [Pytorch](cvml/mlframework/pytorch/) 
+2. [TensorFlow](cvml/mlframework/tensorflow.md)
+3. [Chainer](cvml/mlframework/chainer.md)
 
 # 5. Linux
 
