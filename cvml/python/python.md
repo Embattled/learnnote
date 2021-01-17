@@ -167,6 +167,8 @@ yield
 * list()
 * set()
 
+导入包的内置函数, 用于处理名称里带空格或者首字母是数字的模块
+* `__import__()`
 
 其他内置函数
 ```
@@ -182,7 +184,7 @@ bytes() 	 	iter() 	tuple()
 callable() 	format() 	len() 	property() 
 frozenset() 	 	range() 	vars()
 classmethod() 	getattr() 	locals() 	repr() 
-compile() 	globals() 	map()  	__import__()
+compile() 	globals() 	map()  	
 complex() 	hasattr() 	max() 	round()
 ```
 
@@ -1184,6 +1186,26 @@ def name(list):
 name(list)
 ```
 
+## 8.3. 函数的异常处理
+
+如果 `try` 子句中的代码发生了错误，则程序立即到 `except` 中的代码去执行  
+
+因此将`try` 放到函数中和直接放到代码段中会有不同的效果，会影响程序执行的流程，因此一般**将异常封装在函数里**.
+
+```python
+try:
+   return 42/eggs
+except ZeroDivisionError:
+   print('divide zero')
+#对于try-except模块,可以使用else来使得程序在正确运行时进入下一模块
+else:
+```
+python有很多的error类:  
+`ZeroDivisionError`  
+`ValueError` 对于输入数据的类型不符    
+`FileNotFoundError` 打开文件的路径不对, 文件不存在  
+
+
 
 # 9. python 的类
 
@@ -1298,11 +1320,11 @@ CLanguage.infos("C语言中文网","http://c.biancheng.net")
 
 ```
 
-# 10. python 的模块
+# 10. python 的模块和包
 
 Python 的核心封装功能
 
-## 10.1. 导入包
+## 10.1. 导入模块或包
 
 导入语句有多种写法
 1. `import <name1> [as <别名>], <name2> [as <别名>]`
@@ -1313,13 +1335,39 @@ Python 的核心封装功能
    * 直接使用成员名（或别名）即可
 
 
+模块导入的查找顺序
+* 在当前目录，即当前执行的程序文件所在目录下查找；
+* 到 PYTHONPATH（环境变量）下的每个目录中查找；
+* 到 Python 默认的安装目录下查找。
+
+以上所有涉及到的目录，都保存在标准模块 `sys` 的 `sys.path` 变量  
+因此在自定义包中的 `__init__` 文件中, 都会通过该变量进行路径添加  
+
+```py
+import sys, os
+import warnings
+if(not(os.path.dirname(os.path.realpath(__file__)) in sys.path)):
+    sys.path.append(os.path.dirname(os.path.realpath(__file__)))
+```
+
+
 
 ## 10.2. 自定义模块
 
 * 只要是 Python 程序，都可以作为模块导入
 * 模块名就是文件名, 不带`.py`
 
-### 自定义模块的运行
+自定义模块的文档  
+* 同理, 在模块开头的位置用多行字符串定义 
+* 会自动赋值给该模块的 `__doc__` 变量
+
+
+模块的自定义导入
+1. 名称以下划线（单下划线“_”或者双下划线“__”）开头的变量、函数和类不会被导入, 属于本地
+2. 该模块设有 `__all__` 变量时, `from 模块名 import *` 只能导入该变量指定的成员, 用其他方式导入则不受影响
+
+
+**自定义模块的运行**
 
 导入后, 默认会执行包中的全部代码
 * 通常情况下，为了检验模块中代码的正确性，往往需要在模块中为其设计一段测试代码
@@ -1334,12 +1382,49 @@ if __name__ == '__main__':
   say() # 执行测试代码
 ```
 
-### 自定义模块的文档
 
-* 同理, 在模块开头的位置用多行字符串定义 
-* 会自动赋值给该模块的 `__doc__` 变量
+## 10.3. 包
 
-### 10.2.1. 作用域
+包就是文件夹，只不过在该文件夹下必须存在一个名为 `__init__.py` 的文件   
+* 每个包的目录下都必须建立一个 `__init__.py` 的模块, 可以是一个空模块, 也可以是初始化代码
+  * `__init__.py` 不同于其他模块文件，此模块的模块名不是 `__init__` ，而是它所在的包名, 即文件夹名
+* 文件夹的名称就是包名
+
+包导入的语法和导入模块相同, 只不过多了 `.` 点号, 用指定导入层级
+
+
+
+**__init__ 的编写**
+
+1. 导入包就等同于导入该包中的 `__init__.py` 文件
+2. 该文件的主要作用是导入该包内的其他模块
+
+```py
+# 在多文件编程中, 通过编写 __init__ 快速导入自定义包
+
+# 导入当前文件夹下的模块
+# 不同的书写方法会导致导入包后函数的调用
+
+# 需要用 包名.模块名.
+from . import module1
+
+# 虽然功能定义在模块2里, 但是调用时只用 包名.函数名
+from .module2 import * 
+```
+
+## 包信息调取
+
+任何模块或者包作为一段python代码, 有自己内部定义的变量和类
+
+* help() 函数可以获取传入的对象的信息
+* `__doc__` 变量可以获取用户自己书写的文档
+* `__file__` 变量可以获取当前模块的源文件系统位置
+  * 包的话就是 `__init__.py` 文件的路径
+  * 模块就是源文件的路径
+
+
+
+## 10.4. 作用域
 
 同C语言 全局和局部的覆盖原则也相同  
 函数中引用外部变量 使用`global` 关键字
@@ -1368,26 +1453,6 @@ def spam():
   eggs='spam local' #局部
   #在这里出错
 ```
-
-## 10.3. 函数的异常处理
-
-如果 `try` 子句中的代码发生了错误，则程序立即到 `except` 中的代码去执行  
-
-因此将`try` 放到函数中和直接放到代码段中会有不同的效果，会影响程序执行的流程，因此一般**将异常封装在函数里**.
-
-```python
-try:
-   return 42/eggs
-except ZeroDivisionError:
-   print('divide zero')
-#对于try-except模块,可以使用else来使得程序在正确运行时进入下一模块
-else:
-```
-python有很多的error类:  
-`ZeroDivisionError`  
-`ValueError` 对于输入数据的类型不符    
-`FileNotFoundError` 打开文件的路径不对, 文件不存在  
-
 
 
 # 11. Python 的文件操作 

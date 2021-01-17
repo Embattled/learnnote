@@ -155,7 +155,9 @@ dir_path.replace(dir_path.parent / dir_path2)
 
 # os.path
 
-`os.path` 是一整个模块名, 不存在名为 `os` 的模块
+`os.path` 是一整个模块名  
 * 提供了一些操作路径字符串的方法
 * 还包含一些或者指定文件属性的一些方法
+
+The pathlib module offers high-level path objects.  
 

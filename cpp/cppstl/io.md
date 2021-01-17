@@ -362,10 +362,10 @@ size_t fwrite(const void *ptr, size_t size_of_elements, size_t number_of_element
 
 # 3. 基础层 <ios>
 
-* 定义了 C++ 流的所有基类
+* 定义了 C++ 流的所有基类 ios 和 basic_ios
 * 该头文件的类函数基本适用于所有C++流对象
 
-## 3.1. class ios_base
+## 3.1. std::ios_base
 
 **所有** io 流类的基类, 保存的数据有:
 1. 流的状态, stream status flags
@@ -412,6 +412,7 @@ size_t fwrite(const void *ptr, size_t size_of_elements, size_t number_of_element
     * badbit
     * failbit
     * eofbit
+    * 详细的情况说明定义在了文档中(链接)[https://en.cppreference.com/w/cpp/io/ios_base/iostate]
 
 4. `std::ios_base::seekdir` file seeking direction type
    专门用来指定 seekg 和 seekp 的搜索方法
@@ -519,14 +520,14 @@ template<
 ### 3.2.1. state flags 函数
 
 
-使用 `clear()` 来清除`flag`
+* `clear()`  清除` state flag`
+  
 
 对特定状态的检查函数,返回值都是布尔类型
-|        |                                            |                                                                  |
-| ------ | ------------------------------------------ | ---------------------------------------------------------------- |
-| bad()  | Returns true 如果有读写失败                | 例如对一个没有以写入标志打开的流执行写入或者写入的磁盘已没有空间 |
-| fail() | Returns true 在`bad()`的基础上检查格式问题 | 例如文件读出来的是字符但是传输给了一个整数变量                   |
-| eof()  | 检查是否到了文件末尾.                      |
+* good()  最近的IO操作没有任何是错误的情况下返回 `true`, 此时其他所有状态函数都是 `false`
+* bad()   Returns true 如果有读写失败                 例如对一个没有以写入标志打开的流执行写入或者写入的磁盘已没有空间 
+* fail()  Returns true 在`bad()`的基础上检查格式问题  例如文件读出来的是字符但是传输给了一个整数变量                   
+* eof()   检查是否到了文件末尾.                      
 
 
 # 4. <fstream> C++ 的文件读写流 
@@ -714,7 +715,43 @@ cout<< sstream.str() << endl;
 sstream.str("");
 
 ```
+
+# <iostream> 标准流
+
+只有在该文件中定义了标准输入输出  
+
+**Include**
+* ios
+* streambuf
+* istream
+* ostream
+
+**对象**
+标准IO
+* cin
+* cout
+* cerr  无缓存的输出到 stderr
+* clog  输出到 stderr
+
+宽字符IO
+* wcin
+* wcout
+* wcerr
+* wclog
+
 # 6. <iomanip> 流格式控制
 
 该头文件里只有函数, 均是用于控制流格式的函数  
 
+## std::setw
+
+设置输出位宽  
+
+```cpp
+// 以下两个函数功能相同
+str << setw(n);
+str.width(n);
+
+
+
+```
