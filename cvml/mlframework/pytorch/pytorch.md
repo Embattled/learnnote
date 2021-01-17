@@ -372,31 +372,80 @@ loss_func = nn.CrossEntropyLoss()
 
 ## 3.4. torch.utils.data
 
-* pytorch 核心的数据装载工具,  `torch.utils.data.DataLoader`  
-* It represents a Python iterable over a dataset
+Pytorch 自定义数据库中最重要的部分  
+提供了对 dataset 的所种操作模式  
 
-### 3.4.1. torch.utils.data.DataLoader
-Pytorch的核心数据读取器     :  `torch.utils.data.DataLoader`   是一个可迭代的数据装载器  包括了功能
-* map-style and iterable-style datasets,
-* customizing data loading order,
-* automatic batching,
-* single- and multi-process data loading,
-* automatic memory pinning.
+### 数据集类型
 
-它可以接受两种类型的数据集
-* map-style datasets,
-  * implements the `__getitem__()` and `__len__()` protocols
+Dataset 可以分为两种类型的数据集, 在定义的时候分别继承不同的抽象类
+
+1. map-style datasets 即 继承`Dataset` 类
+  * 必须实现 `__getitem__()` and `__len__()` protocols
   * represents a map from (possibly non-integral) indices/keys to data samples.
   *  when accessed with `dataset[idx]`, could read the idx-th image and its corresponding label from a folder on the disk.
-* iterable-style datasets.
-  * Is a subclass of IterableDataset that implements the `__iter__()` protocol
+
+2. iterable-style datasets 即继承 `IterableDataset` 类
+  * 必须实现 `__iter__()` protocol 
   * particularly suitable for cases where random reads are expensive or even improbable, and where the batch size depends on the fetched data.
   * when called `iter(dataset)`, could return a stream of data reading from a database, a remote server, or even logs generated in real time.
 
+### 3.4.1. torch.utils.data.Dataset
+
+* Dataset 类是一个抽象类, 用于 map-key 的数据集
+* Dataset 类是 DataLoader 的最重要的构造参数  
+
+定义关键:
+1. All datasets that represent a map from keys to data samples should subclass it.
+2. 所有实现类需要重写 `__getitem__()` 用于从一个 index 来获取数据和label
+3. 可选的实现 `__len__()`  用于返回该数据库的大小, 会被用在 默认的 `Sampler` 上
 
 
 ```py
+from torch.utils.data import Dataset
 
+# 继承
+class trainset(Dataset):
+   def __init__(self):
+    #  在这里任意定义自己数据库的内容
+   
+   #  也可以更改构造函数
+   def __init__(self,loader=dafult_loader):
+     # 路径
+     self.images = file_train
+     self.target = number_train
+     self.loader = loader
+
+   #  定义 __getitem__ 传入 index 得到数据和label
+   #  实现了该方法即可使用 dataset[i] 下标方法获取到 i 号样本
+   def __getitem__(self, index):
+      # 获得路径
+      fn = self.images[index]
+      # 读图片
+      img = self.loader(fn)
+      # 得到labels
+      target = self.target[index]
+      return img,target
+
+   def __len__(self):
+      # 返回数据个数
+      return len(self.images)
+
+```
+
+
+### 3.4.2. torch.utils.data.DataLoader
+
+Pytorch的核心数据读取器`torch.utils.data.DataLoader`   
+是一个可迭代的数据装载器  包括了功能:  
+  * map-style and iterable-style datasets,
+  * customizing data loading order,
+  * automatic batching,
+  * single- and multi-process data loading,
+  * automatic memory pinning.
+
+使用的时候预先定义好一个 dataset 然后用 DataLoader包起来  
+
+```py
 # 第一个参数是绑定的数据集  是最重要的参数  
 DataLoader(dataset, batch_size=1, shuffle=False, sampler=None,
            batch_sampler=None, num_workers=0, collate_fn=None,
@@ -419,11 +468,14 @@ images, labels = next(iter_data)
 print(images.size())
 # torch.Size([100, 1, 28, 28])   100 个数据 每个数据 1 channel , 高和宽都是28
 
-print(labels)
-# 打印labels
+
+
+
+train_data  = trainset()
+trainloader = DataLoader(train_data, batch_size=4,shuffle=True)
 ```
 
-### 3.4.2. torch.utils.data.Dataset
+### 3.4.3. torch.utils.data.Dataset
 表示数据集的抽象类          :  `torch.utils.data.Dataset`  
 
 ## 3.5. torch.optim
@@ -545,140 +597,6 @@ for epoch in range(100):
     validate(...)
     scheduler.step()
 ```
-
-
-
-## 3.6. torchivision
-
-包含用于计算机视觉的流行数据集，模型架构和常见图像转换  
-
-### 3.6.1. torchvision.datasets
-
-主流的数据集：  
-
-    MNIST
-    fashion MNIST
-    KMNIST
-    EMNIST
-    QMNIST
-    FakeData
-    coco
-    LSUN
-    ImageFolder
-    DatasetFolder
-    ImageNet
-    CIFAR
-    STL10
-    SVHN
-    PhotoTour
-    SBU
-    Flickr
-    VOC
-    城市景观
-    SBD
-    USPS
-    Kinetics-400
-    HMDB51
-    UCF101
-
-
-### 3.6.2. torchvision.transforms
-
-1. transforms包含了一些常用的图像变换，这些变换能够用 `Compose` 串联组合起来  
-2. `torchvision.transforms.functional` 模块供了一些更加精细的变换，用于搭建复杂的变换流水线(例如分割任务）  
-
-分类: 
-    Scriptable transforms
-    Compositions of transforms
-    Transforms on PIL Image and torch.*Tensor
-    Transforms on PIL Image only
-    Transforms on torch.*Tensor only
-    Conversion Transforms
-    Generic Transforms
-    Functional Transforms
-
-大部分的 Transformation 接受 PIL Image, Tensor Image 和 batch of Tensor Images 作为输入  
-* Tensor Image is a tensor with (C, H, W) shape, where C is a number of channels
-* Batch of Tensor Images is a tensor of (B, C, H, W) shape, where B is a number of images in the batch. 
-
-
-#### 3.6.2.1. Scrpit and Compositions
-
-
-```py
-# In order to script the transformations, please use torch.nn.Sequential instead of Compose.
-transforms = torch.nn.Sequential(
-    transforms.CenterCrop(10),
-    transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-)
-# Make sure to use only scriptable transformations, i.e. that work with torch.Tensor, does not require lambda functions or PIL.Image.
-scripted_transforms = torch.jit.script(transforms)
-
-
-
-# 用 `Compose` 串联组合变换
-
-class torchvision.transforms.Compose(transforms)
-# transforms    :  (Transform对象的list）  一系列需要进行组合的变换。
-
-transforms.Compose( [  transforms.CenterCrop(10), transforms.ToTensor(),  ])
-
-
-
-```
-
-#### 3.6.2.2. Transforms on PIL Image and torch.*Tensor 通用变换函数
-
-* class torchvision.transforms.CenterCrop(size)
-* class torchvision.transforms.ColorJitter(brightness=0, contrast=0, saturation=0, hue=0)
-* class torchvision.transforms.FiveCrop(size)
-* class torchvision.transforms.Grayscale(num_output_channels=1)
-* class torchvision.transforms.Pad(padding, fill=0, padding_mode='constant')
-* class torchvision.transforms.RandomAffine(degrees, translate=None, scale=None, shear=None, resample=0, fillcolor=0)
-* class torchvision.transforms.RandomApply(transforms, p=0.5)
-* class torchvision.transforms.RandomCrop(size, padding=None, pad_if_needed=False, fill=0, padding_mode='constant')
-* class torchvision.transforms.RandomGrayscale(p=0.1)
-* class torchvision.transforms.RandomHorizontalFlip(p=0.5)
-* class torchvision.transforms.RandomPerspective(distortion_scale=0.5, p=0.5, interpolation=2, fill=0)
-* class torchvision.transforms.RandomResizedCrop(size, scale=(0.08, 1.0), ratio=(0.75, 1.3333333333333333), interpolation=2)
-* class torchvision.transforms.RandomRotation(degrees, resample=False, expand=False, center=None, fill=None)
-* class torchvision.transforms.RandomSizedCrop(*args, **kwargs)
-* class torchvision.transforms.Resize(size, interpolation=2)
-* class torchvision.transforms.Scale(*args, **kwargs)
-* class torchvision.transforms.TenCrop(size, vertical_flip=False)
-* class torchvision.transforms.GaussianBlur(kernel_size, sigma=(0.1, 2.0))
-  
-
-#### 3.6.2.3. Transforms on only 特定函数
-
-
-**Transforms on PIL Image Only**
-* class torchvision.transforms.RandomChoice(transforms)
-* class torchvision.transforms.RandomOrder(transforms)
-
-**Transforms on torch.*Tensor only**
-* class torchvision.transforms.LinearTransformation(transformation_matrix, mean_vector)
-* class torchvision.transforms.Normalize(mean, std, inplace=False)
-* class torchvision.transforms.RandomErasing(p=0.5, scale=(0.02, 0.33), ratio=(0.3, 3.3), value=0, inplace=False)
-* class torchvision.transforms.ConvertImageDtype(dtype: torch.dtype)
-
-
-#### 3.6.2.4. Conversion and Generic Transforms 格式转换 和 通用变化
-
-* class torchvision.transforms.ToPILImage(mode=None)
-* class torchvision.transforms.ToTensor
-
-
-* class torchvision.transforms.Lambda(lambd)
-    * 将用户定义的 lambda 作为变换函数
-
-
-
-
-#### 3.6.2.5. Functional Transforms 用于更精细化的变换
-
-`import torchvision.transforms.functional as TF`  函数名称省略前缀  
-
 
 # 4. TorchScript
 
