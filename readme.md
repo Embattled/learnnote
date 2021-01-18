@@ -23,7 +23,7 @@ C/CPP的语言知识, 官方STL和第三方库.
 C++STL的学习笔记, 包括了C++ STL库和 C 兼容库
 
 1. [STL Overview](cpp/cppstl/cppstl.md) : The overview of cpp std.
-2. [Containers](/cpp/cppstl/cppstl.md)  : All cpp containers, like vector, map, list.
+2. [Containers](/cpp/cppstl/containers.md)  : All cpp containers, like vector, map, list.
 3. [String](/cpp/cppstl/string.md)  : C++ string class and original c null-terminal string.
 4. [Time](/cpp/cppstl/time.md)  : Time class defined by C and C++.
 5. [IO](/cpp/cppstl/io.md)  : Input and output header of C/CPP, like stream or *FILE.
@@ -38,8 +38,9 @@ C 和 C++ 的基础知识以及编译器知识
 
 1. [Grammar and feature](cpp/note/cpp.md)   : The C and C++ grammar and feature, like new feature in c++11.
 2. [Makefile](cpp/note/makefile.md) : The basic syntax of makefile.
-3. [GCC and GDB](/cpp/note/gccgdb.md)   : The usage of gcc compiler and gdb debugger.
-4. [HPC](cpp/note/hpc.md)   : The basic knowledge of openmp and mpi.
+3. [GCC ](/cpp/note/gcc.md)   : The usage of gcc compiler and gdb debugger.
+4. [and GDB]
+5. [HPC](cpp/note/hpc.md)   : The basic knowledge of openmp and mpi.
 
 ## 3.3. Third-Party Libary
 

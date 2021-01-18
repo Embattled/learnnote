@@ -26,16 +26,59 @@ x = torch.rand(5, 3)
 print(x)
 ```
 
-# 2. 建模
-## 2.1. Model Authoring
+# 3. API
 
-A `Module` is the basic unit of composition in PyTorch.
+至2020年11月  
+torch 最新版是 1.7  
+中文文档更新到1.4  
+
+```py
+# 开始使用
+import torch
+print(torch.__version__)
+
+```
+
+## 3.1. torch
+
+作为最基础的包, torch 包括了tensors的数据格式以及对应的数学操作. 还提供了许多工具来高效的序列化 tensors以及其他任意数据格式   
+该包有 CUDA 对应  
+
+## 3.2. torch.nn
+
+These are the basic building block for graphs  
+用于定义网络中的各个层  
+
+### 3.2.1. Module
+
+* `class torch.nn.Module  `
+  * 所有神经网络模块的基类 Base class for all neural network modules.
+  * 您的模型也应该继承此类
+  * 模块也可以包含其他模块，从而可以将它们嵌套在树形结构中。 您可以将子模块分配为常规属性
+
+* A `Module` is the basic unit of composition in PyTorch.
   1. A constructor, which prepares the module for invocation.
-  2. A set of Parameters and sub-Modules. These are initialized by the constructor and can be used by the module during invocation.
-  3. A forward function. This is the code that is run when the module is invoked.
+  2. A set of `Parameters` and `sub-Modules`. These are initialized by the constructor and can be used by the module during invocation.
+  3. A `forward` function. This is the code that is run when the module is invoked.
+
+流程总结:
+1. 创建一个类 , 继承于 torch.nn.Module
+2. 定义构造函数, 不需要做什么, 只需要: just calls the constructor for super.
+3. 定义 `forward` 函数, 
+
+基础方法:
+* cpu()                 : Moves all model parameters and buffers to the CPU.
+* cuda(device: Union[int, torch.device, None] = None)   :Moves all model parameters and buffers to the GPU
+* forward(*input: Any)  : Defines the computation performed at every call. Should be overridden by all subclasses.
+
+模式
+* training mode.
+* evaluation mode.  `net.eval()`
 
 
 ```py
+import torch.nn as nn
+import torch.nn.functional as F
 
 # 创建一个被作为成员的子模型
 class MyDecisionGate(torch.nn.Module):
@@ -81,63 +124,9 @@ MyCell(
   (linear): Linear(in_features=4, out_features=4, bias=True)
 )
 """
-
-
 # 输如网络使用 my_cell(输入值)  即可
 print(my_cell(x, h))
 
-```
-
-流程总结:
-1. 创建一个类 , 继承于 torch.nn.Module
-2. 定义构造函数, 不需要做什么, 只需要: just calls the constructor for super.
-3. 定义 `forward` 函数, 
-
-
-# 3. API
-
-至2020年11月  
-torch 最新版是 1.7  
-中文文档更新到1.4  
-
-```py
-# 开始使用
-import torch
-print(torch.__version__)
-
-```
-
-## 3.1. torch
-
-作为最基础的包, torch 包括了tensors的数据格式以及对应的数学操作. 还提供了许多工具来高效的序列化 tensors以及其他任意数据格式   
-该包有 CUDA 对应  
-
-## 3.2. torch.nn
-
-These are the basic building block for graphs  
-用于定义网络中的各个层  
-
-### 3.2.1. Module
-
-* `class torch.nn.Module  `
-  * 所有神经网络模块的基类 Base class for all neural network modules.
-  * 您的模型也应该继承此类
-  * 模块也可以包含其他模块，从而可以将它们嵌套在树形结构中。 您可以将子模块分配为常规属性
-
-
-基础方法:
-* cpu()                 : Moves all model parameters and buffers to the CPU.
-* cuda(device: Union[int, torch.device, None] = None)   :Moves all model parameters and buffers to the GPU
-* forward(*input: Any)  : Defines the computation performed at every call. Should be overridden by all subclasses.
-
-模式
-* training mode.
-* evaluation mode.  `net.eval()`
-
-```py
-
-import torch.nn as nn
-import torch.nn.functional as F
 
 class Model(nn.Module):
     def __init__(self):
@@ -152,15 +141,15 @@ class Model(nn.Module):
 # Initialize the network
 net = Model().cuda()
 
-# 直接打印网络的信息
-print(net)
-
 # 进入 evaluation mode  等同于 
 net.train(False)
 net.eval()
 
 # 进入 training mode
 net.train()
+
+
+
 ```
 
 ### 3.2.2. Convolution Layers 卷积层 

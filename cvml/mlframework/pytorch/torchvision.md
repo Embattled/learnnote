@@ -1,4 +1,4 @@
-# torchvision
+# 1. torchvision
 
 The torchvision package consists of :
 1. popular datasets
@@ -6,12 +6,12 @@ The torchvision package consists of :
 3. common image transformations for computer vision
 
 
-# torchvision.io
+# 2. torchvision.io
 
 * The torchvision.io package provides functions for performing IO operations. 
 * They are currently specific to reading and writing video and images
 
-## Image part
+## 2.1. Image part
 
 1. torchvision.io.read_image(path: str) → torch.Tensor
 2. torchvision.io.decode_image(input: torch.Tensor) → torch.Tensor
@@ -23,7 +23,7 @@ The torchvision package consists of :
 
 
 
-# torchvision.models
+# 3. torchvision.models
 
 保存了预定义的模型用于不同任务
 * image classification

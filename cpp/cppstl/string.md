@@ -279,22 +279,22 @@ find_last_not_of
 
 # 3. C string null-terminated string
 
-## 3.1. <cstring> "string.h"
 
-以下函数为c原生函数,包含在`<string.h>`头文件中, 在C++中也在 `<cstring>`中  
-使用`<string.h>` 不需要在函数名前加`std::`  
+原生的C字符串的头文件:
+* `<cstring> "string.h"`
+* `<cctype>  "ctype.h"`
+* `cstdlib`  C原生 字符串和数字转换的函数定义在了该头文件 
 
 
-该头文件定义了 `NULL` 空指针和 `size_t` 数据大小类型  
 
+`string.h` 头文件定义了 `NULL` 空指针和 `size_t` 数据大小类型  
 按照功能可以分成三类:
 1. 字符串操作函数
 2. 字符串非操作函数
 3. 内存操作函数
 
-### 3.1.1. string manipulation
+## 3.1.1. 字符串操作 string manipulation
 
-**字符串操作函数**  
 
 1. `strcpy(dest, src);`         复制字符串 src 到字符串 dest
 2. `strncpy(dest, src, n);`     复制特定数量的字符 若n大于src的长度, 不足的部分补`\0`, 若n小于src的长度, 则dest是一个非`\0`结尾的字符数组
@@ -302,9 +302,8 @@ find_last_not_of
 4. `strncat(dest, src, n);`     连接字符串 src 的 n 个字符 到字符串 dest 的末尾
 5. `strxfrm(dest, src, n);`     根据程序当前的区域选项中的 `LC_COLLATE` 来转换字符串 src 的前 n 个字符，并把它们放置在字符串 dest 中, 算是另一种形式的 `strncpy`
 
-### 3.1.2. string examination
-
-**字符串检验函数**  
+## 3.1.2. 字符串检验 string examination
+ 
 
 | `strtok(str, delim)`     | 根据字符delim分隔字符串str,该函数返回被分解的第一个子字符串，如果没有可检索的字符串，则返回一个`空指针`  |
 | 字符串验证函数           |                                                                                                          |
@@ -324,7 +323,7 @@ find_last_not_of
 * 若LC_COLLATE为"POSIX"或"C"，则strcoll()与strcmp()作用完全相同 
 * 按照 C94 及 C99 标准的规定，程序在启动时设置 locale 为 "C"。在 "C" locale 下，字符串的比较就是按照内码一个字节一个字节地进行，这时 strcoll 与 strcmp 函数没有区别。在其他 locale 下，字符串的比较方式则不同了，例如在简体中文 locale 下，strcmp 仍然按内码比较，而 strcoll 对于汉字则是按拼音进行的（这也跟操作系统有关，Windows 还支持按笔划排序，可以在“区域和语言设置”里面修改
 
-### 3.1.3. character array manipulation
+## 3.1.3. character array manipulation
 
 
 | `memchr (ptr,ch,count)`  | 找字符第一次出现的位置, 没找到就返回`NULL`|
@@ -336,7 +335,23 @@ find_last_not_of
 move和cpy的区别:
 * memmove先创建temp内存,当src区域和dst内存区域重叠时, 可以安全拷贝
 
+### memset
 
+```cpp
+void* memset( void* dest, int ch, std::size_t count );
+// 注意 虽然 int ch是整型数据 但事实上 
+// Converts the value ch to unsigned char 
+// 因此ch 最大只能 255
+// and copies it into each of the first count characters of the object pointed to by dest.
+
+int a[20];
+// 数组置0
+std::memset(a, 0, sizeof(a));
+
+// 数组置 -1  这里非常有意思
+std::memset(a, 255, sizeof(a));
+
+```
 
 ## 3.2. <cctype> "ctype.h"
 
