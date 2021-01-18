@@ -2,12 +2,31 @@
 
 用于处理文件路径  
 
-# 2. pathlib
+# 2. os.path
+
+`os.path` 是一整个模块名  
+* 提供了一些操作路径字符串的方法
+* 还包含一些或者指定文件属性的一些方法
+
+该模块是较为低级的模块, pathlib里拥有更高级的函数及对象  
+The pathlib module offers high-level path objects.  
+
+## 2.1. 判断函数
+
+* os.path.isdir(path) 	判断路径是否为目录。
+* os.path.isfile(path) 	判断路径是否为文件。
+
+
+## 2.2. 提取及转换函数
+
+* os.path.realpath(path) 	返回 path 的真实路径。
+* os.path.dirname(path) 	返回 path 路径中的目录部分。
+# 3. pathlib
 
 * The pathlib module was introduced in Python 3.4 .
 包含了一些类, 操作对象是各种操作系统中使用的路径  
 
-## 2.1. pathlib.PurePath
+## 3.1. pathlib.PurePath
 
 pathlib模块中的基类, 将路径看作普通的字符串
 * 将多个指定的字符串拼接成适用于当前操作系统的路径格式
@@ -18,7 +37,7 @@ PurePath作为该模块的基类, 提供了最基础的构造方法和实例属�
 1. 创建路径时, 直接创建 PurePath 对象即可, 解释器会自动根据操作系统返回 PurePosixPath或者 PureWindowsPath
 2. 创建好后可以通过 str() 转换成字符串
 
-### 2.1.1. 创建路径
+### 3.1.1. 创建路径
 
 * 在创建对象时,传入多个字符串, 自动生成对应系统的路径  
 * 如果不传入参数, 等同于只传入 `'.'`   表示当前路径
@@ -31,7 +50,7 @@ path = PurePath('http:','c.biancheng.net','python')
 print(path)
 ```
 
-### 2.1.2. 提取路径成分
+### 3.1.2. 提取路径成分
 
 全部都是`PurePath.` 的方法
 
@@ -54,7 +73,7 @@ path1 = Path('.') / 'folder1' / 'text1.txt'
 print([path1, path1.name, path1.stem, path1.suffix, path1.parent, path1.parent.parent, path1.anchor])
 # [PosixPath('folder1/text1.txt'), 'text1.txt', 'text1', '.txt', PosixPath('folder1'), PosixPath('.'), '']
 ```
-## 2.2. pathlib.Path
+## 3.2. pathlib.Path
 
 * Path类是PurePath的子类, 因此继承的方法不多赘述
 * Path类的路径必须是真实有效的
@@ -67,7 +86,7 @@ print([path1, path1.name, path1.stem, path1.suffix, path1.parent, path1.parent.p
 The best way to construct a path is to join the parts of the path using the special operator `/`.
 
 
-### 2.2.1. 定义路径
+### 3.2.1. 定义路径
 
 You can use `Path.cwd()` or `Path('.') `to refer to your currently working directory.
 ```py
@@ -79,7 +98,7 @@ print(path1)
 
 ```
 
-### 2.2.1.2. 获取文件列表
+### 3.2.2. .iterdir() 获取文件列表
 
 Using `.iterdir()` you can get all the files in a folder.   
 By list comprehension, you can convert this into a list object.  
@@ -96,7 +115,7 @@ print(f'Number of files: {len(path_list)}')
 
 ```
 
-### 2.2.1.3. Path 的有用方法
+### 3.2.3. Path 的有用方法
 
 ```py
 
@@ -147,17 +166,9 @@ dir_path.replace(dir_path.parent / dir_path2)
 # Path.rmdir()
 # Removes a path pointing to a file or directory. The directory must be empty, otherwise, OSError is raised.
 ```
-## 2.3. PosixPath WindowsPath
+## 3.3. PosixPath WindowsPath
 
 * PurePosixPath PureWindowsPath 继承自PurePath
 * PosixPath WindowsPath 各自继承Pure*和Path类
 作为实例化的类, 一般不需要手动定义, 解释器会自动根据系统将Path和PurePath实例化成对应的类
-
-# os.path
-
-`os.path` 是一整个模块名  
-* 提供了一些操作路径字符串的方法
-* 还包含一些或者指定文件属性的一些方法
-
-The pathlib module offers high-level path objects.  
 
