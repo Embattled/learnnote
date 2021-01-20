@@ -2,10 +2,12 @@
 
 python数值包 最基础的列表处理包 被其他许多包所依赖  
 
+
 # 2. numpy.array
+
 NumPy’s array class is called `ndarray`. It is also known by the alias `array`.  
   
-* numpy最基础的类, 所有元素都是同一类型
+* numpy最基础的类, 所有元素都是同一类型, nd 代表可以是任意维度
 * 和 python 自带的 `array.array` 是不同的  
 * python 自带的类只能处理一维数组, 并且函数很少
 
@@ -19,20 +21,29 @@ print(A)
  [5 4 6]]
 '''
 ```
+注意 ndarry 的打印特点, 值之间没有逗号, 而是空格
+
 ## 2.1. attributes
 
-* ndim : 维度
-* shape :  A tuple of integers indicating the size of the array in each dimension.
-* size :  Total number of elements of the array. This is equal to the product of the elements of `shape`.
-* dtype : 元素类型
-* itemsize : 元素大小 bytes
-* data : 指向实际数据的 `array` 一般不需要使用
+这些都是属性, 不是方法
+* ndim      : 维度
+* shape     : 元组形式表示各个维度的大小, 等同于 tensor.size()
+* size      : 总共的元素个数
+* dtype     : 元素类型
+* itemsize  : 元素大小 bytes
+* data      : 指向实际数据的 `array` 一般不需要使用
+
+
 
 ## 2.2. creation
 
-1. From a regular Python list or tuple using the array function
+### 2.2.1. numpy.array()
+
+从既存的序列或者元组来创建 `numpy.array()`
    * 必须以序列的形式传入第一个参数第
    * 元素类型会被自动推导, 或者用`dtype=`指定
+
+### 2.2.2. 生成函数
 2. 使用基础矩阵生成函数, 也可以指定类型
    * one()
    * zero()
@@ -66,7 +77,7 @@ numpy的二元基础运算都是元素层面的
     * 遍历`i`下标可能的每个值, 得到一个结果, 结果为 
 
 
-### 3.1.2. numpy.dot()  矩阵点乘
+### 2.3.1. numpy.dot()  矩阵点乘
 
 np.diag(s)  将数组变成对角矩阵  
 使用numpy进行矩阵乘法   
@@ -86,7 +97,6 @@ UsVh = np.dot(Us, Vh)
 
 1. 取消科学计数法显示数据 `np.set_printoptions(suppress=True)  `
 2. 取消省略超长数列的数据 ` np.set_printoptions(threshold=sys.maxsize)`
-
 
 
 ### 3.1.1. numpy.shape

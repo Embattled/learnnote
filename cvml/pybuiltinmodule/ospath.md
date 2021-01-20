@@ -21,6 +21,8 @@ The pathlib module offers high-level path objects.
 
 * os.path.realpath(path) 	返回 path 的真实路径。
 * os.path.dirname(path) 	返回 path 路径中的目录部分。
+
+
 # 3. pathlib
 
 * The pathlib module was introduced in Python 3.4 .
@@ -52,7 +54,7 @@ print(path)
 
 ### 3.1.2. 提取路径成分
 
-全部都是`PurePath.` 的方法
+全部都是`PurePath.` 的成员变量, 直接用即可
 
 | 方法名   | 功能                                                                       |
 | -------- | -------------------------------------------------------------------------- |

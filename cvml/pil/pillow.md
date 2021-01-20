@@ -5,7 +5,7 @@ Pillow is the friendly PIL fork
 所有子模块都定义在 `PIL` 里  
 
 
-# 2. Image class
+# 2. Image
 
 `from PIL import Image`  
 定义在 Image 包中的同名类  
@@ -42,6 +42,27 @@ print(im.format, im.size, im.mode)
 
 
 
+# Ima#geDraw
+
+## 类方法
+### .text
+
+```py
+ImageDraw.text(
+    xy, 
+    text, 
+    fill=None, 
+    font=None, 
+    anchor=None, 
+    spacing=4, 
+    align='left', 
+    direction=None, 
+    features=None, 
+    language=None, 
+    stroke_width=0, 
+    stroke_fill=None, 
+    embedded_color=False)
+```
 # 3. Others
 ## 3.1. ImageFont
 

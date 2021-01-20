@@ -176,7 +176,7 @@ abs() 	delattr() 	hash() 	memoryview()
 all() 	 	 	min() 	setattr()
 any() 	dir() 	 	next() 	slicea()
 ascii() 	divmod()  	object() 	
-bin() 	enumerate() 	 	staticmethod()
+bin() 	 	 	staticmethod()
  		 	open() 	
 breakpoint() 	 	isinstance()  	sum()
 bytearray() 	filter() 	issubclass() 	pow() 	super()
@@ -355,8 +355,22 @@ chars=['http://c.biancheng.net',\
 # 传入 key 等于一个 lambda 函数
 print(sorted(chars,key=lambda x:len(x)))
 ```
+## 3.7. enumerate() 遍历对象函数
 
-## 3.7. 类型转换函数
+* 一般用在 for 循环中, 将一个可遍历的数据对象组合成一个索引序列  
+* 可以同时列出数据和数据下标
+
+```py
+# start 代表起始位置
+enumerate(sequence, [start=0])
+
+# 返回枚举对象
+seq = ['one', 'two', 'three']
+for i, element in enumerate(seq):
+   print i, element
+```
+
+## 3.8. 类型转换函数
 虽然 Python 是弱类型编程语言, 在一些特定场景中，仍然需要用到类型转换  
 
 1. 因为python默认读入的内容都被识别为字符串, 因此需要类型转换
@@ -370,7 +384,7 @@ print(sorted(chars,key=lambda x:len(x)))
 
 3. ASCII码函数
    * ord() : 字符转化成 Unicode 码
-   * chr() : 数字的Unicode 码 转化成字符
+   * chr(integer ) : 数字的 Unicode 码 转化成字符 
 
 4. 进制转换
    * 除了转换成10进制的数，其他的进制转换结果都带有前缀, 可以使用切片去除前缀
@@ -1018,7 +1032,6 @@ print(course_dummy_var)
 
 # 7. Python 流程控制
 
-
 * `break`和`continue` 同C语言是一样的
 * Python中, while和for 后也可以紧跟着一个 else 代码块
 * 它的作用是当循环条件为 False 跳出循环时，程序会最先执行 else 代码块中的代码
@@ -1278,8 +1291,9 @@ python有很多的error类:
 * python可以动态的给类添加变量和方法
   * 添加使用正常赋值
   * 删除使用 `del` 保留字
+  * 
 ## 9.1. 定义
-python 的类通过`class`定义 , python的类名一般以大写字母开头的驼峰式  
+python 的类通过`class`定义 , python的 `类名` 一般以大写字母开头的驼峰式  
 
 ```py
 class TheFirstDemo:
@@ -1337,7 +1351,7 @@ clanguage.bar(clanguage)
 3. 局部变量 : 类方法中普通方法定义
    * 函数执行完成后，局部变量也会被销毁。
 
-## 9.4. 类的方法
+## 9.4. 类方法 静态方法
 
 1. `@classmethod` 修饰的方法为类方法
 2. `@staticmethod` 修饰的方法为静态方法
@@ -1371,8 +1385,6 @@ class CLanguage:
         print(name,add)
 
 
-
-
 # 类方法也要包含一个参数，通常将其命名为 cls
 # Python 会自动将类本身绑定给 cls 参数
 
@@ -1383,6 +1395,71 @@ CLanguage.info()
 CLanguage.infos("C语言中文网","http://c.biancheng.net")
 
 ```
+* 用类的实例对象访问类成员的方式称为绑定方法
+* 而用类名调用类成员的方式称为非绑定方法。
+
+
+## 类的描述符
+
+* 通过使用描述符，可以让程序员在引用一个对象属性时自定义要完成的工作
+* 一个类可以将属性管理全权委托给描述符类
+* 描述符是 Python 中复杂属性访问的基础
+
+### 描述符协议
+
+描述符类基于以下 3 个特殊方法， 即这三个最基础特殊方法构成了描述符协议
+1. `__set__(self, obj, type=None)` ：在设置属性时将调用这一方法
+2. `__get__(self, obj, value)`     ：在读取属性时将调用这一方法
+3. `__delete__(self, obj)`         ：对属性调用 del 时将调用这一方法。
+
+* 实现了 set 和 get 描述符方法的描述符类被称为 `数据描述符`
+* 只实现了 get 被称为 `非数据描述符`
+
+在通过类查找属性时, 即 `类对象.属性` 的调用方法时, 都会隐式的调用 `__getattribute__()` 这一特殊方法  
+它会按照下列顺序查找该属性：  
+1. 验证该属性是否为类实例对象的数据描述符；
+2. 如果不是，就查看该属性是否能在类实例对象的 `__dict__` 中找到；
+3. 最后，查看该属性是否为类实例对象的非数据描述符。
+
+```py
+#描述符类
+class revealAccess:
+    def __init__(self, initval = None, name = 'var'):
+        self.val = initval
+        self.name = name
+    def __get__(self, obj, objtype):
+        print("Retrieving",self.name)
+        return self.val
+    def __set__(self, obj, val):
+        print("updating",self.name)
+        self.val = val
+class myClass:
+    x = revealAccess(10,'var "x"')
+    y = 5
+```
+## 类的封装 私有
+
+* Python 并没有提供 public、private 这些修饰符
+
+    默认情况下，Python 类中的变量和方法都是公有（public）的，它们的名称前都没有下划线（_）；
+    如果类中的变量和函数，其名称以双下划线“__”开头，则该变量（函数）为私有变量（私有函数），其属性等同于 private。
+
+
+
+
+### property()
+* 为了实现类似于C++的类私有变量, 即只能通过类方法来间接操作类属性  
+
+## 类的继承和多态
+
+### super
+1. 在子类中的构造方法中，调用父类构造方法的方式有 2 种，分别是：
+
+    * 类可以看做一个独立空间，在类的外部调用其中的实例方法，可以向调用普通函数那样，只不过需要额外备注类名（此方式又称为未绑定方法）；
+    * 使用 super() 函数。但如果涉及多继承，该函数只能调用第一个直接父类的构造方法。
+
+2. 涉及到多继承时，在子类构造函数中，调用第一个父类构造方法的方式有以上 2 种，而调用其它父类构造方法的方式只能使用未绑定方法。
+
 
 # 10. python 的模块和包
 
