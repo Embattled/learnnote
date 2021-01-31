@@ -2,7 +2,6 @@
 
 A collection of algorithms for image processing.
 
-
 Submodules:
 * skimage
     * color
@@ -25,6 +24,44 @@ Submodules:
     * viewer
 # 2. io
 
+Utilities to read and write images in various formats.  
+
+## imread 
+
+读一个图像, 特点是读取后的类型是 `ndarray`  
+
+```py
+skimage.io.imread(
+  fname, 
+  as_gray=False, 
+  plugin=None, 
+  **plugin_args)
+""" 
+
+"""
+```
+# transform
+
+## resize
+
+```py
+skimage.transform.resize(
+  image, 
+  output_shape, 
+  order=None, 
+  mode='reflect', 
+  cval=0, 
+  clip=True, 
+  preserve_range=False, 
+  anti_aliasing=None, 
+  anti_aliasing_sigma=None)
+""" 
+image         : (ndarray) Input image.
+output_shape  : tuple or ndarray 
+                Size of the generated output image (rows, cols[, …][, dim])
+其他7个参数都是通用参数
+"""
+```
 
 # 3. feature
 

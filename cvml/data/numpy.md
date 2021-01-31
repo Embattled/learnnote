@@ -2,7 +2,6 @@
 
 python数值包 最基础的列表处理包 被其他许多包所依赖  
 
-
 # 2. numpy.array
 
 NumPy’s array class is called `ndarray`. It is also known by the alias `array`.  
@@ -25,13 +24,26 @@ print(A)
 
 ## 2.1. attributes
 
-这些都是属性, 不是方法
+这些都是属性, 不是方法, 调取不加括号
 * ndim      : 维度
 * shape     : 元组形式表示各个维度的大小, 等同于 tensor.size()
 * size      : 总共的元素个数
 * dtype     : 元素类型
 * itemsize  : 元素大小 bytes
 * data      : 指向实际数据的 `array` 一般不需要使用
+
+## 运算
+
+1. 基础数学运算都是元素为单位的, 一个新的 array 会生成并返回
+   * 加减乘除, 乘法会进行元素乘
+   * 指数运算`**`
+   * 大小判断会返回一个只有 布尔类型的 array
+2. 矩阵乘法
+   * elementwise product   `A * B`
+   * matrix product        `A @ B`
+   * another matrix product`A.dot(B)`
+
+### unary operations
 
 
 
@@ -40,21 +52,40 @@ print(A)
 ### 2.2.1. numpy.array()
 
 从既存的序列或者元组来创建 `numpy.array()`
-   * 必须以序列的形式传入第一个参数第
-   * 元素类型会被自动推导, 或者用`dtype=`指定
+   * 必须以序列的形式传入第一个参数
+   * 元素类型会被自动推导, 或者用`dtype=`指定类型
 
 ### 2.2.2. 生成函数
-2. 使用基础矩阵生成函数, 也可以指定类型
+
+1. 使用基础矩阵生成函数, 默认是 float64, 也可以指定类型
    * one()
    * zero()
    * empty()  不确定值, 取决于该块内存原本的值
+   * random() 
    * 第一参数为元组, 指定维度大小
-3. 使用 `arange` 生成等差整数序列
-   * 使用方法基本和 内置函数 range 相同
+2. 使用 `arange` 生成等差整数序列
+   * 使用方法基本和 内置函数 range 相同 (起始值, 结束值, 间隔)
    * python 内置函数 range 返回的是普通 array, 该方法返回的是 np.array
-4. 使用 `linspace` 创建序列
+3. 使用 `linspace` 创建浮点数序列
    * 同 arange 相同, 只不过思想改成了分割
    * linspace(起始值,结束值,分割成多少个值)
+   * 和 range 不同, 结束值会被包括进去
+
+```py
+a = np.arange(15).reshape(3, 5)
+""" 
+array([[ 0,  1,  2,  3,  4],
+       [ 5,  6,  7,  8,  9],
+       [10, 11, 12, 13, 14]])
+"""
+
+
+```
+
+## 形态转换
+
+* reshape
+* 
 
 ## 2.3. 基础运算
 

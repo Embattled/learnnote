@@ -42,10 +42,10 @@ print(im.format, im.size, im.mode)
 
 
 
-# Ima#geDraw
+# 3. Ima#geDraw
 
-## 类方法
-### .text
+## 3.1. 类方法
+### 3.1.1. .text
 
 ```py
 ImageDraw.text(
@@ -63,12 +63,12 @@ ImageDraw.text(
     stroke_fill=None, 
     embedded_color=False)
 ```
-# 3. Others
-## 3.1. ImageFont
+# 4. Others
+## 4.1. ImageFont
 
 定义了一个同名的 ImageFont 类, 可以保存 bitmap 类型的 fonts  
 
-### 3.1.1. truetype
+### 4.1.1. truetype
 
 ```py
 
