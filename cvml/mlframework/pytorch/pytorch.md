@@ -46,6 +46,7 @@ print(torch.__version__)
 * `torch.Tensor` is an alias for the default tensor type (torch.FloatTensor).
 * `torch.` 里有许多便捷创建张量的函数
 * Tensor 类里面也有许多转换格式的方法
+* 几乎所有的类方法都有 torch.* 下的同名方法, 功能一样,第一个参数是输入 tensor   
 
 ## 2.1. torch.Tensor 的格式
 
@@ -67,51 +68,157 @@ pytorch 的 tensor 总共支持10种数据格式, CPU tensor 名称如下
 * GPU的格式名是在 torch 后面加上 .cuda 即可  
 * torch.Tensor 是 torch.FloatTensor 的别称, 即默认都会创建该类型的张量  
 
-## 2.2. 类方法
 
-大部分类方法都有 torch.* 下的同名方法, 功能一样   
+## 2.2. 类型转换
 
-
-### 2.2.1. 类型转换
-
-1. item()   : Returns the value of this tensor as a standard Python number
+1. .item()   : Returns the value of this tensor as a standard Python number
    * 只在张量中只有一个元素时生效
    * 将该元素作为数字返回
-2. tolist() : Returns the tensor as a (nested) list.
-   * 保留层次结构
+2. .tolist() : Returns the tensor as a (nested) list.
+   * 作为多层python原生列表返回,保留层次结构
+3. .numpy()  : Returns self tensor as a NumPy ndarray
+   * 共享内存, 非拷贝
+  
+## 2.3. view 变形
+
+`view(*shape) → Tensor`  
+* 返回一个更改了维度的 tensor
+* view既是一个类方法, 也是一个 tensor 变形函数的类别
+* 特点是共享内存的, 不进行拷贝
+
+
+```py
+a = torch.randn(1, 2, 3, 4)
+# torch.Size([1, 2, 3, 4])
+
+b = a.transpose(1, 2)
+# torch.Size([1, 3, 2, 4])
+
+c = a.view(1, 3, 2, 4)
+# torch.Size([1, 3, 2, 4])
+```
+
+### 2.3.1. transpose
+
+`torch.transpose(input, dim0, dim1) → Tensor`  
+* transpose 可以解释为view的一种
+* 返回一个 transposed 的 tensor
+* The given dimensions dim0 and dim1 are swapped.
+* 该方法是共享内存的, 不进行拷贝
   
 
-### 2.2.2. 创建新 tesnor
-To create a tensor with similar type but different size as another tensor, use tensor.new_* creation ops.  
-
-1. new_tensor
-2. new_full
-3. new_empty
-4. new_ones
-5. new_zeros
+注意该方法只能交换两个维度  
+同 numpy 的 transpose 不同, numpy 的transpose 可以直接交换多个维度  
 
 
-## 2.3. 创建操作 Creation Ops
+## 2.4. 创建操作 Creation Ops
+### 2.4.1. 统一值 tensor
 
-torch.* :
-1. tensor     : 方括号和逗号的列表形式传入数据转换成 Tensor, 可指定类型
-2. 
-
-### 2.3.1. torch.tensor
+### 2.4.2. torch.tensor
 
 ```py
 torch.tensor(data, *, dtype=None, device=None, requires_grad=False, pin_memory=False) → Tensor
 ```
-### 2.3.2. torch.from_numpy
+### 2.4.3. torch.from_numpy
 
 `torch.from_numpy` 接受一个 ndarray 并转换成 tensor 没有任何参数  
 ```py
 torch.from_numpy(ndarray) → Tensor
 ```
 
-## 2.4. 降维操作 Reduction Ops
+### 2.4.4. tensor复制
 
-### 2.4.1. max
+
+* `torch.clone(input, *, memory_format=torch.preserve_format) → Tensor`
+  * 返回一个完全相同的tensor,新的tensor开辟新的内存，但是仍然留在计算图中。
+* `torch.Tensor.detach()`
+  * detach() 属于 view 函数
+  * 返回一个完全相同的tensor,新的tensor开辟与旧的tensor共享内存, 但会脱离计算图，不会牵扯梯度计算
+
+一般彻底的复制并脱离可以使用  `tensor.clone().detach()`  这也是官方推荐的方法  
+
+
+### 2.4.5. .new_ 方法
+
+To create a tensor with similar type but different size as another tensor, use tensor.new_* creation ops.  
+
+1. new_tensor
+   * new_tensor可以将源张量中的数据复制到目标张量（数据不共享）
+   * 提供了更细致的device、dtype和requires_grad属性控制
+   * 默认参数下的操作等同于.clone().detach(), 但官方推荐后者
+2. new_full
+3. new_empty
+4. new_ones
+5. new_zeros
+
+
+## 2.5. 随机创建操作
+
+用随机数来填充一个 tensor , 是与 createion ops 独立开来的
+
+### 2.5.1. 种子操作
+
+seed   :Sets the seed for generating random numbers to a non-deterministic random number.
+
+manual_seed   :Sets the seed for generating random numbers.
+
+initial_seed   :Returns the initial seed for generating random numbers as a Python long.
+
+get_rng_state   :Returns the random number generator state as a torch.ByteTensor.
+
+set_rng_state   :Sets the random number generator state.
+
+
+### 2.5.2. 随机张量生成
+
+* rand(size)
+* torch.randint(low=0, high, size)
+
+
+
+```py
+# 参数
+
+# dtype   : 指定数据类型
+# device  : 指定设备
+# 
+
+
+# Returns a tensor filled with random numbers from a uniform distribution on the interval [0,1)[0, 1)[0,1) 
+torch.rand(*size, *, out=None, dtype=None, layout=torch.strided, device=None, requires_grad=False) → Tensor
+
+
+# Returns a tensor filled with random integers generated uniformly between low (inclusive) and high (exclusive).
+torch.randint(low=0, high, size, *, generator=None, out=None, dtype=None, layout=torch.strided, device=None, requires_grad=False) → Tensor
+
+
+# 
+torch.randn(*size, *, out=None, dtype=None, layout=torch.strided, device=None, requires_grad=False) → Tensor
+```
+## 2.6. 拼接与截取
+
+### 2.6.1. torch.stack
+`torch.stack(tensors, dim=0, *, out=None) → Tensor`  
+
+* 将多个 tensor 叠加到一起, 并产生一个新的 dimension
+* Concatenates a sequence of tensors along a new dimension.
+* 因此所有 tensor 必须相同大小
+* dim 指定新的 dimension 的位置
+
+### 2.6.2. torch.cat
+
+`torch.cat(tensors, dim=0, *, out=None) → Tensor`  
+
+* 将多个 tensor 链接, 沿着最外层 index 或者指定 dim 链接
+* All tensors must either have the same shape (except in the concatenating dimension) or be empty.
+* dim (int, optional) – the dimension over which the tensors are concatenated
+
+
+
+
+## 2.7. 降维操作 Reduction Ops
+
+### 2.7.1. max
 1. torch.max(input) → Tensor 返回张量所有元素里的最大值
 2. torch.max(input, dim, keepdim=False, *, out=None) -> (Tensor, LongTensor) 即(values, indices) 
 

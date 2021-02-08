@@ -518,7 +518,6 @@ swap()
    * pop()
   
 
-## 全局函数 非类方法函数
 
 ## 2.3. 容器的 Lookup 函数
 
@@ -537,7 +536,55 @@ swap()
 * std::multiset::find
 
 
-# 3. array 升级的数组  
+# 3. 全局迭代器访问
+
+* 头文件 `<iterator>`
+* 同类方法的迭代器获取类似, C++定义了全局的迭代器相关函数
+* 可以对所有满足条件的容器进行访问
+
+## 3.1. 范围获取 Range access
+
+
+
+## 3.2. 操作 Operations
+
+### 3.2.1. 无返回位置操作 advance
+
+* 直接在输入 it 上进行移动
+* n 可以为负数, 代表向前返回
+* 如果是随机访问迭代器, 可以线性执行完成
+
+```cpp
+template< class InputIt, class Distance >
+constexpr void advance( InputIt& it, Distance n );
+// it 	- 	iterator to be advanced
+// n 	- 	number of elements it should be advanced 
+
+```
+
+### 3.2.2. 返回值位置操作 next prev 
+
+* C++11 的新增函数, 是基于 advance 实现的
+* next() 迭代器向后推进 n
+* prev() 迭代器向前返回 n
+* 返回移动后的迭代器
+* 如果迭代器是随机访问迭代器, 复杂度常数. 否则复杂度 linear
+
+```cpp
+template< class InputIt >
+constexpr InputIt next(
+  InputIt it,
+  typename std::iterator_traits<InputIt>::difference_type n = 1 );
+
+
+template< class BidirIt >
+constexpr BidirIt prev(
+  BidirIt it,
+  typename std::iterator_traits<BidirIt>::difference_type n = 1 );
+```
+
+
+# 4. array 升级的数组  
 
 rray 容器是 C++ 11 标准中新增的序列容器，它就是在 C++ 普通数组的基础上，添加了一些成员函数和全局函数。  
 在使用上，它比普通数组更安全，且效率并没有因此变差。  
@@ -557,7 +604,7 @@ std::array<double, 10> values {0.5,1.0,1.5,,2.0};
 //剩余的元素都会被初始化为 0.0
 
 ```
-## 3.1. 安全的访问  
+## 4.1. 安全的访问  
 
 1. begin() end()
     C++ 11 标准库还新增加了 begin() 和 end() 这 2 个函数，和 array 容器包含的 begin() 和 end() 成员函数不同的是，标准库提供的这 2 个函数的操作对象，既可以是容器，还可以是普通数组。  
@@ -593,7 +640,7 @@ int main()
 
 
 ```
-## 3.2. array使用方法总结  
+## 4.2. array使用方法总结  
 
 访问array容器中单个元素
 1. 可以通过容器名[]的方式直接访问和使用容器中的元素，这和 C++ 标准数组访问元素的方式相同
@@ -622,7 +669,7 @@ else
     std::cout << "The container has "<< values.size()<<"elements.\n";
 ```
 
-# 4. vector 向量容器
+# 5. vector 向量容器
 
 它和 array 容器非常类似，都可以看做是对 C++ 普通数组的“升级版”。不同之处在于，array 实现的是静态数组（容量固定的数组），而 vector 实现的是一个动态数组，即可以进行元素的插入和删除，在此过程中，vector 会动态调整所占用的内存空间，整个过程无需人工干预  
 
@@ -654,7 +701,7 @@ protected:
 vector 容器扩容时，不同的编译器申请更多内存空间的量是不同的。以 VS 为例，它会扩容现有容器容量的 50%。  
 
 
-## 4.1. 创建
+## 5.1. 创建
 
 ```cpp
 // 最基础的定义
@@ -685,10 +732,10 @@ std::vector<int>value2(std::begin(value1),std::begin(value1)+3);//value2保存{1
 
 ```
 
-## 4.2. queue
+## 5.2. queue
 和 stack 栈容器适配器不同，queue 容器适配器有 2 个开口，其中一个开口专门用来输入数据，另一个专门用来输出数据
 
-## 4.3. 访问修改元素
+## 5.3. 访问修改元素
 
 1. 下标访问 (有越界可能)
 2. at() 访问(抛出 std::out_of_range 异常)
@@ -709,7 +756,7 @@ d.back() = 20;
 cout << *(values.data() + 2) << endl;
 ```
 
-## 4.4. 添加元素
+## 5.4. 添加元素
 
 1. push_back() 和 emplace_back() 插入尾部
    * push_back() 向容器尾部添加元素时，首先会创建这个元素，然后再将这个元素拷贝或者移动到容器中（如果是拷贝的话，事后会自行销毁先前创建的这个元素）
@@ -750,7 +797,7 @@ demo.insert(demo.end(), { 10,11 });//{1,3,2,5,5,7,8,9,10,11}
 // emplace
 demo1.emplace(demo1.begin(), 3);
 ```
-## 4.5. 删除元素
+## 5.5. 删除元素
 
 成员函数  
 * pop_back()     | 删除 vector 容器中最后一个元素，该容器的大小（size）会减 1，但容量（capacity）不会发生改变。
@@ -780,7 +827,7 @@ swap() 函数在头文件 `<algorithm>` 和 `<utility>` 中都有定义，使用
 * swap(beg)、pop_back() |先调用 swap() 函数交换要删除的目标元素和容器最后一个元素的位置，然后使用 pop_back() 删除该目标元素。
 
 
-## 4.6. 迭代器
+## 5.6. 迭代器
 
 1. 8大迭代器生成函数, 使用auto接受返回的迭代器很方便, begin和end()配合迭代全部元素
 2. 可以使用全局的 begin(vector) 和 end(vector) 获取迭代器  
@@ -826,7 +873,7 @@ auto cap = value.capacity();
 auto size = value.size();
 ```
 
-## 4.7. vector 的容量高级操作
+## 5.7. vector 的容量高级操作
 
 vector 容器的扩容过程是非常耗时的，并且当容器进行扩容后，之前和该容器相关的所有指针、迭代器以及引用都会失效。因此在使用 vector 容器过程中，我们应尽量避免执行不必要的扩容操作。
 1. 分配一块大小是当前 vector 容量几倍的新存储空间。注意，多数 STL 版本中的 vector 容器，其容器都会以 2 的倍数增长，也就是说，每次 vector 容器扩容，它们的容量都会提高到之前的 2 倍；
@@ -845,7 +892,7 @@ reserve(n) 	强制 vector 容器的容量至少为 n。注意，如果 n 比当�
 * 避免 vector 容器执行不必要的扩容操作的关键在于，在使用 vector 容器初期，就要将其容量设为足够大的值
 * 在 vector 容器刚刚构造出来的那一刻，就应该借助 reserve() 成员方法为其扩充足够大的容量。
 
-## 4.8. vector 的容量 fit
+## 5.8. vector 的容量 fit
 
 
 ```cpp
@@ -872,7 +919,7 @@ swap()成员函数的执行流程:
 经过以上步骤，就成功的将 myvector 容器的容量由 100 缩减至 10。  
 
 
-# 5. deque 双端队列
+# 6. deque 双端队列
 
 deque 容器和 vecotr 容器有很多相似之处
 
@@ -886,7 +933,7 @@ deque 容器和 vecotr 容器有很多相似之处
 和 vector 相比，额外增加了实现在容器头部添加和删除元素的成员函数，同时删除了 `capacity()`、`reserve()` 和 `data()` 成员函数。     
 
 
-## 5.1. deque的底层实现原理
+## 6.1. deque的底层实现原理
 
 和 vector 容器采用连续的线性空间不同!!  
 
@@ -952,7 +999,7 @@ protected:
 }
 ```
 
-## 5.2. 定义deque
+## 6.2. 定义deque
 
 ```cpp
 // 空队列
@@ -972,7 +1019,7 @@ std::array<int, 5>arr{ 11,12,13,14,15 };
 std::deque<int>d(arr.begin()+2, arr.end()); //13,14,15
 ```
 
-## 5.3. 迭代器
+## 6.3. 迭代器
 
 八大迭代器方法, 不多说  
 begin();  end();    
@@ -986,7 +1033,7 @@ for (auto i = d.begin(); i < d.end(); i++)
 for (auto i = begin(d); i < end(d); i++)
 ```
 
-## 5.4. 访问元素
+## 6.4. 访问元素
 
 基本同 vector 一致  
 
@@ -1007,7 +1054,7 @@ d.front() = 10;
 d.back() = 20;
 ```
 
-## 5.5. 修改元素 增删
+## 6.5. 修改元素 增删
 
 push_back()、push_front() 或者 resize() 成员函数实现向（空）deque 容器中添加元素。  
 在实际应用中，常用 emplace()、emplace_front() 和 emplace_back() 分别代替 insert()、push_front() 和 push_back()  
@@ -1036,7 +1083,7 @@ clear()     // 删除容器中所有的元素。
 
 ```
 
-# 6. list 双向链表
+# 7. list 双向链表
 
 实际场景中，如何需要对序列进行大量添加或删除元素的操作，而直接访问元素的需求却很少，这种情况建议使用 list 容器存储序列。  
 
@@ -1047,7 +1094,7 @@ clear()     // 删除容器中所有的元素。
 
 头文件: `#include <list>`  
 
-## 6.1. 定义  
+## 7.1. 定义  
 ```cpp
 
 // 空
@@ -1070,7 +1117,7 @@ std::array<int, 5>arr{ 11,12,13,14,15 };
 std::list<int>values(arr.begin()+2, arr.end());
 ```
 
-## 6.2. 迭代器
+## 7.2. 迭代器
 
 同理, 也是8大迭代器方法和 全局的 `begin() end()`  
 
@@ -1092,7 +1139,7 @@ for (std::list<char>::iterator it = values.begin(); it != values.end(); ++it)
 for (std::list<char>::reverse_iterator it = values.rbegin(); it != values.rend();++it)
 
 ```
-## 6.3. 访问元素的方法
+## 7.3. 访问元素的方法
 
 list 容器不支持随机访问，未提供下标操作符 [] 和 at() 成员函数，也没有提供 data() 成员函数。  
 
@@ -1114,7 +1161,7 @@ while (it!=mylist.end())
 }
 
 ```
-## 6.4. 添加元素
+## 7.4. 添加元素
 
 list 模板类中，与“添加或插入新元素”相关的成员方法有如下7个：
 单语法格式:
@@ -1157,7 +1204,7 @@ mylist2.splice(mylist2.begin(), mylist1, mylist1.begin(), mylist1.end());//mylis
                                                                          //mylist2:1 10 20 30 3 4 2
 ```
 
-## 6.5. 其他元素操作
+## 7.5. 其他元素操作
 
 
 并不是所有的容器都有 `sort()`方法, 通过更改容器中元素的位置，将它们进行排序。
@@ -1184,7 +1231,7 @@ auto it = values.begin();
 advance(it, 2);
 ```
 
-## 6.6. 删除元素 
+## 7.6. 删除元素 
 
 简单方法
 * pop_front() 	删除位于 list 容器头部的一个元素。
@@ -1203,7 +1250,7 @@ advance(it, 2);
 * remove_if() 	删除容器中满足条件的元素。
 
 
-## 6.7. forward_list  C++11 单向链表
+## 7.7. forward_list  C++11 单向链表
 
 头文件`#include <forward_list>`  
 forward_list 使用的是单链表，而 list 使用的是双向链表  
@@ -1219,7 +1266,7 @@ forward_list 容器具有和 list 容器相同的特性，即擅长在序列的�
 
 
 
-## 6.8. 构造函数
+## 7.8. 构造函数
 
 ```cpp
 // c++ 11 标准之前
@@ -1245,7 +1292,7 @@ template<class U, class V> pair (U&& a, V&& b);
 调用 make_pair() 函数，它也是` <utility>` 头文件提供的，其功能是生成一个 pair 对象。  
 当我们将 make_pair() 函数的返回值（是一个临时对象）作为参数传递给 pair() 构造函数时，其调用的是移动构造函数，而不是拷贝构造函数。  
 
-## 6.9. 值修改
+## 7.9. 值修改
 
 通过访问 `first second` 就可以访问pair的值  
 pair类模板还提供有一个 swap() 成员函数，能够互换 2 个 pair 对象的键值对，其操作成功的前提是这 2 个 pair 对象的键和值的类型要相同  
@@ -1260,12 +1307,12 @@ pair1.swap(pair2);
 
 
 
-# 7. map multimap
+# 8. map multimap
 
 * 向map容器中增添元素，insert()效率更高
 * 更新map容器中的键值对，operator[]效率更高
 
-## 7.1. 构造函数 定义
+## 8.1. 构造函数 定义
 
 ```cpp
 // map 的定义
@@ -1302,7 +1349,7 @@ std::map<std::string, int>newMap(++myMap.begin(), myMap.end());
 std::map<std::string, int, std::greater<std::string> >myMap{ {"C语言教程",10},{"STL教程",20} };
 ```
 
-## 7.2. 获取值 迭代器
+## 8.2. 获取值 迭代器
 
 map 类模板中对[ ]运算符进行了重载，这意味着，类似于借助数组下标可以直接访问数组中元素，通过指定的键，我们可以轻松获取 map 容器中该键对应的值
 1. 有当 map 容器中确实存有包含该指定键的键值对，借助重载的 [ ] 运算符才能成功获取该键对应的值
@@ -1354,7 +1401,7 @@ for (auto& q = p.first; q != p.second; ++q) {
 
 
 
-## 7.3. 插入元素
+## 8.3. 插入元素
 
 ```cpp
 // 定义一个map对象
@@ -1423,7 +1470,7 @@ template <class... Args> iterator emplace_hint (const_iterator position, Args&&.
 
 ```
 
-## 7.4. 删除元素 
+## 8.4. 删除元素 
 ```cpp
 iterator erase( const_iterator pos );         //(since C++11)
 iterator erase( iterator pos );               //(since C++17)
@@ -1450,7 +1497,7 @@ mapStudent.erase(mapStudent.begin(), mapStudent.end());
 //等同于
 mapStudent.clear()
 ```
-## 7.5. 获取大小
+## 8.5. 获取大小
 
 ```cpp
 //函数定义
@@ -1459,7 +1506,7 @@ size_type size() const noexcept;
 //一般使用方法
 int nSize = mapStudent.size();
 ```
-## 7.6. 其他常用函数
+## 8.6. 其他常用函数
 begin()         返回指向map头部的迭代器  
 end()           返回指向map末尾的迭代器  
 rbegin()        返回一个指向map尾部的逆向迭代器  
@@ -1486,7 +1533,7 @@ get_allocator() 返回map的配置器
 key_comp()      返回比较元素key的函数  
 value_comp()     返回比较元素value的函数  
 
-## 7.7. multimap
+## 8.7. multimap
 
 multimap 容器中指定的键可能对应多个键值对，而不再是 1 个。  
 
@@ -1498,7 +1545,7 @@ multimap 容器中指定的键可能对应多个键值对，而不再是 1 个�
 因此表 1 中的 `lower_bound()、upper_bound()、equal_range()` 以及 `count()` 成员方法会经常用到  
 
 
-# 8. set multiset 
+# 9. set multiset 
 
 set 容器定义于`<set>`头文件  
 
@@ -1511,7 +1558,7 @@ set 容器定义于`<set>`头文件
 * 切勿尝试直接修改 set 容器中已存储元素的值，这很有可能破坏 set 容器中元素的有序性，
 * 最正确的修改 set 容器中元素值的做法是：先删除该元素，然后再添加一个修改后的元素。
 
-## 8.1. 创建set
+## 9.1. 创建set
 
 定义对象
 ```cpp
@@ -1549,7 +1596,7 @@ std::set<std::string,std::greater<string> > myset{"java","stl","python"};
 
 ```
 
-## 8.2. 迭代器
+## 9.2. 迭代器
 
 1. C++ STL 中的 set 容器类模板中未提供 at() 成员函数，也未对 [] 运算符进行重载。因此，要想访问 set 容器中存储的元素，只能借助 set 容器的迭代器。  
 2.  set 容器配置的迭代器类型为双向迭代器。这意味着，假设 p 为此类型的迭代器，则其只能进行 ++p、p++、--p、p--、*p 操作，并且 2 个双向迭代器之间做比较，也只能使用 == 或者 != 运算符。
@@ -1570,7 +1617,7 @@ std::set<std::string,std::greater<string> > myset{"java","stl","python"};
   
 虽然 C++ STL 标准中，set 类模板中包含 lower_bound()、upper_bound()、equal_range() 这 3 个成员函数，但它们更适用于 `multiset` 容器，几乎不会用于操作 set 容器。  
 
-## 8.3. 插入元素
+## 9.3. 插入元素
 
 `.insert()` 方法 val 表示要添加的新元素，该方法的返回值为 pair 类型  
 插入单个元素
@@ -1608,7 +1655,7 @@ void insert ( {E1, E2,...,En} );
 myset.insert({ "stl","python","java"});
 
 ```
-## 8.4. 插入元素2
+## 9.4. 插入元素2
 
 `emplace()` 和 `emplace_hint()` 是 C++ 11 标准加入到 set 类模板中的，相比具有同样功能的 insert() 方法，完成同样的任务，emplace() 和 emplace_hint() 的效率会更高。  
 
@@ -1630,7 +1677,7 @@ pair<set<string, string>::iterator, bool> ret = myset.emplace("http://c.bianchen
 * 返回值是一个迭代器，而不再是 pair 对象。当成功添加元素时，返回的迭代器指向新添加的元素；反之，如果添加失败，则迭代器就指向 set 容器和要添加元素的值相同的元素。
 
 
-## 8.5. 删除元素
+## 9.5. 删除元素
 
 
 set也是使用 `erase` 删除元素  `clear()`;
@@ -1648,7 +1695,7 @@ iterator  erase (const_iterator first, const_iterator last);
 * 后 2 种格式的 erase() 方法，返回值都是迭代器，其指向的是 set 容器中删除元素之后的第一个元素
 * 如果要删除的元素就是 set 容器最后一个元素，则 erase() 方法返回的迭代器等价于 end() 方法返回的迭代器。
 
-## 8.6. multiset
+## 9.6. multiset
 回忆一下，set 容器具有以下几个特性：
 * 不再以键值对的方式存储数据，因为 set 容器专门用于存储键和值相等的键值对，因此该容器中真正存储的是各个键值对的值（value）；
 * set 容器在存储数据时，会根据各元素值的大小对存储的元素进行排序（默认做升序排序）；

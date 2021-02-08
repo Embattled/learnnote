@@ -668,7 +668,7 @@ ostringstream::str();//返回的是std::string类型的字符串
 
 ### 5.0.1. 从string中读取字符
 
-stringstream对象可以绑定一行字符串，然后以空格为分隔符把该行分隔开来
+stringstream 对象可以绑定一行字符串，然后以空格为分隔符把该行分隔开来
 ```cpp
 // 构造函数
 istringstream::istringstream(string str);

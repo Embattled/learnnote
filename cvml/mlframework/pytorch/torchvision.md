@@ -39,19 +39,51 @@ The torchvision package consists of :
     UCF101
 # 2. torchvision.io
 
+
 * The torchvision.io package provides functions for performing IO operations. 
 * They are currently specific to reading and writing video and images
 
-## 2.1. Image part
+## 2.1. Image part 图像部分
 
-1. torchvision.io.read_image(path: str) → torch.Tensor
-2. torchvision.io.decode_image(input: torch.Tensor) → torch.Tensor
-3. torchvision.io.encode_jpeg(input: torch.Tensor, quality: int = 75) → torch.Tensor
-4. torchvision.io.write_jpeg(input: torch.Tensor, filename: str, quality: int = 75)
-5. torchvision.io.encode_png(input: torch.Tensor, compression_level: int = 6) → torch.Tensor
-6. torchvision.io.write_png(input: torch.Tensor, filename: str, compression_level: int = 6)
+1. read_image   (path: str) → torch.Tensor
+2. decode_image (input: torch.Tensor) → torch.Tensor
+3. encode_jpeg  (input: torch.Tensor, quality: int = 75) → torch.Tensor
+4. write_jpeg   (input: torch.Tensor, filename: str, quality: int = 75)
+5. encode_png   (input: torch.Tensor, compression_level: int = 6) → torch.Tensor
+6. write_png    (input: torch.Tensor, filename: str, compression_level: int = 6)
 
 
+```py
+
+# 标准读取图片函数
+torchvision.io.read_image(path: str) → torch.Tensor
+# 读出的图片为 3 channel RGB, 数据类型是 uint8  [3,height,width]
+
+
+# 将一个一维 uint8 字节流 tensor 解压成 RGB 图像 tensor
+torchvision.io.decode_image(input: torch.Tensor) → torch.Tensor
+# 输入的 tensor 是一维的
+
+
+# 使用 jpeg 压缩图片
+torchvision.io.encode_jpeg(input: torch.Tensor, quality: int = 75) → torch.Tensor
+# quality : jpeg 压缩的质量,  1~100 的整数
+# 输出 一维 tensor, 可以被 decode_image 解压
+
+
+# 使用 png 压缩图片
+torchvision.io.encode_png(input: torch.Tensor, compression_level: int = 6) → torch.Tensor
+# compression_level  : 压缩等级  0~9
+# 输出 一维 tensor, 可以被 decode_image 解压
+
+
+# 图像tensor写入文件并压缩
+torchvision.io.write_jpeg(input: torch.Tensor, filename: str, quality: int = 75)
+torchvision.io.write_png(input: torch.Tensor, filename: str, compression_level: int = 6)
+# filename  : 输出的 path
+# input     : [c,h,w] 的tensor, c 必须是 1 或者 3 
+
+```
 
 
 # 3. torchvision.models
@@ -167,7 +199,8 @@ torchvision.utils.save_image(
 
 ## 5.1. Compositions of transforms
 
-将多个变换组合起来方便调用, 但是这个变换不支持 torchscript  
+* 将多个变换组合起来方便调用, 但是这个变换不支持 torchscript  
+* 除了 torchvision.transforms.functional module 里的函数都可以进行 compose
 
 ```py
 class torchvision.transforms.Compose(transforms)
@@ -255,36 +288,40 @@ torchvision.transforms.FiveCrop(size)
 写法和 Compose 有点类似, 但是多了一个 p 参数  
 
 
-## 5.3. Transforms on only 特定函数
+## 5.3. 数据格式转换 Conversion Transforms 
 
-
-**Transforms on PIL Image Only**
-* class torchvision.transforms.RandomChoice(transforms)
-* class torchvision.transforms.RandomOrder(transforms)
-
-**Transforms on torch.*Tensor only**
-* class torchvision.transforms.LinearTransformation(transformation_matrix, mean_vector)
-* class torchvision.transforms.Normalize(mean, std, inplace=False)
-* class torchvision.transforms.RandomErasing(p=0.5, scale=(0.02, 0.33), ratio=(0.3, 3.3), value=0, inplace=False)
-* class torchvision.transforms.ConvertImageDtype(dtype: torch.dtype)
-
-
-## 5.4. Conversion and Generic Transforms 格式转换 和 通用变化
+定义到 compose 里, 将 PIL 转化成 Tensor 或者反向变化
+* class torchvision.transforms.ToTensor
+  * 注意这个转化后的数据类型变化和标准化
+  * Converts a PIL Image or numpy.ndarray (H x W x C) in the range [0, 255] 
+  * to a torch.FloatTensor of shape (C x H x W) in the range [0.0, 1.0] 
 
 * class torchvision.transforms.ToPILImage(mode=None)
-* class torchvision.transforms.ToTensor
+  * 反向转化格式
+  * Converts a torch.*Tensor of shape C x H x W or a numpy ndarray 
+  * of shape H x W x C to a PIL Image while preserving the value range.
 
+## 5.4. 一般性自定义函数 Generic Transforms
 
 * class torchvision.transforms.Lambda(lambd)
     * 将用户定义的 lambda 作为变换函数
 
+## 5.5. 基础性变化 Functional Transforms 
+
+* `torchvision.transforms.functional`  算是一个独立出来的 module
+* 和 torchvision 其他变换函数相反
+* 这里的函数都不包含随机数, 意味着更手动, 但是可以控制所有变化
+* 需要输入 image 的 tensor , 意味着不能用 compose 组合起来
 
 
+### 5.5.1. convert_image_dtype
 
-## 5.5. Functional Transforms 用于更精细化的变换
+`torchvision.transforms.functional.convert_image_dtype(image: torch.Tensor, dtype: torch.dtype = torch.float32) → torch.Tensor`
+Convert a tensor image to the given dtype and scale the values accordingly  
 
-`import torchvision.transforms.functional as TF`  函数名称省略前缀  
-
+* 利用 torchvision.io 读取的数据是 uint8 类型
+* 可以用该函数转换成标准 float32 类型的 tensor
+* dtype 可以指定需要转换成的数据类型
 
 ## 5.6. Scrpit and Compositions
 
@@ -309,4 +346,18 @@ transforms.Compose( [  transforms.CenterCrop(10), transforms.ToTensor(),  ])
 
 
 
+
 ```
+
+## 5.7. Transforms on only 特定函数
+
+
+**Transforms on PIL Image Only**
+* class torchvision.transforms.RandomChoice(transforms)
+* class torchvision.transforms.RandomOrder(transforms)
+
+**Transforms on torch.*Tensor only**
+* class torchvision.transforms.LinearTransformation(transformation_matrix, mean_vector)
+* class torchvision.transforms.Normalize(mean, std, inplace=False)
+* class torchvision.transforms.RandomErasing(p=0.5, scale=(0.02, 0.33), ratio=(0.3, 3.3), value=0, inplace=False)
+* class torchvision.transforms.ConvertImageDtype(dtype: torch.dtype)

@@ -32,7 +32,7 @@ print(A)
 * itemsize  : 元素大小 bytes
 * data      : 指向实际数据的 `array` 一般不需要使用
 
-## 运算
+## 2.2. 运算
 
 1. 基础数学运算都是元素为单位的, 一个新的 array 会生成并返回
    * 加减乘除, 乘法会进行元素乘
@@ -40,22 +40,40 @@ print(A)
    * 大小判断会返回一个只有 布尔类型的 array
 2. 矩阵乘法
    * elementwise product   `A * B`
+   * 使用矩阵乘法可以使用    `@` 运算符
    * matrix product        `A @ B`
+   * 使用矩阵乘法也可以用    .dot() 方法
    * another matrix product`A.dot(B)`
 
-### unary operations
+两个类型不同的 np.array 运算, 结果元素类型会是更通用的或者更精确的一方  
+numpy的二元基础运算都是元素层面的  
+* `+ - ** *`
+* `*`乘法也是元素层面, 两个矩阵使用 `*`  不会进行矩阵乘法
+* 组合运算符 `+= -=` 会进行直接结果替换
+
+
+### 2.2.1. unary operations
+
+单元运算的类方法实现:
+* .sum() 返回全元素的和
+* .min() 
+* .max()
+* cumsum() 累加该 array
+* 通过指定以上函数的 `axis=i` 参数, 可以指定运算所执行的对象
+    * `i` 从0开始, 指代最外层的括号, 即索引访问时最左边的方括号
+    * 其他维度的索引每取一个值, 对 所有 i 维度的值进行运算
 
 
 
-## 2.2. creation
+## 2.3. creation
 
-### 2.2.1. numpy.array()
+### 2.3.1. numpy.array()
 
 从既存的序列或者元组来创建 `numpy.array()`
-   * 必须以序列的形式传入第一个参数
+   * 必须以序列的形式传入第一个参数, 即用方括号包住
    * 元素类型会被自动推导, 或者用`dtype=`指定类型
 
-### 2.2.2. 生成函数
+### 2.3.2. 生成函数
 
 1. 使用基础矩阵生成函数, 默认是 float64, 也可以指定类型
    * one()
@@ -82,33 +100,48 @@ array([[ 0,  1,  2,  3,  4],
 
 ```
 
-## 形态转换
+## 2.4. 形态转换 Shape Manipulation
 
-* reshape
-* 
+a.shape 可以返回当前的 array 的形状
 
-## 2.3. 基础运算
-
-两个类型不同的 np.array 运算, 结果元素类型会是更通用的或者更精确的一方  
-numpy的二元基础运算都是元素层面的  
-* `+ - ** *`
-* `*`乘法也是元素层面, 两个矩阵使用 `*`  不会进行矩阵乘法
-* 组合运算符 `+= -=` 会进行直接结果替换
-* 使用矩阵乘法可以使用 `@` 运算符
-* 使用矩阵乘法也可以用 .dot() 方法
+函数可以分为
+1. 类方法和全局函数
+2. 返回改变后的值和改变自身
 
 
-单元运算也有实现
-* .sum 返回全元素的和
-* .min 
-* .max
-* cumsum 返回维度相同的累加矩阵  
-* 通过指定以上函数的 `axis=i` 参数, 可以指定运算所执行的对象
-    * `i`从0开始, 指代最外层的括号, 即索引访问时最左边的方括号
-    * 遍历`i`下标可能的每个值, 得到一个结果, 结果为 
+以下函数都有 类方法和全局函数, 类方法没有第一个参数 array
+1. resize  (a, tuple )  更改这个 array 自身
+2. reshape (a, tuple )  返回更改后的 array
+3. 如果某个维度的值是 -1, 则该维度的值会根据 array的数据量和其他维度的值推算出来
+
+类方法
+* a.T         返回 transposed 的 array
+
+扁平化array
+1. numpy.ravel(a)          返回 flattened 的 array 
+2. a.flatten()             返回 flattened 的 array
+
+扁平化索引, 不需要用多重方括号索引值
+* `a.flat[1]`
+
+### 2.4.1. 拼接 stacking together
+
+* numpy.vstack((a,b)) == numpy.row_stack() 
+  * 上下拼接
+* numpy.hstack((a,b))
+  * 左右拼接
+* numpy.column_stack((a,b))
+  * 将 1D array 视作列进行左右拼接
+  * 在处理 2D array 时与 hstack 相同
+
+### 2.4.2. 拆分 splitting
+
+* numpy.hsplit(a,3) 竖着切3分
+* numpy.vsplit(a,3) 横着切, 沿着 vertical axis
+* numpy.array_split 指定切的方向
 
 
-### 2.3.1. numpy.dot()  矩阵点乘
+### 2.4.3. numpy.dot()  矩阵点乘
 
 np.diag(s)  将数组变成对角矩阵  
 使用numpy进行矩阵乘法   
@@ -121,16 +154,40 @@ Us = np.dot(U, np.diag(s))
 UsVh = np.dot(Us, Vh)
 
 ```
+## 2.5. Copies and Views
 
-# 3. config
+* 普通赋值不进行拷贝       `a=b`
+* view不进行数据拷贝       `c=a.view()` 算是绑定了一个引用, 可以用来操纵数据
+* copy方法会进行完整拷贝   `d=a.copy()`
 
-## 3.1. np.set_printoptions
+对于截取数据中的有用片段, 删除无用片段时, 需要进行拷贝
+```py
+a = np.arange(int(1e8))
+b = a[:100].copy()
+del a  # the memory of ``a`` can be released.
+```
+
+
+# 3. math function
+
+数学运算都是 elementwise 的
+
+* numpy.exp(a)  计算e指数
+* numpy.sqrt(a) 计算开方
+* numpy.add(a,b) 加法
+
+# 4. config
+
+## 4.1. np.set_printoptions
 
 1. 取消科学计数法显示数据 `np.set_printoptions(suppress=True)  `
-2. 取消省略超长数列的数据 ` np.set_printoptions(threshold=sys.maxsize)`
 
 
-### 3.1.1. numpy.shape
+
+2. 取消省略超长数列的数据 ` np.set_printoptions(threshold=sys.maxsize)` 需要 sys 包
+
+
+### 4.1.1. numpy.shape
 
 
 ```py
@@ -149,9 +206,9 @@ print(np.shape(U), np.shape(s), np.shape(Vh))
 
 
 
-## 3.2. linalg 
+## 4.2. linalg 
 
-### 3.2.1. SVD 奇异值分解
+### 4.2.1. SVD 奇异值分解
 
 Singular Value Decomposition  
 * M = U * s * Vh  

@@ -528,3 +528,63 @@ public:
 而如果使用 mycomp 作为参数来调用 sort() 函数，情形则大不相同。要知道，C++ 并不能真正地将一个函数作为参数传递给另一个函数，  
 换句话说，如果我们试图将一个函数作为参数进行传递，编译器会隐式地将它转换成一个指向该函数的指针，并将该指针传递过去。  
 
+
+# 5. 二分查找 Binary Search Operations (On sorted ranges)
+
+
+* 注意自定义 comp 的使用规则
+* 每次执行的是 comp(element,value), 即搜索的value 在后面
+* 搜索保证的是 comp 为 true 的一定在 comp 为false 的前面
+
+## 5.1. *_bound
+
+* 和容器的成员 *_bound 的返回值类似
+* 返回一个前向迭代器代表
+  * lower_bound   : not less than value
+  * upper_bound   : greater than value
+  * equal_bound   : 返回前两个函数的组合pair, 代表与 value 相等的区间
+
+
+
+```cpp
+template< class ForwardIt, class T >
+constexpr ForwardIt lower_bound( ForwardIt first, ForwardIt last, const T& value );
+
+// 自定义比较规则
+// Compare must meet the requirements of BinaryPredicate. 
+template< class ForwardIt, class T, class Compare >
+constexpr ForwardIt lower_bound( ForwardIt first, ForwardIt last, const T& value, Compare comp );
+
+template< class ForwardIt, class T >
+constexpr ForwardIt upper_bound( ForwardIt first, ForwardIt last, const T& value );
+
+// 同样的
+template< class ForwardIt, class T, class Compare >
+constexpr ForwardIt upper_bound( ForwardIt first, ForwardIt last, const T& value, Compare comp );
+
+
+template< class ForwardIt, class T >
+constexpr std::pair<ForwardIt,ForwardIt>
+              equal_range( ForwardIt first, ForwardIt last,
+                           const T& value );
+
+template< class ForwardIt, class T, class Compare >
+constexpr std::pair<ForwardIt,ForwardIt>
+              equal_range( ForwardIt first, ForwardIt last,
+                           const T& value, Compare comp );
+```
+
+## 5.2. binary_search
+
+* 该函数返回布尔值
+* 找到是否有一个元素与 value 相, true if an element equal to value is found, false otherwise. 
+
+函数参数要求同 *_bound 相同
+```cpp
+template< class ForwardIt, class T >
+constexpr bool binary_search( ForwardIt first, ForwardIt last, const T& value );
+
+template< class ForwardIt, class T, class Compare >
+constexpr bool binary_search( ForwardIt first, ForwardIt last, const T& value, Compare comp );
+
+```

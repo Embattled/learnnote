@@ -27,10 +27,10 @@ This header was originally in the C standard library as `<limits.h>`.
 This header is part of the type support library, in particular it's part of the C numeric limits interface. 
 
 
-定义了全部的数字界限 
+定义了全部的 `整数` 数字界限 
 
 
-注意常用的 INT_MAX是C++11才定义的  
+注意常用的 INT_MAX 是C++11才定义的  
 
 | 名称                    | 定义                                     | 备注            |
 | ----------------------- | ---------------------------------------- | --------------- |

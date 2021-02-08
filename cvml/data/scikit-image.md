@@ -26,7 +26,7 @@ Submodules:
 
 Utilities to read and write images in various formats.  
 
-## imread 
+## 2.1. imread 
 
 读一个图像, 特点是读取后的类型是 `ndarray`  
 
@@ -40,9 +40,9 @@ skimage.io.imread(
 
 """
 ```
-# transform
+# 3. transform
 
-## resize
+## 3.1. resize
 
 ```py
 skimage.transform.resize(
@@ -63,12 +63,11 @@ output_shape  : tuple or ndarray
 """
 ```
 
-# 3. feature
+# 4. feature
 
 包含了多种特征提取函数, 一键调用
 
-## 3.1. hog
-
+## 4.1. hog
 
 输入:
 * image : (M, N[, C]) ndarray  注意维度, channel 在最后, 类型是 ndarray

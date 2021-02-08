@@ -14,6 +14,11 @@ C++ 中，独立的几个 string 对象可以占据也可以不占据各自特�
 
 
 
+**该类别的头文件**
+1. string   C++的string库
+2. cstring  C语言的string库
+3. cctype    专注于字符的类别的头文件
+
 # 2. C++ string <string>
 
 This header is part of the strings library. 
@@ -293,7 +298,7 @@ find_last_not_of
 2. 字符串非操作函数
 3. 内存操作函数
 
-## 3.1.1. 字符串操作 string manipulation
+## 3.1. 字符串操作 string manipulation
 
 
 1. `strcpy(dest, src);`         复制字符串 src 到字符串 dest
@@ -302,7 +307,7 @@ find_last_not_of
 4. `strncat(dest, src, n);`     连接字符串 src 的 n 个字符 到字符串 dest 的末尾
 5. `strxfrm(dest, src, n);`     根据程序当前的区域选项中的 `LC_COLLATE` 来转换字符串 src 的前 n 个字符，并把它们放置在字符串 dest 中, 算是另一种形式的 `strncpy`
 
-## 3.1.2. 字符串检验 string examination
+## 3.2. 字符串检验 string examination
  
 
 | `strtok(str, delim)`     | 根据字符delim分隔字符串str,该函数返回被分解的第一个子字符串，如果没有可检索的字符串，则返回一个`空指针`  |
@@ -323,7 +328,7 @@ find_last_not_of
 * 若LC_COLLATE为"POSIX"或"C"，则strcoll()与strcmp()作用完全相同 
 * 按照 C94 及 C99 标准的规定，程序在启动时设置 locale 为 "C"。在 "C" locale 下，字符串的比较就是按照内码一个字节一个字节地进行，这时 strcoll 与 strcmp 函数没有区别。在其他 locale 下，字符串的比较方式则不同了，例如在简体中文 locale 下，strcmp 仍然按内码比较，而 strcoll 对于汉字则是按拼音进行的（这也跟操作系统有关，Windows 还支持按笔划排序，可以在“区域和语言设置”里面修改
 
-## 3.1.3. character array manipulation
+## 3.3. 内存字节操作 character array manipulation
 
 
 | `memchr (ptr,ch,count)`  | 找字符第一次出现的位置, 没找到就返回`NULL`|
@@ -335,7 +340,7 @@ find_last_not_of
 move和cpy的区别:
 * memmove先创建temp内存,当src区域和dst内存区域重叠时, 可以安全拷贝
 
-### memset
+### 3.3.1. memset
 
 ```cpp
 void* memset( void* dest, int ch, std::size_t count );
@@ -353,7 +358,7 @@ std::memset(a, 255, sizeof(a));
 
 ```
 
-## 3.2. <cctype> "ctype.h"
+# 4. <cctype> "ctype.h"
 
 该头文件只包含了一些字符分类函数还有大小写转换函数 总共14个   非常简单  
 
@@ -376,8 +381,9 @@ std::memset(a, 255, sizeof(a));
 | `toupper`        | converts a character to uppercase                |
 
 函数特点：
-1. is* 系列函数的函数定义中, 参数和返回值都是整形, 但是没有指定值, 直接用真假判定即可
-2. to* 系列函数只会对特定的26个字母起作用, 如果输入其他字母则 **不做改变的返回输入值**
+1. 所有函数的参数和返回值都是整型, 即一次只能操作一个字符
+2. is* 系列函数的函数定义中, 返回值没有指定值, 直接用真假判定即可
+3. to* 系列函数只会对特定的26个字母起作用, 如果输入其他字母则 **不做改变的返回输入值**
 
 函数名称解释
 * alnum       : 10个数字和52个大小写字母
@@ -393,4 +399,4 @@ std::memset(a, 255, sizeof(a));
 * graph       : 所有有形状的字符, print 减去 空格字符 就是 graph
 * punct       : 所有特殊字符, graph 减去 alnum 就是 punct
 
-## 3.3. 
+## 4.1. 
