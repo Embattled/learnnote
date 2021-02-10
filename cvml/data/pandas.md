@@ -21,6 +21,8 @@ pandas 中的主要数据结构被实现为以下两类：
 2. DataFrame，您可以将它想象成一个关系型数据表格，其中包含多个行和已命名的列。
 3. DataFrame 中包含一个或多个 Series，每个 Series 均有一个名称。
 
+
+
 # 2. IO 输入输出
 
 ## 2.1. Flat file
@@ -55,21 +57,39 @@ cars=pd.read_csv("cars.csv",sep=';',index_col='Car',names=name)
 
 
 ```
+## 2.2. csv写入
 
+
+  data.to_csv(write_file,index=False)
 
 # 3. Series 
 
 * 最基础的数据类型, 和 numpy.array 有些类似  
 * Series 可用作大多数 NumPy 函数的参数
+* Series 虽然只有一列, 但也有 index 默认是从0开始的整数, 也可以通过 `index=` 指定
 
+## 3.1. creation
 
-## 3.1. 创建
+* 可以从许多数据类型创建 Series
+* 可以指定 index, index 在pandas里可以重复, 但是有可能在别的运算中报出异常
+* 可以从一个 scalar 标量中创建Series, 此时必须提供 Index, 然后该标量会被重复 index 长度次
+
 ```py
+s = pd.Series(data, index=index)
 
 # 创建一个Series
-# pd.Series([A,B,...,D])  圆括号和方括号
-pd.Series(['San Francisco', 'San Jose', 'Sacramento'])
+# 传入的参数可以是 python列表或者元组  numpy.array  python标量
+s = pd.Series(['San Francisco', 'San Jose', 'Sacramento'])
 
+# index 也是一个 list of axis labels  但是一定要和数据等长
+s = pd.Series(np.random.randn(5), index=["a", "b", "c", "d", "e"])
+
+# 甚至可以从 python 字典创建
+d = {"b": 1, "a": 0, "c": 2}
+pd.Series(d)
+
+# 标量创建必须给定 index
+pd.Series(5.0, index=["a", "b", "c", "d", "e"])
 ```
 ## 3.2. 操纵数据
 
@@ -540,15 +560,12 @@ print(group3[['Humid.','CO2']])
 
 ```
 
-## 6.6. 写
 
-
-  data.to_csv(write_file,index=False)
 
     
-## 6.7. 处理数据
+## 6.6. 处理数据
 
-###  6.7.1. Drop数据
+###  6.6.1. Drop数据
 
 ```py
 data=data.drop(data.loc[data['State']=="CA"].index)
@@ -557,7 +574,7 @@ data=data.drop(data.loc[data['State']=="CA"].index)
 ```
 
 
-#### 6.7.1.1. 根据重复内容删除行
+#### 6.6.1.1. 根据重复内容删除行
 
 
 ```py
@@ -586,7 +603,7 @@ print(df.drop_duplicates())
       * New in version 1.0.0.
 
 
-#### 6.7.1.2. 根据缺失字段删除整行
+#### 6.6.1.2. 根据缺失字段删除整行
 
 
 * pandas.DataFrame.dropna (Python method, in pandas.DataFrame.dropna)
@@ -606,7 +623,7 @@ table=table.dropna(thresh=7)
 
 
 
-### 6.7.2. sort 重新排列
+### 6.6.2. sort 重新排列
 
 * Index
   * pandas.DataFrame.sort_index (Python method, in pandas.DataFrame.sort_index)
@@ -648,7 +665,7 @@ table=table.dropna(thresh=7)
 
 
 
-### 6.7.3. groupby
+### 6.6.3. groupby
 ```py
 
 # 可以使用 groupby来分类数据 , 并使用 describe() 来生成一个默认模板的数据分析结果
@@ -676,11 +693,11 @@ homes_table =homes_table.reset_index()
 
 
 ```
-## 6.8. 统计数据
+## 6.7. 统计数据
 
 使用统计方法将会使得数据对象降维  DF->Series   Series->numpy
 
-### 6.8.1. 基础寻值
+### 6.7.1. 基础寻值
 * 平均 .mean()
 * 标准差 .std()
 * 最大最小值中值 .max() .min() .median()
@@ -704,16 +721,16 @@ print("\nRange")
 print(player_table.max(numeric_only=True) -player_table.min(numeric_only=True))
 ```
 
-### 6.8.2. 基于数值统计
+### 6.7.2. 基于数值统计
 
-#### 6.8.2.1. Series.value_counts()
+#### 6.7.2.1. Series.value_counts()
 ```py
 # 对Series使用value_count来进行数据统计, 统计的按照相同数据来进行统计  
 # 得到的返回值仍是一个 Series
 car_table['Year'].value_counts() 
 ```
 
-#### 6.8.2.2. .sum()
+#### 6.7.2.2. .sum()
 
 ```py
 # 对一个DataFrame使用 得到的结果是一个 Series
@@ -726,7 +743,7 @@ hurr_table_sum = pd.DataFrame(hurr_table.sum())
 s_percentage = (s/sum(s)*100).round(2)
 ```
 
-#### 6.8.2.3. cut与qcut
+#### 6.7.2.3. cut与qcut
 
 分组数据  
 
@@ -735,7 +752,7 @@ s_percentage = (s/sum(s)*100).round(2)
 * pandas.qcut(x, q, labels=None, retbins: bool = False, precision: int = 3, duplicates: str = 'raise')  
   * Quantile-based discretization function.
 
-#### 6.8.2.4. crosstab
+#### 6.7.2.4. crosstab
 分析数据关联性  
 By matching different categorical frequency distributions,   
 you can display the relationship between qualitative variables.    
@@ -760,7 +777,7 @@ position_vs_ages = pd.crosstab(player_table["Position"],binned_ages,normalize='c
 
 
 
-### 6.8.3. 基于统计学的数值
+### 6.7.3. 基于统计学的数值
 
 
 
@@ -793,7 +810,7 @@ table.corr()
 
 
 ```
-#### 6.8.3.1. Variance 方差
+#### 6.7.3.1. Variance 方差
 
 可以通过Series获取方差  
 

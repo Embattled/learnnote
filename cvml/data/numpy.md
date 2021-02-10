@@ -32,7 +32,7 @@ print(A)
 * itemsize  : 元素大小 bytes
 * data      : 指向实际数据的 `array` 一般不需要使用
 
-## 2.2. 运算
+## 2.2. 元素运算
 
 1. 基础数学运算都是元素为单位的, 一个新的 array 会生成并返回
    * 加减乘除, 乘法会进行元素乘
@@ -51,29 +51,47 @@ numpy的二元基础运算都是元素层面的
 * `*`乘法也是元素层面, 两个矩阵使用 `*`  不会进行矩阵乘法
 * 组合运算符 `+= -=` 会进行直接结果替换
 
+### 2.2.1. universal function
 
-### 2.2.1. unary operations
+* 基础运算之外, 在numpy 包中有一些其他的数学运算, 也是元素层面的
+* 也有基础运算的全局函数版
+* `np.sin(A) np.exp(A)  np.add(A,B)`
 
-单元运算的类方法实现:
-* .sum() 返回全元素的和
-* .min() 
-* .max()
-* cumsum() 累加该 array
-* 通过指定以上函数的 `axis=i` 参数, 可以指定运算所执行的对象
+
+## 2.3. 降维运算
+
+对全部元素进行操作, 也可以指定维度 
+
+* axie None or int or tuple of ints, optional
+   通过指定函数的 `axis=i` 参数, 可以指定运算所执行的对象
     * `i` 从0开始, 指代最外层的括号, 即索引访问时最左边的方括号
     * 其他维度的索引每取一个值, 对 所有 i 维度的值进行运算
 
 
 
-## 2.3. creation
+### 2.3.1. 数学
 
-### 2.3.1. numpy.array()
+单元运算的类方法实现:
+* .sum() 返回全元素的和
+* .min() 
+* .max()
+* .cumsum() 累加该 array
+
+
+### 2.3.2. 布尔类
+
+* numpy.all 是否全部为 True
+* numpy.any 是否有 True
+
+## 2.4. creation
+
+### 2.4.1. numpy.array()
 
 从既存的序列或者元组来创建 `numpy.array()`
    * 必须以序列的形式传入第一个参数, 即用方括号包住
    * 元素类型会被自动推导, 或者用`dtype=`指定类型
 
-### 2.3.2. 生成函数
+### 2.4.2. 生成函数
 
 1. 使用基础矩阵生成函数, 默认是 float64, 也可以指定类型
    * one()
@@ -100,7 +118,7 @@ array([[ 0,  1,  2,  3,  4],
 
 ```
 
-## 2.4. 形态转换 Shape Manipulation
+## 2.5. 形态转换 Shape Manipulation
 
 a.shape 可以返回当前的 array 的形状
 
@@ -124,7 +142,7 @@ a.shape 可以返回当前的 array 的形状
 扁平化索引, 不需要用多重方括号索引值
 * `a.flat[1]`
 
-### 2.4.1. 拼接 stacking together
+### 2.5.1. 拼接 stacking together
 
 * numpy.vstack((a,b)) == numpy.row_stack() 
   * 上下拼接
@@ -134,27 +152,14 @@ a.shape 可以返回当前的 array 的形状
   * 将 1D array 视作列进行左右拼接
   * 在处理 2D array 时与 hstack 相同
 
-### 2.4.2. 拆分 splitting
+### 2.5.2. 拆分 splitting
 
 * numpy.hsplit(a,3) 竖着切3分
 * numpy.vsplit(a,3) 横着切, 沿着 vertical axis
 * numpy.array_split 指定切的方向
 
 
-### 2.4.3. numpy.dot()  矩阵点乘
-
-np.diag(s)  将数组变成对角矩阵  
-使用numpy进行矩阵乘法   
-
-```py
-# 使用svp分解矩阵
-U, s, Vh = np.linalg.svd(A, full_matrices=False)
-#使用 .dot() 将原本的矩阵乘回来 
-Us = np.dot(U, np.diag(s))
-UsVh = np.dot(Us, Vh)
-
-```
-## 2.5. Copies and Views
+## 2.6. Copies and Views
 
 * 普通赋值不进行拷贝       `a=b`
 * view不进行数据拷贝       `c=a.view()` 算是绑定了一个引用, 可以用来操纵数据
@@ -168,17 +173,11 @@ del a  # the memory of ``a`` can be released.
 ```
 
 
-# 3. math function
 
-数学运算都是 elementwise 的
 
-* numpy.exp(a)  计算e指数
-* numpy.sqrt(a) 计算开方
-* numpy.add(a,b) 加法
+# 3. config
 
-# 4. config
-
-## 4.1. np.set_printoptions
+## 3.1. np.set_printoptions
 
 1. 取消科学计数法显示数据 `np.set_printoptions(suppress=True)  `
 
@@ -187,7 +186,21 @@ del a  # the memory of ``a`` can be released.
 2. 取消省略超长数列的数据 ` np.set_printoptions(threshold=sys.maxsize)` 需要 sys 包
 
 
-### 4.1.1. numpy.shape
+### 3.1.1. numpy.shape
+
+### 3.1.2. numpy.dot()  矩阵点乘
+
+np.diag(s)  将数组变成对角矩阵  
+使用numpy进行矩阵乘法   
+
+```py
+# 使用svp分解矩阵
+U, s, Vh = np.linalg.svd(A, full_matrices=False)
+#使用 .dot() 将原本的矩阵乘回来 
+Us = np.dot(U, np.diag(s))
+UsVh = np.dot(Us, Vh)
+
+```
 
 
 ```py
@@ -206,9 +219,9 @@ print(np.shape(U), np.shape(s), np.shape(Vh))
 
 
 
-## 4.2. linalg 
+## 3.2. linalg 
 
-### 4.2.1. SVD 奇异值分解
+### 3.2.1. SVD 奇异值分解
 
 Singular Value Decomposition  
 * M = U * s * Vh  

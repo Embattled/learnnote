@@ -177,7 +177,7 @@ set_rng_state   :Sets the random number generator state.
 
 
 ```py
-# 参数
+# 统一参数
 
 # dtype   : 指定数据类型
 # device  : 指定设备
