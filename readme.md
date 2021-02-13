@@ -13,10 +13,12 @@ Most of the content comes from the official doc and http://c.biancheng.net.
 
 1. [Markdown](markdown.md)  : Markdown's syntax.
 2. [Git](gitbasic.md)       : Basic usage of git.
+3. [docker](docker.md)      : Basic usage of docker.
 
 # 3. C/CPP
 
-C/CPP的语言知识, 官方STL和第三方库.
+C/CPP的语言知识, 官方STL和第三方库.  
+C/CPP's offical knowledge, new feature, stl library, third party library.  
 
 ## 3.1. STL
 
