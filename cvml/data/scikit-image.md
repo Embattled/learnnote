@@ -87,6 +87,10 @@ HOG参数:
 * feature_vector    : 默认True, 会将特征以一维返回
 * visualize         : 默认false, 设置True时会一并返回可视化的 HOG
 
+返回值：
+* 注意返回值是 double, 对于只接受 float32 的网络来说需要加上类型转换
+* `feature.hog(...).astype(numpy.float32)`
+
 ```py
 skimage.feature.hog(
     image, 
@@ -106,7 +110,4 @@ out         : (n_blocks_row, n_blocks_col, n_cells_row, n_cells_col, n_orient) n
 hog_image   : (M, N) ndarray, optional
                 A visualisation of the HOG image. Only provided if visualize is True.
 """
-
-
-
 ```

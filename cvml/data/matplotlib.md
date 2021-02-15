@@ -1,30 +1,81 @@
 # 1. matplotlib包 图表制作
 Plot show graphically what you've defined numerically
 
-
-
-
 # 2. matplotlib.pyplot
 
 该包是 matplotlib 最核心的包, 也是一般使用者会使用的最多的包
 `import matplotlib.pyplot as plt`  
 
-## 基本操作
+## 2.1. 基本操作
 
-### matplotlib.pyplot.show
 
-```py
-matplotlib.pyplot.show(*, block=None)
-```
+### 2.1.1. matplotlib.pyplot.show
+
+`matplotlib.pyplot.show(*, block=None)`  
 
 * 显示所有在程序中 `打开` 的图像  
 * block 代表该函数是否阻塞
   * 在非交互模式下, 例如远程Terminal, block 默认为 True, 只有在图像关闭后函数才返回
   * 在交互模式下, block 默认为 True, 立即返回
 
-## 2.1. 折线图 plot
 
-### 2.1.1. 画图基本
+
+### 2.1.2. matplotlib.pyplot.subplots 子图
+
+`matplotlib.pyplot.subplot(*args, **kwargs)`  
+
+* 分割图形 , 画多个图  
+* 返回值会自动得到用于设置参数的 `axes.Axes` 对象
+
+```py
+# 第一个参数 *argsint, (int, int, index), or SubplotSpec, default: (1, 1, 1)
+# 221代表分成2行2列后选择第一个子图
+
+# 该函数在调用的时候会自动将下一个画图函数应用到子图中
+# 调用完成后直接画就行
+
+ax1 = plt.subplot(221)
+plt.plot(...)
+ax2 = plt.subplot(222)
+plt.plot(...)
+ax3 = plt.subplot(223)
+plt.plot(...)
+ax4 = plt.subplot(224)
+plt.plot(...)
+# 优雅的写法
+ax1 = plt.subplot(2,2,1)
+
+
+
+# using the variable ax for single a Axes
+fig, ax = plt.subplots()
+
+# using the variable axs for multiple Axes
+fig, axs = plt.subplots(2, 2)
+
+# using tuple unpacking for multiple Axes
+fig, (ax1, ax2) = plt.subplot(1, 2)
+fig, ((ax1, ax2), (ax3, ax4)) = plt.subplot(2, 2)
+```
+
+### 2.1.3. 坐标轴设置 axes
+```py
+# 获得一个axes变量 , 然后就可以通过这个变量来对图标的坐标轴进行设置
+ax = plt.axes()
+# 开启网格
+ax.grid()
+# 可以设置网格线 , 线的格式以及颜色
+ax.grid(ls = ':')
+ax.grid(ls = '--',color='w')
+# 设置 x y 轴的范围
+ax.set(ylim=(4000 , 6000))
+# 设置整个坐标轴的背景颜色
+ax.set_facecolor(color='tab:gray')
+```
+
+## 2.2. 折线图 plot
+
+### 2.2.1. 画图基本
 ```py
 # 画图库常与pandas一起用 , csv文件  
 hurricane_table = pd.read_csv("hurricane.csv")
@@ -43,7 +94,7 @@ plt.plot(range(5,13),hurr_table[["2015"]].values)
 plt.show()
 
 ```
-### 2.1.2. 折线图线的颜色及样式 标识 参数 
+### 2.2.2. 折线图线的颜色及样式 标识 参数 
 
 对于网格和折线都可以对其进行样式设置
 ```py
@@ -88,7 +139,7 @@ plt.plot(range(1,13),aritravel[["1958"]].values, ls='-',color='r',marker='s')
 plt.plot(range(1,13),aritravel[["1960"]].values, ls='--',color='b',marker='o')
 ```
 
-## 2.2. 饼图 pie
+## 2.3. 饼图 pie
 
 
 `matplotlib.pyplot.pie(values, colors=colors, labels=labels,explode=explode, autopct='%1.1f%%', shadow=True)` 
@@ -104,7 +155,7 @@ plt.plot(range(1,13),aritravel[["1960"]].values, ls='--',color='b',marker='o')
 
 
 
-## 2.3. bar  条形图
+## 2.4. bar  条形图
 创建一个条形图 x坐标和其对应的值是必须的  
 
 ```py
@@ -134,9 +185,9 @@ matplotlib.pyplot.bar(x,height)
 
 
 
-## 2.4. 直方图 Histograms  matplotlib.pyplot.hist
+## 2.5. 直方图 Histograms  matplotlib.pyplot.hist
 
-### 2.4.1. 单数据图
+### 2.5.1. 单数据图
 * 直方图是一种统计报告图，形式上也是一个个的长条形，  
 * 但是直方图用长条形的面积表示频数，所以长条形的高度表示频数/组距，宽度表示组距，其长度和宽度均有意义。  
 * 当宽度相同时，一般就用长条形长度表示频数。  
@@ -176,7 +227,7 @@ plt.hist(flights['arr_delay'], color = 'blue', edgecolor = 'black',bins = int(18
 
   * The type of histogram to draw. 'bar' is a traditional bar-type histogram.
   * 
-### 2.4.2. 多数据图  
+### 2.5.2. 多数据图  
 
 
 
@@ -216,7 +267,7 @@ side-by-side 缺点
 * still hard to compare distributions between airlines.
 
 
-## 2.5. 箱线图  plt.boxplot
+## 2.6. 箱线图  plt.boxplot
 
 * 箱线图能够明确的展示离群点的信息，同时能够让我们了解数据是否对称，数据如何分组、数据的峰度.  
 
@@ -257,7 +308,7 @@ plt.show()
   * Sets the width of each box either with a scalar or a sequence. 
   * The default is 0.5, or 0.15*(distance between extreme positions), if that is smaller.
 
-## 2.6. 散点图 Scatterplots
+## 2.7. 散点图 Scatterplots
 
 Scatterplots show clusters of data rather than trends (as with line graphs) or discrete values (as with bar charts).  
 The purpose of a scatterplot is to help you see data patterns.  
@@ -273,7 +324,7 @@ plt.scatter(x, y, s=[100], marker='x', c='r')
 
 ```
 
-### 2.6.1. 使用numpy 来分析散点数据 
+### 2.7.1. 使用numpy 来分析散点数据 
 
 
 ```py
@@ -289,43 +340,9 @@ plb.plot(x, p(x), 'k-')
 ```
 
 
-## 2.7. 图的设置
+## 2.8. 图的设置
 
-### 2.7.1. matplotlib.pyplot.subplots 子图
-
-分割图形 , 画多个图  
-返回值会自动得到用于设置参数的 `axes.Axes` 对象
-
-```py
-# axaxes.Axes object or array of Axes objects.
-
-# using the variable ax for single a Axes
-fig, ax = plt.subplots()
-
-# using the variable axs for multiple Axes
-fig, axs = plt.subplots(2, 2)
-
-# using tuple unpacking for multiple Axes
-fig, (ax1, ax2) = plt.subplot(1, 2)
-fig, ((ax1, ax2), (ax3, ax4)) = plt.subplot(2, 2)
-```
-
-### 2.7.2. 坐标轴设置 axes
-```py
-# 获得一个axes变量 , 然后就可以通过这个变量来对图标的坐标轴进行设置
-ax = plt.axes()
-# 开启网格
-ax.grid()
-# 可以设置网格线 , 线的格式以及颜色
-ax.grid(ls = ':')
-ax.grid(ls = '--',color='w')
-# 设置 x y 轴的范围
-ax.set(ylim=(4000 , 6000))
-# 设置整个坐标轴的背景颜色
-ax.set_facecolor(color='tab:gray')
-```
-
-### 2.7.3. 标签设置 坐标轴标签  图的标签 
+### 2.8.1. 标签设置 坐标轴标签  图的标签 
 ```py
 # 设置坐标轴标签 , 指明x y轴分别是什么
 plt.xlabel('Months')
@@ -347,7 +364,7 @@ label = plt.xticks()
 # Passing an empty list removes all xticks.
 plt.xticks([])
 ```
-###  2.7.4. 为折线图的线添加注解 
+###  2.8.2. 为折线图的线添加注解 
 
 ```py
 # 两条折线
@@ -361,7 +378,7 @@ plt.legend(['1958', '1960'], loc=2,facecolor ="None")
 
 ```
 
-## 2.8. Annotations
+## 2.9. Annotations
 
 ###　matplotlib.pyplot.annotate
 
@@ -388,7 +405,7 @@ plt.legend(['1958', '1960'], loc=2,facecolor ="None")
 
 
 
-## 2.9. Text properties
+## 2.10. Text properties
 
 对于一切字符实例,都可以指定其属性  (e.g., title(), xlabel() and text()).
 The matplotlib.text.Text instances have a variety of properties which can be configured via keyword arguments to the text commands   

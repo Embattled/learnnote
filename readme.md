@@ -58,14 +58,17 @@ C 和 C++ 的基础知识以及编译器知识
 
 Python以及机器学习框架笔记
 
-## 4.1. Python and tools
+## 4.1. Python and Python's tools
 1. [Python](cvml/python/python.md)  : Python syntax and feature note.
-2. [anaconda](cvml/python/anaconda.md)  : The usage of anaconda suit, includes conda, jupyter noot.
+2. [PythonSTL](cvml/pystl/readme.md) : Python's Standard Module.
+3. [PythonExEm](cvml/python/pythonexem.md) : Python Extending and Embedding the Python Interpreter.
+4. [anaconda](cvml/python/anaconda.md)  : The usage of anaconda suit, includes conda, jupyter noot.
 
-## 4.2. Data Modual
+## 4.2. Python DataOP Modual
 
 1. [Pandas](/cvml/data/pandas.md)    : The usage of pandas.
 2. [Numpy](/cvml/data/numpy.md)  : Numpy is a really basic modual.
+3. [matplotlib](cvml/data/matplotlib.md) : Usage of matplotlib.
 
 ## 4.3. ML Framework
 

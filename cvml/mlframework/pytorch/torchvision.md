@@ -194,7 +194,6 @@ torchvision.utils.save_image(
 * Transforms on torch.*Tensor only
 * Conversion Transforms
 * Generic Transforms
-* Functional Transforms
 * Scriptable transforms
 
 ## 5.1. Compositions of transforms
@@ -253,7 +252,7 @@ torchvision.transforms.FiveCrop(size)
 # size : 整数或者 (h,w)的列表元组  整数的话代表正方形  指定切割的大小
 ```
 
-### 5.2.2. 颜色噪点
+### 5.2.2. 颜色
 
 随机改变图像的 亮度, 对比度, 饱和度, 色度:
 * ColorJitter(brightness=0, contrast=0, saturation=0, hue=0)
@@ -261,32 +260,54 @@ torchvision.transforms.FiveCrop(size)
   * 前三个都会 chosen uniformly from [max(0, 1 - 输入值), 1 + 输入值] or the given [min, max]
   * hue 会 chosen uniformly from [-hue, hue] or the given [min, max]
 
+### 5.2.3. 噪点
 
-
-
-
-* Grayscale(num_output_channels=1)
-* Pad(padding, fill=0, padding_mode='constant')
-* RandomAffine(degrees, translate=None, scale=None, shear=None, resample=0, fillcolor=0)
-* RandomGrayscale(p=0.1)
-* RandomHorizontalFlip(p=0.5)
-* RandomPerspective(distortion_scale=0.5, p=0.5, interpolation=2, fill=0)
-* RandomResizedCrop(size, scale=(0.08, 1.0), ratio=(0.75, 1.3333333333333333), interpolation=2)
-* RandomRotation(degrees, resample=False, expand=False, center=None, fill=None)
-* RandomSizedCrop(*args, **kwargs)
-
-* TenCrop(size, vertical_flip=False)
 * GaussianBlur(kernel_size, sigma=(0.1, 2.0))
 
-### 5.2.3. 调整大小
+* TenCrop(size, vertical_flip=False)
+
+### 5.2.4. 几何变换
+
+* RandomAffine(degrees, translate=None, scale=None, shear=None, resample=0, fillcolor=0)
+
+仿射变换：除了角度是必须参数, 其他的都默认为空
+
+* degrees   : ( sequence float or int)  指定 rotations 的角度, 可以是一个元组指定 (min,max), 也可以是单个数字代表 范围是(-n,n), 0 代表不使用旋转
+* translate : 指定平移, None代表不平移, 输入元组 (a,b) 代表随机水平平移 %a, 或者垂直%b, a和b的值小于等于1
+* scale     : 指定缩放, 同样的是 (a,b) 代表水平平移的 百分比
+* shear     : ( sequence float or int) 输入类型和 degrees 类似但是有不同
+    * 一个值n  代表水平随机 shear (-n,n)
+    * 两个值   代表水平随机 shear (n1,n2)
+    * 只有四个值的时候 才有垂直 shear (n3,n4)
+
+
+
+
+
+
+
+* RandomPerspective(distortion_scale=0.5, p=0.5, interpolation=2, fill=0)
+
+
+
+### 5.2.5. 调整大小
 * Resize(size, interpolation=2)
 
-
-### 5.2.4. 随机应用  
+### 5.2.6. 随机应用  
 
 * RandomApply(transforms, p=0.5)
 写法和 Compose 有点类似, 但是多了一个 p 参数  
 
+
+### 还没看的
+
+* Grayscale(num_output_channels=1)
+* Pad(padding, fill=0, padding_mode='constant')
+* RandomGrayscale(p=0.1)
+* RandomHorizontalFlip(p=0.5)
+* RandomResizedCrop(size, scale=(0.08, 1.0), ratio=(0.75, 1.3333333333333333), interpolation=2)
+* RandomRotation(degrees, resample=False, expand=False, center=None, fill=None)
+* RandomSizedCrop(*args, **kwargs)
 
 ## 5.3. 数据格式转换 Conversion Transforms 
 
@@ -306,24 +327,45 @@ torchvision.transforms.FiveCrop(size)
 * class torchvision.transforms.Lambda(lambd)
     * 将用户定义的 lambda 作为变换函数
 
-## 5.5. 基础性变化 Functional Transforms 
 
-* `torchvision.transforms.functional`  算是一个独立出来的 module
+# 6. 基础性变化 Functional Transforms 
+
+* `torchvision.transforms.functional`  算是一个独立出来的 module `as TF`
 * 和 torchvision 其他变换函数相反
 * 这里的函数都不包含随机数, 意味着更手动, 但是可以控制所有变化
 * 需要输入 image 的 tensor , 意味着不能用 compose 组合起来
 
 
-### 5.5.1. convert_image_dtype
+## 6.1. 类型转换
 
-`torchvision.transforms.functional.convert_image_dtype(image: torch.Tensor, dtype: torch.dtype = torch.float32) → torch.Tensor`
+并不是变换函数, 但是是找了很久的 pytorch 中的图像类型转换函数
+
+### 6.1.1. pil_to_tensor
+
+`torchvision.transforms.functional.pil_to_tensor(pic)`  
+* 如名称, 将 `PIL Image` 转换成相同类型  
+* 只有一个参数, 就是 PIL Image 对象
+
+
+
+### 6.1.2. convert_image_dtype
+
 Convert a tensor image to the given dtype and scale the values accordingly  
-
-* 利用 torchvision.io 读取的数据是 uint8 类型
-* 可以用该函数转换成标准 float32 类型的 tensor
+* 利用 torchvision.io 读取的数据虽然是`Tensor`, 但是数值是 `uint8` 类型
+* 可以用该函数转换成标准 float32 类型的 tensor 或者其他类型
 * dtype 可以指定需要转换成的数据类型
 
-## 5.6. Scrpit and Compositions
+
+```py
+torchvision.transforms.functional.convert_image_dtype(
+    image: torch.Tensor, 
+    dtype: torch.dtype = torch.float32
+)→ torch.Tensor
+
+```
+
+
+## 6.2. Scrpit and Compositions
 
 
 ```py
@@ -349,7 +391,7 @@ transforms.Compose( [  transforms.CenterCrop(10), transforms.ToTensor(),  ])
 
 ```
 
-## 5.7. Transforms on only 特定函数
+## 6.3. Transforms on only 特定函数
 
 
 **Transforms on PIL Image Only**
