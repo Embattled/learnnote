@@ -274,17 +274,11 @@ torchvision.transforms.FiveCrop(size)
 
 * degrees   : ( sequence float or int)  指定 rotations 的角度, 可以是一个元组指定 (min,max), 也可以是单个数字代表 范围是(-n,n), 0 代表不使用旋转
 * translate : 指定平移, None代表不平移, 输入元组 (a,b) 代表随机水平平移 %a, 或者垂直%b, a和b的值小于等于1
-* scale     : 指定缩放, 同样的是 (a,b) 代表水平平移的 百分比
+* scale     : 指定缩放, 同样的是 (a,b) 代表水平和垂直的 百分比
 * shear     : ( sequence float or int) 输入类型和 degrees 类似但是有不同
     * 一个值n  代表水平随机 shear (-n,n)
     * 两个值   代表水平随机 shear (n1,n2)
     * 只有四个值的时候 才有垂直 shear (n3,n4)
-
-
-
-
-
-
 
 * RandomPerspective(distortion_scale=0.5, p=0.5, interpolation=2, fill=0)
 
