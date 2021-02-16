@@ -112,7 +112,10 @@ c = a.view(1, 3, 2, 4)
 
 
 ## 2.4. 创建操作 Creation Ops
+
 ### 2.4.1. 统一值 tensor
+
+
 
 ### 2.4.2. torch.tensor
 
@@ -171,17 +174,15 @@ set_rng_state   :Sets the random number generator state.
 
 ### 2.5.2. 随机张量生成
 
-* rand(size)
+* torch.rand(size)
 * torch.randint(low=0, high, size)
-
-
+* torch.randn(size)
 
 ```py
 # 统一参数
 
 # dtype   : 指定数据类型
 # device  : 指定设备
-# 
 
 
 # Returns a tensor filled with random numbers from a uniform distribution on the interval [0,1)[0, 1)[0,1) 
@@ -192,9 +193,12 @@ torch.rand(*size, *, out=None, dtype=None, layout=torch.strided, device=None, re
 torch.randint(low=0, high, size, *, generator=None, out=None, dtype=None, layout=torch.strided, device=None, requires_grad=False) → Tensor
 
 
-# 
+# Returns a tensor filled with random numbers from a normal distribution with mean 0 and variance 1 (also called the standard normal distribution).
+# 随机标准分布
 torch.randn(*size, *, out=None, dtype=None, layout=torch.strided, device=None, requires_grad=False) → Tensor
 ```
+
+
 ## 2.6. 拼接与截取
 
 ### 2.6.1. torch.stack

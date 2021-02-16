@@ -59,7 +59,6 @@ cars=pd.read_csv("cars.csv",sep=';',index_col='Car',names=name)
 ```
 ## 2.2. csv写入
 
-
   data.to_csv(write_file,index=False)
 
 # 3. Series 

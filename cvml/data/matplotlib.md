@@ -1,13 +1,41 @@
+- [1. matplotlib包 图表制作](#1-matplotlib包-图表制作)
+- [2. matplotlib.pyplot](#2-matplotlibpyplot)
+  - [2.1. 基本操作](#21-基本操作)
+    - [2.1.1. matplotlib.pyplot.show](#211-matplotlibpyplotshow)
+    - [2.1.2. matplotlib.pyplot.subplots 子图](#212-matplotlibpyplotsubplots-子图)
+    - [2.1.3. 坐标轴设置 axes](#213-坐标轴设置-axes)
+    - [2.1.4. 标签标题设置 label](#214-标签标题设置-label)
+  - [2.2. Annotations](#22-annotations)
+  - [2.3. 折线图 plot](#23-折线图-plot)
+    - [2.3.1. 画图基本](#231-画图基本)
+    - [2.3.2. 折线图线的颜色及样式 标识 参数](#232-折线图线的颜色及样式-标识-参数)
+  - [2.4. 饼图 pie](#24-饼图-pie)
+  - [2.5. bar  条形图](#25-bar--条形图)
+  - [2.6. 直方图 Histograms  matplotlib.pyplot.hist](#26-直方图-histograms--matplotlibpyplothist)
+    - [2.6.1. 单数据图](#261-单数据图)
+    - [2.6.2. 多数据图](#262-多数据图)
+  - [2.7. 箱线图  plt.boxplot](#27-箱线图--pltboxplot)
+  - [2.8. 散点图 Scatterplots](#28-散点图-scatterplots)
+    - [2.8.1. 使用numpy 来分析散点数据](#281-使用numpy-来分析散点数据)
+  - [2.9. 图的设置](#29-图的设置)
+    - [2.9.1. 为折线图的线添加注解](#291-为折线图的线添加注解)
+  - [2.10. Text properties](#210-text-properties)
+
+
 # 1. matplotlib包 图表制作
 Plot show graphically what you've defined numerically
 
 # 2. matplotlib.pyplot
 
 该包是 matplotlib 最核心的包, 也是一般使用者会使用的最多的包
-`import matplotlib.pyplot as plt`  
+
+* `import matplotlib.pyplot as plt`  
+* 图的数据输入接受 numpy.array, 因此和 pandas 一起使用的时候需要用 `.values`
+
 
 ## 2.1. 基本操作
 
+与图的类型无关, 是所有图通用的相关设置与操作  
 
 ### 2.1.1. matplotlib.pyplot.show
 
@@ -17,7 +45,6 @@ Plot show graphically what you've defined numerically
 * block 代表该函数是否阻塞
   * 在非交互模式下, 例如远程Terminal, block 默认为 True, 只有在图像关闭后函数才返回
   * 在交互模式下, block 默认为 True, 立即返回
-
 
 
 ### 2.1.2. matplotlib.pyplot.subplots 子图
@@ -47,6 +74,7 @@ ax1 = plt.subplot(2,2,1)
 
 
 
+
 # using the variable ax for single a Axes
 fig, ax = plt.subplots()
 
@@ -59,9 +87,19 @@ fig, ((ax1, ax2), (ax3, ax4)) = plt.subplot(2, 2)
 ```
 
 ### 2.1.3. 坐标轴设置 axes
+
+* axes 是一个图的坐标轴对象的引用
+* 如果获取了一个 axes 变量 , 然后就可以通过这个变量来对图标的坐标轴进行设置
+
+
+图的axes设置:
+* grid()      网格设置
+* set()       坐标轴范围与长度设置
+
+
 ```py
-# 获得一个axes变量 , 然后就可以通过这个变量来对图标的坐标轴进行设置
 ax = plt.axes()
+
 # 开启网格
 ax.grid()
 # 可以设置网格线 , 线的格式以及颜色
@@ -73,33 +111,92 @@ ax.set(ylim=(4000 , 6000))
 ax.set_facecolor(color='tab:gray')
 ```
 
-## 2.2. 折线图 plot
+### 2.1.4. 标签标题设置 label
 
-### 2.2.1. 画图基本
+* 不需要调用对象, 直接使用 plt 包的函数
+* 坐标轴标签
+  * plt.xlabel()
+  * plt.ylabel()
+* 图标题
+  * title()
+* 坐标内容
+  * plt.xticks()
+  * plt.yticks()
+
 ```py
-# 画图库常与pandas一起用 , csv文件  
-hurricane_table = pd.read_csv("hurricane.csv")
-
-# 设置坐标轴标签
+# 设置坐标轴标签 , 指明x y轴分别是什么
 plt.xlabel('Months')
 plt.ylabel('Number of Hurricanes')
 
+# 设置图的标题
+plt.title("MLB Players Height")
+
+
+
+# matplotlib.pyplot.xticks(ticks=None, labels=None)  
+# 通过 .xticks 可以设置x轴上具体的坐标内容 , (索引,链接的坐标)
+# 设置完成后就把具体的内容链接到了数字的索引上
+plt.xticks(range(5,13),hurr_table[["Month"]].values.flatten())
+# 同理 Plt.yticks() 也一样
+
+# Pass no arguments to return the current values without modifying them.
+# 获取当前坐标轴标签
+label = plt.xticks()
+
+# Passing an empty list removes all xticks.
+plt.xticks([])
+```
+## 2.2. Annotations
+
+为图片添加注释
+* `matplotlib.pyplot.annotate(text, xy, *args, **kwargs)`  
+
+参数说明: 
+* text : str  , 标注的文字 , 必须参数
+* xy   : 是最基础的坐标,必须参数    
+* xytext : (float, float), optional  文字的坐标 , 默认就在xy 上 ,若指定了文字坐标, 就可以添加 text 指向 xy 的箭头
+* arrowprops : (dict)  用于指定 text 指向 xy 的箭头格式
+  * 例: `arrowprops=dict(arrowstyle="->",connectionstyle="arc3`
+  * 该参数实际上调用了 `FancyArrowPatch` 的创建, 详细的设置可以参照相关函数
+  * 使用 `arrowstype` 可以快速设置内置的箭头格式
+
+
+
+
+arrowpros 箭头格式设置: 
+* 如果指定了`'arrowstyle'` , 则可以使用一些默认设定
+    * '-' 	None
+    * '->' 	head_length=0.4,head_width=0.2
+    * '-[' 	widthB=1.0,lengthB=0.2,angleB=None
+    * '|-|' 	widthA=1.0,widthB=1.0
+    * 'fancy' 	head_length=0.4,head_width=0.4,tail_width=0.4
+    * 'simple' 	head_length=0.5,head_width=0.5,tail_width=0.2
+    * 'wedge' 	tail_width=0.3,shrink_factor=0.5
+* 分为两种 如果字典中没有指明参数`'arrowstyle'` 则是手动模式
+    * width 	The width of the arrow in points
+    * headwidth 	The width of the base of the arrow head in points
+    * headlength 	The length of the arrow head in points
+    * shrink 	Fraction of total length to shrink from both ends
+    * ? 	Any key to matplotlib.patches.FancyArrowPatch
+
+
+## 2.3. 折线图 plot
+
+### 2.3.1. 画图基本
+```py
+
 # plt.plot( x轴, y轴)
-# 注意后一个参数的格式 
 plt.plot(range(5,13),hurricane_table[["2005"]].values)
 
 # 可以运行多次 就可以在同一个图中画多条数据
 plt.plot(range(5,13),hurr_table[["2015"]].values)
-
 plt.show()
 
 ```
-### 2.2.2. 折线图线的颜色及样式 标识 参数 
+### 2.3.2. 折线图线的颜色及样式 标识 参数 
 
 对于网格和折线都可以对其进行样式设置
 ```py
-# 设置网格的线的类型
-ax.grid(ls = ':')
 # 画线的
 plt.plot(range(5,13),hurr_table[["2005"]].values,ls= '-')
 ```
@@ -139,7 +236,7 @@ plt.plot(range(1,13),aritravel[["1958"]].values, ls='-',color='r',marker='s')
 plt.plot(range(1,13),aritravel[["1960"]].values, ls='--',color='b',marker='o')
 ```
 
-## 2.3. 饼图 pie
+## 2.4. 饼图 pie
 
 
 `matplotlib.pyplot.pie(values, colors=colors, labels=labels,explode=explode, autopct='%1.1f%%', shadow=True)` 
@@ -155,7 +252,7 @@ plt.plot(range(1,13),aritravel[["1960"]].values, ls='--',color='b',marker='o')
 
 
 
-## 2.4. bar  条形图
+## 2.5. bar  条形图
 创建一个条形图 x坐标和其对应的值是必须的  
 
 ```py
@@ -185,9 +282,9 @@ matplotlib.pyplot.bar(x,height)
 
 
 
-## 2.5. 直方图 Histograms  matplotlib.pyplot.hist
+## 2.6. 直方图 Histograms  matplotlib.pyplot.hist
 
-### 2.5.1. 单数据图
+### 2.6.1. 单数据图
 * 直方图是一种统计报告图，形式上也是一个个的长条形，  
 * 但是直方图用长条形的面积表示频数，所以长条形的高度表示频数/组距，宽度表示组距，其长度和宽度均有意义。  
 * 当宽度相同时，一般就用长条形长度表示频数。  
@@ -227,7 +324,7 @@ plt.hist(flights['arr_delay'], color = 'blue', edgecolor = 'black',bins = int(18
 
   * The type of histogram to draw. 'bar' is a traditional bar-type histogram.
   * 
-### 2.5.2. 多数据图  
+### 2.6.2. 多数据图  
 
 
 
@@ -267,7 +364,7 @@ side-by-side 缺点
 * still hard to compare distributions between airlines.
 
 
-## 2.6. 箱线图  plt.boxplot
+## 2.7. 箱线图  plt.boxplot
 
 * 箱线图能够明确的展示离群点的信息，同时能够让我们了解数据是否对称，数据如何分组、数据的峰度.  
 
@@ -308,7 +405,7 @@ plt.show()
   * Sets the width of each box either with a scalar or a sequence. 
   * The default is 0.5, or 0.15*(distance between extreme positions), if that is smaller.
 
-## 2.7. 散点图 Scatterplots
+## 2.8. 散点图 Scatterplots
 
 Scatterplots show clusters of data rather than trends (as with line graphs) or discrete values (as with bar charts).  
 The purpose of a scatterplot is to help you see data patterns.  
@@ -324,7 +421,7 @@ plt.scatter(x, y, s=[100], marker='x', c='r')
 
 ```
 
-### 2.7.1. 使用numpy 来分析散点数据 
+### 2.8.1. 使用numpy 来分析散点数据 
 
 
 ```py
@@ -340,31 +437,10 @@ plb.plot(x, p(x), 'k-')
 ```
 
 
-## 2.8. 图的设置
+## 2.9. 图的设置
 
-### 2.8.1. 标签设置 坐标轴标签  图的标签 
-```py
-# 设置坐标轴标签 , 指明x y轴分别是什么
-plt.xlabel('Months')
-plt.ylabel('Number of Hurricanes')
-# 设置图的标题
-plt.title("MLB Players Height")
 
-####  matplotlib.pyplot.xticks(ticks=None, labels=None)  
-
-# 通过 .xticks 可以设置x轴上具体的坐标内容 , (索引,链接的坐标)
-# 设置完成后就把具体的内容链接到了数字的索引上
-plt.xticks(range(5,13),hurr_table[["Month"]].values.flatten())
-# 同理 Plt.yticks() 也一样
-
-# Pass no arguments to return the current values without modifying them.
-# 获取当前坐标轴标签
-label = plt.xticks()
-
-# Passing an empty list removes all xticks.
-plt.xticks([])
-```
-###  2.8.2. 为折线图的线添加注解 
+###  2.9.1. 为折线图的线添加注解 
 
 ```py
 # 两条折线
@@ -378,30 +454,7 @@ plt.legend(['1958', '1960'], loc=2,facecolor ="None")
 
 ```
 
-## 2.9. Annotations
 
-###　matplotlib.pyplot.annotate
-
-`matplotlib.pyplot.annotate(s, xy, *args, **kwargs)`  
-* xy是最基础的坐标,必须参数    
-* text : str  , 标注的文字 , 必须参数
-* xytext : (float, float), optional  文字的坐标 , 默认就在xy 上 ,若指定了文字坐标, 就可以添加 text 指向 xy 的箭头
-* arrowprops :  dict  参数是个字典
-  * `arrowprops=dict(arrowstyle="->",connectionstyle="arc3`
-  * 分为两种 如果字典中没有指明参数`'arrowstyle'` 则是手动模式
-    * width 	The width of the arrow in points
-    * headwidth 	The width of the base of the arrow head in points
-    * headlength 	The length of the arrow head in points
-    * shrink 	Fraction of total length to shrink from both ends
-    * ? 	Any key to matplotlib.patches.FancyArrowPatch
-  * 如果指定了`'arrowstyle'` , 则可以使用一些默认设定
-    * '-' 	None
-    * '->' 	head_length=0.4,head_width=0.2
-    * '-[' 	widthB=1.0,lengthB=0.2,angleB=None
-    * '|-|' 	widthA=1.0,widthB=1.0
-    * 'fancy' 	head_length=0.4,head_width=0.4,tail_width=0.4
-    * 'simple' 	head_length=0.5,head_width=0.5,tail_width=0.2
-    * 'wedge' 	tail_width=0.3,shrink_factor=0.5
 
 
 
