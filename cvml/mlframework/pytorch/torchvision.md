@@ -1,5 +1,32 @@
-# 1. torchvision
+- [1. torchvision](#1-torchvision)
+  - [1.1. torchvision.datasets](#11-torchvisiondatasets)
+- [2. torchvision.io](#2-torchvisionio)
+  - [2.1. Image part 图像部分](#21-image-part-图像部分)
+- [3. torchvision.models](#3-torchvisionmodels)
+  - [3.1. image classification](#31-image-classification)
+- [4. torchvision.utils](#4-torchvisionutils)
+  - [4.1. make_grid](#41-make_grid)
+  - [4.2. save_image](#42-save_image)
+- [5. torchvision.transforms](#5-torchvisiontransforms)
+  - [5.1. Compositions of transforms](#51-compositions-of-transforms)
+  - [5.2. 通用变换函数](#52-通用变换函数)
+    - [5.2.1. 切割函数](#521-切割函数)
+    - [5.2.2. 颜色](#522-颜色)
+    - [5.2.3. 噪点](#523-噪点)
+    - [5.2.4. 几何变换](#524-几何变换)
+    - [5.2.5. 调整大小](#525-调整大小)
+    - [5.2.6. 随机应用](#526-随机应用)
+    - [5.2.7. 还没看的](#527-还没看的)
+  - [5.3. 数据格式转换 Conversion Transforms](#53-数据格式转换-conversion-transforms)
+  - [5.4. 一般性自定义函数 Generic Transforms](#54-一般性自定义函数-generic-transforms)
+- [6. 基础性变化 Functional Transforms](#6-基础性变化-functional-transforms)
+  - [6.1. 类型转换](#61-类型转换)
+    - [6.1.1. pil_to_tensor](#611-pil_to_tensor)
+    - [6.1.2. convert_image_dtype](#612-convert_image_dtype)
+  - [6.2. Scrpit and Compositions](#62-scrpit-and-compositions)
+  - [6.3. Transforms on only 特定函数](#63-transforms-on-only-特定函数)
 
+# 1. torchvision
 
 包含用于计算机视觉的流行数据集，模型架构和常见图像转换   
 
@@ -241,6 +268,7 @@ def sscd_loader(path):
 会将切割下来的图像部分返回, 原图像不受改变  
 * CenterCrop(size)      : 中心
 * FiveCrop(size)        : 经典的 4个角落加中心 
+* TenCrop(size, vertical_flip=False)
 * RandomCrop
 
 ```py
@@ -263,8 +291,9 @@ torchvision.transforms.FiveCrop(size)
 ### 5.2.3. 噪点
 
 * GaussianBlur(kernel_size, sigma=(0.1, 2.0))
-
-* TenCrop(size, vertical_flip=False)
+* 参数:
+    - kernel_size : int or (kx,ky) 高斯模糊的核的大小
+    - sigma       : float or (min,max), 指定要被用于模糊的标准差, 
 
 ### 5.2.4. 几何变换
 
@@ -281,6 +310,11 @@ torchvision.transforms.FiveCrop(size)
     * 只有四个值的时候 才有垂直 shear (n3,n4)
 
 * RandomPerspective(distortion_scale=0.5, p=0.5, interpolation=2, fill=0)
+投影变换, 这个变换可以设置应用概率
+
+* destortion_scale : (float) 0~1 , 代表扭曲的程度
+* inerploation     : 一个整数代表插值的类型, 例如 `Nearest Bilinear`
+* fill             : 填入空白位置的像素, 这里的 fill 可以是多通道的元组
 
 
 
@@ -293,7 +327,7 @@ torchvision.transforms.FiveCrop(size)
 写法和 Compose 有点类似, 但是多了一个 p 参数  
 
 
-### 还没看的
+### 5.2.7. 还没看的
 
 * Grayscale(num_output_channels=1)
 * Pad(padding, fill=0, padding_mode='constant')

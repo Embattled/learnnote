@@ -41,7 +41,7 @@ C 和 C++ 的基础知识以及编译器知识
 1. [Grammar and feature](cpp/note/cpp.md)   : The C and C++ grammar and feature, like new feature in c++11.
 2. [Makefile](cpp/note/makefile.md) : The basic syntax of makefile.
 3. [GCC ](/cpp/note/gcc.md)   : The usage of gcc compiler and gdb debugger.
-4. [and GDB]
+4. [GDB](cpp/note/gdb.md) : The usage of GDB.
 5. [HPC](cpp/note/hpc.md)   : The basic knowledge of openmp and mpi.
 
 ## 3.3. Third-Party Libary
