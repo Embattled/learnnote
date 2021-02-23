@@ -149,7 +149,7 @@ plt.xticks([])
 ## 2.2. Annotations
 
 为图片添加注释
-* `matplotlib.pyplot.annotate(text, xy, *args, **kwargs)`  
+* `matplotlib.pyplot.annotate(text, xy, *ara, **kwargs)`  
 
 参数说明: 
 * text : str  , 标注的文字 , 必须参数

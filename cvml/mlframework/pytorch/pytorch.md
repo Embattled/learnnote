@@ -159,28 +159,18 @@ To create a tensor with similar type but different size as another tensor, use t
 
 用随机数来填充一个 tensor , 是与 createion ops 独立开来的
 
-### 2.5.1. 种子操作
+### 2.5.1. 随机张量生成
 
-seed   :Sets the seed for generating random numbers to a non-deterministic random number.
-
-manual_seed   :Sets the seed for generating random numbers.
-
-initial_seed   :Returns the initial seed for generating random numbers as a Python long.
-
-get_rng_state   :Returns the random number generator state as a torch.ByteTensor.
-
-set_rng_state   :Sets the random number generator state.
-
-
-### 2.5.2. 随机张量生成
-
-* torch.rand(size)
-* torch.randint(low=0, high, size)
-* torch.randn(size)
+* torch.rand(size)                  随机数 0~1 平均分布
+* torch.randint(low=0, high, size)  随机整数, 指定区间, 平均分布
+* torch.randn(size)                 随机标准分布, 均值 0, 方差 1
+* torch.normal(mean, std)           随机标准分布, 均值方差手动指定
+* torch.randperm(n)                 随机 0~n-1 的排列组合 
 
 ```py
 # 统一参数
 
+#oout     : 除了返回值外, 还可以直接将创建的 tensor 赋值给另一个 tensor
 # dtype   : 指定数据类型
 # device  : 指定设备
 
@@ -197,6 +187,18 @@ torch.randint(low=0, high, size, *, generator=None, out=None, dtype=None, layout
 # 随机标准分布
 torch.randn(*size, *, out=None, dtype=None, layout=torch.strided, device=None, requires_grad=False) → Tensor
 ```
+### 2.5.2. 种子操作
+
+seed   :Sets the seed for generating random numbers to a non-deterministic random number.
+
+manual_seed   :Sets the seed for generating random numbers.
+
+initial_seed   :Returns the initial seed for generating random numbers as a Python long.
+
+get_rng_state   :Returns the random number generator state as a torch.ByteTensor.
+
+set_rng_state   :Sets the random number generator state.
+
 
 
 ## 2.6. 拼接与截取
@@ -240,8 +242,6 @@ torch.randn(*size, *, out=None, dtype=None, layout=torch.strided, device=None, r
 和存储相关, 将各种模型, 张量, 字典等数据类型序列化后存储到文件, 或者从文件中读取  
 
 pytorch 的load()使用 pickle 模组, 不要轻易unpick不信任的序列数据  
-
-
 
 ```py
 torch.save(

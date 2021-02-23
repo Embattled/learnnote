@@ -52,3 +52,5 @@ Android NDK 在 Changelog 中提到：
     * 从 r13 起，默认使用 Clang 进行编译, Google 会一直等到 libc++ 足够稳定后再删掉 GCC
     * 在 r17 中宣称不再支持 GCC 并在后续的 r18 中删掉 GCC
 
+
+# 2. Start Clang
