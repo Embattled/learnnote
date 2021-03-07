@@ -21,8 +21,7 @@
   - [4.1. pair 例外](#41-pair-例外)
   - [4.2. stack](#42-stack)
   - [4.3. queue](#43-queue)
-    - [4.3.1. 普通 queue](#431-普通-queue)
-    - [4.3.2. priority_queue](#432-priority_queue)
+  - [4.3.2. priority_queue](#432-priority_queue)
 - [5. array 升级的数组](#5-array-升级的数组)
   - [5.1. 安全的访问](#51-安全的访问)
   - [5.2. array使用方法总结](#52-array使用方法总结)
@@ -582,7 +581,6 @@ std::stack<int, std::list<int>> my_stack(my_stack1);
 
 ## 4.3. queue
 
-### 4.3.1. 普通 queue
 和 stack 栈容器适配器不同，queue 容器适配器有 2 个开口，其中一个开口专门用来输入数据，另一个专门用来输出数据  
 最先进入 queue 的元素，也可以最先从 queue 中出来，  
 即用此容器适配器存储数据具有“先进先出（简称 "FIFO" ）”的特点，因此 queue 又称为队列适配器。  
@@ -621,12 +619,26 @@ while (!my_queue.empty())
 }
 ```
 
-### 4.3.2. priority_queue
+## 4.3.2. priority_queue
 
-和queue有几点不同
+和queue有几点不同, 且构造函数非常复杂
 1. 只能访问 priority_queue 中位于队头的元素
 2. 只能“从一端进（称为队尾），从另一端出（称为队头）
-3. 不是 “First in,First out”（先入先出）原则，而是“First in，Largest out”原则
+3. 不是 “First in,First out”（先入先出）原则，而是 `First in，Largest out` 原则
+4. 提供常数时间的 `最大` 元素查找
+
+
+**成员函数**
+* 元素访问
+  * top()
+* 容量
+  * empty()
+  * size()
+* 修改元素
+  * push()
+  * emplace() `C++11`
+  * pop()
+  * swap()
 
 ```cpp
 // T：指定存储元素的具体类型
@@ -637,26 +649,28 @@ template <typename T,
       typename Compare=std::less<T> >
 class priority_queue{
   //......
-}
 
+}
 // 初始化的数组或容器中的数据不需要有序，priority_queue 会自动对它们进行排序。
 std::priority_queue<int> values;
 
-// 成员函数：
-// 元素访问
-top()
 
-// 容量
-empty()
-size()
+// 构造函数解析
 
-// 更改内容
-push()
-emplace()
-pop()
-swap()
+// 1. 默认构造函数
+priority_queue() : priority_queue(Compare(), Container()) { }
 
+// 2. C++11 用 compare 的内容复制构造比较函数 cmp
+explicit priority_queue(const Compare& compare)
+        : priority_queue(compare, Container()) { }
+
+// 3. 用 cont 的内容复制构造底层容器, 然后传入 compare 比较函数
+priority_queue( const Compare& compare, const Container& cont );
+
+// 4. 用move移动构造底层容器, 然后调用 compare 进行比较
+priority_queue( const Compare& compare, Container&& cont );
 ```
+
 
 
 

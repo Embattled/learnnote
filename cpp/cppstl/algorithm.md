@@ -11,7 +11,7 @@
 * 使用算法函数编写的程序，可扩展性更强，更容易维护；
 
 
-# 2. Non-modifying sequence operations 
+# 2. Non-modifying sequence operations 非修改序列操作
 
 ## 2.1. std::find std::find_if std::find_if_not
 
@@ -152,7 +152,7 @@ bool all_of(InputIt first, InputIt last, UnaryPredicate p)
 * none_of 必须所有元素的 p(v) 都返回 false, 函数才会返回 true, 如果 range 为空也返回 true
 
 
-# 3. Modifying sequence operations 
+# 3. Modifying sequence operations 修改序列操作
 
 ## 3.1. std::transform
 
@@ -324,7 +324,7 @@ int main()
 
 ```
 
-# 4. Sorting operations 
+# 4. Sorting operations 排序
 
 STL 有很多排序算法, 用于适用不同的应用场景  
 
@@ -529,7 +529,7 @@ public:
 换句话说，如果我们试图将一个函数作为参数进行传递，编译器会隐式地将它转换成一个指向该函数的指针，并将该指针传递过去。  
 
 
-# 5. 二分查找 Binary Search Operations (On sorted ranges)
+# 5. 二分查找 Binary Search Operations (On sorted ranges) 二分查找
 
 
 * 注意自定义 comp 的使用规则
@@ -588,3 +588,7 @@ template< class ForwardIt, class T, class Compare >
 constexpr bool binary_search( ForwardIt first, ForwardIt last, const T& value, Compare comp );
 
 ```
+
+
+# Heap operations 对操作
+

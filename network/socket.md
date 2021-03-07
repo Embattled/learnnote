@@ -15,7 +15,6 @@
   * `read() write()`
   * `close()`
 
-
 ## 1.2. Windows
 
 * Windows 会区分 socket 和文件
@@ -83,6 +82,17 @@ WSAStartup( MAKEWORD(2, 2), &wsaData);
 
 # 2. socket 编程
 
+标准的TCP通信流程:
+1. 服务器
+   1. 创建 socket
+   2. socket 绑定本地ip和端口
+   3. socket 开启监听
+   4. 接受客户端请求并获得链接socket
+   5. 通过链接socket通信
+2. 客户端
+   1. 创建 socket
+   2. socket 发起连接
+   3. 通信
 
 ## 2.1. 创建 socket
 
@@ -120,14 +130,16 @@ returnValue udp_socket = socket(AF_INET, SOCK_DGRAM, 0);  //创建UDP套接字
 
 ```
 
-## 2.2. 端口绑定 bind
+## 2.2. bind/connect
 
-* 创建好 socket 后, 需要将其绑定到本机的 ip 以及 port 上
+* 创建好 socket 后, 需要将其绑定到对应的 ip 以及 port 上
 * 这样流经该port的数据才能被程序所接收到
 * 对于流传输(TCP)
-  * 服务端用 bind() 绑定
-  * 客户端用 connect() 建立连接
+  * 服务端用 bind() 绑定本机ip以及port, 绑定后还需要开启监听, 然后接受连接
+  * 客户端用 connect() 即可直接向服务器发起连接请求
 * `connect()` 用于建立链接, 所有参数都和 `bind()` 相同
+  * 服务器 bind() 绑定的是服务器自身的 ip 和 port
+  * 客户端 connect() 输入的同样是服务器的 ip 和 port 
 
 
 总结:
@@ -143,6 +155,7 @@ returnValue udp_socket = socket(AF_INET, SOCK_DGRAM, 0);  //创建UDP套接字
 int bind(   int sock,       struct sockaddr *addr, socklen_t addrlen);  //Linux
 int bind(SOCKET sock, const struct sockaddr *addr, int addrlen);  //Windows
 
+// 客户端调用 connect 后直接使用传入的 socket 进行通信
 int connect(int sock, struct sockaddr *serv_addr, socklen_t addrlen);  //Linux
 int connect(SOCKET sock, const struct sockaddr *serv_addr, int addrlen);  //Windows
 
@@ -156,7 +169,7 @@ struct sockaddr_in{
 };
 // 1. sin_family 地址类型, 和 socket 函数的第一的参数需要保持一致
 // 2. sin_port   端口号, 理论上 0~65535 取值, 传入的时候需要使用 htons() 进行转换
-// 3. sin_addr   in_addr的结构体 用于指定地址的结构体
+// 3. sin_addr   in_addr的结构体 用于指定地址的结构体, 传入的时候需要 inet_addr() 进行转化
 // 4. sin_zero[8]纯粹多余的8个字节, 一般填充0, 可用 memset先给整个结构体填充0再复制
 
 // sockaddr 结构体原型
@@ -177,15 +190,26 @@ struct in_addr{
 };
 in_addr_t ip = inet_addr("127.0.0.1");
 
+
+//绑定套接字例
+sockaddr_in sockAddr;
+memset(&sockAddr, 0, sizeof(sockAddr));             //每个字节都用0填充
+sockAddr.sin_family = PF_INET;                      //使用IPv4地址
+
+//具体的IP地址和端口, 都需要使用转换函数
+sockAddr.sin_addr.s_addr = inet_addr("127.0.0.1");  
+sockAddr.sin_port = htons(1234);  //端口
+bind(servSock, (SOCKADDR*)&sockAddr, sizeof(SOCKADDR));
 ```
 
-## 开始监听 listen
+## 2.3. 服务器开始监听 listen
 
 * 通过 listen() 函数可以让套接字进入被动监听状态
 * 被动监听即: 没有客户端请求时, 套接字处于睡眠状态, 而收到客户端请求时会唤醒
 * 客户端的请求会形成请求队列 (Request Queue)
   * 前一个客户端请求正在处理的时候, 新的请求会进入缓冲区
   * 缓冲区的长度就是在 `listen()` 中指定的, 通过 `backlog` 来指定长度
+  * `backlog` 可以设置成 `SOMAXCONN`, 即根据系统决定的最大的队列长度
 
 
 ```cpp
@@ -197,3 +221,185 @@ int listen(SOCKET sock, int backlog);  //Windows
 
 ```
 
+## 2.4. 服务器接受请求
+
+* 开始监听后, 既可以通过 accept() 来接受客户端请求
+* 注意该函数是阻塞的, 一旦运行就会持续到连接完成  
+* 该函数会返回一个`新的套接字`, 专门用来和客户端通信
+* 该函数的参数 `sock` 是客户端的套接字
+* 该函数的参数 `addr` 会保存请求客户端的 ip和端口号
+
+```cpp
+
+// 该函数的参数从声明上看和 bind() 以及 connect 基本
+// 但是 bind() 传入的 addr 是本机的ip和地址, 是向函数输入信息
+// 而 accept() 传入的 addr 在函数执行后会保存客户端的信息, 是函数输出信息
+// 最后一个参数 len, bind() 传入的是值, 而 accept() 传入的是地址
+
+int accept(int sock, struct sockaddr *addr, socklen_t *addrlen);  //Linux
+SOCKET accept(SOCKET sock, struct sockaddr *addr, int *addrlen);  //Windows
+
+```
+## 2.5. 传送数据 
+
+**根据系统的不同, 传输数据用的函数也不同:**
+* Linux 由于不区分套接字和普通文件
+  * write() 直接向套接字中写入数据
+  * read()  从套接字中读取通信
+* Windows 区分了套接字为单独的结构体
+  * send() 发送数据
+  * recv() 接收数据
+
+```cpp
+
+// Linux
+ssize_t write(int fd, const void *buf, size_t nbytes);
+ssize_t read(int fd, void *buf, size_t nbytes);
+// size_t 是 unsigned int, ssize_t 是 int
+// 1. fd      即要写入/读取的文件的描述符, 网络通信中即套接字
+// 2. *buf    写入/读取数据的缓冲区地址
+// 3. nbytes  写入/读取数据的字节数
+// write() 会返回成功写入的字节数, 失败则返回 -1
+// read()  会返回成功读到的字节数, 失败则返回 -1
+
+
+// Windows
+int send(SOCKET sock, const char *buf, int len, int flags);
+int recv(SOCKET sock, char *buf, int len, int flags);
+
+// 前三个参数同 linux 中的一致
+// sock   套接字结构体
+// buf    要发送的数据地址或者要接受的数据的缓冲区地址
+// len    长度
+// flags  发送数据时的选项, 一般置 0
+```
+
+## 关闭连接
+
+* linux   : close()
+* windows : closesocket()
+
+* 服务端调用closesocket() 不仅会关闭服务器端的 socket, 还会通知客户端连接已断开, 客户端也会清理 socket 相关资源 (系统被动的)
+* 因此客户端传入 connect() 的参数socket 不能重复利用
+
+# 3. 源码
+
+
+## 3.1. windows 下的回声程序
+
+
+服务器端:
+```cpp
+
+#include <stdio.h>
+#include <winsock2.h>
+
+//加载 ws2_32.dll
+#pragma comment (lib, "ws2_32.lib") 
+
+#define BUF_SIZE 100
+
+int main(){
+    // 初始化
+    WSADATA wsaData;
+    WSAStartup( MAKEWORD(2, 2), &wsaData);
+
+    //创建流式套接字, 最后一个参数输入 0 即可
+    SOCKET servSock = socket(AF_INET, SOCK_STREAM, 0);
+
+    // 地址族
+    sockaddr_in sockAddr;
+    memset(&sockAddr, 0, sizeof(sockAddr));             //每个字节都用0填充
+    sockAddr.sin_family = PF_INET;                      //使用IPv4地址
+    
+    //具体的IP地址和端口, 都需要使用转换函数
+    sockAddr.sin_addr.s_addr = inet_addr("127.0.0.1");  
+    sockAddr.sin_port = htons(1234);  //端口
+    //绑定套接字
+    bind(servSock, (SOCKADDR*)&sockAddr, sizeof(SOCKADDR));
+
+    //进入监听状态
+    listen(servSock, 20);
+
+    //接收客户端请求
+    SOCKADDR clntAddr;
+    int nSize = sizeof(SOCKADDR);
+    SOCKET clntSock = accept(servSock, (SOCKADDR*)&clntAddr, &nSize);
+    char buffer[BUF_SIZE];  //缓冲区
+
+    while(1){
+        SOCKET clntSock = accept(servSock, (SOCKADDR*)&clntAddr, &nSize);
+        int strLen = recv(clntSock, buffer, BUF_SIZE, 0);  //接收客户端发来的数据
+        send(clntSock, buffer, strLen, 0);  //将数据原样返回
+        closesocket(clntSock);  //关闭套接字
+        memset(buffer, 0, BUF_SIZE);  //重置缓冲区
+
+    }
+
+    //Windows 下的关闭套接字
+    closesocket(servSock);
+
+    //终止 DLL 的使用
+    WSACleanup();
+
+    return 0;
+}
+
+```
+
+
+客户端:
+```cpp
+#include <stdio.h>
+#include <stdlib.h>
+#include <WinSock2.h>
+#pragma comment(lib, "ws2_32.lib")  //加载 ws2_32.dll
+
+#define BUF_SIZE 100
+
+int main(){
+    //初始化DLL
+    WSADATA wsaData;
+    WSAStartup(MAKEWORD(2, 2), &wsaData);
+
+    //填写端口和地址
+    sockaddr_in sockAddr;
+    memset(&sockAddr, 0, sizeof(sockAddr));  //每个字节都用0填充
+    sockAddr.sin_family = PF_INET;
+    sockAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    sockAddr.sin_port = htons(1234);
+
+    // 缓冲区
+    char bufSend[BUF_SIZE] = {0};
+    char bufRecv[BUF_SIZE] = {0};
+
+    while(1){
+      //创建套接字
+      SOCKET sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+      // 发起连接请求, 返回连接套接字
+      connect(sock, (SOCKADDR*)&sockAddr, sizeof(SOCKADDR));
+      //获取用户输入的字符串并发送给服务器
+      printf("Input a string: ");
+      scanf("%s", bufSend);
+
+      //发送数据
+      send(sock, bufSend, strlen(bufSend), 0);
+      //接收服务器传回的数据
+      recv(sock, bufRecv, BUF_SIZE, 0);
+
+      //输出接收到的数据
+      printf("Message form server: %s\n", bufRecv);
+
+      memset(bufSend, 0, BUF_SIZE);  //重置缓冲区
+      memset(bufRecv, 0, BUF_SIZE);  //重置缓冲区
+      //关闭套接字
+      closesocket(sock);
+    }
+
+    //终止使用 DLL
+    WSACleanup();
+
+    system("pause");
+    return 0;
+}
+```
