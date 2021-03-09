@@ -202,7 +202,7 @@ string s10(str,1);
 ### 2.3.1. 字符串转整数
 
 和C语言风格的函数 `ato*()` 和 `strto*`  不同  
-C++风格的函数为 `sto*()`   
+C++风格的函数为 `sto*()`   `stio stol stoll stoul stoull`
 
 ```cpp
 #include <string> //string 头文件
@@ -239,9 +239,6 @@ wstring to_wstring (int val);
 
 
 ```
-
-
-stio stol stoll stoul stoull
 ## 2.4. 关于子字符串的操作
 ```cpp
 //获得子函数, pos 开始位置, 默认截取到字符串尾
@@ -290,13 +287,13 @@ find_last_not_of
 * `<cctype>  "ctype.h"`
 * `cstdlib`  C原生 字符串和数字转换的函数定义在了该头文件 
 
-
-
 `string.h` 头文件定义了 `NULL` 空指针和 `size_t` 数据大小类型  
 按照功能可以分成三类:
 1. 字符串操作函数
 2. 字符串非操作函数
 3. 内存操作函数
+
+**注意, 字符串转数字的库函数定义在了cstdlib中而非cstring**
 
 ## 3.1. 字符串操作 string manipulation
 

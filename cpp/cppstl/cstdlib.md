@@ -6,7 +6,8 @@ This header provides miscellaneous utilities.
 Symbols defined here are used by several library components.   
 
 
-### 1.0.1. 随机数生成
+# 2. Functions 函数
+## 2.1. 随机数生成
 
 所有和计算机有关的随机都是数学意义上的伪随机,真正的随机基本都是基于物理上的分子熵增,白噪声等因素作为种子来生成随机数  
 
@@ -24,7 +25,7 @@ std::cout << "Random value on [0 " << RAND_MAX << "]: " << random_variable << '\
 ```
 
 
-### 1.0.2. 字符串转换成数字类型
+## 2.2. Numeric string conversion  字符串转换成数字类型
 
 因为是C语言库, 函数参数都是 `const char * str`  
 
