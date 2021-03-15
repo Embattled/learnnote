@@ -1,6 +1,6 @@
 # 1. Docker 
 
-* Docker 是一个开源的应用容器引擎，基于 Go 语言 并遵从 Apache2.0 协议开源
+* Docker 是一个开源的应用容器引擎，基于 `Go` 语言 并遵从 Apache2.0 协议开源
 * 适合运维工程师及后端开发人员, 用于开发，交付和运行应用程序的开放平台。
 * Docker 可以让开发者打包他们的应用以及依赖包到一个轻量级、可移植的容器中，然后发布到任何流行的 Linux 机器上
 * 容器是完全使用沙箱机制，相互之间不会有任何接口（类似 iPhone 的 app）,更重要的是容器性能开销极低
@@ -42,20 +42,48 @@
 2. 使用远程API来管理和创建Docker容器
 3. Docker 容器通过 Docker 镜像来创建
 
-## 1.3. 安装
+## 1.3. 安装 Ubuntu
 
 * apt 里能搜到的 `docker.io` 是旧版本, 不要安装
+  * 卸载已有的版本 `$ sudo apt remove docker docker-engine docker.io containerd runc` 
+  * docker 的文件库是 `/var/lib/docker/`  如果想清洁安装的话可以删除掉该文件夹
 
-官方安装步骤:  
-1. 卸载已有的版本 `$ sudo apt-get remove docker docker-engine docker.io containerd runc` 
-2. docker 的文件库是 `/var/lib/docker/`  如果想清洁安装的话可以删除掉该文件夹
+### 通过仓库安装 docker
 
+0. 添加docker 的 apt 公钥
+   * `sudo apt-key adv --recv-keys --keyserver keyserver.Ubuntu.com F273FCD8 `
+1. 设置仓库
+   1. 安装 apt 的相关依赖, 使得允许 `apt 通过 http 来使用一个仓库`
+      * sudo apt-get update
+      * sudo apt-get install 
+        * apt-transport-https
+        * ca-certificates
+        * curl
+        * gnupg
+        * lsb-release
+   2. Add Docker’s official GPG key
+      * `curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg`
+   3. 设置 stable(稳定版) 仓库
+      * 在 `stable` 后面添加 `nightly` or `test` 可以获取测试版
+      * `命令不复制了`
+2. 安装 docker 引擎
+   1. 先更新 apt index
+      * `sudo apt-get update`
+   2. 安装最新版的 docker engine
+      * `sudo apt-get install docker-ce docker-ce-cli containerd.io`
+
+
+
+### 通过 docker repository
+* 在一台新主机上先设置 docker repository
+* 在仓库中可以进行 Docker 的安装和更新
+
+1. 
 
 ## 1.4. storage driver
 
 storage driver 和 file system 不是同一个东西. 存储驱动是在文件系统之上创建的, 可以使用的存储驱动和文件系统有关:  
     例: `btrfs` 只能在文件系统为 `btrfs` 上的主机上使用
-
 
 docker支持许多存储驱动, 在 `Ubuntu`下支持 : `overlay2, aufs, btrfs`  
 使用`docker info` 可以查看当前所使用的存储驱动   
@@ -77,26 +105,8 @@ docker支持许多存储驱动, 在 `Ubuntu`下支持 : `overlay2, aufs, btrfs`
   * 在Linux2.6内核中被并入内核
   * docker 在 `RedHat` 系中默认使用 `device mapper`。
 * overlayfs : 与AUFS相似，也是一种联合文件系统(union filesystem)
+  * 当前默认的
   * 设计更简单, 被加入Linux3.18版本内核, 可能更快
   * 在Docker社区中获得了很高的人气，被认为比AUFS具有很多优势。
   * 但它还很年轻，在成产环境中使用要谨慎。
 
-
-■参加条件
-- 学生であること (学部/修士/博士)
-- 学校やアルバイト、趣味などでプログラミングの経験があること
-- ハンズオン受講までにDockerの初歩的なコマンド、Dockerfileの
-　役割・書き方について概要を理解できていること
--　参考文献はこちらです:
-- [公式チュートリアルサイト](https://docs.docker.com/get-started/)
-- 英語で書かれていますが、取り組みづらい場合はやってみた系の記事が
-　Google検索できます
-- [Play with Docker](https://labs.play-with-docker.com/)
-- ブラウザでDockerを試せるサイトです
-　※Dockerへユーザ登録が必要ですが無料で登録可能です
-- https://hub.docker.com/signup/ ※ユーザ登録はこちらから可能です
-- [おすすめ書籍 イラストでわかる DockerとKubernetes]　　　　
-　(https://gihyo.jp/book/2020/978-4-297-11837-2)
-- [おすすめ書籍 Kubernetes完全ガイド]
-　(https://book.impress.co.jp/books/1118101055)
-- Google検索で"Dockerとは" "k8sとは"と検索する， などなど

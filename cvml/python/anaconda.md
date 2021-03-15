@@ -214,7 +214,6 @@ conda create --name python38 python=3.8
 conda create -n python3 python=3.5 numpy pandas
 # 不指定python版本的话则会安装与 anaconda　版本相同的　python 版本
 
-
 # 复制一个环境
 conda create --name <new_env_name> --clone <copied_env_name>
 
