@@ -503,8 +503,6 @@ systemd 默认读取 `/etc/systemd/system `下的配置文件,该目录下的文
 代表四种`Unit`  
 
 
-
-
 ### 4.2.2. 命令综述
 
 `systemctl –-version`  查看版本  
@@ -615,7 +613,7 @@ Type=hugetlbfs
 
 ### 4.3.6. 编写开机启动rc.local
 
-查看`/lib/systemd/system/rc.local.server`,默认会缺少`Install`段,显然这样配置是无效的  
+查看`/lib/systemd/system/rc-local.server`,默认会缺少`Install`段,显然这样配置是无效的  
 
 ```shell
 # rc.local.server的Unit段, 可以看到会执行 /etc/rc.local

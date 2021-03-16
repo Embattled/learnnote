@@ -1,4 +1,20 @@
-# 1. Docker 
+- [1. Start Docker](#1-start-docker)
+  - [1.1. 基本介绍](#11-基本介绍)
+  - [1.2. Docker 架构基本概念](#12-docker-架构基本概念)
+  - [1.3. 安装 Ubuntu](#13-安装-ubuntu)
+    - [1.3.1. 通过仓库安装 docker](#131-通过仓库安装-docker)
+    - [1.3.2. 运行权限](#132-运行权限)
+  - [1.4. storage driver](#14-storage-driver)
+- [2. Docker App](#2-docker-app)
+  - [2.1. Dockerfile](#21-dockerfile)
+  - [2.2. build](#22-build)
+  - [image container](#image-container)
+  - [tag](#tag)
+  - [Docker repo](#docker-repo)
+  - [2.3. Docker 运行命令](#23-docker-运行命令)
+    - [运行镜像](#运行镜像)
+    - [进程管理](#进程管理)
+# 1. Start Docker 
 
 * Docker 是一个开源的应用容器引擎，基于 `Go` 语言 并遵从 Apache2.0 协议开源
 * 适合运维工程师及后端开发人员, 用于开发，交付和运行应用程序的开放平台。
@@ -48,7 +64,7 @@
   * 卸载已有的版本 `$ sudo apt remove docker docker-engine docker.io containerd runc` 
   * docker 的文件库是 `/var/lib/docker/`  如果想清洁安装的话可以删除掉该文件夹
 
-### 通过仓库安装 docker
+### 1.3.1. 通过仓库安装 docker
 
 0. 添加docker 的 apt 公钥
    * `sudo apt-key adv --recv-keys --keyserver keyserver.Ubuntu.com F273FCD8 `
@@ -71,14 +87,16 @@
       * `sudo apt-get update`
    2. 安装最新版的 docker engine
       * `sudo apt-get install docker-ce docker-ce-cli containerd.io`
+   3. 这样安装的话使用 apt upgrade 即可进行升级
 
+### 1.3.2. 运行权限
 
-
-### 通过 docker repository
-* 在一台新主机上先设置 docker repository
-* 在仓库中可以进行 Docker 的安装和更新
-
-1. 
+* docker's daemon 是通过 Unix socket 来实现的, 而非 TCP port
+* 而 Unix socket 是属于 root, 因此一般的用户执行 docker 命令需要 sudo
+* 如果不想加 `sudo`, 可以创建一个名为 `docker`的用户组, docker会自动将权限赋予该用户组的用户
+  * `sudo groupadd docker`
+  * `sudo usermod -aG docker $USER`
+  * `newgrp docker` 该命令用来刷新用户组的信息
 
 ## 1.4. storage driver
 
@@ -109,4 +127,71 @@ docker支持许多存储驱动, 在 `Ubuntu`下支持 : `overlay2, aufs, btrfs`
   * 设计更简单, 被加入Linux3.18版本内核, 可能更快
   * 在Docker社区中获得了很高的人气，被认为比AUFS具有很多优势。
   * 但它还很年轻，在成产环境中使用要谨慎。
+
+
+# 2. Docker App
+
+## 2.1. Dockerfile
+
+* `Dockerfile` 是一个文本文件脚本, 用于创建一个容器镜像(注意没有文件后缀), 放在项目的根目录
+
+
+## 2.2. build
+
+* 使用 `docker build [flags] dockerfile路径` 来创建 docker container
+  * `-t 项目名` 用于指定该镜像的名称
+```
+FROM node:12-alpine
+WORKDIR /app
+COPY . .
+RUN yarn install --production
+CMD ["node", "src/index.js"]
+```
+
+## image container
+
+image 和 container 相关的命令比较类似
+
+* `docker image ls` 可以用来查看本机当前拥有的 image 以及对应的 tag
+* `docker image rm [imageName]` 用来删除一个 image
+
+* `docker container ls -l` 列出本机正在运行的容器
+* `docker container ls -l --all` 列出本机所有容器，包括终止运行的容器：
+* `docker container rm [containerID]` 删除一个容器
+## tag
+
+* `docker tag 旧名字 新名字` 用来给一个 image 赋予新的名字
+* 新旧名字会同时存在, 但是都指向同一个 image, ID 是相同的
+
+## Docker repo
+
+* `Docker Hub` 是 docker image 的标准 registry
+* 在 Docker Hub 中先创建好仓库后, 可以得到推送命令
+  * `docker push 用户名/镜像名:tagname`
+  * 注意 `用户名/镜像名` 是完整的镜像名, 必须确保 image 有这个名字
+  * 否则需要用 `tag` 命令来添加新的命名
+
+* 通过命令行使用推送必须在本机进行登录
+* `docker login -u 用户名` 然后输入密码
+  * 登录信息会储存, 不需要重复输入
+
+
+## 2.3. Docker 运行命令
+
+### 运行镜像
+* 使用 `docker run [OPTIONS] IMAGE [COMMAND] [ARG...]` 在本机的 docker engine 上运行一个镜像, 此时会创建一个容器
+  * `docker run -dp 3000:3000 getting-started`
+  * 使用 flags 来进行特殊设置
+    * `-d` `detached mode` 运行程序, 即后台运行
+    * `-p xx:xx ` 端口映射  `host:container`
+* 容器可以关闭, 再次启动时不能用`run`
+  * 使用命令 `docker start [OPTIONS] CONTAINER [CONTAINER...]`
+  * 
+
+### 进程管理
+
+* `docker ps`         类似于系统的同名命令, 显示所有正在运行的 docker 容器
+* `docker stop [id]`  停止一个 docker 容器
+* `docker rm <id>`    永久删除一个 docker 容器
+  * 可以通过 `rm -f` 来直接停止并删除正在运行的容器
 
