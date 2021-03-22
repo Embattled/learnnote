@@ -8,12 +8,12 @@
 - [2. Docker App](#2-docker-app)
   - [2.1. Dockerfile](#21-dockerfile)
   - [2.2. build](#22-build)
-  - [image container](#image-container)
-  - [tag](#tag)
-  - [Docker repo](#docker-repo)
-  - [2.3. Docker 运行命令](#23-docker-运行命令)
-    - [运行镜像](#运行镜像)
-    - [进程管理](#进程管理)
+  - [2.3. image container](#23-image-container)
+  - [2.4. tag](#24-tag)
+  - [2.5. Docker repo](#25-docker-repo)
+  - [2.6. Docker 运行命令](#26-docker-运行命令)
+    - [2.6.1. 运行镜像](#261-运行镜像)
+    - [2.6.2. 进程管理](#262-进程管理)
 # 1. Start Docker 
 
 * Docker 是一个开源的应用容器引擎，基于 `Go` 语言 并遵从 Apache2.0 协议开源
@@ -134,12 +134,7 @@ docker支持许多存储驱动, 在 `Ubuntu`下支持 : `overlay2, aufs, btrfs`
 ## 2.1. Dockerfile
 
 * `Dockerfile` 是一个文本文件脚本, 用于创建一个容器镜像(注意没有文件后缀), 放在项目的根目录
-
-
-## 2.2. build
-
-* 使用 `docker build [flags] dockerfile路径` 来创建 docker container
-  * `-t 项目名` 用于指定该镜像的名称
+* 
 ```
 FROM node:12-alpine
 WORKDIR /app
@@ -148,7 +143,13 @@ RUN yarn install --production
 CMD ["node", "src/index.js"]
 ```
 
-## image container
+## 2.2. build
+
+* 使用 `docker build [flags] dockerfile路径` 来创建 docker container
+  * `-t 项目名` 用于指定该镜像的名称
+
+
+## 2.3. image container
 
 image 和 container 相关的命令比较类似
 
@@ -158,27 +159,28 @@ image 和 container 相关的命令比较类似
 * `docker container ls -l` 列出本机正在运行的容器
 * `docker container ls -l --all` 列出本机所有容器，包括终止运行的容器：
 * `docker container rm [containerID]` 删除一个容器
-## tag
+## 2.4. tag
 
 * `docker tag 旧名字 新名字` 用来给一个 image 赋予新的名字
 * 新旧名字会同时存在, 但是都指向同一个 image, ID 是相同的
 
-## Docker repo
+## 2.5. Docker repo
 
 * `Docker Hub` 是 docker image 的标准 registry
+* 通过命令行使用推送必须在本机进行登录
+* `docker login -u 用户名` 然后输入密码
+  * 登录信息会储存, 不需要重复输入
+  
 * 在 Docker Hub 中先创建好仓库后, 可以得到推送命令
   * `docker push 用户名/镜像名:tagname`
   * 注意 `用户名/镜像名` 是完整的镜像名, 必须确保 image 有这个名字
   * 否则需要用 `tag` 命令来添加新的命名
-
-* 通过命令行使用推送必须在本机进行登录
-* `docker login -u 用户名` 然后输入密码
-  * 登录信息会储存, 不需要重复输入
+  * tagname 默认是 `latest`
 
 
-## 2.3. Docker 运行命令
+## 2.6. Docker 运行命令
 
-### 运行镜像
+### 2.6.1. 运行镜像
 * 使用 `docker run [OPTIONS] IMAGE [COMMAND] [ARG...]` 在本机的 docker engine 上运行一个镜像, 此时会创建一个容器
   * `docker run -dp 3000:3000 getting-started`
   * 使用 flags 来进行特殊设置
@@ -188,7 +190,7 @@ image 和 container 相关的命令比较类似
   * 使用命令 `docker start [OPTIONS] CONTAINER [CONTAINER...]`
   * 
 
-### 进程管理
+### 2.6.2. 进程管理
 
 * `docker ps`         类似于系统的同名命令, 显示所有正在运行的 docker 容器
 * `docker stop [id]`  停止一个 docker 容器

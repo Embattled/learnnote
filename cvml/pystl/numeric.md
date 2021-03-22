@@ -1,21 +1,22 @@
-# Numeric and Mathematical Modules
+# 1. Numeric and Mathematical Modules
 
 Python 也提供了与数字和数学相关的一系列标准库  
 
+* `random` 提供了常用的伪随机数生成功能
 * `numbers` 定义了抽象的分级数值类型
 * `cmath math` 包括了多种数学运算, 包括浮点数和复数
 * `decimal` 提供了十进制数的拓展表示方法
 
 
-# random — Generate pseudo-random numbers
+# 2. random — Generate pseudo-random numbers
 
 该模组提供了伪随机数的生成器  
 
 
-## 生成器
+## 2.1. 生成器
 
 
-### 整数生成
+### 2.1.1. 整数生成
 
 
 *  random.randrange(stop)
@@ -28,4 +29,4 @@ Python 也提供了与数字和数学相关的一系列标准库
 *  random.getrandbits(k)
 返回一个由 k 个随机bit 生成的非负整数
 
-### 
+### 2.1.2. 

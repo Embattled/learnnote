@@ -1,3 +1,55 @@
+- [1. 数据处理pandas包](#1-数据处理pandas包)
+- [2. IO 输入输出](#2-io-输入输出)
+  - [2.1. Flat file](#21-flat-file)
+  - [2.2. csv写入](#22-csv写入)
+- [3. Series](#3-series)
+  - [3.1. creation](#31-creation)
+  - [3.2. 操纵数据](#32-操纵数据)
+  - [3.3. index](#33-index)
+- [4. DataFrame](#4-dataframe)
+  - [4.1. 创建DF Constructor](#41-创建df-constructor)
+  - [4.2. 访问数据 Indexing, iteration](#42-访问数据-indexing-iteration)
+    - [4.2.1. 添加修改内容](#421-添加修改内容)
+    - [4.2.2. DF切片](#422-df切片)
+  - [4.3. Attributes and underlying data](#43-attributes-and-underlying-data)
+    - [4.3.1. DF.info](#431-dfinfo)
+    - [4.3.2. index](#432-index)
+  - [4.4. 选择 Reindexing / selection / label manipulation](#44-选择-reindexing--selection--label-manipulation)
+    - [4.4.1. label 操作](#441-label-操作)
+      - [4.4.1.1. 根据重复内容删除行](#4411-根据重复内容删除行)
+    - [4.4.2. reindexing](#442-reindexing)
+      - [4.4.2.1. .reindex ()](#4421-reindex-)
+  - [4.5. 计算与描述 Computations / descriptive stats](#45-计算与描述-computations--descriptive-stats)
+  - [4.6. 分组以及应用函数变换 Function application, GroupBy & window](#46-分组以及应用函数变换-function-application-groupby--window)
+    - [4.6.1. groupby](#461-groupby)
+  - [4.7. Plotting](#47-plotting)
+  - [4.8. 合并 Combining / comparing / joining / merging](#48-合并-combining--comparing--joining--merging)
+  - [4.9. 缺失值处理 Missing data handling](#49-缺失值处理-missing-data-handling)
+  - [4.10. 排序 sort_values sort_index](#410-排序-sort_values-sort_index)
+  - [4.11. .loc 按标签提取 laber](#411-loc-按标签提取-laber)
+      - [4.11.0.1. 使用下标切片](#41101-使用下标切片)
+      - [4.11.0.2.](#41102)
+- [5. pandas.Categorical](#5-pandascategorical)
+  - [5.1. 创建 categorical](#51-创建-categorical)
+- [6. pandas.Timestamp](#6-pandastimestamp)
+  - [6.1. Timestamp](#61-timestamp)
+  - [6.2. Timedelta](#62-timedelta)
+  - [6.3. 计算](#63-计算)
+  - [6.4. DatetimeIndex](#64-datetimeindex)
+  - [6.5. 使用时间索引来切片](#65-使用时间索引来切片)
+    - [6.5.1. 基于时间索引的统计  resample](#651-基于时间索引的统计--resample)
+- [7. 处理数据](#7-处理数据)
+      - [7.0.0.1. 根据缺失字段删除整行](#7001-根据缺失字段删除整行)
+    - [7.0.1. sort 重新排列](#701-sort-重新排列)
+  - [7.1. 统计数据](#71-统计数据)
+    - [7.1.1. 基础寻值](#711-基础寻值)
+    - [7.1.2. 基于数值统计](#712-基于数值统计)
+      - [7.1.2.1. Series.value_counts()](#7121-seriesvalue_counts)
+      - [7.1.2.2. .sum()](#7122-sum)
+      - [7.1.2.3. cut与qcut](#7123-cut与qcut)
+      - [7.1.2.4. crosstab](#7124-crosstab)
+    - [7.1.3. 基于统计学的数值](#713-基于统计学的数值)
+      - [7.1.3.1. Variance 方差](#7131-variance-方差)
 # 1. 数据处理pandas包
 
 pandas 是一种列存数据分析 API。它是用于处理和分析输入数据的强大工具，很多机器学习框架都支持将 pandas 数据结构作为输入。   
@@ -26,14 +78,15 @@ pandas 中的主要数据结构被实现为以下两类：
 # 2. IO 输入输出
 
 ## 2.1. Flat file
+
 最常用的部分
-1. read_table(filepath_or_buffer[, sep, …])
+1. `read_table(filepath_or_buffer[, sep, …])`
       Read general delimited file into DataFrame.
 
-2. read_csv(filepath_or_buffer[, sep, …])
+2. `read_csv(filepath_or_buffer[, sep, …])`
 	    Read a comma-separated values (csv) file into DataFrame.
 
-3. read_fwf(filepath_or_buffer[, colspecs, …])
+3. `read_fwf(filepath_or_buffer[, colspecs, …])`
       Read a table of fixed-width formatted lines into DataFrame.
  
 * read_table 和 read_csv 基本一样, 只不过默认的数据分隔符不相同
@@ -65,7 +118,7 @@ cars=pd.read_csv("cars.csv",sep=';',index_col='Car',names=name)
 
 * 最基础的数据类型, 和 numpy.array 有些类似  
 * Series 可用作大多数 NumPy 函数的参数
-* Series 虽然只有一列, 但也有 index 默认是从0开始的整数, 也可以通过 `index=` 指定
+* Series 虽然只有一列, 但也有 index, 默认是从0开始的整数, 也可以通过 `index=` 指定
 
 ## 3.1. creation
 
@@ -116,9 +169,27 @@ population.apply(lambda val: val > 1000000)
 
 # 4. DataFrame
 
-pandas最核心的数据类型, 由任意个 Series 和其名称组成  
+pandas最核心的数据类型, 由任意个 Series 和其名称组成   
+可以理解为 spreadsheet 或者 SQL 表  
 
-## 4.1. 创建DF和访问数据
+
+## 4.1. 创建DF Constructor
+
+DataFrame accepts many different kinds of input:
+* Dict of 1D ndarrays, lists, dicts, or Series
+* 2-D numpy.ndarray
+* Structured or record ndarray
+* A Series
+* Another DataFrame
+
+创建:
+1. 通过字典创建 
+   1. dict: `df=pd.DataFrame( dict() )`
+   2. 通过 dict of Series  : `df=pd.DataFrame( 同样是字典dict(),value=Series  )`
+      * 需要通过 字典的方式给 Series 赋予列名称
+   3. dict of ndarrays/lists: 
+      * `d = {"one": [1.0, 2.0, 3.0, 4.0], "two": [4.0, 3.0, 2.0, 1.0]}`
+      * `pd.DataFrame(d)`
 
 ```py
 # 从Series创建, 需要赋予每个Series列名称
@@ -148,7 +219,11 @@ df = pd.DataFrame(np.random.randn(8, 4),
    # index 的样式
 dfl = pd.DataFrame(np.random.randn(5, 4),columns=list('ABCD'),index=pd.date_range('20130101', periods=5))
 
+```
+## 4.2. 访问数据 Indexing, iteration
 
+
+```py
 
 # 访问数据, 可以使用 python 的 dict/list 指令访问 DataFrame数据
 # 创建DF
@@ -171,26 +246,7 @@ cities['City name'][1]
 # <class 'str'>
 # San Jose
 ```
-
-
-
-
-## 4.2. 描述.绘图
-
-```py
-
-# 使用 DataFrame.describe 来显示关于 DataFrame 的有趣统计信息。
-california_housing_dataframe.describe()
-
-# 另一个实用函数是 DataFrame.head，它显示 DataFrame 的前几个记录
-california_housing_dataframe.head()
-
-# 借助 DataFrame.hist，可以快速了解某一个列的中值的分布： 这是pandas自带的绘图函数
-california_housing_dataframe.hist('housing_median_age')
-
-```
-
-## 4.3. 添加修改内容
+### 4.2.1. 添加修改内容
 
 对于df类型, 直接使用标签即可添加修改内容
 ```py
@@ -227,7 +283,7 @@ for i in birthday:
 tanjoubi['年齢']=age
 ```
 
-## 4.4. DF切片
+### 4.2.2. DF切片
 
 * DataFrame是个结构化数据　`<class 'pandas.core.frame.DataFrame'>`  
 * 在输出 `DataFrame`的时候会输出表头 , 再输出内容   `print(car_year)`  
@@ -237,7 +293,152 @@ tanjoubi['年齢']=age
 `homes_table[:10]`  
 
 
-## 4.5. 合并 join  concat  append
+## 4.3. Attributes and underlying data
+
+最基础的, DF 相关的属性
+* `DataFrame.index`    The index (row labels) of the DataFrame.
+* `DataFrame.columns`  The column labels of the DataFrame.
+* 数据维度类 
+  * `DF.size`            返回一个整数, 代表元组总数
+  * `DF.shape`           返回一个元组, 代表 DF 的维度
+  * `DF.ndim`            返回整数, 代表维度个数
+* 数据表示
+  * `DF.value`           将任意 DF 转为 numpy 表示的类型返回
+
+
+### 4.3.1. DF.info
+
+打印信息在屏幕上, 无返回值  
+* Print a concise summary of a DataFrame.
+* including the index dtype and columns, non-null values and memory usage.
+
+```py
+DataFrame.info(verbose=None, buf=None, max_cols=None, memory_usage=None, show_counts=None, null_counts=None)
+
+```
+### 4.3.2. index
+
+使用`DataFrame.index`可以获取一个类数组的索引列表,依据数据的不同有多种形式    
+
+`Int64Index([1997, 1998, 1996, 1995, 1994, 1993], dtype='int64')`  
+`<class 'pandas.core.indexes.numeric.Int64Index'>`  
+
+`RangeIndex(start=0, stop=23, step=1)`  
+`<class 'pandas.core.indexes.range.RangeIndex'>`   
+
+
+更改DF的索引, 将会替换原本索引,并且通过values获取数据时该列数据将不再出现  
+df = df.set_index("Country")
+
+## 4.4. 选择 Reindexing / selection / label manipulation
+
+### 4.4.1. label 操作
+
+* drop  : Drop specified labels from rows or columns.
+* 
+
+```py
+data=data.drop(data.loc[data['State']=="CA"].index)
+```
+
+#### 4.4.1.1. 根据重复内容删除行
+
+
+```py
+# 在成为 DataFrame 格式后 ,可以使用 自带的方法来清除重复数据  drop_duplicates
+
+print(df.drop_duplicates())
+
+```
+* pandas.DataFrame.drop_duplicates (Python method, in pandas.DataFrame.drop_duplicates)
+* pandas.Index.drop_duplicates (Python method, in pandas.Index.drop_duplicates)
+* pandas.Series.drop_duplicates (Python method, in pandas.Series.drop_duplicates)
+
+
+* Parameters
+  * subset : `column label `or `sequence of labels`, optional
+    * Only consider` certain columns` for identifying duplicates, by `default use all of the columns.`
+  * keep : {‘first’, ‘last’, False}, default ‘first’
+    * Determines which duplicates (if any) to keep. 
+      * first : Drop duplicates except for the first occurrence. 
+      * last : Drop duplicates except for the last occurrence.
+      * False : Drop all duplicates.
+  * inplace : bool, default False
+    * Whether to drop duplicates in place or to return a copy.
+    * ignore_index : bool, default False
+      * If True, the resulting axis will be `labeled 0, 1, …, n - 1. `
+      * New in version 1.0.0.
+
+### 4.4.2. reindexing
+
+#### 4.4.2.1. .reindex ()
+
+pandas有一个类似 .loc的方法, 为 reindex() , 会检查内容的有无并返回对应的数值  
+缺点是代码长, 不简洁 ,必须要指定 `index` 和 `columns`参数  
+```py
+# When checking elements that possibly does not exist, use reindex()
+print("\nChecking rows ['f','g','h','i'] and column ['D','E']")
+print(df.reindex(index=['f','g','h','i'],columns=['D','E']))
+```
+
+## 4.5. 计算与描述 Computations / descriptive stats
+
+可以使用多种方法来对 DF 数据进行全局描述
+* 
+
+
+```py
+
+# 使用 DataFrame.describe 来显示关于 DataFrame 的有趣统计信息。
+df.describe()
+
+```
+## 4.6. 分组以及应用函数变换 Function application, GroupBy & window
+
+
+### 4.6.1. groupby
+
+* 最为常用的分析工具
+* 使用 groupby来分类数据 , 并使用 describe() 来生成一个默认模板的数据分析结果
+
+```py
+DataFrame.groupby(by=None, axis=0, level=None, as_index=True, sort=True, group_keys=True, squeeze=<object object>, observed=False, dropna=True)
+"""
+as_index : 是否将分组的 by 作为 index, False 的话就是传统的 SQL groupby 返回类型
+
+"""
+
+
+
+
+# example
+gender_group_desc = df.groupby("Gender").describe()
+# describe()的默认模板有很多不必要的列 , 使用下面的方法来筛选只想保留的数据 
+gen_gr_desc_countmean = gender_group_desc.loc[:,(slice(None),['count','mean'])]
+
+
+```
+
+## 4.7. Plotting
+
+
+
+```py
+# 借助 DataFrame.hist，可以快速了解某一个列的中值的分布： 这是pandas自带的绘图函数
+df.hist('housing_median_age')
+```
+
+
+## 4.8. 合并 Combining / comparing / joining / merging
+
+包含了基本的多DF连接处理, 类似于数据库 table
+* append
+* assign
+* compare
+* join
+* merge
+* update
+
 ```py
 # 对于读取到的两个文件, 可以很方便的将他们链接, 记得要重新排列索引
 h_table = h1_table.append(h2_table)
@@ -260,30 +461,27 @@ df.join(other, lsuffix='_caller', rsuffix='_other')
 df.set_index('key').join(other.set_index('key'))
 ```
 
+## 4.9. 缺失值处理 Missing data handling
 
 
-## 4.6. values
-
-使用`DataFrame.values` 获取到的类型为 `<class 'numpy.ndarray'>`, 为双方括号形式, 没有索引 , `[ [第一整行内容] [第二整行内容]... ]  `  
-再使用`DataFrame.values.flatten()`  类型仍为`<class 'numpy.ndarray'>` , 但是变为单方括号 `[  第一整行内容  第二整行内容 ... ]`
-`.flatten()` 是 `ndarray`的方法  
-使用`Series.values` 获取到的类型同样为 `<class 'numpy.ndarray'>`, 直接就是单方括号形式, `[ 第一个值  第二个值 ... ]  `  
-
-## 4.7. index
-
-使用`DataFrame.index`可以获取一个类数组的索引列表,依据数据的不同有多种形式    
-
-`Int64Index([1997, 1998, 1996, 1995, 1994, 1993], dtype='int64')`  
-`<class 'pandas.core.indexes.numeric.Int64Index'>`  
-
-`RangeIndex(start=0, stop=23, step=1)`  
-`<class 'pandas.core.indexes.range.RangeIndex'>`   
+```py
+# 有些时候 , 无效数据在源数据中的表示方法不一致, 可以先替换成能够识别的 np.NaN
+homes_table = homes_table.replace('-',np.NaN)
+# 为了防止失效数据, 可以使用 isnull() 来查找无效数据 , 无效数据可能是空白, 也可能是错误格式
+print(bmi_table.isnull())
+# 对于失效数据也有方法可以方便的填充它
+w_sep = bmi_table[["Weight(Sep)"]]
+w_sep_filled = w_sep.fillna(int(w_sep.mean()))  # 也可以使用别的值 如 .median()
+# Replacing the old data with new filled one
+bmi_table[["Weight(Sep)"]] = w_sep_filled  
 
 
-更改DF的索引, 将会替换原本索引,并且通过values获取数据时该列数据将不再出现  
-df = df.set_index("Country")
+# 在删除行后重新设定行索引
+homes_table =homes_table.reset_index()
+```
 
-## 4.8. 排序 sort_values sort_index
+
+## 4.10. 排序 sort_values sort_index
 
 ```py
 
@@ -292,7 +490,7 @@ DataFrame.sort_index(ascending = False)
 DataFrame.sort_values(by='mean_rating',)
 
 ```
-## 4.9. .loc 按标签提取 laber 
+## 4.11. .loc 按标签提取 laber 
 
 
 `.loc ` 是一个很严格的类型, 如果输入的切片是整数而且不能转化成原本DF的Index,会报类型错误  
@@ -311,7 +509,7 @@ dfl.loc['20130102':'20130104']
 ```
 
 
-#### 4.9.0.1. 使用下标切片
+#### 4.11.0.1. 使用下标切片
 ```
 按具体数值来切片  
 df1 = pd.DataFrame(np.random.randn(6, 4),index=list('abcdef'),columns=list('ABCD'))
@@ -346,7 +544,7 @@ f -1.281247 -0.727707 -0.121306
 ```
 
 
-#### 4.9.0.2. 
+#### 4.11.0.2. 
 按照具体值来切
 ```py
 
@@ -358,15 +556,7 @@ df.loc[['a','b']]> 0
 data.loc[data['State']=="CA"]
 ```
 
-#### 4.9.0.3. .reindex ()
 
-pandas有一个类似 .loc的方法, 为 reindex() , 会检查内容的有无并返回对应的数值  
-缺点是代码长, 不简洁 ,必须要指定 `index` 和 `columns`参数  
-```py
-# When checking elements that possibly does not exist, use reindex()
-print("\nChecking rows ['f','g','h','i'] and column ['D','E']")
-print(df.reindex(index=['f','g','h','i'],columns=['D','E']))
-```
 
 # 5. pandas.Categorical 
 
@@ -562,47 +752,12 @@ print(group3[['Humid.','CO2']])
 
 
     
-## 6.6. 处理数据
-
-###  6.6.1. Drop数据
-
-```py
-data=data.drop(data.loc[data['State']=="CA"].index)
+# 7. 处理数据
 
 
-```
 
 
-#### 6.6.1.1. 根据重复内容删除行
-
-
-```py
-# 在成为 DataFrame 格式后 ,可以使用 自带的方法来清除重复数据  drop_duplicates
-
-print(df.drop_duplicates())
-
-```
-* pandas.DataFrame.drop_duplicates (Python method, in pandas.DataFrame.drop_duplicates)
-* pandas.Index.drop_duplicates (Python method, in pandas.Index.drop_duplicates)
-* pandas.Series.drop_duplicates (Python method, in pandas.Series.drop_duplicates)
-
-
-* Parameters
-  * subset : `column label `or `sequence of labels`, optional
-    * Only consider` certain columns` for identifying duplicates, by `default use all of the columns.`
-  * keep : {‘first’, ‘last’, False}, default ‘first’
-    * Determines which duplicates (if any) to keep. 
-      * first : Drop duplicates except for the first occurrence. 
-      * last : Drop duplicates except for the last occurrence.
-      * False : Drop all duplicates.
-  * inplace : bool, default False
-    * Whether to drop duplicates in place or to return a copy.
-    * ignore_index : bool, default False
-      * If True, the resulting axis will be `labeled 0, 1, …, n - 1. `
-      * New in version 1.0.0.
-
-
-#### 6.6.1.2. 根据缺失字段删除整行
+#### 7.0.0.1. 根据缺失字段删除整行
 
 
 * pandas.DataFrame.dropna (Python method, in pandas.DataFrame.dropna)
@@ -622,7 +777,7 @@ table=table.dropna(thresh=7)
 
 
 
-### 6.6.2. sort 重新排列
+### 7.0.1. sort 重新排列
 
 * Index
   * pandas.DataFrame.sort_index (Python method, in pandas.DataFrame.sort_index)
@@ -664,39 +819,12 @@ table=table.dropna(thresh=7)
 
 
 
-### 6.6.3. groupby
-```py
 
-# 可以使用 groupby来分类数据 , 并使用 describe() 来生成一个默认模板的数据分析结果
-gender_group_desc = df.groupby("Gender").describe()
-
-# describe()的默认模板有很多不必要的列 , 使用下面的方法来筛选只想保留的数据 
-gen_gr_desc_countmean = gender_group_desc.loc[:,(slice(None),['count','mean'])]
-
-
-
-# 有些时候 , 无效数据在源数据中的表示方法不一致, 可以先替换成能够识别的 np.NaN
-homes_table = homes_table.replace('-',np.NaN)
-# 为了防止失效数据, 可以使用 isnull() 来查找无效数据 , 无效数据可能是空白, 也可能是错误格式
-print(bmi_table.isnull())
-# 对于失效数据也有方法可以方便的填充它
-w_sep = bmi_table[["Weight(Sep)"]]
-w_sep_filled = w_sep.fillna(int(w_sep.mean()))  # 也可以使用别的值 如 .median()
-# Replacing the old data with new filled one
-bmi_table[["Weight(Sep)"]] = w_sep_filled  
-
-
-# 在删除行后重新设定行索引
-homes_table =homes_table.reset_index()
-
-
-
-```
-## 6.7. 统计数据
+## 7.1. 统计数据
 
 使用统计方法将会使得数据对象降维  DF->Series   Series->numpy
 
-### 6.7.1. 基础寻值
+### 7.1.1. 基础寻值
 * 平均 .mean()
 * 标准差 .std()
 * 最大最小值中值 .max() .min() .median()
@@ -720,16 +848,16 @@ print("\nRange")
 print(player_table.max(numeric_only=True) -player_table.min(numeric_only=True))
 ```
 
-### 6.7.2. 基于数值统计
+### 7.1.2. 基于数值统计
 
-#### 6.7.2.1. Series.value_counts()
+#### 7.1.2.1. Series.value_counts()
 ```py
 # 对Series使用value_count来进行数据统计, 统计的按照相同数据来进行统计  
 # 得到的返回值仍是一个 Series
 car_table['Year'].value_counts() 
 ```
 
-#### 6.7.2.2. .sum()
+#### 7.1.2.2. .sum()
 
 ```py
 # 对一个DataFrame使用 得到的结果是一个 Series
@@ -742,7 +870,7 @@ hurr_table_sum = pd.DataFrame(hurr_table.sum())
 s_percentage = (s/sum(s)*100).round(2)
 ```
 
-#### 6.7.2.3. cut与qcut
+#### 7.1.2.3. cut与qcut
 
 分组数据  
 
@@ -751,7 +879,7 @@ s_percentage = (s/sum(s)*100).round(2)
 * pandas.qcut(x, q, labels=None, retbins: bool = False, precision: int = 3, duplicates: str = 'raise')  
   * Quantile-based discretization function.
 
-#### 6.7.2.4. crosstab
+#### 7.1.2.4. crosstab
 分析数据关联性  
 By matching different categorical frequency distributions,   
 you can display the relationship between qualitative variables.    
@@ -776,7 +904,7 @@ position_vs_ages = pd.crosstab(player_table["Position"],binned_ages,normalize='c
 
 
 
-### 6.7.3. 基于统计学的数值
+### 7.1.3. 基于统计学的数值
 
 
 
@@ -809,7 +937,7 @@ table.corr()
 
 
 ```
-#### 6.7.3.1. Variance 方差
+#### 7.1.3.1. Variance 方差
 
 可以通过Series获取方差  
 
