@@ -7,18 +7,20 @@ Symbols defined here are used by several library components.
 
 
 # 2. Functions 函数
+
 ## 2.1. 随机数生成
 
 所有和计算机有关的随机都是数学意义上的伪随机,真正的随机基本都是基于物理上的分子熵增,白噪声等因素作为种子来生成随机数  
 
 在 c语言 stdlib 中有随机数生成函数
-
+* 在C++中推荐使用 `<random>` 中的随机数生成器
 * RAND_MAX  : 和机器有关的常量, 反映了随机数能得到的最大的值, 一般最低也有32767 
-* rand() : 返回随机数 范围是`[0,RAND_MAX]`
+* rand() : 返回随机数 范围是`[0,RAND_MAX]`的`整数`
 * srand(): 给随机函数 rand() 投喂种子,如果没有投喂,则程序默认已经执行 srand(1),一般使用`time(0)`来获取当前时间作为种子
 
 ```cpp
 
+// 使用当前时间作为种子
 std::srand(std::time(0)); //use current time as seed for random generator
 int random_variable = std::rand();
 std::cout << "Random value on [0 " << RAND_MAX << "]: " << random_variable << '\n';

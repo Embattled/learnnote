@@ -1,10 +1,10 @@
-# 1. File System
+# 1. File and Directory Access
 
 用于处理文件路径  
 
 # 2. os.path
 
-`os.path` 是一整个模块名  
+`os.path` 是一整个模块名, 从 `os` 模组中被分离出来
 * 提供了一些操作路径字符串的方法
 * 还包含一些或者指定文件属性的一些方法
 
@@ -173,4 +173,8 @@ dir_path.replace(dir_path.parent / dir_path2)
 * PurePosixPath PureWindowsPath 继承自PurePath
 * PosixPath WindowsPath 各自继承Pure*和Path类
 作为实例化的类, 一般不需要手动定义, 解释器会自动根据系统将Path和PurePath实例化成对应的类
+
+
+
+# shutil - High-level file operations
 

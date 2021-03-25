@@ -1,11 +1,39 @@
+- [1. scikit-learn introduction](#1-scikit-learn-introduction)
+- [2. Supervised learning 模型](#2-supervised-learning-模型)
+  - [2.1. Ensemble Methods](#21-ensemble-methods)
+- [3. Unsupervised learning 模型](#3-unsupervised-learning-模型)
+- [4. Model selection and evaluation](#4-model-selection-and-evaluation)
+- [5. decomposition](#5-decomposition)
+  - [5.1. FactorAnalysis](#51-factoranalysis)
+  - [5.2. PCA](#52-pca)
+- [6. manifold](#6-manifold)
+    - [6.0.1. TSNE](#601-tsne)
+- [7. preprocessing](#7-preprocessing)
+  - [7.1. scale](#71-scale)
+- [8. cluster](#8-cluster)
+  - [8.1. DBSCAN](#81-dbscan)
+  - [8.2. KMeans](#82-kmeans)
+- [9. collections](#9-collections)
+# 1. scikit-learn introduction
 
-# 1. scikit-learn 
+* 目前非常有名的开业机器学习库
+* 导入 : `import sklearn`
 
-`import sklearn `
 
-## 1.1. decomposition
+# 2. Supervised learning 模型
 
-### 1.1.1. FactorAnalysis
+## 2.1. Ensemble Methods
+
+* `import sklearn.ensemble`
+
+
+# 3. Unsupervised learning 模型
+
+
+# 4. Model selection and evaluation
+# 5. decomposition
+
+## 5.1. FactorAnalysis
 
 ```py
 from sklearn.decomposition import FactorAnalysis
@@ -26,7 +54,7 @@ print(pd.DataFrame(pca_comp,columns=cols))
 
 ```
 
-### 1.1.2. PCA
+## 5.2. PCA
 
 
 ```py
@@ -51,9 +79,9 @@ print(pd.DataFrame(pca_comp,columns=cols))
 
 
 
-## 1.2. manifold
+# 6. manifold
 
-### 1.2.1. TSNE
+### 6.0.1. TSNE
 ```py
 import imp
 from sklearn.manifold import TSNE
@@ -86,9 +114,9 @@ plt.show()
 
 ```
 
-## 1.3. preprocessing
+# 7. preprocessing
 
-### 1.3.1. scale
+## 7.1. scale
 
 ```py
 digits = pd.read_csv('digits.csv')
@@ -109,13 +137,13 @@ print(f'Explained variance {evr}')
 
 ```
 
-## 1.4. cluster
+# 8. cluster
 
-### 1.4.1. DBSCAN
+## 8.1. DBSCAN
 
 
 
-### 1.4.2. KMeans
+## 8.2. KMeans
 
 ```py
 X = digits.values
@@ -155,5 +183,5 @@ delta_inertia = np.diff(inertia) * (-1)
 ```
 
 
-## 1.5. collections
+# 9. collections
 

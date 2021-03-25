@@ -1,26 +1,29 @@
 # 1. 数值库 Numerics
 
 ```cpp
+#include <cmath>
+#include <cfenv>
+#include <climit>
+
+#include <limits>
 #include <complex>
 #include <random>
 #include <valarray>
 #include <numeric>
 #include <bit>
 #include <numbers>
-#include <cfenv>
-#include <cmath>
 ```
 
 标准C++数值库包含了常规数学函数以及类型， 以及一些特殊化的数列和随机数生成。
 包括了一系列的头文件  稍微有点多  
 
-## 1.1. limit 库
+# 2. limit 库
+
 和数值库配套的 limit 两个库提供了所有基本类型的相关数字范围
 * climit
 * limits
 
-
-## 1.2. <climits>
+## 2.1. <climits>
 
 This header was originally in the C standard library as `<limits.h>`.
 
@@ -55,15 +58,13 @@ This header is part of the type support library, in particular it's part of the 
 
 只有这么点内容，很容易记
 
-## 1.3. <limits>
-
-
+## 2.2. <limits>
 
 C++的数据界限对应库,定义了一个类和两个枚举类型
 
-### 1.3.1. std::numeric_limits
+### 2.2.1. std::numeric_limits
 
-# 2. <cfenv> 浮点数环境
+# 3. <cfenv> 浮点数环境
 
 非标准C头文件, 用于控制 浮点数的各种错误符号位  
 
@@ -82,12 +83,12 @@ The floating-point environment access and modification is only meaningful when #
 
 ```
 
-# 3. <cmath> 通用数学函数
+# 4. <cmath> 通用数学函数
 
 包括了从 C语言继承来的一些 通用数学运算  
 
 
-## 3.1. 类型
+## 4.1. 类型
 
 Cmath 里只定义了两个类型， 都是C++11新加入的
 1. `float_t`    
@@ -97,12 +98,12 @@ most efficient floating-point type at least as wide as float
 most efficient floating-point type at least as wide as double  
 
 
-## 3.2. 常量与宏
+## 4.2. 常量与宏
 
 math.h 的常量基本都与浮点数相关  
 注意 : 全部都是 C11 新加入的  
 
-### 3.2.1. 浮点特殊值
+### 4.2.1. 浮点特殊值
 IEEE 754 中关于特殊值的表示方法
 1. 正负无穷     E 段全1 , M 段 全0 , S 表示正负
 2. NaN          E 段全1 , M段非全 0
@@ -119,7 +120,7 @@ IEEE 754 中关于特殊值的表示方法
    * If the implementation does not support QNaNs, this macro constant is not defined.
    * 对于不同的 NAN 具体由相关函数的符号位来表示
 
-### 3.2.2. 越界
+### 4.2.2. 越界
 
 作为函数和操作的返回值  
 compare equal to the values returned by floating-point functions and operators in case of overflow  
@@ -140,7 +141,7 @@ compare equal to the values returned by floating-point functions and operators i
 #define math_errhandling  /*implementation defined*/
 ```
 
-### 3.2.3. 浮点数类型
+### 4.2.3. 浮点数类型
 
 和该头文件下的 `fpclassify` 进行配合, 作为该函数的返回值  
 * `FP_NORMAL`       常规浮点数
@@ -177,9 +178,9 @@ int main()
 ```
 
 
-## 3.3. 基础运算函数
+## 4.3. 基础运算函数
 
-### 3.3.1. 绝对值
+### 4.3.1. 绝对值 abs
 
 ```cpp
 // 同时也定义在了 `cstdlib` 的函数 C++重载的版本
@@ -196,8 +197,9 @@ double      fabs ( double arg );
 long double fabsl( long double arg );
 double      fabs ( IntegralType arg );
 ```
-
-## 3.4. 指数对数函数
+### 4.3.2. 取模 mod
+### 4.3.3. 取最大最小 max min
+## 4.4. 指数对数函数
 
 这些函数的命名规则都大致相同  
 都有重载版本和针对不同浮点数类型单独命名的版本  
@@ -208,7 +210,7 @@ double      fabs ( IntegralType arg );
   * xl 为 long double 版本
   * 还有一个额外的 x , 返回值为 double , 接受 `IntegralType` 类型
 
-### 3.4.1. e指数
+### 4.4.1. e指数
 ```cpp
 // 重载通用版本
 float       exp ( float arg );
@@ -221,7 +223,7 @@ long double expl( long double arg );
 double      exp ( IntegralType arg );
 ```
 
-### 3.4.2. 2指数
+### 4.4.2. 2指数
 ```cpp
 // 重载通用版本
 float       exp2 ( float arg );
@@ -235,7 +237,7 @@ double      exp2 ( IntegralType arg );
 ```
 
 
-### 3.4.3. e对数
+### 4.4.3. e对数
 ```cpp
 // 重载通用版本
 float       log ( float arg );
@@ -248,7 +250,7 @@ long double logl( long double arg );
 double      log ( IntegralType arg );
 ```
 
-### 3.4.4. 2和10对数
+### 4.4.4. 2和10对数
 ```cpp
 // 重载通用版本
 float       log10 ( float arg );
@@ -271,8 +273,47 @@ long double log2l( long double arg );
 double      log2 ( IntegralType arg );
 ```
 
+## 4.5. 幂函数 power function
 
-## 3.5. 三角函数 trigonometric functions
+### 4.5.1. 幂函数 pow
+
+```cpp
+// 大部分都是从 C++11 支持
+// C++11以前的幂只支持整数
+
+float       pow ( float base, float exp );
+double      pow ( double base, double exp );
+long double pow ( long double base, long double exp );
+Promoted    pow ( Arithmetic1 base, Arithmetic2 exp )
+
+float       powf( float base, float exp );
+long double powl( long double base, long double exp );
+
+```
+
+### 4.5.2. 开平方 sqrt
+```cpp
+float       sqrt ( float arg );
+double      sqrt ( double arg );
+long double sqrt ( long double arg );
+double      sqrt ( IntegralType arg );
+
+float       sqrtf( float arg );
+long double sqrtl( long double arg );
+```
+### 4.5.3. 开立方 cbrt
+```cpp
+float       cbrt ( float arg );
+double      cbrt ( double arg );
+long double cbrt ( long double arg );
+double      cbrt ( IntegralType arg );
+
+float       cbrtf( float arg );
+long double cbrtl( long double arg );
+```
+### 4.5.4. 开勾股 hypot
+
+## 4.6. 三角函数 trigonometric functions
 
 特殊方法获取 PI:
 `const double pi = std::acos(-1);`   
@@ -300,16 +341,49 @@ double      log2 ( IntegralType arg );
 * atan2         有象限判断的版本, 返回值为正负派
 
 
-# 4. <number> 数学常量
+# 5. <random> 随机数
 
-# 5. <complex> 复数运算
+* 所有随机数引擎都可以指定地播种, 序列化和反序列化, 以用于可重复的模拟器
+* C++的随机数库, 提供:
+  * `Uniform random bit generators (URBGs)`, 生成伪随机数, 若有真随机数设备也可以调用
+  * `Random number distributions` , 将生成的随机数转化成相应的统计分布
+  * 这两个类会相互调用
+
+## 预定义的
+
+## 随机数引擎 Random number engines 
 
 
-# 6. <numeric> 数学运算库
+## 随机数引擎适配器 Random number engine adaptors
+
+
+## C++20新内容 
+
+* 指定类型的 `uniform_random_bit_generator` 
+```cpp
+template <class G>
+concept uniform_random_bit_generator =
+  std::invocable<G&> && std::unsigned_integral<std::invoke_result_t<G&>> &&
+  requires {
+    { G::min() } -> std::same_as<std::invoke_result_t<G&>>;
+    { G::max() } -> std::same_as<std::invoke_result_t<G&>>;
+    requires std::bool_constant<(G::min() < G::max())>::value;
+  };
+
+
+```
+
+
+
+# 6. <number> 数学常量
+
+
+
+# 7. <numeric> 数学运算库
 
 numerics library 的一部分， 包含一些特殊的常用函数，可以简化编程流程  
 
-## 6.1. accumulate 
+## 7.1. accumulate 
 
 自动累加 first 到 last 之间的元素  
 
@@ -390,7 +464,7 @@ int main()
 
 ```
 
-## 6.2. inner_product
+## 7.2. inner_product
 
 内积, 类似于向量点乘  
 
@@ -426,7 +500,7 @@ constexpr T inner_product( InputIt1 first1, InputIt1 last1,
 
 ```
 
-## 6.3. gcd lcm 公倍数 公约数 since c++17
+## 7.3. gcd lcm 公倍数 公约数 since c++17
 
 C++17 才加入的新函数   
 不会抛出异常  
@@ -463,7 +537,7 @@ lcm:
 */
 ```
 
-## 6.4. iota  自动生成加1数列
+## 7.4. iota  自动生成加1数列
 
 
 ```cpp
@@ -489,7 +563,7 @@ constexpr void iota( ForwardIt first, ForwardIt last, T value );
     std::vector<std::list<int>::iterator> v(l.size());
     std::iota(v.begin(), v.end(), l.begin());
 ```
-### 6.4.1. midpoint since c++20
+### 7.4.1. midpoint since c++20
 
 Computes the midpoint of the integers, floating-points, or pointers a and b.   
 计算中点  
@@ -530,7 +604,7 @@ int main()
 
 ```
 
-## 6.5. partial_sum
+## 7.5. partial_sum
 
 累加数列的生成  
 
@@ -561,3 +635,5 @@ std::partial_sum(v.begin(), v.end(), std::ostream_iterator<int>(std::cout, " "))
 // 自定义操作，改成累乘
 std::partial_sum(v.begin(), v.end(), v.begin(), std::multiplies<int>());
 ```
+
+# 8. <complex> 复数运算
