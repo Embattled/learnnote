@@ -343,21 +343,172 @@ long double cbrtl( long double arg );
 
 # 5. <random> 随机数
 
+C语言的随机数定义在 `cstdlib` 中
+* 如果学习了 C++的随机数, 就不推荐再使用C的随机数生成器了
+  * rand() 生成伪随机数, 是一个整数
+  * srand() 输入种子
+  * RAND_MAX 生成的最大可能值
+
+
 * 所有随机数引擎都可以指定地播种, 序列化和反序列化, 以用于可重复的模拟器
 * C++的随机数库, 提供:
   * `Uniform random bit generators (URBGs)`, 生成伪随机数, 若有真随机数设备也可以调用
   * `Random number distributions` , 将生成的随机数转化成相应的统计分布
   * 这两个类会相互调用
 
-## 预定义的
-
-## 随机数引擎 Random number engines 
 
 
-## 随机数引擎适配器 Random number engine adaptors
+```cpp
+// random_device 获取真随机值(若可能) 用于播种
+std::random_device r;
+
+// 播种一个 default_random_engine 
+std::default_random_engine e1(r());
+
+// 均匀分布 1 与 6 间的随机数
+std::uniform_int_distribution<int> uniform_dist(1, 6);
+// 获取随机值
+int mean = uniform_dist(e1);
+```
+
+## 5.1. 随机数生成系统 Uniform random bit generators 
+
+C++的 random 定义了一套复杂的随机数引擎系统
 
 
-## C++20新内容 
+### 5.1.1. 预定义随机数生成器
+
+* 可以直接调用的方便的标准库类, 日常使用的对象
+* 具体的类型需要参照类的定义
+  
+| 生成器名(C++11)       | 简单说明                   |
+| --------------------- | -------------------------- |
+| minstd_rand0          | 1988采纳的最低标准         |
+| minstd_rand           | 1993更新的最低标准         |
+| mt19937               | 32为梅森缠绕器, 1998年发布 |
+| mt19937_64            | 64位梅森缠绕器             |
+| ranlux24_base         | 无说明                     |
+| ranlux48_base         | 无说明                     |
+| ranlux24              | 24位RANLUX生成器           |
+| ranlux48              | 48位RANLUX生成器           |
+| knuth_b               | shuffle order engine       |
+| default_random_engine | 用于实现定义的默认         |
+
+```cpp
+
+// minstd_rand0
+std::linear_congruential_engine<std::uint_fast32_t, 16807, 0, 2147483647> 
+// minstd_rand
+std::linear_congruential_engine<std::uint_fast32_t, 48271, 0, 2147483647>
+
+// mt19937
+std::mersenne_twister_engine<std::uint_fast32_t, 32, 624, 397, 31,
+                             0x9908b0df, 11,
+                             0xffffffff, 7,
+                             0x9d2c5680, 15,
+                             0xefc60000, 18, 1812433253>
+// mt19937_64
+std::mersenne_twister_engine<std::uint_fast64_t, 64, 312, 156, 31,
+                             0xb5026f5aa96619e9, 29,
+                             0x5555555555555555, 17,
+                             0x71d67fffeda60000, 37,
+                             0xfff7eee000000000, 43, 6364136223846793005>
+
+// ranlux24_base
+std::subtract_with_carry_engine<std::uint_fast32_t, 24, 10, 24>
+// ranlux48_base
+std::subtract_with_carry_engine<std::uint_fast64_t, 48, 5, 12>
+
+// ranlux24
+std::discard_block_engine<std::ranlux24_base, 223, 23>
+// ranlux48
+std::discard_block_engine<std::ranlux48_base, 389, 11>
+
+// knuth_b
+std::shuffle_order_engine<std::minstd_rand0, 256>
+
+```
+
+### 5.1.2. 随机数引擎 Random number engines 
+
+* 所谓引擎?
+  * 以种子数据为熵源生成伪随机数
+  * C++定义了几种不同的随机数算法, 并将它们实现成可以定制的模板类
+* 引擎的选择需要进行权衡
+  * 线性同余 (linear_congruential)   一般的快, 存储要求小
+  * 延迟斐波那契 (lagged Fibonacci ) 在任何设备上(无先进指令集)都能最快执行, 存储要求大, 有时会有` 不太想要的谱特性`
+  * 梅森缠绕器 (Mersenne twister)    最慢, 存储要求大, 但是能生产最长的不重复序列, 且能得到`想要的谱特性`
+* 类名称(C++11)
+  * `linear_congruential_engine`  线性同余
+  * `subtract_with_carry_engine` 带进位减(延迟斐波那契)
+  * `mersenne_twister_engine`     梅森缠绕器
+
+
+
+### 5.1.3. 随机数引擎适配器 Random number engine adaptors
+
+* 何为引擎适配器?
+  * 引擎已经可以生成随机数, 适配器用于进一步打乱随机数的输出结果
+  * 这种适配器主要的目的是改名引擎的 `谱特性`
+* 类名称(C++11)
+  * `discard_block_engine`     舍弃随机数引擎的某些输出 
+  * `independent_bits_engine`  将一个随机数引擎的输出打包为指定位数的块 
+  * `shuffle_order_engine`     以不同顺序发送一个随机数引擎的输出 
+
+### 5.1.4. 非确定随机数 Non-deterministic random numbers 
+
+`std::random_device`
+* 最简单的随机数生成器, 均匀分布的生成一个整数
+  * 一般不适用该类作为具体的随机数生成器
+  * 而是用该类只生成一个数, 作为其他标准生成器(类似mt19937) 的种子
+* 某种程度的真随机数
+  * 如果`硬件允许`, 使用硬件熵源来生成随机数
+  * 否则仍然使用上文的伪随机数引擎
+
+成员函数:
+* () : 返回随机生成的值
+* entropy()  返回该生成器的熵估计. 
+  * 确定的随机数生成器（例如伪随机数生成器）拥有零熵
+  * 设备熵的值，或若不可应用则为零.
+* min()  返回固定值, 意为该随机数生成器的最小值
+* max()  返回固定值, 意为该随机数生成器的最大值
+
+```cpp
+// 默认构造函数定义
+random_device() : random_device(/*implementation-defined*/) {}
+// 带有 token 的随机生成器, 这里 token 是另一个知识点
+explicit random_device(const std::string& token);
+
+// 随机生成器不可以被复制
+random_device(const random_device& ) = delete;
+
+
+// example
+std::random_device rd; // 使用 RDRND 或 /dev/urandom
+std::random_device rd2("/dev/random"); // Linux 上更慢
+std::uniform_int_distribution<int> dist(0, 9);
+
+std::map<int, int> hist;
+// 一般不适用 random_device 生成大量的值
+for (int n = 0; n < 20000; ++n) {
+  // 统计随机生成的值
+  ++hist[dist(rd)];
+}
+```
+## 5.2. 随机数分布
+
+* 所谓一种后处理 post-processes , 将 URBG 的输出结果按照定义的统计概率密度函数分布
+* 所有标准库的分布都满足 `C++具名要求: 随机数分布 (RandomNumberDistribution)`
+* 分布的分类:
+  * 均匀分布
+  * 伯努利分布
+  * 泊松分布
+  * 正态分布
+  * 采样分布
+
+
+
+## 5.3. C++20新内容 
 
 * 指定类型的 `uniform_random_bit_generator` 
 ```cpp
@@ -372,8 +523,6 @@ concept uniform_random_bit_generator =
 
 
 ```
-
-
 
 # 6. <number> 数学常量
 

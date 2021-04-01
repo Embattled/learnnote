@@ -1,6 +1,7 @@
 # 1. numpy 
 
-python数值包 最基础的列表处理包 被其他许多包所依赖  
+* python数值包 最基础的列表处理包 被其他许多包所依赖  
+* python stl 中的 math 有许多同名函数, 但不支持向量输入, 因此机器学习中更多的使用 numpy
 
 # 2. numpy.array
 

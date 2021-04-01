@@ -113,23 +113,65 @@ c = a.view(1, 3, 2, 4)
 
 ## 2.4. 创建操作 Creation Ops
 
+位于 `torch.` 下  
+
 ### 2.4.1. 统一值 tensor
 
 
+### 2.4.2. 随机值 random
 
-### 2.4.2. torch.tensor
+函数参数 : `(*size, *, out=None, dtype=None, layout=torch.strided, device=None, requires_grad=False)`
+* size 指定大小
+* out  除了返回值以外的另一种获取方法
+* dtype
+* layout 指定 tensor 的 layout (暂时还不懂)
+* device 默认时会指定为 `torch.set_default_tensor_type()`
+* requires_grad : If autograd should record operations on the returned tensor.
+
+
+基础函数:
+* rand(*)                Uniform distribution on interval `[0,1)`
+* randint(low=0,high)    high是必须参数, Uniform 
+* randn(*)               standard normal distribution
+* 
+
+特殊函数:
+* normal(mean, std)      随机标准分布, 均值方差手动指定
+  * 这个函数原型 mean 和 std 至少有一项必须是 tensor, 用来指明生成的 tensor 的 size
+  * normal(mean, std, size) 该原型用第三个参数来指定tensor 大小
+* randperm(n)            随机 0~n-1 的排列, 默认type是 int64
+
+
+
+
+种子操作:
+* seed   :Sets the seed for generating random numbers to a non-deterministic random number.
+* manual_seed   :Sets the seed for generating random numbers.
+* initial_seed   :Returns the initial seed for generating random numbers as a Python long.
+* get_rng_state   :Returns the random number generator state as a torch.ByteTensor.
+* set_rng_state   :Sets the random number generator state.
+
+
+### 2.4.3. _like 类方法
+
+需要获取一个不确定维度的 tensor, 即通过另一个 tensor 指定大小
+* rand_like
+* randint_like
+* randn_like
+
+### 2.4.4. torch.tensor
 
 ```py
 torch.tensor(data, *, dtype=None, device=None, requires_grad=False, pin_memory=False) → Tensor
 ```
-### 2.4.3. torch.from_numpy
+### 2.4.5. torch.from_numpy
 
 `torch.from_numpy` 接受一个 ndarray 并转换成 tensor 没有任何参数  
 ```py
 torch.from_numpy(ndarray) → Tensor
 ```
 
-### 2.4.4. tensor复制
+### 2.4.6. tensor复制
 
 
 * `torch.clone(input, *, memory_format=torch.preserve_format) → Tensor`
@@ -141,7 +183,7 @@ torch.from_numpy(ndarray) → Tensor
 一般彻底的复制并脱离可以使用  `tensor.clone().detach()`  这也是官方推荐的方法  
 
 
-### 2.4.5. .new_ 方法
+### 2.4.7. .new_ 方法
 
 To create a tensor with similar type but different size as another tensor, use tensor.new_* creation ops.  
 
@@ -155,55 +197,10 @@ To create a tensor with similar type but different size as another tensor, use t
 5. new_zeros
 
 
-## 2.5. 随机创建操作
 
-用随机数来填充一个 tensor , 是与 createion ops 独立开来的
+## 2.5. 拼接与截取
 
-### 2.5.1. 随机张量生成
-
-* torch.rand(size)                  随机数 0~1 平均分布
-* torch.randint(low=0, high, size)  随机整数, 指定区间, 平均分布
-* torch.randn(size)                 随机标准分布, 均值 0, 方差 1
-* torch.normal(mean, std)           随机标准分布, 均值方差手动指定
-* torch.randperm(n)                 随机 0~n-1 的排列组合 
-
-```py
-# 统一参数
-
-#oout     : 除了返回值外, 还可以直接将创建的 tensor 赋值给另一个 tensor
-# dtype   : 指定数据类型
-# device  : 指定设备
-
-
-# Returns a tensor filled with random numbers from a uniform distribution on the interval [0,1)[0, 1)[0,1) 
-torch.rand(*size, *, out=None, dtype=None, layout=torch.strided, device=None, requires_grad=False) → Tensor
-
-
-# Returns a tensor filled with random integers generated uniformly between low (inclusive) and high (exclusive).
-torch.randint(low=0, high, size, *, generator=None, out=None, dtype=None, layout=torch.strided, device=None, requires_grad=False) → Tensor
-
-
-# Returns a tensor filled with random numbers from a normal distribution with mean 0 and variance 1 (also called the standard normal distribution).
-# 随机标准分布
-torch.randn(*size, *, out=None, dtype=None, layout=torch.strided, device=None, requires_grad=False) → Tensor
-```
-### 2.5.2. 种子操作
-
-seed   :Sets the seed for generating random numbers to a non-deterministic random number.
-
-manual_seed   :Sets the seed for generating random numbers.
-
-initial_seed   :Returns the initial seed for generating random numbers as a Python long.
-
-get_rng_state   :Returns the random number generator state as a torch.ByteTensor.
-
-set_rng_state   :Sets the random number generator state.
-
-
-
-## 2.6. 拼接与截取
-
-### 2.6.1. torch.stack
+### 2.5.1. torch.stack
 `torch.stack(tensors, dim=0, *, out=None) → Tensor`  
 
 * 将多个 tensor 叠加到一起, 并产生一个新的 dimension
@@ -211,7 +208,7 @@ set_rng_state   :Sets the random number generator state.
 * 因此所有 tensor 必须相同大小
 * dim 指定新的 dimension 的位置
 
-### 2.6.2. torch.cat
+### 2.5.2. torch.cat
 
 `torch.cat(tensors, dim=0, *, out=None) → Tensor`  
 
@@ -222,9 +219,9 @@ set_rng_state   :Sets the random number generator state.
 
 
 
-## 2.7. 降维操作 Reduction Ops
+## 2.6. 降维操作 Reduction Ops
 
-### 2.7.1. max
+### 2.6.1. max
 1. torch.max(input) → Tensor 返回张量所有元素里的最大值
 2. torch.max(input, dim, keepdim=False, *, out=None) -> (Tensor, LongTensor) 即(values, indices) 
 
@@ -593,9 +590,10 @@ loss_func = nn.CrossEntropyLoss()
 Pytorch 自定义数据库中最重要的部分  
 提供了对 `dataset` 的所种操作模式  
 
-## 6.1. torch.utils.data
+# 7. torch.utils
+## 7.1. torch.utils.data
 
-### 6.1.1. 数据集类型
+### 7.1.1. 数据集类型
 
 Dataset 可以分为两种类型的数据集, 在定义的时候分别继承不同的抽象类
 
@@ -612,7 +610,7 @@ Dataset 可以分为两种类型的数据集, 在定义的时候分别继承不�
 
 `torch.utils.data.Dataset`  和  `torch.utils.data.IterableDataset`  
 
-### 6.1.2. torch.utils.data.Dataset
+### 7.1.2. torch.utils.data.Dataset
 
 * Dataset 类是一个抽象类, 用于 map-key 的数据集
 * Dataset 类是 DataLoader 的最重要的构造参数  
@@ -652,7 +650,7 @@ class trainset(Dataset):
 ```
 
 
-### 6.1.3. torch.utils.data.DataLoader
+### 7.1.3. torch.utils.data.DataLoader
 
 Pytorch的核心数据读取器`torch.utils.data.DataLoader`   
 是一个可迭代的数据装载器  包括了功能:  
@@ -698,7 +696,7 @@ for images,labels in trainLoader:
 ```
 
 
-## 6.2. torch.optim
+# 8. torch.optim
 
 是一个实现各种优化算法的包。已经支持最常用的方法，并且界面足够通用，因此将来可以轻松集成更复杂的方法。  
 
@@ -717,7 +715,7 @@ optimizer = optim.Adam([var1, var2], lr = 0.0001)
 
 ```
 
-### 6.2.1. per-parameter options
+### 8.0.1. per-parameter options
 
 To do this, instead of passing an iterable of `Variable` s, pass in an iterable of `dict` s.    
 * dict 中指定了不同的 parameter group, 并且需要使用 `params` 关键字
@@ -731,7 +729,7 @@ optim.SGD([
                 {'params': model.classifier.parameters(), 'lr': 1e-3}
             ], lr=1e-2, momentum=0.9)
 ```
-### 6.2.2. optimization step
+### 8.0.2. optimization step
 
 重点: 所有 optimizers 必须实现 step 方法, 用来更新要优化的参数  
 
@@ -774,7 +772,7 @@ for input, target in dataset:
     optimizer.step(closure)
 
 ```
-### 6.2.3. Algorithm
+### 8.0.3. Algorithm
 
 `class torch.optim.Optimizer(params, defaults)` 是所有优化器的基类, 定义了优化器的必须操作  
 * 参数
@@ -805,7 +803,7 @@ for input, target in dataset:
 * Rprop
 * **SGD**
 
-### 6.2.4. 动态 Learn Rate
+### 8.0.4. 动态 Learn Rate
 
 `torch.optim.lr_scheduler` 提供了一些方法用来根据 epoch 或者其他计算来调整学习速率
 
@@ -822,7 +820,7 @@ for epoch in range(100):
 
 
 
-# 7. TorchScript
+# 9. TorchScript
 
 
 对于一个从Pytorch创建的一个可优化和串行的模型, 使其可以运行在其他非Python的平台上  
@@ -837,7 +835,7 @@ TorchScript provides tools to capture the definition of your model, even in ligh
 4. TorchScript 可以允许与许多后端设备运行接口, 这些运行环境往往需要比单独的操作器更广泛的程序视野.
 
 
-## 7.1. Tracing Modules
+## 9.1. Tracing Modules
 
 Trace:
 1. invoked the Module
@@ -908,7 +906,7 @@ def forward(self,
 
 ```
 
-## 7.2. Convert Modules
+## 9.2. Convert Modules
 
 * 对于一个带有控制流的子模型, 直接使用 Trace 不能正确的捕捉整个程序流程  
 * 使用 `script compiler` 即可, 可以直接分析Python 源代码来导出 TorchScript
@@ -978,7 +976,7 @@ my_cell(x,h)
 
 ```
 
-## 7.3. Mixing Scripting and Tracing
+## 9.3. Mixing Scripting and Tracing
 
 混合 Script 和 Trace
 
@@ -1044,7 +1042,7 @@ def forward(self,
 
 ```
 
-## 7.4. Saving and Loading models
+## 9.4. Saving and Loading models
 
 save and load TorchScript modules  
 这种形式的存储 包括了代码,参数,性质还有Debug信息
@@ -1060,7 +1058,7 @@ print(loaded.code)
 
 ```
 
-## 7.5. API torch.jit
+## 9.5. API torch.jit
 
 * script(obj[, optimize, _frames_up, _rcb])
 * trace(func, example_inputs[, optimize, …])
@@ -1074,17 +1072,17 @@ print(loaded.code)
 * ignore([drop])
 * unused(fn)
 
-# 8. Pytorch C++ API
+# 10. Pytorch C++ API
 
-## 8.1. ATen
-
-
-
-# 9. 例程
+## 10.1. ATen
 
 
-## 9.1. MNIST LeNet 例程
-### 9.1.1. Network structure
+
+# 11. 例程
+
+
+## 11.1. MNIST LeNet 例程
+### 11.1.1. Network structure
 ```py
 
 class LeNet(nn.Module):
@@ -1161,7 +1159,7 @@ print(net)
 ```
 
 
-### 9.1.2. dataset
+### 11.1.2. dataset
 
 
 ```py
@@ -1217,7 +1215,7 @@ show_imgs = torchvision.utils.make_grid(images, nrow=10).numpy().transpose((1,2,
 plt.imshow(show_imgs)
 
 ```
-### 9.1.3. iteration
+### 11.1.3. iteration
 
 ```py
 
@@ -1294,7 +1292,7 @@ for iteration, data in enumerate(trainloader):
 
 
 
-### 9.1.4. evaluate
+### 11.1.4. evaluate
 
 ```py
 
@@ -1346,9 +1344,9 @@ def evaluate_model():
 
 ```
 
-## 9.2. MINST GAN 例程
+## 11.2. MINST GAN 例程
 
-### 9.2.1. dataset
+### 11.2.1. dataset
 
 ```py
 # Define transform func.
@@ -1368,7 +1366,7 @@ train_loader  = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=bc
 test_loader   = torch.utils.data.DataLoader(dataset= test_dataset, batch_size=bch_size, shuffle=False)
 ```
 
-### 9.2.2. 网络
+### 11.2.2. 网络
 
 ```py
 # 训练 epoch
@@ -1436,7 +1434,7 @@ G_optimizer = optim.Adam(G.parameters(), lr = base_lr)
 D_optimizer = optim.Adam(D.parameters(), lr = base_lr)
 ```
 
-### 9.2.3. G 训练
+### 11.2.3. G 训练
 
 ```py
 # Code for training the generator
@@ -1461,7 +1459,7 @@ def G_train(bch_size, z_dim, G_optimizer):
 
 ```
 
-### 9.2.4. D 训练
+### 11.2.4. D 训练
 对于每次 D 训练, 先输入一组 real image 再输入一组 fake image 作为一次训练流程  
 
 ```py
@@ -1501,7 +1499,7 @@ def D_train(x, D_optimizer):
     return  D_loss.data.item()
 ```
 
-### 9.2.5. iteration
+### 11.2.5. iteration
 
 ```py
 
@@ -1567,9 +1565,9 @@ def Logging(images, G_loss, D_loss):
         
 ```
 
-## 9.3. MINST USPS adversarial examples
+## 11.3. MINST USPS adversarial examples
 
-### 9.3.1. dataset
+### 11.3.1. dataset
 
 ```py
 # Make MINIST dataloaders
@@ -1589,7 +1587,7 @@ usps_testloader  = utils.data.DataLoader(usps_test,  batch_size=1,  shuffle=Fals
 
 ```
 
-### 9.3.2. general train and evaluate
+### 11.3.2. general train and evaluate
 
 ```py
 # Script for training a network

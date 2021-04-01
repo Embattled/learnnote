@@ -395,8 +395,8 @@ size_t fwrite(const void *ptr, size_t size_of_elements, size_t number_of_element
      * right        right adjustment (adds fill characters to the left): see std::right
      * internal 	internal adjustment (adds fill characters to the internal designated point): see std::internal
      * adjustfield 	left|right|internal. Useful for masking operations
-     * scientific 	generate floating point types using scientific notation, or hex notation if combined with fixed: see std::scientific
-     * fixed 	    generate floating point types using fixed notation, or hex notation if combined with scientific: see std::fixed
+     * `scientific` 	generate floating point types using scientific notation, or hex notation if combined with fixed: see std::scientific
+     * `fixed` 	    generate floating point types using fixed notation, or hex notation if combined with scientific: see std::fixed
      * floatfield 	scientific|fixed. Useful for masking operations
      * boolalpha 	insert and extract bool type in alphanumeric format: see std::boolalpha
      * showbase 	generate a prefix indicating the numeric base for integer output, require the currency indicator in monetary I/O: see std::showbase

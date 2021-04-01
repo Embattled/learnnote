@@ -72,6 +72,7 @@
   - [8.2. Python的可变参数](#82-python的可变参数)
   - [8.3. 逆向参数收集](#83-逆向参数收集)
   - [8.4. 函数的文档](#84-函数的文档)
+  - [yield 表达式](#yield-表达式)
   - [8.5. lambda 表达式 匿名函数](#85-lambda-表达式-匿名函数)
   - [8.6. 函数的异常处理](#86-函数的异常处理)
 - [9. python 的类](#9-python-的类)
@@ -223,6 +224,11 @@ keyword.kwlist
   * True False              : bool类型的值  
   * None                    : NoneType的值
 
+* 函数保留字
+  * def  : 函数定义
+  * lambda : lambda函数
+  * yield : 定义生成器
+
 * 运算保留字
   * and or not is           : 逻辑保留字
   * not 可以和一些保留字组合取反义
@@ -237,22 +243,21 @@ keyword.kwlist
 * assert                  : 断言
 * in                      : 序列元素检查
 
-* def  : 函数定义
 
 * del  : 字典删除键值对
+* class : 创建类
 
 其他保留字:  
-class  
-except  
 finally   
 global  
-lambda  
 nonlocal    
 raise  
 return  
-try  
 with  
-yield 	  
+
+* 鲁棒性保留字
+  * try  
+  * except  
 
 # 3. 内置函数
 
@@ -1360,6 +1365,76 @@ help(str_max)
 print(str_max.__doc__)
 
 ```
+## yield 表达式
+
+* yield 用来定义一个生成器函数或者异步生成器函数中
+* 因此只能被用在函数体的定义里, 使得该函数不再是一个普通函数
+  * def 函数生成一个生成器
+  * async def 函数生成一个异步生成器
+
+* 作用
+  * 提高函数的复用性, 如果需要一个数列, 最好不要直接打印出数列, 而是返回一个 List
+  * 但是返回数列会导致, 函数在运行中占用的内存会随着返回的 list 的长度而增大
+  * 如果要控制内存占用, 最好不要用 List, 来保存中间结果, 而是通过 iterable 对象来迭代
+  * 
+
+```py
+def gen():  # defines a generator function
+    yield 123
+
+async def agen(): # defines an asynchronous generator function
+    yield 123
+
+
+# range(1000) 函数会返回一个 1000 的list
+for i in range(1000): pass
+# xrange 不会返回一个一整个 list, 而是返回一个 iterable 对象, 在每次迭代中返回下一个数值, 内存空间占用很小
+for i in xrange(1000): pass
+
+
+# 使用 yield 编写的斐波那契生成数列, 效果不变, 内存只占用常数项
+def fab(max): 
+    n, a, b = 0, 0, 1 
+    while n < max: 
+        yield b      # 使用 yield
+        # print b 
+        a, b = b, a + b 
+        n = n + 1
+ 
+for n in fab(5): 
+    print n
+
+# 使用类编写相应的 iterate 方法也能有同样的效果, 但是代码不简洁
+class Fab(object): 
+  def __init__(self, max): 
+      self.max = max 
+      self.n, self.a, self.b = 0, 0, 1 
+
+  def __iter__(self): 
+      return self 
+
+  def next(self): 
+      if self.n < self.max: 
+          r = self.b 
+          self.a, self.b = self.b, self.a + self.b 
+          self.n = self.n + 1 
+          return r 
+      raise StopIteration()
+
+# 使用 yield 编写定长缓冲区读取文件
+
+def read_file(fpath): 
+    BLOCK_SIZE = 1024 
+    with open(fpath, 'rb') as f: 
+        while True: 
+            block = f.read(BLOCK_SIZE) 
+            if block: 
+                yield block 
+            else: 
+                return
+                
+```
+
 
 ## 8.5. lambda 表达式 匿名函数
 
@@ -1396,8 +1471,6 @@ python有很多的error类:
 `ZeroDivisionError`  
 `ValueError` 对于输入数据的类型不符    
 `FileNotFoundError` 打开文件的路径不对, 文件不存在  
-
-
 
 # 9. python 的类
 

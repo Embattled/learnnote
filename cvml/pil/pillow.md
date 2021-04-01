@@ -4,7 +4,6 @@ Pillow is the friendly PIL fork
 
 所有子模块都定义在 `PIL` 里  
 
-
 # 2. Image
 
 `from PIL import Image`  
@@ -20,16 +19,15 @@ Pillow is the friendly PIL fork
 ```py
 im = Image.open("hopper.ppm")
 ```
-
 ### 2.1.2. new
 
 ```py
 PIL.Image.new(mode, size, color=0)
 ```
 
-## 2.2. Information
+## 2.2. Image Class
 
-class 拥有的情报:
+class 拥有的情报属性:
 * format    : 来源的格式, 如果是从内存中创建的图像则为 `None`
 * size
 * mode
@@ -41,8 +39,7 @@ print(im.format, im.size, im.mode)
 ## 2.3. transform
 
 
-
-# 3. Ima#geDraw
+# 3. ImageDraw
 
 ## 3.1. 类方法
 ### 3.1.1. .text
@@ -63,14 +60,88 @@ ImageDraw.text(
     stroke_fill=None, 
     embedded_color=False)
 ```
-# 4. Others
-## 4.1. ImageFont
+# 4. ImageOps
+
+Most operators only work on L and RGB images.
+
+
+## 4.1. 黑白彩色转换
+
+* 将一个图片转换成 GrayScale
+  * `PIL.ImageOps.grayscale(image)`
+  * 该函数源代码就是直接将 mode 更改为 `("L")`
+* 将一个 GrayScale 转成 RBG彩色
+  * `PIL.ImageOps.colorize(image, black, white, mid=None, blackpoint=0, whitepoint=255, midpoint=127)`
+  * black white mid 分别是一个 RBG tuples
+  * 该颜色赋予是有梯度的, 不是单纯的二值赋值
+  * mid 可是可选的, 指定了 mid 代表这是一个三区间 mapping
+
+
+# 5. Other 小包
+## 5.1. ImageMorph
+
+提供对图片的形态学变化
+
+* 创建变换
+  * A class for building a MorphLut from a descriptive language
+  * `class PIL.ImageMorph.LutBuilder(patterns=None, op_name=None)`
+  * `patterns` 是一个单独的描述性语言, 用来说明要进行的变换
+  * `op_name`  可以使用预定义的变换
+  * 类成员函数
+    * `add_patterns( patterns )`
+    * `build_lut()` 编译这个变换, 返回 morphology lut.
+    * `get_lut()` 获取 lut
+
+```py
+# patterns 是一个列表包裹着的字符串, 类似于
+p=["4:(....1.111)->1"]
+"""
+Operations:
+    - 4 - 4 way rotation
+    - N - Negate
+    - 1 - Dummy op for no other operation (an op must always be given)
+    - M - Mirroring
+
+Kernel:
+    - . or X - Ignore
+    - 1 - Pixel is on
+    - 0 - Pixel is off
+
+->0 : 代表该 kernel 匹配时, 输出的像素值
+"""
+known_patterns = {
+              "corner": ["1:(... ... ...)->0", "4:(00. 01. ...)->1"],
+              "dilation4": ["4:(... .0. .1.)->1"],
+              "dilation8": ["4:(... .0. .1.)->1", "4:(... .0. ..1)->1"],
+              "erosion4": ["4:(... .1. .0.)->0"],
+              "erosion8": ["4:(... .1. .0.)->0", "4:(... .1. ..0)->0"],
+              "edge": [
+                  "1:(... ... ...)->0",
+                  "4:(.0. .1. ...)->1",
+                  "4:(01. .1. ...)->1",
+              ],
+          }
+
+```
+
+* 应用变换
+  * A class for binary morphological operators  
+  * `class PIL.ImageMorph.MorphOp(lut=None, op_name=None, patterns=None)`
+
+
+
+
+
+
+
+# 6. ImageFont
 
 定义了一个同名的 ImageFont 类, 可以保存 bitmap 类型的 fonts  
 
-### 4.1.1. truetype
+## 6.1. truetype
 
 ```py
 
 PIL.ImageFont.truetype(font=None, size=10, index=0, encoding='', layout_engine=None)
 ```
+

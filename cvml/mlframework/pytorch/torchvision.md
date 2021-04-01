@@ -21,7 +21,6 @@
   - [5.4. 一般性自定义函数 Generic Transforms](#54-一般性自定义函数-generic-transforms)
 - [6. 基础性变化 Functional Transforms](#6-基础性变化-functional-transforms)
   - [6.1. 类型转换](#61-类型转换)
-    - [6.1.1. pil_to_tensor](#611-pil_to_tensor)
     - [6.1.2. convert_image_dtype](#612-convert_image_dtype)
   - [6.2. Scrpit and Compositions](#62-scrpit-and-compositions)
   - [6.3. Transforms on only 特定函数](#63-transforms-on-only-特定函数)
@@ -121,16 +120,41 @@ torchvision.io.write_png(input: torch.Tensor, filename: str, compression_level: 
 * pixelwise semantic segmentation
 * object detection, instance segmentation , person keypoint detection
 
+
+Pytorch 的所有预定义 model 都继承自  `nn.Module` , 注意类的相关构造参数
+
 ## 3.1. image classification
 
-* 通过调用构造函数可以直接获得网络模型对象  
+主要用于图像识别, Classification 的模型
+* 通过直接调用构造函数, 可以直接生成一个拥有随机 weights 的模型对象
 * 通过传入参数 `pretrained=True` 可以直接获得基于 `model_zoo` 训练好的模型
-* pre-trained 的模型则需要输入图像的尺寸至少有 224
+  * 模型参数会下载并存入一个 `cache` 文件
+  * pre-trained 的模型则需要:
+    * 输入图像的尺寸至少有 224 且 shape (3 H W)
+    * 图像需要被 normalized, 范围 0~1 
+    * 
+* 注意模型的 train 和 test 可能会有不同的动作
+  * train 中可能会有 batch normalization
+  * 使用 .train()  和 .eval() 确保模型正常工作
 
 
 
-
-
+| Network       | 函数名称                                        |
+| ------------- | ----------------------------------------------- |
+| Alexnet       | alexnet                                         |
+| VGG           | vgg11 vgg11_bn vgg13 vgg13_bn *16 *19           |
+| ResNet        | resnet18 resnet34 resnet50 resnet101  resnet152 |
+| squeezeNet    | squeezenet1_0 squeezenet1_1                     |
+| DenseNet      | densenet121 densenet169 densenet161 densenet201 |
+| Inception v3  | inception_v3                                    |
+| GoogLeNet     | googlenet                                       |
+| ShuffleNet v2 | ShuffleNet_v2_*                                 |
+| MobileNet V2  | mobilenet_v2                                    |
+| MobileNet V3  | mobilenet_v3_large  mobilenet_v3_small          |
+| ResNext       | resnext50_32x4d resnext101_32x8d                |
+| Wide ResNet   | wide_resnet50_2 wide_resnet101_2                |
+| MNASNet       | mnasnet0_5 mnasnet0_75 mnasnet1_0 mnasnet1_3    |
+ 
 
 # 4. torchvision.utils
 
@@ -368,12 +392,18 @@ torchvision.transforms.FiveCrop(size)
 
 并不是变换函数, 但是是找了很久的 pytorch 中的图像类型转换函数
 
-### 6.1.1. pil_to_tensor
-
-`torchvision.transforms.functional.pil_to_tensor(pic)`  
-* 如名称, 将 `PIL Image` 转换成相同类型  
-* 只有一个参数, 就是 PIL Image 对象
-
+* to_tensor
+  * `torchvision.transforms.functional.to_tensor(pic)`
+  * 将 PIL 或者 ndarray 转换成 tensor
+* pil_to_tensor
+  `torchvision.transforms.functional.pil_to_tensor(pic)`  
+  * 如名称, 将 `PIL Image` 转换成相同类型  
+  * 只有一个参数, 就是 PIL Image 对象
+* to_pil_image
+  * `torchvision.transforms.functional.to_pil_image(pic, mode=None)`
+  * 将 tensor 或者 ndarray 转换成 PIL 图片
+  * `mode` 可以指定目标类型
+* 
 
 
 ### 6.1.2. convert_image_dtype
@@ -413,8 +443,6 @@ class torchvision.transforms.Compose(transforms)
 # transforms    :  (Transform对象的list）  一系列需要进行组合的变换。
 
 transforms.Compose( [  transforms.CenterCrop(10), transforms.ToTensor(),  ])
-
-
 
 
 ```

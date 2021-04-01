@@ -184,10 +184,11 @@ DataFrame accepts many different kinds of input:
 
 创建:
 1. 通过字典创建 
-   1. dict: `df=pd.DataFrame( dict() )`
-   2. 通过 dict of Series  : `df=pd.DataFrame( 同样是字典dict(),value=Series  )`
+   1. dict: `df=pd.DataFrame( d
+   2. ict() )`
+   3. 通过 dict of Series  : `df=pd.DataFrame( 同样是字典dict(),value=Series  )`
       * 需要通过 字典的方式给 Series 赋予列名称
-   3. dict of ndarrays/lists: 
+   4. dict of ndarrays/lists: 
       * `d = {"one": [1.0, 2.0, 3.0, 4.0], "two": [4.0, 3.0, 2.0, 1.0]}`
       * `pd.DataFrame(d)`
 
@@ -207,6 +208,8 @@ data = {"Name"  : ["Eli", "Abe", "Ito", "Mia", "Moe", "Leo", "Mia", "Ann"],
 }
 #字典转为 DF
 df = pd.DataFrame(data)
+# 直接创建
+pd.DataFrame({'Bob': ['I liked it.', 'It was awful.'], 'Sue': ['Pretty good.', 'Bland.']})
 
 # 创建随机内容 , 指定 索引和列标签
 df = pd.DataFrame(np.random.randn(8, 4),
