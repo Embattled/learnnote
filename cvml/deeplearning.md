@@ -5,6 +5,27 @@
 * MaxPool 在 Alexnet 中被发扬光大, 避免了平均池化的模糊效果, 并且池化核的步长比核的尺寸小, 让池化层的感受野有重叠, 提高了特征的丰富性
 
 
+## Activate Function
+
+* Sigmoid
+  * 1/(1-e^(-z))
+  * 计算梯度
+    * a=sig(z)
+    * dz=a(1-a)
+* tanh
+  * (e^(z)-e^(-z))/(e^(z)+e^(-z))
+  * 计算梯度
+    * a=tanh(z)
+    * dz=1-a*a
+
+* 梯度消失在 Sigmoid 和 tanh 中都会发生
+
+选择激活函数的规则
+* 如果是 Binary Classification
+  * 只在输出层用 Sigmoid 函数
+  * 其他层用 ReLU 或者 Leaky ReLU
+* 
+
 ## 1.1. LRN 和 BN
 
 * LRN : 局部响应归一化 ( Local Response Normalization )
@@ -21,6 +42,7 @@
 * 为了鼓励 横向抑制 ( lateral inhibition )
   * 组织兴奋神经元向其临近的神经元传递其动作趋势
   * 目的是进行局部对比度增强, 以便使局部最大像素值作用于下一层的激励
+* 在VGG的论文中提到了 LRN 基本没什么作用 Very Deep Convolutional Networks for Large-Scale Image Recognition.
 
 
 * 通道间的 LRN ( Inter-Channel LRN ) , 在 Alexnet 中被使用, 定义的邻域在整个通道上, 即对于 x,y 位置, 在 RGB 维度上进行归一化
@@ -50,6 +72,10 @@
 ### 2.1.1. Alexnet
 
 * ReLU 激活函数被应用在了所有卷积层和FC层的后面
+
+PS : 更新知识点 
+* Alex Krizhevsky在2014年发表《One weird trick for parallelizing convolutional neural networks》。
+* Pytorch官方给出的AlexNet模板是基于2014年这篇论文。
 
 前5层卷积层的网络结构:
 * 输入:  原论文中是 `224*224*3` 的图片, 经过`迷之` padding 到 227

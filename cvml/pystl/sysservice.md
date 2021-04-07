@@ -48,11 +48,44 @@ for root, dirs, files in os.walk('/home/eugene/workspace/learnnote/cvml'):
 * 与系统时间相关的函数, 大部分都是直接调取操作系统内置的 同名C函数  
 * Python 中与时间操作的 module 还有 `datetime` 和 `calendar`
 
+并不是所有的函数都可以在所有平台使用, 因为大部分函数都是直接调用 C 函数库
+
+## 3.2. 相关定义
+
+* epoch 时间是从 1970, 00:00:00 (UTC) 开始的, 根据平台不同可能会有不同的开始时间
+* 该模组中的函数都是 C 相关的, 因此对日期的处理只限于 32位描述, 即 1970~2038
+* 2位数的年份表示: `POSIX and ISO C standards` 69~99表示 `19**`, 0~68表示`20**`
+
+| From                      | To                        | Use               |
+| ------------------------- | ------------------------- | ----------------- |
+| seconds since the epoch   | struct_time in UTC        | gmtime()          |
+| seconds since the epoch   | struct_time in local time | localtime()       |
+| struct_time in UTC        | seconds since the epoch   | calendar.timegm() |
+| struct_time in local time | seconds since the epoch   | mktime()          |
+```py
+# 获取该计算机平台的时间表示开始时间
+time.gmtime(0)
+
+```
+
 ## 3.1. 获取时间
 
+无参数函数
+1. time()    : 获取浮点数表示的从 epoch 开始经过的秒数
 
+## 获取规格化字符串时间
 
-## 3.2. 相关系统原理的定义
+`time.strftime(format, t=None )`
+* 将一个元组或者 struct_time 转化成格式的字符串
+  * t 可以接受 gmtime() 或者 localtime() 的输入
+  * 没有 t 的话代表输出当前的时间
 
-* epoch 时间是从 1970, 00:00:00 (UTC) 开始的
-
+| 描述符 | 意义                  |
+| ------ | --------------------- |
+| %S     | 秒数                  |
+| %M     | 分钟数                |
+| %H %I  | 24-小时 12-小时       |
+| %w     | 星期几 0表星期天      |
+| %d     | 日期                  |
+| %m     | 月份                  |
+| %Y %y  | 四位数年份 两位数年份 |
