@@ -2,7 +2,7 @@
 
 该分类的模组用于提供 Python 解释器和其运行环境, 也就是操作系统之间的交互  
 
-# 2. sys
+# 2. sys python解释器服务
 
 与 python 解释器密切相关的一些函数与变量  
 
@@ -20,7 +20,7 @@
 * `sys.__stdout__`
 * `sys.__stderr__`
 
-# 3. sysconfig
+# 3. sysconfig python解释器配置
 
 用于指定 python 自己的相关控制参数  
 
@@ -47,3 +47,8 @@
 * getsource(obj)
 
 ## 
+
+
+# traceback 用于异常溯源
+
+

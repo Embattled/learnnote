@@ -30,9 +30,99 @@ TeX的组成
 
 
 
-# 2. latex 基础
+# 2. latex 数学
 
-## 2.1. 文档的基础
+过于重要, 在markdown也能用, 因此先介绍
+
+## 2.1. 特殊字符及转义
+
+* latex的特殊字符:
+  * `# $ % & ~ _ ^ \ { }`
+  * 使用这些特殊字符时需要加上转义符 `\`
+* 在公式中添加空格 `\quad`
+
+### 希腊字符
+
+* 希腊字符在latex中有对应的表示代码
+* 有些希腊字母的大写和英文一样因此没有特殊代码
+
+字母表:
+| 读音    | latex代码         | 示例                |
+| ------- | ----------------- | ------------------- |
+| 阿尔法  | \alpha A          | $\alpha A$          |
+| 贝塔    | \beta B           | $\beta B$           |
+| 伽马    | \gamma \Gamma     | $\gamma \Gamma$     |
+| 得塔    | \delta \Delta     | $\delta \Delta$     |
+| 伊普松  | \epsilon E        | $\epsilon E$        |
+| 泽塔    | \zeta Z           | $\zeta Z$           |
+| eta     | \eta H            | $\eta H$            |
+| theta   | \theta \Theta     | $\theta \Theta$     |
+| iota    | \iota I           | $\iota I$           |
+| kappa   | \kappa K          | $\kappa K$          |
+| lambda  | \lambda \Lambda   | $\lambda \Lambda$   |
+| mu      | \mu M             | $\mu M$             |
+| mu      | \mu N             | $\mu N$             |
+| xi      | \xi \Xi           | $\xi \Xi$           |
+| o       | o O               | $o O$               |
+| pi      | \pi \PI           | $\pi \Pi$           |
+| rho     | \rho P            | $\rho P$            |
+| sigma   | \sigma \Sigma     | $\sigma \Sigma$     |
+| tau     | \tau T            | $\tau T$            |
+| upsilon | \upsilon \Upsilon | $\upsilon \Upsilon$ |
+| phi     | \phi Phi          | $\phi \Phi$         |
+| chi     | \chi X            | $\chi X$            |
+| psi     | \psi \Psi         | $\psi \Psi$         |
+| omega   | \omega \Omega     | $\omega \Omega$     |
+
+## 上下标和根号
+* 上下标的字符多于一个的时候, 需要用 {} 括起来
+  * ^ 表示商标
+  * _ 表示下标
+* \sqrt表示开方, 类似于一个函数, 默认开平方
+  * 完整写法是 `\sqrt[开方字符]`
+* $\sqrt[\alpha]\Gamma^{25}$
+
+## 运算符和分数
+
+* 分数的表示也是类似函数, 需要填入两个空
+  * `\frac{分子}{分母}`
+  * 分数可以设置字号大小, 用引申出来的两个命令
+    * `\dfrac`命令把字号设置为独立公式中的大小 默认
+    * `\tfrac`则把字号设置为行间公式中的大小
+
+* 加减乘除等于 + - * / = 是直接输入的
+
+特殊运算符:
+| 名称   | 代码    | 显示       |
+| ------ | ------- | ---------- |
+| 加减   | \pm     | $\pm$      |
+| 大乘   | \times  | $\times$   |
+| 大除   | \div    | $\div$     |
+| 点乘   | \cdot   | $\cdot$    |
+| 合     | \cap    | $\cap$     |
+| 并     | \cup    | $\cup$     |
+| 大于   | \gt \ge | $\gt \geq$ |
+| 小于   | < \le   | $< \le$    |
+| 不等于 | \ne     | $\ne$      |
+| 约等于 | \approx | $\approx$  |
+| 全等   | \equiv  | $\equiv$   |
+
+
+范围运算符
+| 名称   | 代码  | 显示              |
+| ------ | ----- | ----------------- |
+| 求和   | \sum  | $\sum_{i=1}^n$    |
+| 求积   | \prod | $\prod_{i=1}^n$   |
+| 求极限 | \lim  | $\lim_{x\to1}x^2$ |
+求积分|\int|$\int_{a}^{b}x^2$ 
+多重积分|\多个i + nt| $\iiint$
+
+
+# 3. latex 文档基础
+
+
+
+## 3.1. 文档的基础
 
 * `\documentclass{}`  定义在一开始, 说明文档的类型
 * `begin{document}` `\end{documnet}`  内容的开始与结束
@@ -46,7 +136,7 @@ First document.
 \end{document}
 ```
 
-## 2.2. preamble
+## 3.2. preamble
 
 定义在 ` \begin{document}` 叫做 latex 的preamble, 一般包含了:  
 1.  the type of document you are writing
@@ -68,7 +158,7 @@ First document.
 \author{Hubert Farnsworth \thanks{funded by the Overleaf team}}
 \date{February 2014}
 ```
-## 2.3. 显示文档标题
+## 3.3. 显示文档标题
 
 ```
 \title{First document}
@@ -90,6 +180,6 @@ In this document.
 *  `\thanks{}` 用于在作者中加入致谢, It will add a superscript and a footnote with the text inside the braces. 
   
 
-# 3. latex 基础API
+# 4. latex 基础API
 
-### 3.0.1. documentclass
+### 4.0.1. documentclass

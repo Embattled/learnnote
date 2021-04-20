@@ -175,11 +175,15 @@ Markdown使用 `|`来制作表格 `-` 来分隔表头和其他行
 `:`代表内容 `--`代表空白
 
 ## 9. 高级技巧  
+
 ### 1. 支持使用HTML元素
 目前支持的 HTML 元素有：`<kbd> <b> <i> <em> <sup> <sub> <br>`等  
 `使用 <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Del</kbd> 重启电脑`
 使用 <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Del</kbd> 重启电脑
 
-### 2. 支持使用TeX和LaTeX来表示数学公式
-使用 `&&公式内容&&`
-来调用Mathjax对公式进行渲染
+### 2. TeX LaTeX 数学公式
+
+* 使用 `$公式内容$` 表示行内公式
+  * $c = \sqrt{a^{2}+b_{xy}^{2}+e^{x}}$
+* 使用 `$$表示块公式$$`, 会居中显示
+  * $$c = \sqrt{a^{2}+b_{xy}^{2} +e^{x}}$$

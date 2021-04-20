@@ -275,6 +275,14 @@ double      log2 ( IntegralType arg );
 
 ## 4.5. 幂函数 power function
 
+* pow 函数是开平方和开立方的完整函数
+* pow 函数支持输入负数幂用来开任意次方
+
+1. pow 函数, C++11之前只支持整数
+2. sqrt
+3. cbrt C++11新函数
+4. hypot C++11新函数
+
 ### 4.5.1. 幂函数 pow
 
 ```cpp
@@ -288,7 +296,6 @@ Promoted    pow ( Arithmetic1 base, Arithmetic2 exp )
 
 float       powf( float base, float exp );
 long double powl( long double base, long double exp );
-
 ```
 
 ### 4.5.2. 开平方 sqrt
@@ -312,6 +319,25 @@ float       cbrtf( float arg );
 long double cbrtl( long double arg );
 ```
 ### 4.5.4. 开勾股 hypot
+
+* C++17 开始支持三个数的开勾股
+
+```cpp
+// C++11 开始
+float       hypot ( float arg );
+double      hypot ( double arg );
+long double hypot ( long double arg );
+Promoted    hypot ( Arithmetic1 x, Arithmetic2 y );
+
+float       hypotf( float arg );
+long double hypotl( long double arg );
+
+// C++17 开始
+float       hypot ( float x, float y, float z );
+double      hypot ( double x, double y, double z );
+long double hypot ( long double x, long double y, long double z );
+Promoted    hypot ( Arithmetic1 x, Arithmetic2 y, Arithmetic3 z );
+```
 
 ## 4.6. 三角函数 trigonometric functions
 

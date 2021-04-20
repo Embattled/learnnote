@@ -5,6 +5,9 @@
 - [2. Python的语法](#2-python的语法)
   - [2.1. Python 书写规范 (PEP 8)](#21-python-书写规范-pep-8)
   - [2.2. Python 保留字](#22-python-保留字)
+  - [2.3. python 的类型提示](#23-python-的类型提示)
+    - [2.3.1. 类型别名](#231-类型别名)
+    - [2.3.2. 函数的类型注解](#232-函数的类型注解)
 - [3. 内置函数](#3-内置函数)
   - [3.1. 类型转换函数](#31-类型转换函数)
   - [3.2. print()](#32-print)
@@ -62,19 +65,25 @@
     - [6.2.6. 识别转换方法 **str.extract()**](#626-识别转换方法-strextract)
     - [6.2.7. str.get_dummies()](#627-strget_dummies)
 - [7. Python 流程控制](#7-python-流程控制)
-  - [7.1. `if` 表达式](#71-if-表达式)
-  - [7.2. assert 语句](#72-assert-语句)
-  - [7.3. `while` 表达式](#73-while-表达式)
-  - [7.4. `for` 表达式](#74-for-表达式)
-  - [7.5. 列表推导式（又称列表解析式）](#75-列表推导式又称列表解析式)
+  - [7.1. 逻辑流程](#71-逻辑流程)
+    - [7.1.1. `if` 表达式](#711-if-表达式)
+    - [7.1.2. while 表达式](#712-while-表达式)
+    - [7.1.3. for 表达式](#713-for-表达式)
+    - [7.1.4. 列表推导式（又称列表解析式）](#714-列表推导式又称列表解析式)
+  - [7.2. 异常流程控制](#72-异常流程控制)
+    - [7.2.1. 异常类](#721-异常类)
+    - [7.2.2. raise 语句](#722-raise-语句)
+    - [7.2.3. assert 语句](#723-assert-语句)
+    - [7.2.4. 异常信息捕获](#724-异常信息捕获)
+    - [自定义异常类](#自定义异常类)
 - [8. python 的函数](#8-python-的函数)
   - [8.1. 函数参数](#81-函数参数)
   - [8.2. Python的可变参数](#82-python的可变参数)
   - [8.3. 逆向参数收集](#83-逆向参数收集)
   - [8.4. 函数的文档](#84-函数的文档)
-  - [yield 表达式](#yield-表达式)
-  - [8.5. lambda 表达式 匿名函数](#85-lambda-表达式-匿名函数)
-  - [8.6. 函数的异常处理](#86-函数的异常处理)
+  - [8.5. yield 表达式](#85-yield-表达式)
+  - [8.6. lambda 表达式 匿名函数](#86-lambda-表达式-匿名函数)
+  - [8.7. 函数的异常处理](#87-函数的异常处理)
 - [9. python 的类](#9-python-的类)
   - [9.1. 定义](#91-定义)
   - [9.2. self](#92-self)
@@ -259,6 +268,31 @@ with
   * try  
   * except  
 
+## 2.3. python 的类型提示
+
+* python 本身的运行时不强制执行函数和变量类型注解
+* 但是加入类型注解可以辅助 IDE 等第三方工具的错误检查
+
+### 2.3.1. 类型别名
+
+* 把类型赋予一个别名, 相当于 typedef 
+* 可以用于简化复杂的类型签名
+
+```py
+# 将 Vector 代表一个浮点数的列表
+Vector = list[float]
+
+```
+### 2.3.2. 函数的类型注解
+
+* 输入参数和返回值都可以进行注解
+
+```py
+def greeting(name: str) -> str:
+    return 'Hello ' + name
+```
+
+
 # 3. 内置函数
 
 可以直接使用, 不需要导入某个模块, 解释器自带的函数叫做内置函数  
@@ -297,7 +331,7 @@ bytearray() 	filter() 	issubclass() 	pow() 	super()
 bytes() 	 	iter() 	tuple()
 callable() 	format() 	len() 	property() 
 frozenset() 	 	range() 	vars()
-classmethod() 	getattr() 	locals() 	repr() 
+classmethod() 	getattr() 	locals() 	
 compile() 	globals() 	map()  	
 complex() 	hasattr() 	max() 	round()
 ```
@@ -1152,14 +1186,19 @@ print(course_dummy_var)
 
 # 7. Python 流程控制
 
-* `break`和`continue` 同C语言是一样的
-* Python中, while和for 后也可以紧跟着一个 else 代码块
-* 它的作用是当循环条件为 False 跳出循环时，程序会最先执行 else 代码块中的代码
-  * 使用 `break` 跳出当前循环体之后，该循环后的 `else` 代码块**也不会被执行**
+控制程序的执行顺序
+* 运行逻辑控制
+* 异常处理
 
+## 7.1. 逻辑流程
 
+* 逻辑流程控制
+  * `break`和`continue` 同C语言是一样的
+  * Python中, while 和for 后也可以紧跟着一个 else 代码块
+    * 当循环条件为 False 跳出循环时，程序会最先执行 else 代码块中的代码
+    * 但是使用 `break` 跳出当前循环体之后，该循环后的 `else` 代码块**也不会被执行**
 
-## 7.1. `if` 表达式
+### 7.1.1. `if` 表达式
 
 1. `if ` `elif `  `else ` 是三个关键字, 后面接表达式和 `:`
 2. 代码块记得加缩进
@@ -1174,27 +1213,7 @@ else:
   pass
 ```
 
-## 7.2. assert 语句
-
-类似于 C 语言的 assert
-* 判断某个表达式的值，如果值为真，则程序可以继续往下执行
-* 反之，Python 解释器会报 AssertionError 错误。
-
-不能滥用 assert，很多情况下，程序中出现的不同情况都是意料之中的，需要用不同的方案去处理  
-有时用条件语句进行判断更为合适，而对于程序中可能出现的一些异常，要记得用 try except 语句处理  
-```py
-assert 表达式
-
-# 等同于
-
-if 表达式==True:
-    程序继续执行
-else:
-    程序报 AssertionError 错误
-```
-
-
-## 7.3. `while` 表达式
+### 7.1.2. while 表达式
 内容同样不需要括号
 
 ```py
@@ -1205,7 +1224,7 @@ else:
     pass
 ```
 
-## 7.4. `for` 表达式
+### 7.1.3. for 表达式
 
 1. for 循环中经常使用 `range()` 函数来指定循环
 2. 在使用 for 循环遍历字典时，经常会用到和字典相关的 3 个方法，即 items()、keys() 以及 values()
@@ -1223,7 +1242,7 @@ for ele in my_dic.items():
 ```
 
 
-## 7.5. 列表推导式（又称列表解析式） 
+### 7.1.4. 列表推导式（又称列表解析式） 
 
 推导式（又称解析器），是 Python 独有的一种特性。  
 使用推导式可以快速生成列表、元组、字典以及集合类型的数据,因此推导式又可细分为:  
@@ -1252,6 +1271,150 @@ for x in range(1,5):
     for y in range(1,4):
       if y < 3:
         x*y
+```
+
+## 7.2. 异常流程控制
+
+* python 的核心异常处理机制即 try except
+* 异常处理中也可以使用 else
+  * 代表程序不出现异常时执行的代码
+  * 即不对应任何一种 exception 的情况
+* 异常处理中还有一个 `finally` 块
+  * 该块和 try 对应, 即不在乎程序中是否有 except 或者 else 块
+  * 和else的逻辑相比, finally 不管是否发生异常最终都会被执行, 而 else 和 except 都是可能会被执行
+  * 通常用于垃圾回收, 关闭文件, 关闭数据库连接
+  * 甚至除了无视异常, 被 break 或者 return 语句推出的时候, finally 也会执行
+    * finally 块中的 return 因此会覆盖 其他块中的 return, 因此不要在 finally 中使用 return 
+    * 唯一的例外是 python 解释器的退出语句 `os.exit(1)`
+
+```py
+try:
+    可能产生异常的代码块
+except [ (Error1, Error2, ... ) [as e] ]:
+    处理异常的代码块1
+except [ (Error3, Error4, ... ) [as e] ]:
+    处理异常的代码块2
+except  [Exception]:
+    处理其它异常
+else:
+    无异常的情况
+finally:
+    最终的垃圾回收
+```
+* 语法格式
+  * `Error1, Error2` 等代表具体的异常类型, 一个 except 块可以处理多种异常
+  * `as e` 给异常一个别名, 方便调用异常
+  * `except  [Exception]` 代表程序可能发生的所有异常情况, 通常放在最后兜底
+    * 这种语句写在最后, 就算不加 Exception 也代表接受所有异常情况
+
+### 7.2.1. 异常类
+
+* 异常作为一个类也拥有对应的属性
+  * args  记录了异常的错误编号和描述字符串
+* python 预定义了许多异常类  
+  * 所有的类都继承于 BaseException
+  * 但是程序中的异常都继承于子类 Exception
+  * 用户自定义的异常也应该继承 Exception
+
+BaseException  
+ +-- SystemExit  
+ +-- KeyboardInterrupt  
+ +-- GeneratorExit  
+ +-- Exception  
+```py
+try:
+    1/0
+except Exception as e:
+    # 访问异常的错误编号和详细信息
+    print(e.args)
+    print(str(e))
+    print(repr(e))
+# 输出
+# ('division by zero',)
+# division by zero
+# ZeroDivisionError(division by zero',)
+```
+
+
+### 7.2.2. raise 语句
+
+* raise 语句用于主动调取一个异常
+* 语法格式: `raise [exceptionName [(reason)]]`
+  * 可以指定异常类型, 默认是返回上文中已经捕获的异常, 否则返回 RuntimeError 异常
+  * reason, 异常的描述信息
+```py
+raise
+# RuntimeError: No active exception to reraise
+
+raise ZeroDivisionError
+# ZeroDivisionError
+
+raise ZeroDivisionError("除数不能为零")
+# ZeroDivisionError: 除数不能为零
+```
+
+
+### 7.2.3. assert 语句
+
+类似于 C 语言的 assert
+* 判断某个表达式的值，如果值为真，则程序可以继续往下执行
+* 反之，Python 解释器会报 AssertionError 错误。
+
+不能滥用 assert，很多情况下，程序中出现的不同情况都是意料之中的，需要用不同的方案去处理  
+有时用条件语句进行判断更为合适，而对于程序中可能出现的一些异常，要记得用 try except 语句处理  
+```py
+assert 表达式
+
+# 等同于
+
+if 表达式==True:
+    程序继续执行
+else:
+    程序报 AssertionError 错误
+```
+
+### 7.2.4. 异常信息捕获
+
+或许异常的详细信息
+* 使用 sys 中的 exc_info 方法
+  * 返回当前的异常信息, 以元组返回, 有三个元素
+    * type: 异常类型的名称, 即异常类的名字
+    * value: 异常实例
+    * traceback: traceback的对象, 需要调用 traceback 包才能进行解析
+* 使用 traceback 模块
+
+```py
+try:
+  1/0
+except:
+  # 输出异常信息
+  print(sys.exc_info())
+
+  # 使用模块来打印 traceback
+  traceback.print_tb(sys.exc_info()[2])
+# (<class 'ZeroDivisionError'>, ZeroDivisionError('division by zero',), <traceback object at 0x000001FCF638DD48>)
+
+# File "C:\Users\mengma\Desktop\demo.py", line 7, in <module>
+```
+
+### 自定义异常类
+
+* 自定义的异常类通常继承自 Exception 类, 名字以 `Error` 结尾
+* 自定义异常类也是一个类, 而且只能被 raise 调用, 不会被解释器触发
+  * 实现一些必要的类方法有助于异常类的使用
+```py
+class SelfExceptionError(Exception):
+    def __init__(self,value):
+      self.value=value
+    def __str__(self):
+      return ("{} is invalid input".format(repr(self.value)))
+
+try:
+    raise SelfExceptionError(1)
+except SelfExceptionError as err:
+    print('error: {}'.format(err))
+
+# error: 1 is invalid input
 ```
 
 # 8. python 的函数
@@ -1365,7 +1528,7 @@ help(str_max)
 print(str_max.__doc__)
 
 ```
-## yield 表达式
+## 8.5. yield 表达式
 
 * yield 用来定义一个生成器函数或者异步生成器函数中
 * 因此只能被用在函数体的定义里, 使得该函数不再是一个普通函数
@@ -1436,7 +1599,7 @@ def read_file(fpath):
 ```
 
 
-## 8.5. lambda 表达式 匿名函数
+## 8.6. lambda 表达式 匿名函数
 
 lambda 表达式，又称匿名函数，常用来表示内部仅包含 1 行表达式的函数.  
 如果一个函数的函数体仅有 1 行表达式，则该函数就可以用 lambda 表达式来代替。  
@@ -1453,7 +1616,7 @@ def name(list):
 name(list)
 ```
 
-## 8.6. 函数的异常处理
+## 8.7. 函数的异常处理
 
 如果 `try` 子句中的代码发生了错误，则程序立即到 `except` 中的代码去执行  
 
