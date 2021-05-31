@@ -1,6 +1,7 @@
 # 1. scikit-image
 
-A collection of algorithms for image processing.
+A collection of algorithms for image processing.  
+scikit-的图像处理相关库.  
 
 Submodules:
 * skimage
@@ -22,24 +23,77 @@ Submodules:
     * transform
     * util
     * viewer
+
 # 2. io
 
 Utilities to read and write images in various formats.  
+sci 的图像 IO 包  
 
-## 2.1. imread 
+## 2.1. class 类
 
-读一个图像, 特点是读取后的类型是 `ndarray`  
+IO包中提供了操纵数据的几个类.  
+
+### 2.1.1. ImageCollection
+
+有点类似于 DataLoader  
+
+```py
+class skimage.io.ImageCollection(
+  load_pattern, # Pattern string 或者 list of 文件path , 这个path 可以是相对路径也可以是绝对
+  conserve_memory=True,  # 节省内存
+  load_func=None, # Default 是 imread, 即标准读取
+  **load_func_kwargs)
+
+# 使用 pattern string 来创建
+coll = io.ImageCollection(data_dir + '/chess*.png')
+len(coll) # = 2 
+```
+类的属性
+* `files` : 文件路径的 list
+类的方法
+* `concatenate` : 将所有图片作为一个 np.ndarray 返回  
+
+
+### 2.1.2. MultiImage
+
+* 基于 ImageCollection 的子类  
+* 特点是可以读取动图 eg. tif 文件
+* 会将所有帧区分存储  
+
+
+```py
+class skimage.io.MultiImage(
+  load_pattern, 
+  conserve_memory=True, 
+  dtype=None, 
+  **imread_kwargs)
+```
+
+
+## 2.2. imread 
+
+读一个图像, 读取后的类型是 `ndarray`  
 
 ```py
 skimage.io.imread(
-  fname, 
-  as_gray=False, 
+  fname,   # 图像路径, 也可以是 url
+  as_gray=False,  # 是否将图像转为灰度图 64-bit floats
   plugin=None, 
   **plugin_args)
-""" 
-
-"""
 ```
+
+## 2.3. imread_collection
+
+读入一组图像, 需要和该库中的 imageCollection 类型配合  
+
+```py
+skimage.io.imread_collection(
+  load_pattern, # List of objects to load. 一般都是文件名
+  conserve_memory=True, # 如果 True, 只会在内存中存储当前使用的图像, 否则会把所有图片读入内存
+  plugin=None, **plugin_args)
+```
+
+
 # 3. transform
 
 ## 3.1. resize

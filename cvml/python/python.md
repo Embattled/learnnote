@@ -75,7 +75,7 @@
     - [7.2.2. raise 语句](#722-raise-语句)
     - [7.2.3. assert 语句](#723-assert-语句)
     - [7.2.4. 异常信息捕获](#724-异常信息捕获)
-    - [自定义异常类](#自定义异常类)
+    - [7.2.5. 自定义异常类](#725-自定义异常类)
 - [8. python 的函数](#8-python-的函数)
   - [8.1. 函数参数](#81-函数参数)
   - [8.2. Python的可变参数](#82-python的可变参数)
@@ -102,9 +102,10 @@
   - [10.4. 包信息调取](#104-包信息调取)
   - [10.5. 作用域](#105-作用域)
 - [11. Python 的文件操作](#11-python-的文件操作)
-  - [11.1. 打开文件](#111-打开文件)
-  - [11.2. 写入文件](#112-写入文件)
-  - [11.3. 结构化读取文件](#113-结构化读取文件)
+  - [11.1. open 打开文件](#111-open-打开文件)
+  - [11.2. 读取文件](#112-读取文件)
+  - [11.3. 写入文件](#113-写入文件)
+  - [11.4. 结构化读取文件](#114-结构化读取文件)
 - [12. 正则表达式 re包](#12-正则表达式-re包)
   - [12.1. 使用正则表达式的基础函数](#121-使用正则表达式的基础函数)
   - [12.2. 正则表达式-单字符](#122-正则表达式-单字符)
@@ -1397,7 +1398,7 @@ except:
 # File "C:\Users\mengma\Desktop\demo.py", line 7, in <module>
 ```
 
-### 自定义异常类
+### 7.2.5. 自定义异常类
 
 * 自定义的异常类通常继承自 Exception 类, 名字以 `Error` 结尾
 * 自定义异常类也是一个类, 而且只能被 raise 调用, 不会被解释器触发
@@ -1953,43 +1954,83 @@ def spam():
 
 # 11. Python 的文件操作 
 
-## 11.1. 打开文件
+* python 的文件操作核心就是 `file object`
 
-`with`关键字  
-`open('路径')`  
-`as [别名]  `   
+* 与 C++ 的文件对象一样, 也有地点指针
+  * `.tell()` 返回一个整数, 代表当前的文件指针位置, 即从文件开始的bytes数或者字符数
+  * `.seek(offset,whence)` 
+    * offset 表示偏移量
+    * whence表示偏移起始位置
+    * 0表示从文件开始
+    * 1表示从当前位置
+    * 2表示从文件末尾
 
-读取一个文件的字符串  
+## 11.1. open 打开文件
+
+* 打开一个文件路径并返回 file object
+* 如果不能打开, 会 raise OSError
+  * 需要配合 with 语句来确保打开范围
+  * 如果不用 with 的话, 需要手动调用 f.close()来确保文件正常关闭
+
+```py
+open(file, mode='r', buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None)
+# file    ：一个 path-like object
+# mode    : 一个字符串用来指定打开的模式, 默认是'r', 
+
+```
+| Character | Meaning                                                         |
+| --------- | --------------------------------------------------------------- |
+| 'r'       | open for reading                                                |
+| 'w'       | open for writing, truncating the file first                     |
+| 'x'       | open for exclusive creation, failing if the file already exists |
+| 'a'       | open for writing, appending to the end of the file if it exists |
+| 'b'       | binary mode                                                     |
+| 't'       | text mode (default)                                             |
+| '+'       | open for updating (reading and writing)                         |
+
+## 11.2. 读取文件
+
+* 在通过 open 得到 file object 后, 即可通过相关方法来读取文件
+  * .read(size) 读取一定数量的数据
+    * size的单位是字符数或者bytes数
+    * 没有 size 默认读取整个文件
+  * .readline() 读取单个行
+    * 这种方法会读取到行末的 `\n`
+    * 使用 for 循环来遍历 file object 时也是默认以行为单位
+  * 希望将数据转换成 list
+    * list(f) 直接转化
+    * f.readlines() 返回一个list
+
 ```python
 #这个文件对象只在with的Block里面有效
 with open('pi_digits.txt') as file_object:
+  # 1. read() 读取整个文件
   contents = file_object.read()         
-  # read() 读取整个文件
   
-  #按行来读取文件
+  # 2. 按行来读取文件
   for line in file_object:
-    print(line)
-  #将文件读取到一个list里
+    # 行末已有换行符
+    print(line,end='')
+
+  # 3. 将文件读取到一个list里
   lines = file_object.readlines()
 for line in lines:  #可以在block外读取文件内容
   print(line.rstrip()) # 可以用rstrip方法来清除文件的换行符
-
 ```
 
-## 11.2. 写入文件
+## 11.3. 写入文件
 
-要想写入文件,需要在文件对象创建的时候指定`'w'`参数,或者`'a'`参数    
+* 要想写入文件,需要在文件对象创建的时候指定`'w'`参数,或者`'a'`参数    
+* 使用方法 `.write(str)` 传入要写入的字符串, 同时会返回写入的字符个数
+
+
 ```python
-with open(filename, 'w') as file_object: 
-  # 使用 write()方法来写入内容
-  file_object.write("I like programming.\n") # 记得自己输入换行符
-
-# 使用'a'参数来代表追加模式, 文字将输入到文件末尾  
-with open(filename, 'a') as file_object: 
-
+# 使用 write()方法来写入内容
+# 记得自己输入换行符
+file_object.write("I like programming.\n") 
 ```
 
-## 11.3. 结构化读取文件
+## 11.4. 结构化读取文件
 使用 enumerate 可以按行获取文件内容  
 `for j, data in enumerate(openfile) `
 

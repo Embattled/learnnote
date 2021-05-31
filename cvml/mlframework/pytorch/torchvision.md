@@ -395,10 +395,12 @@ torchvision.transforms.FiveCrop(size)
 * to_tensor
   * `torchvision.transforms.functional.to_tensor(pic)`
   * 将 PIL 或者 ndarray 转换成 tensor
+  * 注意如果输入的像素值是8位255整数, 这个函数会将像素值转为浮点数 0~1, 即颜色缩放
 * pil_to_tensor
   `torchvision.transforms.functional.pil_to_tensor(pic)`  
   * 如名称, 将 `PIL Image` 转换成相同类型  
   * 只有一个参数, 就是 PIL Image 对象
+  * 这个函数不会进行浮点数缩放
 * to_pil_image
   * `torchvision.transforms.functional.to_pil_image(pic, mode=None)`
   * 将 tensor 或者 ndarray 转换成 PIL 图片

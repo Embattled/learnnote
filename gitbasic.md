@@ -148,9 +148,10 @@ $ git commit --amend
 `git restore --staged <file>`可以把已经`add`的内容撤销,将暂存区的内容撤销掉(unstage),重新放回工作区  
 
 
-# 3. 使用Github进行远程推送
+# 3. 云
+## 3.1. 使用Github
 
-## 3.1. 第一次的初始化
+### 3.1.1. 第一次的初始化
 
 本地Git仓库和GitHub仓库之间的传输是通过SSH加密的  
 
@@ -160,7 +161,7 @@ $ git commit --amend
   * 在`.ssh`目录中找到<kbd>id_ras.pub</kbd>,就是SSH公钥
 * 在github上将自己的SSH KEY公钥添加
 
-## 3.2. 添加远程版本库
+### 3.1.2. 添加远程版本库
 
 使用`git remote`查看远程库的名称  
 使用`git remote -v`可以显示包括url的详细信息  
@@ -173,7 +174,7 @@ origin是默认的远程库叫法,也可以自定义
 
 
 
-## 3.3. 推送到远程库
+### 3.1.3. 推送到远程库
 
 `git push <远程库名称> <分支名称>`
 使用  
@@ -190,7 +191,7 @@ origin是默认的远程库叫法,也可以自定义
 `$ git pull origin master --allow-unrelated-histories`  
 这时会可能会提示必须输入提交的信息，默认会打开vim编辑器  
 
-##  3.4. 从远端克隆一个项目
+###  3.1.4. 从远端克隆一个项目
 
 `git clone git@github.com:Embattled/learnnote.git`  
 GitHub给出的地址不止一个，还可以用`https://github.com/Embattled/learnnote.git`这样的地址。实际上，Git支持多种协议，默认的`git://`使用`ssh`，但也可以使用https等其他协议。
@@ -198,9 +199,13 @@ GitHub给出的地址不止一个，还可以用`https://github.com/Embattled/le
 使用ssh的话，在github中保存公钥了后不用输入密码  
 使用http的话需要每次输入密码  
 
-## 3.5. 从远端更新代码
+### 3.1.5. 从远端更新代码
 
 克隆后,若要更新代码,使用git pull
+
+## 3.2. 使用gitlab
+
+
 
 
 # 4. Git的分支管理

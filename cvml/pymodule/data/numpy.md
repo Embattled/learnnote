@@ -11,16 +11,7 @@ NumPy’s array class is called `ndarray`. It is also known by the alias `array`
 * 和 python 自带的 `array.array` 是不同的  
 * python 自带的类只能处理一维数组, 并且函数很少
 
-```py
-A = np.array([[1,3,4], [2,3,5], [1,2,3], [5,4,6]])
-print(A)
-'''
-[[1 3 4]
- [2 3 5]
- [1 2 3]
- [5 4 6]]
-'''
-```
+`A = np.array([[1,3,4], [2,3,5], [1,2,3], [5,4,6]])`  
 注意 ndarry 的打印特点, 值之间没有逗号, 而是空格
 
 ## 2.1. attributes
@@ -159,6 +150,20 @@ a.shape 可以返回当前的 array 的形状
 * numpy.vsplit(a,3) 横着切, 沿着 vertical axis
 * numpy.array_split 指定切的方向
 
+### 维度压缩 squeeze
+
+* 删掉维度数为1的轴
+* Remove axes of length one from a.
+
+```py
+>>> x = np.array([[[0], [1], [2]]])
+>>> x.shape
+(1, 3, 1)
+>>> np.squeeze(x).shape
+(3,)
+>>> np.squeeze(x, axis=(2,)).shape
+(1, 3)
+```
 
 ## 2.6. Copies and Views
 
@@ -175,10 +180,51 @@ del a  # the memory of ``a`` can be released.
 
 
 
+# 3. numpy.random
 
-# 3. config
+* numpy 的随机包是独立出来的 `numpy.random`
+* 比 Pystl 的 random 包通用性更广, 值得学习
 
-## 3.1. np.set_printoptions
+基本概念
+1. BitGenerators: 生成随机数的对象, 由随机32 or 64 bit 填入的 unsigned interger 
+2. random generator: 主要负责将随机bit转为特定分布
+3. Generators: 该库的用户接口, 将 BitGenerator 的随机序列转换为特定的概率分布以及范围的随机数
+4. RandomState: 已经被淘汰的旧版生成器, 只能基于一种 BitGenerators
+   - RandomState 目前直接作为一个对象被放入了 该命名空间
+
+## 3.1. Generator
+
+基本生成器
+* `default_rng(seed=None)`  : 被官方推荐的生成器, 使用 `PCG64` , 效果优于 `MT19937`
+  - seed : None, int, array_like`[ints]`, SeedSequence, BitGenerator, Generator. 
+
+
+通过使用生成器对象的方法可以产生任意区间和分布的随机数
+* Simple random data 简单随机数
+  * `integers(low[, high, size, dtype, endpoint])`
+    - 产生整数
+    - 默认 dtype= np.int64
+  * `random([size, dtype, out])`
+    - 可以用来初始化网络, 随机floats in interval [0.0, 1.0).
+  * `choice(a[, size, replace, p, axis, shuffle])`
+    - 从给定的 a 数组中进行随机采样, 如果 a 是int, 则从 np.arange(a) 中采样
+    - size 指定采样的大小, None 代表采样 1 个
+    - replace : 是否允许替代
+    - p : array, 给定 a 中每个元素的采样概率
+  * `bytes(length)`
+    - 返回一个 random bytes
+
+* 分布采样, 基于特定分布的采样方法
+  * `random.Generator.normal(loc=0.0, scale=1.0, size=None)`
+    - loc scale , 代表 mean 和标准差
+  * `random.Generator.standard_normal(size=None, dtype=np.float64, out=None)`
+    - 从标准的正态分布采样
+  * `random.Generator.uniform(low=0.0, high=1.0, size=None)`
+    - 均一分布
+
+# 4. config
+
+## 4.1. np.set_printoptions
 
 1. 取消科学计数法显示数据 `np.set_printoptions(suppress=True)  `
 
@@ -187,9 +233,9 @@ del a  # the memory of ``a`` can be released.
 2. 取消省略超长数列的数据 ` np.set_printoptions(threshold=sys.maxsize)` 需要 sys 包
 
 
-### 3.1.1. numpy.shape
+### 4.1.1. numpy.shape
 
-### 3.1.2. numpy.dot()  矩阵点乘
+### 4.1.2. numpy.dot()  矩阵点乘
 
 np.diag(s)  将数组变成对角矩阵  
 使用numpy进行矩阵乘法   
@@ -220,9 +266,9 @@ print(np.shape(U), np.shape(s), np.shape(Vh))
 
 
 
-## 3.2. linalg 
+## 4.2. linalg 
 
-### 3.2.1. SVD 奇异值分解
+### 4.2.1. SVD 奇异值分解
 
 Singular Value Decomposition  
 * M = U * s * Vh  

@@ -6,20 +6,23 @@
     - [1.3.2. 运行权限](#132-运行权限)
   - [1.4. storage driver](#14-storage-driver)
 - [2. Docker App](#2-docker-app)
-  - [2.1. Dockerfile](#21-dockerfile)
-  - [2.2. build](#22-build)
-  - [2.3. image container](#23-image-container)
+  - [2.1. build](#21-build)
+  - [2.2. image  管理](#22-image--管理)
+  - [2.3. container 管理](#23-container-管理)
   - [2.4. tag](#24-tag)
   - [2.5. Docker repo](#25-docker-repo)
   - [2.6. Docker 运行命令](#26-docker-运行命令)
     - [2.6.1. 运行镜像](#261-运行镜像)
-    - [2.6.2. 进程管理](#262-进程管理)
+    - [2.6.2. 运行容器](#262-运行容器)
+    - [2.6.3. 进入容器](#263-进入容器)
+    - [2.6.4. 进程管理](#264-进程管理)
+- [3. Dockerfile](#3-dockerfile)
 # 1. Start Docker 
 
-* Docker 是一个开源的应用容器引擎，基于 `Go` 语言 并遵从 Apache2.0 协议开源
-* 适合运维工程师及后端开发人员, 用于开发，交付和运行应用程序的开放平台。
-* Docker 可以让开发者打包他们的应用以及依赖包到一个轻量级、可移植的容器中，然后发布到任何流行的 Linux 机器上
-* 容器是完全使用沙箱机制，相互之间不会有任何接口（类似 iPhone 的 app）,更重要的是容器性能开销极低
+* Docker 是一个开源的应用容器引擎, 基于 `Go` 语言 并遵从 Apache2.0 协议开源
+* 适合运维工程师及后端开发人员, 用于开发, 交付和运行应用程序的开放平台。
+* Docker 可以让开发者打包他们的应用以及依赖包到一个轻量级、可移植的容器中, 然后发布到任何流行的 Linux 机器上
+* 容器是完全使用沙箱机制, 相互之间不会有任何接口（类似 iPhone 的 app）,更重要的是容器性能开销极低
 
 
 ## 1.1. 基本介绍
@@ -30,28 +33,28 @@
 4. 从头编译或者扩展现有的 OpenShift 或 Cloud Foundry 平台来搭建自己的 PaaS 环境。
 
 使用目标:
-1. 将应用程序与基础架构分开，从而可以快速交付软件。
+1. 将应用程序与基础架构分开, 从而可以快速交付软件。
 2. 与管理应用程序相同的方式来管理基础架构
 
 开发流程:
-1. 开发人员在本地编写代码，并使用 Docker 容器与同事共享他们的工作。
-2. 使用 Docker 将其应用程序推送到测试环境中，并执行自动或手动测试。
-3. 开发人员发现错误时，他们可以在开发环境中对其进行修复，然后将其重新部署到测试环境中，以进行测试和验证。
-4. 测试完成后，将修补程序推送给生产环境，就像将更新的镜像推送到生产环境一样简单
+1. 开发人员在本地编写代码, 并使用 Docker 容器与同事共享他们的工作。
+2. 使用 Docker 将其应用程序推送到测试环境中, 并执行自动或手动测试。
+3. 开发人员发现错误时, 他们可以在开发环境中对其进行修复, 然后将其重新部署到测试环境中, 以进行测试和验证。
+4. 测试完成后, 将修补程序推送给生产环境, 就像将更新的镜像推送到生产环境一样简单
 
 
 ## 1.2. Docker 架构基本概念
 
-* 镜像（Image）：Docker 本身的镜像（Image），就相当于是一个 root 文件系统。
-* 容器（Container）：镜像是静态的定义，容器是镜像运行时的实体。容器可以被创建、启动、停止、删除、暂停等。
-* 仓库（Repository）：仓库可看成一个代码控制中心，用来保存镜像。
+* 镜像（Image）：Docker 本身的镜像（Image）, 就相当于是一个 root 文件系统。
+* 容器（Container）：镜像是静态的定义, 容器是镜像运行时的实体。容器可以被创建、启动、停止、删除、暂停等。
+* 仓库（Repository）：仓库可看成一个代码控制中心, 用来保存镜像。
   * 每个仓库可以包含多个标签（Tag）；每个标签对应一个镜像。
-  * 通常，一个仓库会包含同一个软件不同版本的镜像，而标签就常用于对应该软件的各个版本。
-  * 通过 <仓库名>:<标签> 的格式来指定具体是这个软件哪个版本的镜像。如果不给出标签，将以 `latest` 作为默认标签。
+  * 通常, 一个仓库会包含同一个软件不同版本的镜像, 而标签就常用于对应该软件的各个版本。
+  * 通过 <仓库名>:<标签> 的格式来指定具体是这个软件哪个版本的镜像。如果不给出标签, 将以 `latest` 作为默认标签。
 * Docker Registry: 一个 Docker Registry 中可以包含多个仓库（Repository）
 * Docker 主机(Host): 一个物理或者虚拟的机器用于执行 `Docker 守护进程`和`容器`。
 * Docker 客户端(Client): 客户端通过命令行或者其他工具使用 Docker SDK与 Docker 的`守护进程`通信。
-* Docker Machine : 是一个简化Docker安装的命令行工具，通过一个简单的命令行即可在相应的平台上安装Docker，比如VirtualBox、 Digital Ocean、Microsoft Azure。
+* Docker Machine : 是一个简化Docker安装的命令行工具, 通过一个简单的命令行即可在相应的平台上安装Docker, 比如VirtualBox、 Digital Ocean、Microsoft Azure。
 
 
 1. 使用客户端-服务器 (C/S) 架构模式
@@ -112,53 +115,47 @@ docker支持许多存储驱动, 在 `Ubuntu`下支持 : `overlay2, aufs, btrfs`
 
 不同的存储驱动对容器中的应用是有影响的,  选择原则:
 1. 选择你及你的团队最熟悉的；
-2. 如果你的设施由别人提供技术支持，那么选择它们擅长的；
+2. 如果你的设施由别人提供技术支持, 那么选择它们擅长的；
 3. 选择有比较完备的社区支持的。
 
 不同存储驱动的简略说明:
 * aufs: Docker最先使用的 storage driver 技术成熟 社区支持也很好
-  * 有一些Linux发行版不支持AUFS，主要是它没有被并入Linux内核
-  * Docker在Debian，Ubuntu系的系统中默认使用aufs
-* device mapper : 很稳定，也有很好的社区支持
+  * 有一些Linux发行版不支持AUFS, 主要是它没有被并入Linux内核
+  * Docker在Debian, Ubuntu系的系统中默认使用aufs
+* device mapper : 很稳定, 也有很好的社区支持
   * 在Linux2.6内核中被并入内核
   * docker 在 `RedHat` 系中默认使用 `device mapper`。
-* overlayfs : 与AUFS相似，也是一种联合文件系统(union filesystem)
+* overlayfs : 与AUFS相似, 也是一种联合文件系统(union filesystem)
   * 当前默认的
   * 设计更简单, 被加入Linux3.18版本内核, 可能更快
-  * 在Docker社区中获得了很高的人气，被认为比AUFS具有很多优势。
-  * 但它还很年轻，在成产环境中使用要谨慎。
+  * 在Docker社区中获得了很高的人气, 被认为比AUFS具有很多优势。
+  * 但它还很年轻, 在成产环境中使用要谨慎。
 
 
 # 2. Docker App
 
-## 2.1. Dockerfile
+记录docker的相关基础命令
 
-* `Dockerfile` 是一个文本文件脚本, 用于创建一个容器镜像(注意没有文件后缀), 放在项目的根目录
-* 
-```
-FROM node:12-alpine
-WORKDIR /app
-COPY . .
-RUN yarn install --production
-CMD ["node", "src/index.js"]
-```
 
-## 2.2. build
+## 2.1. build
 
 * 使用 `docker build [flags] dockerfile路径` 来创建 docker container
   * `-t 项目名` 用于指定该镜像的名称
 
+## 2.2. image  管理
 
-## 2.3. image container
+image 和 container 相关的命令比较类似 `docker image ls` 可以用来查看本机当前拥有的 image 以及对应的 tag
+* `docker images` 和 `image ls` 功能相同
+* `docker image rm [imageName]` 和 `docker rmi [imageName]` 用来删除一个 image
 
-image 和 container 相关的命令比较类似
-
-* `docker image ls` 可以用来查看本机当前拥有的 image 以及对应的 tag
-* `docker image rm [imageName]` 用来删除一个 image
+## 2.3. container 管理
 
 * `docker container ls -l` 列出本机正在运行的容器
-* `docker container ls -l --all` 列出本机所有容器，包括终止运行的容器：
+* `docker container ls -l --all` 列出本机所有容器, 包括终止运行的容器：
 * `docker container rm [containerID]` 删除一个容器
+* `docker ps -a` 列出所有容器
+* 
+
 ## 2.4. tag
 
 * `docker tag 旧名字 新名字` 用来给一个 image 赋予新的名字
@@ -176,24 +173,53 @@ image 和 container 相关的命令比较类似
   * 注意 `用户名/镜像名` 是完整的镜像名, 必须确保 image 有这个名字
   * 否则需要用 `tag` 命令来添加新的命名
   * tagname 默认是 `latest`
+* 使用 `docker pull` 命令来获取一个 prebuild image
 
 
 ## 2.6. Docker 运行命令
 
 ### 2.6.1. 运行镜像
+
 * 使用 `docker run [OPTIONS] IMAGE [COMMAND] [ARG...]` 在本机的 docker engine 上运行一个镜像, 此时会创建一个容器
   * `docker run -dp 3000:3000 getting-started`
   * 使用 flags 来进行特殊设置
     * `-d` `detached mode` 运行程序, 即后台运行
     * `-p xx:xx ` 端口映射  `host:container`
+    * `--name` 如果容器有名字的话, 可以使用名字调用
+    * `--runtime==nvidia` 指定 docker 使用GPU
+      * `-e NVIDIA_VISIBLE_DEVICES=1` 指定容器只能使用 GPU1
+
+### 2.6.2. 运行容器
+
 * 容器可以关闭, 再次启动时不能用`run`
   * 使用命令 `docker start [OPTIONS] CONTAINER [CONTAINER...]`
-  * 
+  * `docker start -i <name>-cuda-10.2`
 
-### 2.6.2. 进程管理
+### 2.6.3. 进入容器
+
+在使用Docker创建了容器之后, 比较关心的就是如何进入该容器了, 其实进入Docker容器有好几多种方式
+
+1. 使用 docker 提供的 attach命令 `docker attach 44fc0f0582d9`, 容器是单线程的, 当多个窗口同时用该命令进入容器, 所有的窗口都会同步显示, 有一个窗口阻塞了所有的窗口都不能进行操作
+2. 使用 docker 的 exec 命令, 该命令会在容器中执行一个命令, 可以通过调用容器中的bash 来进入容器  `sudo docker exec -it 775c7c9ee1e1 /bin/bash`
+3. 使用 nsenter 进入容器, 需要通过 docker 相关命令获得容器的 PID
+    
+
+### 2.6.4. 进程管理
 
 * `docker ps`         类似于系统的同名命令, 显示所有正在运行的 docker 容器
 * `docker stop [id]`  停止一个 docker 容器
 * `docker rm <id>`    永久删除一个 docker 容器
   * 可以通过 `rm -f` 来直接停止并删除正在运行的容器
 
+
+# 3. Dockerfile
+
+* `Dockerfile` 是一个文本文件脚本, 用于创建一个容器镜像(注意没有文件后缀), 放在项目的根目录
+
+```
+FROM node:12-alpine
+WORKDIR /app
+COPY . .
+RUN yarn install --production
+CMD ["node", "src/index.js"]
+```

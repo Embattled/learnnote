@@ -1,6 +1,7 @@
 - [1. 数据处理pandas包](#1-数据处理pandas包)
 - [2. IO 输入输出](#2-io-输入输出)
-  - [2.1. Flat file](#21-flat-file)
+  - [2.1. read_csv](#21-read_csv)
+  - [others](#others)
   - [2.2. csv写入](#22-csv写入)
 - [3. Series](#3-series)
   - [3.1. creation](#31-creation)
@@ -77,16 +78,47 @@ pandas 中的主要数据结构被实现为以下两类：
 
 # 2. IO 输入输出
 
-## 2.1. Flat file
+* IO 是 Pandas 最基础的功能
+  * Pandas 包中提供的读写函数都是非常高层次的函数
+  * 支持了多种格式
 
+## 2.1. read_csv
+
+* `read_csv(filepath_or_buffer[, sep, …])`
+* read_csv 是最基础的读取函数, 拥有巨多的参数
+* 提供了在读取阶段就实现 Miss Value 补足的功能
+* `filepath_or_buffer` 必要参数 str, path object or file-like object
+  * str 可以是 URL, include http, ftp, s3, gs, and file
+  * 可以接受 `os.PathLike` 的对象
+  * 可以接受通过 `open()` 打开的 file object
+
+1. 数据格式设定
+   * sep: str, default `,` 逗号, 用于指定一行数据间的分隔符
+   * index_col: int,str,sequence of int/str, False, default None
+     * 用于指定 DataFrame 的index, 指定第几列数据是该数据集的index, 默认由 Pandas 推倒
+     * 指定 False 代表该数据中没有 Index
+   * header: int or list of int, default "infer"
+     * 用于指定第几行数据是该 DataFrame 的列名称, 默认由 Pandas 推导
+     * 如果原本数据中没有列名, 必须设置好 `header=None`
+     * 如果传入了 names 参数, 则该参数自动设置成 None
+   * names: array-like, default None
+     * 接上个参数, 代表传入的列名, 传入的列名不能有重复
+   * squeeze: boolean, default
+     * 设定好该参数可以将只有一列的数据作为 Series 返回而不再是 DF
+
+2. 特殊字符处理
+   * quoting:
+   * quotechar:
+   * doublequote:
+
+## others
 最常用的部分
 1. `read_table(filepath_or_buffer[, sep, …])`
       Read general delimited file into DataFrame.
 
-2. `read_csv(filepath_or_buffer[, sep, …])`
 	    Read a comma-separated values (csv) file into DataFrame.
 
-3. `read_fwf(filepath_or_buffer[, colspecs, …])`
+2. `read_fwf(filepath_or_buffer[, colspecs, …])`
       Read a table of fixed-width formatted lines into DataFrame.
  
 * read_table 和 read_csv 基本一样, 只不过默认的数据分隔符不相同

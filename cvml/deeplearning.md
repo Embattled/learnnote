@@ -1,16 +1,34 @@
-- [1. Neuron Network](#1-neuron-network)
+- [1. Neuron Network 优化方法](#1-neuron-network-优化方法)
   - [1.1. Activate Function](#11-activate-function)
   - [1.2. LRN 和 BN](#12-lrn-和-bn)
     - [1.2.1. LRN](#121-lrn)
     - [1.2.2. BN](#122-bn)
-- [2. CNN](#2-cnn)
-  - [2.1. Recognition](#21-recognition)
-    - [2.1.1. Alexnet](#211-alexnet)
-    - [2.1.2. VGGNet](#212-vggnet)
-    - [2.1.3. GoogLeNet](#213-googlenet)
-    - [2.1.4. ResNet](#214-resnet)
-- [3. RNN](#3-rnn)
-# 1. Neuron Network
+  - [1.3. Attention Mechanism](#13-attention-mechanism)
+- [2. Data Augmentation](#2-data-augmentation)
+  - [2.1. Reference](#21-reference)
+  - [2.2. Traditional](#22-traditional)
+  - [2.3. Geometric / Spatial](#23-geometric--spatial)
+  - [2.4. 融合 augmentation 参数和网络参数](#24-融合-augmentation-参数和网络参数)
+- [3. Dataset](#3-dataset)
+  - [3.1. Text spot](#31-text-spot)
+    - [3.1.1. Scene Text](#311-scene-text)
+    - [3.1.2. Handwritten Text](#312-handwritten-text)
+- [4. 网络结构](#4-网络结构)
+  - [4.1. Recognition 分类网络 Backbone](#41-recognition-分类网络-backbone)
+    - [4.1.1. Alexnet](#411-alexnet)
+    - [4.1.2. VGGNet](#412-vggnet)
+    - [4.1.3. GoogLeNet](#413-googlenet)
+    - [4.1.4. ResNet](#414-resnet)
+  - [4.2. Detection 系列网络](#42-detection-系列网络)
+    - [4.2.1. R-CNN](#421-r-cnn)
+    - [4.2.2. SPP-Net](#422-spp-net)
+    - [4.2.3. Fast-RCNN](#423-fast-rcnn)
+    - [4.2.4. FasterRCNN RPN](#424-fasterrcnn-rpn)
+  - [4.3. 语义分割 Semantic Segmentation](#43-语义分割-semantic-segmentation)
+    - [4.3.1. FCN - Fully Convolutional Networks](#431-fcn---fully-convolutional-networks)
+  - [4.4. FPN - Feature Pyramid Networks](#44-fpn---feature-pyramid-networks)
+- [5. RNN](#5-rnn)
+# 1. Neuron Network 优化方法
 
 * ReLU ( Rectified Linear Units) 在 Alexnet 中被发扬光大, 被证明在深层网络中远比 tanh 快, 成功解决了Sigmoid在网络较深时的梯度弥散问题
 * Dropout 在 Alexnet 被实用化, 验证了其避免模型过拟合的效果, 在 Alexnet 中主要是最后几个全连接层使用了 Dropout
@@ -90,8 +108,56 @@ $b_{x,y}^k=a_{x,y}^k/(k+\alpha\sum_{i=max(0,x-n/2)}^{min(W,x+n/2)}\sum_{j=max(0,
     * $\hat{x}$ 代表完成0均值和单位方差归一化后的输出
     * $y_i=\gamma\hat{x}+\beta\equiv BN_{\gamma,\beta}(x_i)$
 
+## 1.3. Attention Mechanism
 
-# 2. CNN 
+* Attention 从出发点上说是用于提升基于 RNN 的S2S模型效果的机制
+* 目前广泛应用于机器翻译, 语音识别, 图像标注等领域
+* Attention 给模型赋予了 区分辨别的能力, 使得网络模型的学习变得更加灵活
+* Attention本身可以作为一种对齐的关系, 可以用来解释翻译输入输出句子之间的对其关系
+
+
+总结:
+  - Attention 可以帮助模型对输入的X的每个部分赋予不同的权重, 抽出更加关键的信息
+  - 并不会对模型的计算和存储带来更大的开销
+
+# 2. Data Augmentation
+
+Data augmentation is a low cost way.
+
+## 2.1. Reference
+
+1. Jaderberg, M., Simonyan, K., Vedaldi, A., & Zisserman, A. (2014). Synthetic Data and Artificial Neural Networks for Natural Scene Text Recognition. Computer Vision and Pattern Recognition. http://arxiv.org/abs/1406.2227
+2. Luo, C., Zhu, Y., Jin, L., & Wang, Y. (2020). Learn to augment: Joint data augmentation and network optimization for text recognition. Proceedings of the IEEE Computer Society Conference on Computer Vision and Pattern Recognition, 13743–13752. https://doi.org/10.1109/CVPR42600.2020.01376
+
+## 2.2. Traditional 
+
+Traditional augmentation methods such as rotation, scaling and perspective transformation,
+
+## 2.3. Geometric / Spatial
+
+## 2.4. 融合 augmentation 参数和网络参数
+
+
+# 3. Dataset
+
+## 3.1. Text spot
+
+3755 classes (Ievel-l set of GB2312-80)  ｄ
+### 3.1.1. Scene Text
+* IIIT 5K-Words  (IIIT5K) contains 3000 cropped word images for testing.
+* Street View Text (SVT) consists of 647 word images for testing. Many images are severely corrupted by noise and blur.
+* Street View Text Perspective (SVT-P) contains 645
+cropped images for testing. Most of them are perspective distorted.
+* ICDAR 2003 (IC03) contains 867 cropped images after discarding images that contained non-alphanumeric characters or had fewer than three characters.
+* ICDAR 2013 (IC13) inherits most of its samples from IC03. It contains 1015 cropped images.
+* ICDAR 2015 (IC15) is obtained by cropping the words using the ground truth word bounding boxes and includes more than 200 irregular text images.
+
+### 3.1.2. Handwritten Text
+
+* IAM contains more than 13,000 lines and 115,000 words written by 657 different writers.
+* RIMES contains more than 60,000 words written in French by over 1000 authors. 4.3.
+
+# 4. 网络结构 
 
 * 简单粗暴的方法来提高精度就是加深网络以及加宽网络, 缺点有
   * 容易过拟合
@@ -100,7 +166,8 @@ $b_{x,y}^k=a_{x,y}^k/(k+\alpha\sum_{i=max(0,x-n/2)}^{min(W,x+n/2)}\sum_{j=max(0,
     * 即使使用了 BN, 几十层的CNN也非常难训练
 * 基础的方法是增加网络的稀疏性, 尽可能减少全连接层
 
-## 2.1. Recognition
+
+## 4.1. Recognition 分类网络 Backbone
 
 * AlexNet
   * 推广了 ReLU 和 Dropout
@@ -111,9 +178,11 @@ $b_{x,y}^k=a_{x,y}^k/(k+\alpha\sum_{i=max(0,x-n/2)}^{min(W,x+n/2)}\sum_{j=max(0,
   * AlexNet 和 VGGNet 中的FC层占据了9成的参数, 而且会导致过拟合
   * 使用模块化的 Inception 来抽取特征
 
+原始论文:
+0. (1998)Gradient-based learning applied to document recognition
+1. 
 
-
-### 2.1.1. Alexnet
+### 4.1.1. Alexnet
 
 * ReLU 激活函数被应用在了所有卷积层和FC层的后面
 
@@ -202,7 +271,7 @@ class AlexNet(nn.Module):
         x = self.classifier(x)
         return x
 ```
-### 2.1.2. VGGNet
+### 4.1.2. VGGNet
 
 * 网络模型
   * 输入大小为 224*224 
@@ -220,7 +289,7 @@ class AlexNet(nn.Module):
   * 再加上随机水平翻转和色彩偏移
 
 
-### 2.1.3. GoogLeNet
+### 4.1.3. GoogLeNet
 
 GoogLeNet的发展共有四个版本  
 
@@ -256,7 +325,7 @@ Inception V3:
 * 高维特征信息包含的更多, 更容易加快训练
 
 
-### 2.1.4. ResNet
+### 4.1.4. ResNet
 
 * Residual Network
 * 灵感来源于: 如果使用恒等映射层, 那么网络的加深起码不会带来训练误差的上升
@@ -275,7 +344,137 @@ Inception V3:
 
 
 
-# 3. RNN
+## 4.2. Detection 系列网络
+
+Detection 相比 Recognition 是更复杂的任务:
+1. Detection 的过程中往往也就顺带进行了分类识别
+2. Detection 的特征提取往往更复杂:
+   * 目前的手法大多数是输入一个区域, 区域经过CNN计算, 得到该区域是否是正区域来得到结果
+   * 以前的手法更多的使用 sliding windows, 窗口移动方法, RPN 网络也是基于 Sliding-windows
+   * R-CNN 的出现引领了 Region-Based 的风潮
+
+针对速度和精度的权衡 trade-off between speed and accuracy:
+- Multi-scale Feature 即使在深度学习的时代, 依然能够带来更高的精度
+- 如何快速的计算出 Multi-scale Feature 也是一个研究方向. eg. FPN  
+
+
+* Regions with CNN feature 是将CNN方法应用到目标检测的方法, 是目标检测问题的一个里程碑.  
+* SPP-Net 为Fast-RCNN提供了灵感
+* RPN网络分支为加速训练提供了候选区域筛选方法, Faster RCNN 基本实现了端到端的检测
+* YOLO 直接舍弃了 RPN的候选框提取, 直接进行整图回归
+* SSD 解决了 YOLO的目标定位偏差问题和小目标遗漏问题  
+
+原始论文:
+1. (2013)Selective search for object recognition 
+2. (2014)Rich feature hierarchies for accurate object detection and semantic segmentation 
+3. (2014)Spatial Pyramid Pooling in Deep Convolutional Networks for Visual Recognition
+4. (2017)Faster R-CNN: Towards Real-Time Object Detection with Region Proposal Networks
+
+### 4.2.1. R-CNN
+
+R-CNN算法可以分为四步:
+1. 候选区域选择, 即 Region Proposal
+2. 使用CNN提取候选区域的特征
+3. 对CNN提取的特征向量进行分类
+4. 边界回归得到精确的目标区域
+
+
+缺陷:
+* 多个候选区域 (2K) 需要预先提取, 非常占用磁盘
+* CNN需要固定尺寸输入, 因此对候选区域的拉伸或截取会丢失信息
+* 候选区域存在重叠, 因此计算浪费
+
+### 4.2.2. SPP-Net
+
+由其他作者对RCNN的一个实质性的改进  
+1. 取消了 crop/warp 的图像归一化过程, 解决了图像变形导致的信息丢失
+2. 用 空间金字塔池化 ( Spatial Pyramid Polling ) 替换了全连接层之前的最后一个池化层  
+3. 解决了卷积层的重复计算问题 速度提高了 24~102 倍
+
+缺陷:
+1. 和RCNN一样，训练过程仍然是隔离的，提取候选框 | 计算CNN特征| SVM分类 | Bounding Box回归独立训练，大量的中间结果需要转存，无法整体训练参数；
+2. SPP-Net在无法同时Tuning在SPP-Layer两边的卷积层和全连接层，很大程度上限制了深度CNN的效果；
+3. 在整个过程中，Proposal Region仍然很耗时。
+
+
+### 4.2.3. Fast-RCNN
+
+主要贡献在于对RCNN进行加速, 受SPP-Net启发而来  
+1. 借鉴了SPP-Net的思路, 提出了简化版的 ROI池化层 (注意并非金字塔), 加入了候选框映射功能, 使得网络可以反向传播, 解决了SPP的整体网络训练问题  
+2. 多任务Loss, SoftmaxLoss代替了SVM, 证明了Softmax比SVM有更好的效果
+3. SVD加速全连接层的训练
+4. 
+
+### 4.2.4. FasterRCNN RPN
+
+Faster RCNN 基本实现了端到端的实时检测  
+
+
+RPN网络分支:
+* RPN作为一个分支网络模块, 完美的解决了 Selective Search 提取候选区域慢的问题  
+* RPN作为网络分支, 和 backbone 时别网络共享权值, 一起训练
+* 参数:  n是 slide windows 的边长, k 是锚点box的个数
+
+1. 输入任意大小的图像, 输出一组矩形候选区域和对应的 objectness score
+2. 和最初RCNN的Selective Search 不同, RPN是滑窗搜索 (Slide Windows) 论文中滑窗大小 3X3
+3. 和滑窗搜索一起出现的一个新名词 - 锚点 (anchor box) 
+
+RPN网络过程
+1. RPN 作用于共享网络的最后一层 (feature map output by the last shared conv layer), 这最后一层网络输出的特征图的WH先不管, 通道是 256(ZFnet) 或 512 (VGG)
+2. RPN 网络在一个位置, 产生 k 个候选区域, 经过参数化后对应 k 个 anchors, 若 feature map 是WXH, 那么总共的 anchors 为 WHk个
+
+
+
+## 4.3. 语义分割 Semantic Segmentation
+
+图像分割: 让网络做像素级别的预测, 直接得出label map  
+
+1. (2017)Fully Convolutional Networks for Semantic Segmentation
+
+
+
+### 4.3.1. FCN - Fully Convolutional Networks
+
+深度学习应用在图像分割的代表成就
+* FCN 接受任意尺寸的输入图像
+* 对最后一个卷积层的输出feature map 使用反卷积进行上采样, 恢复到原本输入图像的尺寸
+* 对每一个像素都产生了一个预测, 同时保留了原始输入图像中的空间信息
+* end-to-end, pixels-to-pixels
+
+概念: 全连接层与全卷积层的转换
+- 任意一个卷积层都可以又一个全连接层代替 (该全连接层的权重矩阵中由很多0, 有很多重复模块)
+- 任何一个全连接层都可以转化为一个卷积层 (卷积核的大小=上层特征大小, 卷积核的个数=下层特征大小)
+
+全连接层->全卷积层:
+* 将 1000 个节点的全连接层改成了 1000个 1X1卷积核的卷积层
+* Feature map 经过该卷积层, 还是得到二维的 Feature map, 因此对输入图片的 size 没有了限制
+* 例: 全连接层 4096->4096->1000, 对应的卷积核 (4096,1,1)-> (4096,1,1)-> (1000,1,1)
+
+## 4.4. FPN - Feature Pyramid Networks
+
+论文: Feature pyramid networks for object detection  
+一种获得多缩放特征( Multi-scale Feature )的方法, 独立于 Backbone 网络.  
+
+结构定义:
+* 背景和概念:
+  * 输入一个 single-scale 图像, 任意大小, 得到一系列成比例大小的特征图
+  * FPN由三部分组成, 自底向上路径, 自顶向下路径, 水平连接 三部分
+  * 定义输出特征图的大小相同的网络layers为同一个stage, 整个网络因此被分成了几个stage
+  * 依据各个stage输出的大小, 网络的输出被分成了 几个部分, 特征图的大小依次降低
+  * stage1因为输出的size太大了而不使用
+* Bottom-up Pathway:
+  * 前向传播过程中, 取各个stage最后一层的输出作为 Ci
+  * C1不使用
+* Top-down Pathway:
+  * 从后层的输出开始, 以2为单位进行升采样, 直接使用最近邻方法来进行填充
+* Lateral connection:
+  * 使用 1X1 卷积核对 Bottom-up 进行通道降维
+  * 直接将 BU和TD的特征图进行元素层面的加法
+  * 最后一层C5不用进行merge, 直接降维后输出
+  * 在merge后的特征图加一个3X3的卷积层, 用于消除升采样带来的误差
+  * 最终获得了 P2~P5 的特征图
+
+# 5. RNN
 
 * 普通的神经网络以及CNN, 都是假设元素之间是相互独立的, 输入与输出也是独立的
 * 循环神经网络的特点: 拥有记忆能力, 输入依赖于当前的输出和记忆
@@ -289,10 +488,6 @@ Inception V3:
   * $f()$是激活函数
   * 可以把St当作一个隐状态
 * 网络中的所有细胞共享参数 $UVW$
-
-
-
-
 
 
 

@@ -16,7 +16,6 @@
 
 * 非常大的库
 * 
-##
 
 ### os.walk
 
@@ -39,10 +38,6 @@ for root, dirs, files in os.walk('/home/eugene/workspace/learnnote/cvml'):
     print("bytes in", len(files), "non-directory files")
 
 ```
-
-
-
-
 
 # 3. time
 
@@ -93,3 +88,47 @@ time.gmtime(0)
 
 # logging 日志模块
 
+
+# argparse
+
+该模组非常常用, 用于书写一个 user-friendly 的命令行调用  
+
+```py
+import argparse
+parser = argparse.ArgumentParser()  # 建立命令行翻译器
+parser.parse_args() # 翻译传入的命令行参数
+```
+
+## add_argument()
+
+* 基础上使用 `parser.add_argument()` 来添加一个命令行参数  
+
+```py
+ArgumentParser.add_argument(
+  name or flags...
+  [, action]
+  [, nargs]
+  [, const]
+  [, default]     # 默认值无需多解释
+  [, type]        # 转换的类型
+  [, choices]
+  [, required]    # 一般带 - 的就是可选参数, 否则必须参数, 设置required会带来混淆因此应该避免使用
+  [, help]        # str, 当使用 --help 时, 对该参数的说明
+  [, metavar]
+  [, dest])
+```
+
+
+按照常用的顺序进行说明:
+1. `type`    指定该参数被转换成什么类型, 默认是 string, 这个可以指定为一个接受单个字符串的函数
+```py
+parser.add_argument('count', type=int)
+parser.add_argument('distance', type=float)
+parser.add_argument('street', type=ascii)
+parser.add_argument('code_point', type=ord)
+
+def hyphenated(string):
+  pass
+parser.add_argument('short_title', type=hyphenated)
+```
+2. `default`  就是默认值, 注意 `default=argparse.SUPPRESS` 表示为默认该成员不出现在返回中

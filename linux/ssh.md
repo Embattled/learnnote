@@ -20,7 +20,7 @@ The OpenSSH suite consists of the following tools:
 
 
 ssh服务端由2部分组成： openssh(提供ssh服务)    openssl(提供加密的程序)
-SSH(远程连接工具)连接原理：ssh服务是一个守护进程 (deamon) ，系统后台监听客户端的连接   
+SSH(远程连接工具)连irtsve接原理：ssh服务是一个守护进程 (deamon) ，系统后台监听客户端的连接   
 ssh服务端的进程名为sshd,负责实时监听客户端的请求(IP 22端口)，包括公共秘钥等交换等信息   
 * 查看server是否启动以及启动
 `$ ps -e | grep sshd`  
