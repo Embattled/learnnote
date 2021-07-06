@@ -17,7 +17,7 @@
 * 非常大的库
 * 
 
-### os.walk
+### 2.0.1. os.walk
 
 - `os.walk(top, topdown=True, onerror=None, followlinks=False)`
 - 遍历一个文件目录下的所有子目录(包括该文件目录本身), 一直遍历到没有子目录
@@ -46,7 +46,7 @@ for root, dirs, files in os.walk('/home/eugene/workspace/learnnote/cvml'):
 
 并不是所有的函数都可以在所有平台使用, 因为大部分函数都是直接调用 C 函数库
 
-## 3.2. 相关定义
+## 3.1. 相关定义
 
 * epoch 时间是从 1970, 00:00:00 (UTC) 开始的, 根据平台不同可能会有不同的开始时间
 * 该模组中的函数都是 C 相关的, 因此对日期的处理只限于 32位描述, 即 1970~2038
@@ -64,12 +64,12 @@ time.gmtime(0)
 
 ```
 
-## 3.1. 获取时间
+## 3.2. 获取时间
 
 无参数函数
 1. time()    : 获取浮点数表示的从 epoch 开始经过的秒数
 
-## 获取规格化字符串时间
+## 3.3. 获取规格化字符串时间
 
 `time.strftime(format, t=None )`
 * 将一个元组或者 struct_time 转化成格式的字符串
@@ -86,22 +86,29 @@ time.gmtime(0)
 | %m     | 月份                  |
 | %Y %y  | 四位数年份 两位数年份 |
 
-# logging 日志模块
+# 4. logging 日志模块
 
 
-# argparse
+# 5. argparse
 
-该模组非常常用, 用于书写一个 user-friendly 的命令行调用  
+argparse组件可以很方便的写一个命令行界面, 可以很容易的定义程序的参数, 并从`sys.argv`中提取出来, 同时还会自动提供错误信息  
 
 ```py
 import argparse
-parser = argparse.ArgumentParser()  # 建立命令行翻译器
-parser.parse_args() # 翻译传入的命令行参数
+# 建立命令行翻译器, 可以同时设置该程序的主要目的
+parser = argparse.ArgumentParser(description="calculate X to the power of Y")  
+args = parser.parse_args() # 翻译传入的命令行参数
 ```
 
-## add_argument()
+* `parser.parse_args()` 一般就是直接无参数调用, 会直接翻译传入的命令行参数, 返回一个 `Namespace` object
+* `Namespace` 就是定义在 argparse 包中的一个简单的类, 和字典类似, 但是 print()更加可读, 可以使用 `vars()` 方法进行转换成字典
+  * `args.*` 用点号进行对应的参数访问
+
+## 5.1. add_argument()
 
 * 基础上使用 `parser.add_argument()` 来添加一个命令行参数  
+* 添加可选参数的时候使用 `-` 或者 `--`, 会自动识别, 且在调用值的时候不需要加 `-`
+  * 同时有 `-` 和 `--` 的时候会选择 `--` 的名字作为参数调用名
 
 ```py
 ArgumentParser.add_argument(
@@ -111,8 +118,8 @@ ArgumentParser.add_argument(
   [, const]
   [, default]     # 默认值无需多解释
   [, type]        # 转换的类型
-  [, choices]
-  [, required]    # 一般带 - 的就是可选参数, 否则必须参数, 设置required会带来混淆因此应该避免使用
+  [, choices]     # 限制该参数可能的值, 输入一个 list 
+  [, required]    # 官方推荐带 - 的就是可选参数, 否则必须参数, 官方doc说设置required会带来混淆因此应该避免使用. 但是实际上都在用
   [, help]        # str, 当使用 --help 时, 对该参数的说明
   [, metavar]
   [, dest])
@@ -131,4 +138,46 @@ def hyphenated(string):
   pass
 parser.add_argument('short_title', type=hyphenated)
 ```
-2. `default`  就是默认值, 注意 `default=argparse.SUPPRESS` 表示为默认该成员不出现在返回中
+2. `default`  就是默认值, 注意 `default=argparse.SUPPRESS` 表示为默认该成员不出现在返回中, 如果不指定的话默认值是 `None`
+3. `action`   特殊操作, 代表该参数是一个动作参数, 默认是`store`, 在Action class 中具体说
+4. `choices`  该参数只能是特定值中的某一项, 否则会报错, 用于防止输入非法的值
+
+
+**argparse的使用**
+```python
+
+# action="store_true"
+parser.add_argument("-V","--verbose", help="increase output verbosity", action="store_true")
+
+# 用另一种方法增加信息冗余 action="count" ,统计某一参数出现了几次
+# 可以识别 -v -vv -vvv '--verbosity --verbosity'
+# 可以创建一个矛盾参数组, 当中的参数不能同时出现
+group = parser.add_mutually_exclusive_group()
+# 在group的方法中添加参数
+group.add_argument("-v", "--verbose", action="store_true")
+group.add_argument("-q", "--quiet", action="store_true")
+```  
+
+### 5.1.1. Action class
+
+
+## 5.2. 高级 args
+
+### 5.2.1. mutual exclusion 矛盾参数
+
+* 可以将不同的参数归到一组里, 这个组的参数只能出现一种
+* 每次调用该参数会返回一个类似于`ArgumentParser` 的对象, 通过调用该对象的 add_argument来实现矛盾参数
+* required 参数代表该组参数是否必须出现一个, 同单个参数的 required 的差不多相同意思  
+
+`ArgumentParser.add_mutually_exclusive_group(required=False)`  
+
+```py
+parser = argparse.ArgumentParser()
+group = parser.add_mutually_exclusive_group()
+
+group.add_argument('--foo', action='store_true')
+group.add_argument('--bar', action='store_false')
+```
+
+## Print help
+

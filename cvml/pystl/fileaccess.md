@@ -7,21 +7,57 @@
 `os.path` 是一整个模块名, 从 `os` 模组中被分离出来
 * 提供了一些操作路径字符串的方法
 * 还包含一些或者指定文件属性的一些方法
+* 该包的所有函数都接受  only bytes or only string objects as their parameters.
 
 该模块是较为低级的模块, pathlib里拥有更高级的函数及对象  
 The pathlib module offers high-level path objects.  
+* 但是 os.path 用的非常多  
+* 内容非常简单
 
 ## 2.1. 判断函数
 
 * os.path.isdir(path) 	判断路径是否为目录。
 * os.path.isfile(path) 	判断路径是否为文件。
+* os.path.isabs(path)   判断是否是一个绝对路径
+  * linux 下即 `/` 开头
+  * windows下即 盘符: 加反斜杠开头
+
 
 
 ## 2.2. 提取及转换函数
 
-* os.path.realpath(path) 	返回 path 的真实路径。
-* os.path.dirname(path) 	返回 path 路径中的目录部分。
+一分为二  
+* os.path.basename(path)  返回 path 路径中的最后一个成分
+  * 如果 path 是文件路径, 就是文件名
+  * 如果 path 是目录, 就是叶子文件夹名
+* os.path.dirname(path) 	返回 path 路径中的 减去 basename(path)
+* os.path.split(path)     将路径分解成 head 和 tail 两部分, 分别相当于上面的函数
+  * join(head, tail) returns a path to the same location as path
 
+* os.path.realpath(path) 	返回 path 的真实路径。
+* os.path.abspath(path)   返回相对路径 path 的绝对路径版本
+  * 相当于 `os.path.normpath(os.path.join(os.getcwd(), path))`
+  * 直接执行 `os.path.abspath('.')` 获取当前路径
+
+## 路径操作
+
+* os.path.join(paths) 该包最重要的函数, 自动生成路径, 不用考虑 `/` 的问题
+  * 接受一系列的参数
+  * 每个参数作为一个文件名目录
+  * 最后一个参数后面不接 `/`
+  * 如果某个元素是绝对路径, 那么该元素之前的输入会被抛弃 (windows下是 `c:` 之类的)
+* os.path.normpath(path) 标准化一个路径
+  * 删除多余的 `/`
+  * 删除最末尾的 `/`
+  * 删除位于中间的 `..` 并进行逻辑重定位
+
+
+## 路径生成
+
+* os.path.join(path, *paths)
+* 只能链接生成路径
+  * 每个输入的成员之间会加一个分隔符
+  * 最后一个成员不会加
 
 # 3. pathlib
 

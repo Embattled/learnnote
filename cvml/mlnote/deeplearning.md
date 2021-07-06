@@ -28,6 +28,8 @@
     - [4.3.1. FCN - Fully Convolutional Networks](#431-fcn---fully-convolutional-networks)
   - [4.4. FPN - Feature Pyramid Networks](#44-fpn---feature-pyramid-networks)
 - [5. RNN](#5-rnn)
+  - [常见的序列网络即应用](#常见的序列网络即应用)
+- [Attention](#attention)
 # 1. Neuron Network 优化方法
 
 * ReLU ( Rectified Linear Units) 在 Alexnet 中被发扬光大, 被证明在深层网络中远比 tanh 快, 成功解决了Sigmoid在网络较深时的梯度弥散问题
@@ -142,8 +144,10 @@ Traditional augmentation methods such as rotation, scaling and perspective trans
 
 ## 3.1. Text spot
 
-3755 classes (Ievel-l set of GB2312-80)  ｄ
+3755 classes (Ievel-l set of GB2312-80) 
+
 ### 3.1.1. Scene Text
+
 * IIIT 5K-Words  (IIIT5K) contains 3000 cropped word images for testing.
 * Street View Text (SVT) consists of 647 word images for testing. Many images are severely corrupted by noise and blur.
 * Street View Text Perspective (SVT-P) contains 645
@@ -490,21 +494,61 @@ RPN网络过程
 * 网络中的所有细胞共享参数 $UVW$
 
 
+## 常见的序列网络即应用
+
+网络结构:
+* Recurrent neural networks (RNN)
+* Long short-term memory (LSTM)
+* Gated recurrent neural networks. (GRNN)
+
+应用领域:
+* Sequence modeling
+  * Language modeling
+* Transduction problem
+  * Machine translation
 
 
 
 
+# Attention
+
+* Attention mechanism - 注意力机制, 一种思想
+  * Self-attention (intra-attention)
+* Transformer - a transduction model
+  * relying entirely on self-attention to compute representations.
+  * without using sequence-aligned RNN or convolution.
 
 
-
-
-
-
-
-
-
-
-
+1. Attention function
+   * 映射 : a query and a set of key-value pairs to an output. (Q K V output)
+   * output: values 的带权加法 weighted
+   * 权值 weight : Computed by a compatibility function of the query with the corresponding key.
+   * 总结 : fun(query, key) -> weight, sum(weight-value)-> output
+2. Dot-product Attention
+   * $Attention(Q,K,V)=softmax (QK^T) V$
+   * 矩阵化的计算方法使得实现的时候计算速度相对较快
+   * 一种想法是因为 dk 比较大的时候, QK 也指数增大, 导致 Softmax 的值偏向极端, 使得梯度变得非常小影响了性能
+3. Additive attention
+   * Using a feed-forward network with single hidden layer.
+   * 在 dk 比较大的时候效果优于 doc-product attention
+4. Scaled Dot-Product Attention
+   * 将多个向量矩阵化, 实现并行
+   * QK矩阵乘法, 除以 k的维度开根号, softmax后极为 value的权值
+   * $Attention(Q,K,V)=softmax (QK^T/\sqrt(d_k)) V$
+5. Multi-Head Attention
+   * 在 Scaled Dot-product attention 的基础上, 以不同的线性投影方法重复 h 次
+   * 对于原本有相同维度$d_{model}$ 的 Q K V, 也用一组 learned linear projections 投影到 $d_k, d_v$维向量
+   * 这里的投影可以解释为权重矩阵, 是可学习的 (learned)
+     * $W_i^Q\in \mathbb{R}^{d_{model}\times d_k}$
+     * $W_i^K\in \mathbb{R}^{d_{model}\times d_k}$
+     * $W_i^V\in \mathbb{R}^{d_{model}\times d_v}$
+   * 最后 concat h 个 $d_v$ 维的向量形成最终输出
+   * $headi_i=Attention(QW_i^Q,KW_i^K,VW_i^V)$  
+   * $MultiHead(Q,K,V)=Concat(head_1,...,head_h)W^O$
+   * 原论文中
+     * h=8
+     * $d_k=d_v=d_{model}/h=64$ , 即相对于原本的维度, 投影后的向量实现了降维
+     * 大大降低了计算量, h=8 总共的计算量也小于之前保持维度的单个计算量
 
 
 

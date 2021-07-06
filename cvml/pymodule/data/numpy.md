@@ -50,23 +50,27 @@ numpy的二元基础运算都是元素层面的
 * `np.sin(A) np.exp(A)  np.add(A,B)`
 
 
-## 2.3. 降维运算
+## 2.3. Calculation 降维运算
 
-对全部元素进行操作, 也可以指定维度 
+对元素进行某种会带来降维的运算操作, 也可以指定维度 
 
-* axie None or int or tuple of ints, optional
+基本上都有类方法和全局方法两种实现
+1. `ndarray.fun(*)`
+2. `numpy.fun(array,)`
+
+全局通用参数
+* `axis=None` None or int or tuple of ints, optional
    通过指定函数的 `axis=i` 参数, 可以指定运算所执行的对象
     * `i` 从0开始, 指代最外层的括号, 即索引访问时最左边的方括号
     * 其他维度的索引每取一个值, 对 所有 i 维度的值进行运算
+* `dtype` 指定, 来保证运算时不会溢出, 默认是相同类型
 
 
-
-### 2.3.1. 数学
-
-单元运算的类方法实现:
+### 数学类
+* `ndarray.max()  numpy.amax()`
+* `ndarray.min()  numpy.amin()`
+* `ndarray.argmax() numpy.argmax()` 返回最大值对应的索引
 * .sum() 返回全元素的和
-* .min() 
-* .max()
 * .cumsum() 累加该 array
 
 
@@ -150,8 +154,15 @@ a.shape 可以返回当前的 array 的形状
 * numpy.vsplit(a,3) 横着切, 沿着 vertical axis
 * numpy.array_split 指定切的方向
 
-### 维度压缩 squeeze
+### 升维 
 
+1. `arr=arr[:,:,np.newaxis`
+2. `arr=np.array([arr])`
+
+### 降维 
+
+
+* `np.squeeze(x)`
 * 删掉维度数为1的轴
 * Remove axes of length one from a.
 

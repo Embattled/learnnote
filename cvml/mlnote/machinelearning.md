@@ -24,8 +24,37 @@
    * 确认哪些 features 可能会有 errors or `typos` 打印错误
    * 确认是否有 missing value
 
-# 2. Machine Learning
+# 2. Machine Learning 机器学习基础
 
+机器学习算法即 - 能够从数据中学习的算法  
+* 机器学习本质上属于应用统计学
+  * 统计学的两种主要方法
+    * 频率派估计
+    * 贝叶斯推理
+  * 大部分算法都具有超参数 (在算法之外定义)
+* 机器学习算法可以分成
+  * 监督学习    : 回归, 分类, 等结构化输出问题
+  * 无监督学习  : 密度估计等
+  * 半监督学习
+    * 一部分样本有监督目标, 另一部分没有
+    * 整个样本集合被标记为 正负, 但是单独的样本例没有标记
+
+## 学习算法
+
+* 给定经验 E , 应用于任务 T, 获得性能度量 P 的提升
+* 样本 (example) 是已经从事件中收集来的量化后的 特征(feature) 集合
+* 当前机器学习任务举例
+  * 分类
+    * 输入缺失分类
+  * 回归
+  * 结构化输出
+    * 转录 - OCR, NLP
+    * 机器翻译
+    * 图片标识 , segmentation, 文字表述图片
+
+机器学习的性能
+* 错误率 (errorrate) : 模型的 0-1 损失的期望
+  * 
 
 Q: What is Cross-Validation?
 
@@ -44,6 +73,20 @@ The metric chosen to evaluate a model depends on various factors:
 Metrics: adjusted r-squared, MAE, MSE, accuracy, recall, precision, f1 score.
 
 Q: 
+
+# 监督学习算法 Supervised Learning
+
+## Support Vector Machines
+
+* SVMs are a set of supervised learning methods used for classification, regression and outliers detection.
+* 优点
+  * Effective in high dimensional spaces.
+  * Still effective in cases where number of dimensions is greater than the number of samples.
+  * Uses a subset of training points in the decision function (called support vectors), so it is also memory efficient.
+  * Versatile: different Kernel functions can be specified for the decision function. 
+* 缺点
+  * If the number of features is much greater than the number of samples, avoid over-fitting in choosing Kernel functions and regularization term is crucial.
+  * SVMs do not directly provide probability estimates, these are calculated using an expensive five-fold cross-validation.
 
 # 3. 特征工程 - 抽出问题的特征向量
 
