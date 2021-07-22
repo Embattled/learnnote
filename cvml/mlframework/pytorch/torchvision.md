@@ -3,6 +3,7 @@
 - [2. torchvision.io](#2-torchvisionio)
   - [2.1. Image part 图像部分](#21-image-part-图像部分)
 - [3. torchvision.models](#3-torchvisionmodels)
+  - [全局参数](#全局参数)
   - [3.1. image classification](#31-image-classification)
 - [4. torchvision.utils](#4-torchvisionutils)
   - [4.1. make_grid](#41-make_grid)
@@ -120,8 +121,16 @@ torchvision.io.write_png(input: torch.Tensor, filename: str, compression_level: 
 * pixelwise semantic segmentation
 * object detection, instance segmentation , person keypoint detection
 
-
 Pytorch 的所有预定义 model 都继承自  `nn.Module` , 注意类的相关构造参数
+
+相关模型的源代码非常有参考意义, 保存到了 [这里](torchvisionmodel.py)
+
+## 全局参数
+
+* 类的定义为首字母大写, 相关模型获取函数为小写
+* 函数的通用参数
+  * `pretrained: bool = False`  使用预训练模型
+  * `progress: bool = True`     显示模型参数下载进度条
 
 ## 3.1. image classification
 

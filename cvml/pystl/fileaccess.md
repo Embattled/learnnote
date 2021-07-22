@@ -39,7 +39,7 @@ The pathlib module offers high-level path objects.
   * 相当于 `os.path.normpath(os.path.join(os.getcwd(), path))`
   * 直接执行 `os.path.abspath('.')` 获取当前路径
 
-## 路径操作
+## 2.3. 路径操作
 
 * os.path.join(paths) 该包最重要的函数, 自动生成路径, 不用考虑 `/` 的问题
   * 接受一系列的参数
@@ -52,7 +52,7 @@ The pathlib module offers high-level path objects.
   * 删除位于中间的 `..` 并进行逻辑重定位
 
 
-## 路径生成
+## 2.4. 路径生成
 
 * os.path.join(path, *paths)
 * 只能链接生成路径
@@ -212,5 +212,5 @@ dir_path.replace(dir_path.parent / dir_path2)
 
 
 
-# shutil - High-level file operations
+# 4. shutil - High-level file operations
 

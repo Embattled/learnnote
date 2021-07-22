@@ -547,9 +547,11 @@ systemctl 提供了子命令可以查看系统上的 unit,命令格式为:
 * 第一行是对 unit 的基本描述。  
 * 第二行中的 Loaded 描述操作系统启动时会不会启动这个服务,enabled 表示开机时启动,disabled 表示开机时不启动。  
   * 关于 unit 的启动状态,除了 enable 和 disable 之外还有:  
-  *   static:这个 unit 不可以自己启动,不过可能会被其它的 enabled 的服务来唤醒。
+  * static:这个 unit 不可以自己启动,不过可能会被其它的 enabled 的服务来唤醒。
   * mask:这个 unit 无论如何都无法被启动！因为已经被强制注销。可通过 systemctl unmask 改回原来的状态。
-* 第三行 中的 Active 描述服务当前的状态,active (running) 表示服务正在运行中。如果是 inactive (dead) 则表示服务当前没有运行。 
+* 第三行 中的 Active 描述服务当前的状态,如果是 
+  * inactive (dead) 则表示服务当前没有运行。 
+  * active (running) 表示服务正在运行中。
   * active (exited)：仅执行一次就正常结束的服务,目前并没有任何程序在系统中执行。
   * active (waiting)：正在执行当中,不过还再等待其他的事件才能继续处理。 
 * 第四行的 Docs 提供了在线文档的地址。  
@@ -1053,6 +1055,9 @@ useradd 命令创建用户的过程，其实就是修改了与用户相关的几
 
 
 # 7. 环境配置  
+
+* 配置linux中的系统环境
+* 所谓环境就是系统在启动的时候就自动载入的各种变量
 
 ## 7.1. 环境变量
 

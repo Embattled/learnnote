@@ -8,7 +8,8 @@
   - [2.3. python 的类型提示](#23-python-的类型提示)
     - [2.3.1. 类型别名](#231-类型别名)
     - [2.3.2. 函数的类型注解](#232-函数的类型注解)
-- [3. 内置函数](#3-内置函数)
+- [3. 内置函数 Build-in Function](#3-内置函数-build-in-function)
+  - [类型确认函数](#类型确认函数)
   - [3.1. 类型转换函数](#31-类型转换函数)
   - [3.2. print()](#32-print)
     - [3.2.1. 格式化输出](#321-格式化输出)
@@ -295,7 +296,7 @@ def greeting(name: str) -> str:
 ```
 
 
-# 3. 内置函数
+# 3. 内置函数 Build-in Function
 
 可以直接使用, 不需要导入某个模块, 解释器自带的函数叫做内置函数  
 
@@ -328,7 +329,7 @@ any() 	dir() 	 	next() 	slicea()
 ascii() 	divmod()  	object() 	
 bin() 	 	 	staticmethod()
  		 	open() 	
-breakpoint() 	 	isinstance()  	sum()
+breakpoint() 	  	sum()
 bytearray() 	filter() 	issubclass() 	pow() 	super()
 bytes() 	 	iter() 	tuple()
 callable() 	format() 	len() 	property() 
@@ -337,6 +338,13 @@ classmethod() 	getattr()
 compile() 	 	map()  	
 complex() 	hasattr() 	max() 	round()
 ```
+
+## 类型确认函数
+
+* 确认一个变量的类型
+  * isinstance(object, classinfo)   如果 object 的类型属于 classinfo 中的一种, 返回 True
+
+
 ## 3.1. 类型转换函数
 虽然 Python 是弱类型编程语言, 在一些特定场景中, 仍然需要用到类型转换  
 
@@ -457,8 +465,17 @@ print("%+08.3f" % f)
 
 ## 3.4. open() 基础文件操作
 
-open() 函数用于创建或打开指定文件  
-
+open() 函数用于创建或打开指定文件, 返回一个 file object  
+`open(file, mode='r', buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None)`  
+* file    : 一个路径, 最好是 path-like oject
+* mode    : 文件模式
+* buffering: 设置 buffering policy, 一个整数. 
+* encoding: 只能在文本模式下使用, 用字符串代表编码格式
+  
+文件模式
+* r读取 w写入 +读写 a谁家
+* b二进制, t 文本
+* x 如果文件已存在则失败
 
 
 ## 3.5. range()

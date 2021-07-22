@@ -18,15 +18,15 @@
     - [2.3.1. PIL.Image.effect_*](#231-pilimageeffect_)
     - [2.3.2. PIL.Image.*_gradient](#232-pilimage_gradient)
 - [3. ImageDraw](#3-imagedraw)
-  - [基础知识](#基础知识)
-  - [3.1. 类方法](#31-类方法)
-    - [3.1.1. .text](#311-text)
+  - [3.1. 基础知识](#31-基础知识)
+  - [3.2. 类方法](#32-类方法)
+    - [3.2.1. .text](#321-text)
 - [4. ImageOps](#4-imageops)
   - [4.1. 黑白彩色转换](#41-黑白彩色转换)
 - [5. ImageFont](#5-imagefont)
   - [5.1. truetype](#51-truetype)
 - [6. Other 小包](#6-other-小包)
-  - [6.1. ImageMorph](#61-imagemorph)
+  - [6.1. ImageMorph 形态学变换](#61-imagemorph-形态学变换)
   - [6.2. ImageFilter](#62-imagefilter)
     - [6.2.1. 预定义filter](#621-预定义filter)
     - [6.2.2. size区域定义filter](#622-size区域定义filter)
@@ -85,6 +85,7 @@ Pillow is the friendly PIL fork
 
 ### 2.1.1. PIL.Image.open
 
+
 * `PIL.Image.open(fp, mode='r', formats=None)` 打开一个给定的图像文件
   * fp : 指定文件路径  filename (string), pathlib.Path object or a file object.
   * mode : 对该函数来说只能给定 'r', 搞不懂为啥还要独立出来, 表示读取
@@ -95,6 +96,11 @@ Pillow is the friendly PIL fork
   * ValueError : 如果 mode 未指定成 'r', 或者 fp 被别的 IO 占用
   * TypeError : format 传入异常值
   * PIL.UnidentifiedImageError : 无法打开或者无法识别的图像文件
+
+* 注意该文件是一个 lazy 函数, 调用了后会保持底层对这个文件的 open 状态, 并在第一次对图像进行操作的时候将文件读取到内存中, 如果调用过多会导致系统上的 OSERROR  
+* 通过调用 `Image.load()` 方法来正式将文件读取到内存中, 并且会自动关闭文件连接状态
+
+
 
 
 ### 2.1.2. PIL.Image.new
@@ -256,14 +262,14 @@ method 变换方法:
   * annotate or retouch existing images
   * generate graphics on the fly for web use.
 
-## 基础知识
+## 3.1. 基础知识
 
 * 坐标系: 标准 (0,0) 代表左上角的坐标系
 * 颜色  : 同创建图像的时候相同, 整数或者 3-tuple 或者浮点数
 * 
 
-## 3.1. 类方法
-### 3.1.1. .text
+## 3.2. 类方法
+### 3.2.1. .text
 
 ```py
 ImageDraw.text(
@@ -317,23 +323,31 @@ PIL.ImageFont.truetype(font=None, size=10, index=0, encoding='', layout_engine=N
 
 
 # 6. Other 小包
-## 6.1. ImageMorph
 
-提供对图片的形态学变化
+## 6.1. ImageMorph 形态学变换
 
-* 创建变换
+提供对图片的形态学变化, 只能应用在 `L` 图片上
+
+* `class PIL.ImageMorph.LutBuilder(patterns=None, op_name=None)` 创建变换
   * A class for building a MorphLut from a descriptive language
-  * `class PIL.ImageMorph.LutBuilder(patterns=None, op_name=None)`
-  * `patterns` 是一个单独的描述性语言, 用来说明要进行的变换
+  * `patterns` 是一个单独的描述性语言, 用来说明要进行的变换, 字符串形式输入
   * `op_name`  可以使用预定义的变换
   * 类成员函数
-    * `add_patterns( patterns )`
+    * `add_patterns( patterns )` 后加入 patterns
     * `build_lut()` 编译这个变换, 返回 morphology lut.
     * `get_lut()` 获取 lut
 
+
+* patterns 是一个字符串列表, 其中的每个字符串代表一个操作,  圆括号内除去空格共计9个字符, 代表 kernel
+  `p=["4:(....1.111)->1"]`
+* 预定义 patterns
+  * corner 只保留所有边角的像素
+  * dilation4  4方向膨胀
+  * dilation8  8方向膨胀,  包括了斜方向
+  * erosion4   4方向消减
+  * erosion8   8方向削减
+  * edge       边缘检测
 ```py
-# patterns 是一个列表包裹着的字符串, 类似于
-p=["4:(....1.111)->1"]
 """
 Operations:
     - 4 - 4 way rotation
@@ -346,7 +360,7 @@ Kernel:
     - 1 - Pixel is on
     - 0 - Pixel is off
 
-->0 : 代表该 kernel 匹配时, 输出的像素值
+->0 ->1: 代表该 kernel 匹配时, 输出的像素值
 """
 known_patterns = {
               "corner": ["1:(... ... ...)->0", "4:(00. 01. ...)->1"],
@@ -360,12 +374,18 @@ known_patterns = {
                   "4:(01. .1. ...)->1",
               ],
           }
-
 ```
 
-* 应用变换
-  * A class for binary morphological operators  
-  * `class PIL.ImageMorph.MorphOp(lut=None, op_name=None, patterns=None)`
+* `class PIL.ImageMorph.MorphOp(lut=None, op_name=None, patterns=None)` 应用变换
+  * A class for binary morphological operators  用来切实执行该变换
+  * 应用类方法：
+    * `.apply(image)`           应用该变换, return count(被改变的像素个数), outimage `输出图像`
+    * `get_on_pixels(image)`    获得 all turned on pixels in a binary image, 返回list 包含所有 maching pixels (2-tuple) 形式
+    * `match(image)`            寻找matching 变换的坐标 ,返回list 包含所有 matching pixels (2-tuple) 形式
+  * 载入方法
+    * `load_lut(filename)`      从一个 mrl 文件载入 lut
+    * `save_lut(filename)`      将该 lut 存入一个 mrl 文件
+    * `set_lut(lut)`            设置lut
 
 
 ## 6.2. ImageFilter
@@ -414,7 +434,7 @@ known_patterns = {
 `class PIL.ImageFilter.Kernel(size, kernel, scale=None, offset=0)`  
 * 完全的自定义卷积核, 只能用在 `RGB` 和 `L` 图形上
 * `size` 卷积核的大小, 只能是 33 或者 55
-* `kernel` 一个序列, 传入卷积核的 weight
+* `kernel` 一个序列, 传入卷积核的 weight, 可以是整数或者浮点数
 * `scale` 均一化的值, 像素的最终值是卷积的结果以scale, 默认即可(卷积weight的sum)
 * `offset` 偏差, 用加法添加到像素的最终值
 

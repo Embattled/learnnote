@@ -83,9 +83,10 @@ numpy的二元基础运算都是元素层面的
 
 ### 2.4.1. numpy.array()
 
-从既存的序列或者元组来创建 `numpy.array()`
-   * 必须以序列的形式传入第一个参数, 即用方括号包住
-   * 元素类型会被自动推导, 或者用`dtype=`指定类型
+从既存的序列或者元组来创建  
+`numpy.array(object, dtype=None, *, copy=True, order='K', subok=False, ndmin=0, like=None)`
+  * 必须以序列的形式传入第一个参数, 即用方括号包住
+  * 元素类型会被自动推导, 或者用`dtype=`指定类型
 
 ### 2.4.2. 生成函数
 

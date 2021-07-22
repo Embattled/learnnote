@@ -165,3 +165,26 @@ hog_image   : (M, N) ndarray, optional
                 A visualisation of the HOG image. Only provided if visualize is True.
 """
 ```
+
+# util
+
+提供了面对图像的各种基础工具化的操作方法  
+
+## random_noise
+
+`skimage.util.random_noise(image, mode='gaussian', seed=None, clip=True, **kwargs)`  
+* image : 一个 ndarry , 将会被转换成 float 类型
+* mode  : str, 指定噪声的模式
+  * gaussian : 高斯分布的加法噪声
+  * localvar : 同样高斯分布, 但是对每个像素都有单独的 variance, 需要传入 local_vars
+  * poisson  : 泊松分布
+  * salt     : 盐噪声, 白色像素点
+  * pepper   : 胡椒噪声, 黑色像素点 
+* var   : float , 随机分布的标准差, 被用于 高斯分布和 斑点噪声
+  * variance = sigma**2
+* local_vars : Array of positive floats. same shape as image.
+* mean  : float , 噪声的均值  
+
+
+* clip  : bool , 用于防止添加噪声后的数据范围越界
+* seed  : int, 随机化的种子, 用于数据再现

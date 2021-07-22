@@ -40,7 +40,7 @@ print(torch.__version__)
 ```
 
 
-# 2. torch.Tensor
+# 2. torch.Tensor 张量类
 
 * `torch.Tensor` 是 pytorch 的张量的类名
 * `torch.Tensor` is an alias for the default tensor type (torch.FloatTensor).
@@ -50,7 +50,13 @@ print(torch.__version__)
 
 ## 2.1. torch.Tensor 的格式
 
-pytorch 的 tensor 总共支持10种数据格式, CPU tensor 名称如下  
+* `torch.Tensor` 其实是 `torch.FloatTensor` 的别称, 即默认都会创建该类型的张量  
+* pytorch 的 tensor 总共支持10种数据格式, CPU tensor 名称如下  
+  * 可以通过对应的类名进行创建, 但更一般的都是指定 `dtype` 来指定数据类型
+* GPU的格式名是在 torch 后面加上 .cuda 即可  
+  * 但一般都是指定 `device` 来指定设备
+
+
 * 16,32,64 bit 的浮点数
   * torch.HalfTensor 和 torch.BFloat16Tensor
   * torch.FloatTensor
@@ -58,18 +64,48 @@ pytorch 的 tensor 总共支持10种数据格式, CPU tensor 名称如下
 * 32,64,128bit 的复数
   * 无 CPU tensor
 * 8,16,32,64 bit 的整数 (区分有无符号)
-  * torch.ByteTensor 和 torch.CharTensor
+  * torch.ByteTensor 和 (有符号)torch.CharTensor
   * torch.ShortTensor
   * torch.IntTensor
   * torch.LongTensor
 * 布尔类型
   * torch.BoolTensor
 
-* GPU的格式名是在 torch 后面加上 .cuda 即可  
-* torch.Tensor 是 torch.FloatTensor 的别称, 即默认都会创建该类型的张量  
+## 类属性
+
+* 所有的张量类都有三个基础属性
+  * `torch.dtype`
+  * `torch.device`
+  * `torch.layout`
+
+1. dtype:  
+是一个object 用来指定张量的数据类型, 和张量本身的类型有所区分  
+* 省略了`torch.` 的表格, 省略了 `*.` 代表的 CPU或者GPU 指定
+* 注意用的时候要指定 `torch.int8` 这样子
+  
+| 数据类型  | dtype              | 张量类名(传统创建) |
+| --------- | ------------------ | ------------------ |
+| 16浮点1   | float16/half       | HalfTensor         |
+| 16浮点2   | bfloat16           | BFloat16Tensor     |
+| 32浮点    | float32/float      | FloatTensor        |
+| 64浮点    | float64/double     | DoubleTensor       |
+| 64复数    | complex64/cfloat   | 无                 |
+| 128复数   | complex128/cdouble | 无                 |
+| 无符8整数 | uint8              | ByteTensor         |
+| 8整数     | int8               | CharTensor         |
+| 16整数    | int16/short        | ShortTensor        |
+| 32整数    | int32/int          | IntTensor          |
+| 64整数    | int64/long         | LongTensor         |
+| 布尔      | bool               | BoolTensor         |
 
 
-## 2.2. 类型转换
+
+
+
+
+
+## 2.2. 类方法
+### 2.2.1. 类型转换
 
 1. .item()   : Returns the value of this tensor as a standard Python number
    * 只在张量中只有一个元素时生效
@@ -79,7 +115,7 @@ pytorch 的 tensor 总共支持10种数据格式, CPU tensor 名称如下
 3. .numpy()  : Returns self tensor as a NumPy ndarray
    * 共享内存, 非拷贝
   
-## 2.3. view 变形
+### 2.2.2. view 变形
 
 `view(*shape) → Tensor`  
 * 返回一个更改了维度的 tensor
@@ -98,7 +134,7 @@ c = a.view(1, 3, 2, 4)
 # torch.Size([1, 3, 2, 4])
 ```
 
-### 2.3.1. transpose
+### 2.2.3. transpose
 
 `torch.transpose(input, dim0, dim1) → Tensor`  
 * transpose 可以解释为view的一种
@@ -111,14 +147,27 @@ c = a.view(1, 3, 2, 4)
 同 numpy 的 transpose 不同, numpy 的transpose 可以直接交换多个维度  
 
 
-## 2.4. 创建操作 Creation Ops
+## 2.3. 创建操作 Creation Ops
 
-位于 `torch.` 下  
+基本上所有创建 tensor 的函数都位于 `torch.` 下  
 
-### 2.4.1. 统一值 tensor
+创建tensor 有许多通用的参数
+* `dtype  =`
+* `device =`
+
+### 2.3.1. torch.tensor
+
+* 从 python list 或者 numpy array 来创建张量
+* `torch.tensor()` 函数总是会进行数据拷贝
+  * 防止拷贝可以使用 `torch.as_tensor()`
+```py
+torch.tensor(data, *, dtype=None, device=None, requires_grad=False, pin_memory=False) → Tensor
+``` 
+
+### 2.3.2. 统一值 tensor
 
 
-### 2.4.2. 随机值 random
+### 2.3.3. 随机值 random
 
 函数参数 : `(*size, *, out=None, dtype=None, layout=torch.strided, device=None, requires_grad=False)`
 * size 指定大小
@@ -152,26 +201,22 @@ c = a.view(1, 3, 2, 4)
 * set_rng_state   :Sets the random number generator state.
 
 
-### 2.4.3. _like 类方法
+### 2.3.4. _like 类方法
 
 需要获取一个不确定维度的 tensor, 即通过另一个 tensor 指定大小
 * rand_like
 * randint_like
 * randn_like
 
-### 2.4.4. torch.tensor
 
-```py
-torch.tensor(data, *, dtype=None, device=None, requires_grad=False, pin_memory=False) → Tensor
-```
-### 2.4.5. torch.from_numpy
+### 2.3.5. torch.from_numpy
 
 `torch.from_numpy` 接受一个 ndarray 并转换成 tensor 没有任何参数  
 ```py
 torch.from_numpy(ndarray) → Tensor
 ```
 
-### 2.4.6. tensor复制
+### 2.3.6. tensor复制
 
 
 * `torch.clone(input, *, memory_format=torch.preserve_format) → Tensor`
@@ -183,7 +228,7 @@ torch.from_numpy(ndarray) → Tensor
 一般彻底的复制并脱离可以使用  `tensor.clone().detach()`  这也是官方推荐的方法  
 
 
-### 2.4.7. .new_ 方法
+### 2.3.7. .new_ 方法
 
 To create a tensor with similar type but different size as another tensor, use tensor.new_* creation ops.  
 
@@ -198,9 +243,9 @@ To create a tensor with similar type but different size as another tensor, use t
 
 
 
-## 2.5. 拼接与截取
+## 2.4. 拼接与截取
 
-### 2.5.1. torch.stack
+### 2.4.1. torch.stack
 `torch.stack(tensors, dim=0, *, out=None) → Tensor`  
 
 * 将多个 tensor 叠加到一起, 并产生一个新的 dimension
@@ -208,7 +253,7 @@ To create a tensor with similar type but different size as another tensor, use t
 * 因此所有 tensor 必须相同大小
 * dim 指定新的 dimension 的位置
 
-### 2.5.2. torch.cat
+### 2.4.2. torch.cat
 
 `torch.cat(tensors, dim=0, *, out=None) → Tensor`  
 
@@ -219,9 +264,9 @@ To create a tensor with similar type but different size as another tensor, use t
 
 
 
-## 2.6. 降维操作 Reduction Ops
+## 2.5. 降维操作 Reduction Ops
 
-### 2.6.1. max
+### 2.5.1. max
 1. torch.max(input) → Tensor 返回张量所有元素里的最大值
 2. torch.max(input, dim, keepdim=False, *, out=None) -> (Tensor, LongTensor) 即(values, indices) 
 
@@ -229,10 +274,9 @@ To create a tensor with similar type but different size as another tensor, use t
 
 # 3. torch
 
-作为最基础的包, torch 包括了tensors的数据格式以及对应的数学操作. 还提供了许多工具来高效的序列化 tensors 以及其他任意数据格式   
-该包有 CUDA 对应  
-
-
+* 作为最基础的包, torch 包括了tensors的数据格式以及对应的数学操作. 
+* 还提供了许多工具来高效的序列化 tensors 以及其他任意数据格式   
+* 该包有 CUDA 对应  
 
 ## 3.1. 序列化 Serialization
 
@@ -299,7 +343,29 @@ View 是一个数据的映射共享, 可以避免多余的数据拷贝
 These are the basic building block for graphs  
 用于定义神经网络相关的内容  
 
-## 5.1. torch.nn.Module
+分类
+* Containers            承载网络的各种模块
+* Convolution Layers    卷积层
+* Pooling Layers        池化层
+* Padding Layers        填充层
+* Non-linear Act        非线性激活函数
+* Normalization         标准化层
+* Recurrent Layers      循环网络层
+* Transformer Layer     编码器层
+* Linear Layers         线性层, 全连接层
+* Dropout Layers        Dropout层
+* Sparse Layers         稀疏层
+* Loss Functions        损失函数
+* Vision Layers         视觉层
+* Shuffle Layers        洗牌层
+* DataParallel Layers   数据并行层
+* 其他
+  * Utilities
+  * Quantized Functions
+  * Lazy Modules Initalization
+
+
+## 5.1. torch.nn.Module 类
 
 * `class torch.nn.Module  `
   * 所有神经网络模块的基类 Base class for all neural network modules.
@@ -317,9 +383,9 @@ These are the basic building block for graphs
 3. 定义 `forward` 函数, 
 
 基础方法:
-* cpu()                 : Moves all model parameters and buffers to the CPU.
-* cuda(device: Union[int, torch.device, None] = None)   :Moves all model parameters and buffers to the GPU
-* forward(*input: Any)  : Defines the computation performed at every call. Should be overridden by all subclasses.
+* `cpu() `                : Moves all model parameters and buffers to the CPU.
+* `cuda(device: Union[int, torch.device, None] = None)`   :Moves all model parameters and buffers to the GPU
+* `forward(*input: Any)`  : Defines the computation performed at every call. Should be overridden by all subclasses.
 
 模式
 * training mode.
@@ -704,7 +770,6 @@ for images,labels in trainLoader:
 
 
 ```py
-
 import torch.optim as optim
 
 # 如果使用 .cuda() 将模型移动到GPU, 则应该在构建优化器之前操作  因为模型参数不同
@@ -715,27 +780,13 @@ optimizer = optim.Adam([var1, var2], lr = 0.0001)
 
 ```
 
-### 8.0.1. per-parameter options
 
-To do this, instead of passing an iterable of `Variable` s, pass in an iterable of `dict` s.    
-* dict 中指定了不同的 parameter group, 并且需要使用 `params` 关键字
-* 可以在 dict 中对不同 group 的参数分别指定 options ,也可以在 dict 外指定作为其他 group 的默认的 options.
-
-```py
-# classifier 的 lr 是 1e-3
-# 其他默认的 lr 是 1e-2
-optim.SGD([
-                {'params': model.base.parameters()},
-                {'params': model.classifier.parameters(), 'lr': 1e-3}
-            ], lr=1e-2, momentum=0.9)
-```
-### 8.0.2. optimization step
+## 8.1. optimization step
 
 重点: 所有 optimizers 必须实现 step 方法, 用来更新要优化的参数  
 
 1. optimizer.step()
-   大部分优化器都实现了的简单的版本, 在 backward() 方法之后调用
-
+   * 大部分优化器都实现了的简单的版本, 在 `backward()` 方法之后调用
 ```py
 for input, target in dataset:
     # 初始化
@@ -772,7 +823,37 @@ for input, target in dataset:
     optimizer.step(closure)
 
 ```
-### 8.0.3. Algorithm
+## 8.2. Algorithm
+
+优化方法, (参数各不相同, 一般都有 lr )
+* Adadelta
+* Adagrad
+* Adam
+* AdamW
+* SparseAdam
+* Adamax
+* ASGD
+* LBFGS
+* RMSprop
+* Rprop
+* SGD
+
+## 8.3. 动态 Learn Rate
+
+`torch.optim.lr_scheduler` 提供了一些方法用来根据 epoch 或者其他计算来调整学习速率
+
+```py
+# 使用方法: 一般学习速度的调整应该放在 optimizer 更新之后
+scheduler = ...
+for epoch in range(100):
+    train(...)
+    validate(...)
+    scheduler.step()
+```
+
+## 8.4. 定义自己的 optim
+
+### 8.4.1. Optimizer 基类
 
 `class torch.optim.Optimizer(params, defaults)` 是所有优化器的基类, 定义了优化器的必须操作  
 * 参数
@@ -790,31 +871,22 @@ for input, target in dataset:
     初始化所有梯度为0 
     `set_to_none` 设置初始化梯度不是0而是 `None` 这会带来一些性能优化,但同时会有一些其他后果 *懒得看了
 
-优化方法, (参数各不相同, 一般都有 lr )
-* Adadelta
-* Adagrad
-* Adam
-* AdamW
-* SparseAdam
-* Adamax
-* ASGD
-* LBFGS
-* RMSprop
-* Rprop
-* **SGD**
 
-### 8.0.4. 动态 Learn Rate
+### 8.4.2. per-parameter options
 
-`torch.optim.lr_scheduler` 提供了一些方法用来根据 epoch 或者其他计算来调整学习速率
+To do this, instead of passing an iterable of `Variable` s, pass in an iterable of `dict` s.    
+* dict 中指定了不同的 parameter group, 并且需要使用 `params` 关键字
+* 可以在 dict 中对不同 group 的参数分别指定 options ,也可以在 dict 外指定作为其他 group 的默认的 options.
 
 ```py
-# 使用方法: 一般学习速度的调整应该放在 optimizer 更新之后
-scheduler = ...
-for epoch in range(100):
-    train(...)
-    validate(...)
-    scheduler.step()
+# classifier 的 lr 是 1e-3
+# 其他默认的 lr 是 1e-2
+optim.SGD([
+                {'params': model.base.parameters()},
+                {'params': model.classifier.parameters(), 'lr': 1e-3}
+            ], lr=1e-2, momentum=0.9)
 ```
+
 
 
 

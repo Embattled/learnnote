@@ -1,19 +1,19 @@
 - [1. scikit-learn introduction](#1-scikit-learn-introduction)
-  - [Model Persistence](#model-persistence)
-  - [Model Operation](#model-operation)
+  - [1.1. Model Persistence](#11-model-persistence)
+  - [1.2. Model Operation](#12-model-operation)
 - [2. Supervised learning 模型](#2-supervised-learning-模型)
   - [2.1. Linear Models 线性模型](#21-linear-models-线性模型)
     - [2.1.1. Logistic regression](#211-logistic-regression)
     - [2.1.2. SGD - Stochastic Gradient Descent](#212-sgd---stochastic-gradient-descent)
-  - [Support Vector Machines](#support-vector-machines)
-  - [2.2. Nearest Neighbors 最近邻](#22-nearest-neighbors-最近邻)
-    - [2.2.1. NN Classification](#221-nn-classification)
-    - [2.2.2. NN Regression](#222-nn-regression)
-  - [2.3. Decision Trees](#23-decision-trees)
-  - [2.4. Ensemble Methods](#24-ensemble-methods)
-    - [Voting Classifier](#voting-classifier)
-    - [Voting Regressor](#voting-regressor)
-  - [2.5. 监督学习的 Neural Network models](#25-监督学习的-neural-network-models)
+  - [2.2. Support Vector Machines](#22-support-vector-machines)
+  - [2.3. Nearest Neighbors 最近邻](#23-nearest-neighbors-最近邻)
+    - [2.3.1. NN Classification](#231-nn-classification)
+    - [2.3.2. NN Regression](#232-nn-regression)
+  - [2.4. Decision Trees](#24-decision-trees)
+  - [2.5. Ensemble Methods](#25-ensemble-methods)
+    - [2.5.1. Voting Classifier](#251-voting-classifier)
+    - [2.5.2. Voting Regressor](#252-voting-regressor)
+  - [2.6. 监督学习的 Neural Network models](#26-监督学习的-neural-network-models)
 - [3. Unsupervised learning 模型](#3-unsupervised-learning-模型)
   - [3.1. cluster](#31-cluster)
     - [3.1.1. DBSCAN](#311-dbscan)
@@ -37,17 +37,17 @@
 * 目前非常有名的开源机器学习库
 * 导入 : `import sklearn`
 
-## Model Persistence
+## 1.1. Model Persistence
 
 如何去保存一个 scikit-learn 模型  
 
 1. 使用 python 自带的 pickle 包
 2. `Open Neural Network Exchange` 或者 `Predictive Model Markup Language (PMML)`
 
-## Model Operation
+## 1.2. Model Operation
 
-* 记录一下可能是所有模型类通用的方法
-
+记录一下可能是所有模型类通用的方法
+  
 
 
 
@@ -91,7 +91,7 @@ A linear model for classification rather than regression.
 最简单的拟合模型的方法  
 
 
-## Support Vector Machines
+## 2.2. Support Vector Machines
 
 `from sklearn import svm`  
 
@@ -111,7 +111,7 @@ A linear model for classification rather than regression.
   * ovr = one versus rest , 即在多类别分类时会产生 n 个分类器
   * ovo = one versus one  , 产生 n*(n-1)/2 个分类器
 
-## 2.2. Nearest Neighbors 最近邻
+## 2.3. Nearest Neighbors 最近邻
 
 `sklearn.neighbors`  
 
@@ -131,7 +131,7 @@ A linear model for classification rather than regression.
 
 sklearn.neighbors 的函数可以接受 numpy arrays 或者 scipy.sparse 的matrices 作为训练输入  
 
-### 2.2.1. NN Classification  
+### 2.3.1. NN Classification  
 
 * Neighbors-based classification 是一种 instance-based learning or non-generalizing learning.
 * Not attempt to construct a general internal model, but simply stores instances of training data.
@@ -184,18 +184,18 @@ Z = Z.reshape(xx.shape)
    **kwargs)
 ```
 
-### 2.2.2. NN Regression
+### 2.3.2. NN Regression
 
 
 
-## 2.3. Decision Trees
+## 2.4. Decision Trees
 
 * Decision Trees (DTs) 也是一种 非参数监督学习 ( non-parametric supervised learning method ).
 * 
 
 
 
-## 2.4. Ensemble Methods 
+## 2.5. Ensemble Methods 
 
 Ensemble 是组个几个基础模型的预测, 提高算法的泛化性和鲁棒性  
 * `import sklearn.ensemble`
@@ -203,7 +203,7 @@ Ensemble 是组个几个基础模型的预测, 提高算法的泛化性和鲁棒
   * averaging method : 降低了模型的 variance. 建立多个独立的模型并取之平均
   * Boosting method : 降低了模型的 bias, 基础模型按顺序排列.
 
-### Voting Classifier
+### 2.5.1. Voting Classifier
 
 `sklearn.ensemble.VotingClassifier`  
 * 组合不同的模型, 使用多数表决进行分类. majority vote or sote vote (average predicted probabilities).
@@ -245,14 +245,14 @@ class sklearn.ensemble.VotingClassifier(
 * `predict(X)` 预测, 返回和样本长度一样的 array-like
 * `transform(X)` 预测, 但是返回的是每个分类器对每个类的预测概率 `probabilities`  
 
-### Voting Regressor
+### 2.5.2. Voting Regressor
 
 
 
 
 
 
-## 2.5. 监督学习的 Neural Network models
+## 2.6. 监督学习的 Neural Network models
 
 
 # 3. Unsupervised learning 模型

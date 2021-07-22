@@ -1,4 +1,12 @@
-# Data Persistence
+- [1. Data Persistence](#1-data-persistence)
+- [2. pickle](#2-pickle)
+  - [2.1. 和其他打包模组的比较](#21-和其他打包模组的比较)
+  - [2.2. 常量](#22-常量)
+  - [2.3. 类](#23-类)
+    - [2.3.1. Pickler](#231-pickler)
+  - [2.4. 函数](#24-函数)
+  - [2.5. 使用方法](#25-使用方法)
+# 1. Data Persistence
 
 磁盘上以持久形式存储 Python 数据
 
@@ -6,7 +14,7 @@
 2. marshal 是 pickle 的原始模块  
 3. 各种与 DBM 相关的模块支持一系列基于散列的文件格式，这些格式存储字符串到其他字符串的映射。
 
-# pickle
+# 2. pickle
 
 实现了对一个 Python 对象结构的二进制序列化和反序列化
 * "Pickling" 是将 Python 对象及其所拥有的层次结构转化为一个字节流的过程
@@ -20,16 +28,16 @@ Pickling (and unpickling) is alternatively known as `serialization`, `marshallin
   * pickle并不是完全安全的模组, unpickle有可能会创建一个可以执行任何代码的数据对象
   * 不要轻易unpickle一个未知来源的数据
 
-pickle 版本 | 支持的 python 版本 | 特点
--|-|-
-0| all | human-readable
-1| all| binary
-2| 2.3 | 支持 new-style classes
-3 | 3.0| 支持 bytes, 不支持 python2, python 3.0~3.7 的默认
-4 | 3.4| 优化大规模对象, 3.8~的默认
-5 | 3.8 | 支持 out-of-band data
+| pickle 版本 | 支持的 python 版本 | 特点                                              |
+| ----------- | ------------------ | ------------------------------------------------- |
+| 0           | all                | human-readable                                    |
+| 1           | all                | binary                                            |
+| 2           | 2.3                | 支持 new-style classes                            |
+| 3           | 3.0                | 支持 bytes, 不支持 python2, python 3.0~3.7 的默认 |
+| 4           | 3.4                | 优化大规模对象, 3.8~的默认                        |
+| 5           | 3.8                | 支持 out-of-band data                             |
 
-## 和其他打包模组的比较
+## 2.1. 和其他打包模组的比较
 
 1. python 专用, 通常不能被别的语言 unpickle
 2. 可以保存并恢复数据引用和指针
@@ -47,14 +55,14 @@ pickle 版本 | 支持的 python 版本 | 特点
     4. JSON 读取一个数据不会有任意代码被执行的脆弱性
 
 
-## 常量
+## 2.2. 常量
 
 函数中的 protocol 传入一个数字参数指定协议版本, 或者传入以下的常量  
 1. `pickle.HIGHEST_PROTOCOL`  替代具体版本数字, 使用 python 解释器支持的最高版本
 2. `pickle.DEFAULT_PROTOCOL`  作为模组里函数参数的默认值, 根据python版本而不同
 
 
-## 类 
+## 2.3. 类 
 
 pickle 模组定义了三个类  
 * Pickler
@@ -66,7 +74,7 @@ pickle 模组定义了三个类
 * fix_imports : 如果协议是 protocol 0,1,2 提供 python 2,3的通用兼容性, True 就完事儿了
 * buffer_callback : `protocol 5` 相关的, 看不懂
 
-### Pickler
+### 2.3.1. Pickler
 
 class `pickle.Pickler(file, protocol=None, *, fix_imports=True, buffer_callback=None)`  
 
@@ -77,15 +85,19 @@ class `pickle.Pickler(file, protocol=None, *, fix_imports=True, buffer_callback=
   * 
 
 
-## 函数
+## 2.4. 函数
 
 包中提供了可直接使用的函数, 可类对象相比, 这些函数主要用于快速使用  
 参数的意思也完全一样  
 
+打包:  
 `pickle.dump(obj, file, protocol=None, *, fix_imports=True, buffer_callback=None)`  
 `pickle.dumps(obj, protocol=None, *, fix_imports=True, buffer_callback=None)`  
 
+加载:  
 `pickle.load(file, *, fix_imports=True, encoding="ASCII", errors="strict", buffers=None)`  
 `pickle.loads(data, /, *, fix_imports=True, encoding="ASCII", errors="strict", buffers=None)`  
 
-## 使用方法
+带 s 的即为转化成二进制格式， 但不直接写入文件  
+
+## 2.5. 使用方法

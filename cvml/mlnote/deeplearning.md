@@ -4,38 +4,40 @@
     - [1.2.1. LRN](#121-lrn)
     - [1.2.2. BN](#122-bn)
   - [1.3. Attention Mechanism](#13-attention-mechanism)
-- [2. Data Augmentation](#2-data-augmentation)
-  - [2.1. Reference](#21-reference)
-  - [2.2. Traditional](#22-traditional)
-  - [2.3. Geometric / Spatial](#23-geometric--spatial)
-  - [2.4. 融合 augmentation 参数和网络参数](#24-融合-augmentation-参数和网络参数)
-- [3. Dataset](#3-dataset)
-  - [3.1. Text spot](#31-text-spot)
-    - [3.1.1. Scene Text](#311-scene-text)
-    - [3.1.2. Handwritten Text](#312-handwritten-text)
-- [4. 网络结构](#4-网络结构)
-  - [4.1. Recognition 分类网络 Backbone](#41-recognition-分类网络-backbone)
-    - [4.1.1. Alexnet](#411-alexnet)
-    - [4.1.2. VGGNet](#412-vggnet)
-    - [4.1.3. GoogLeNet](#413-googlenet)
-    - [4.1.4. ResNet](#414-resnet)
-  - [4.2. Detection 系列网络](#42-detection-系列网络)
-    - [4.2.1. R-CNN](#421-r-cnn)
-    - [4.2.2. SPP-Net](#422-spp-net)
-    - [4.2.3. Fast-RCNN](#423-fast-rcnn)
-    - [4.2.4. FasterRCNN RPN](#424-fasterrcnn-rpn)
-  - [4.3. 语义分割 Semantic Segmentation](#43-语义分割-semantic-segmentation)
-    - [4.3.1. FCN - Fully Convolutional Networks](#431-fcn---fully-convolutional-networks)
-  - [4.4. FPN - Feature Pyramid Networks](#44-fpn---feature-pyramid-networks)
-- [5. RNN](#5-rnn)
-  - [常见的序列网络即应用](#常见的序列网络即应用)
-- [Attention](#attention)
+- [2. 深度学习的训练 - 优化](#2-深度学习的训练---优化)
+  - [2.1. 基本算法](#21-基本算法)
+    - [2.1.1. 动态学习率](#211-动态学习率)
+- [3. Data Augmentation](#3-data-augmentation)
+  - [3.1. Reference](#31-reference)
+  - [3.2. Traditional](#32-traditional)
+  - [3.3. Geometric / Spatial](#33-geometric--spatial)
+  - [3.4. 融合 augmentation 参数和网络参数](#34-融合-augmentation-参数和网络参数)
+- [4. Dataset](#4-dataset)
+  - [4.1. Text spot](#41-text-spot)
+    - [4.1.1. Scene Text](#411-scene-text)
+    - [4.1.2. Handwritten Text](#412-handwritten-text)
+- [5. 网络结构](#5-网络结构)
+  - [5.1. Recognition 分类网络 Backbone](#51-recognition-分类网络-backbone)
+    - [5.1.1. Alexnet](#511-alexnet)
+    - [5.1.2. VGGNet](#512-vggnet)
+    - [5.1.3. GoogLeNet](#513-googlenet)
+    - [5.1.4. ResNet](#514-resnet)
+  - [5.2. Detection 系列网络](#52-detection-系列网络)
+    - [5.2.1. R-CNN](#521-r-cnn)
+    - [5.2.2. SPP-Net](#522-spp-net)
+    - [5.2.3. Fast-RCNN](#523-fast-rcnn)
+    - [5.2.4. FasterRCNN RPN](#524-fasterrcnn-rpn)
+  - [5.3. 语义分割 Semantic Segmentation](#53-语义分割-semantic-segmentation)
+    - [5.3.1. FCN - Fully Convolutional Networks](#531-fcn---fully-convolutional-networks)
+  - [5.4. FPN - Feature Pyramid Networks](#54-fpn---feature-pyramid-networks)
+- [6. 序列建模 - 循环和递归网络](#6-序列建模---循环和递归网络)
+  - [6.1. 常见的序列网络即应用](#61-常见的序列网络即应用)
+- [7. Attention](#7-attention)
 # 1. Neuron Network 优化方法
 
 * ReLU ( Rectified Linear Units) 在 Alexnet 中被发扬光大, 被证明在深层网络中远比 tanh 快, 成功解决了Sigmoid在网络较深时的梯度弥散问题
 * Dropout 在 Alexnet 被实用化, 验证了其避免模型过拟合的效果, 在 Alexnet 中主要是最后几个全连接层使用了 Dropout
 * MaxPool 在 Alexnet 中被发扬光大, 避免了平均池化的模糊效果, 并且池化核的步长比核的尺寸小, 让池化层的感受野有重叠, 提高了特征的丰富性
-
 
 ## 1.1. Activate Function
 
@@ -122,31 +124,54 @@ $b_{x,y}^k=a_{x,y}^k/(k+\alpha\sum_{i=max(0,x-n/2)}^{min(W,x+n/2)}\sum_{j=max(0,
   - Attention 可以帮助模型对输入的X的每个部分赋予不同的权重, 抽出更加关键的信息
   - 并不会对模型的计算和存储带来更大的开销
 
-# 2. Data Augmentation
+# 2. 深度学习的训练 - 优化
+
+相关名词:
+* 目标函数 objective function = 准则 criterion = 代价函数 cost function = 损失函数 loss function = 误差函数 error function
+* 导数为0 : 临界点 critical point = 驻点 stationary point
+  * 或者梯度为0
+* 梯度 gradient : 是一个多为函数 f 的所有偏导数的向量
+* 梯度下降      : 沿着梯度的负方向移动 函数参数, 可以被称为 最速下降 method of steepest descent
+
+
+## 2.1. 基本算法
+* SGD stochastic gradient descent - 随机梯度下降
+  * 提出了 minibatch 的概念
+  * 相比于正规的梯度下降需要计算整个训练集上的平均损失, 然后计算梯度
+  * SGD 表示仅使用 minibatch 的训练样本即可更新一次参数
+
+### 2.1.1. 动态学习率
+
+1. 线性衰减学习率
+   * 通过线性条件, 设置 处置学习率, 终止学习率, 衰减次数 3个变量来控制
+   * 在衰减次数之后的学习速率为常数
+
+
+# 3. Data Augmentation
 
 Data augmentation is a low cost way.
 
-## 2.1. Reference
+## 3.1. Reference
 
 1. Jaderberg, M., Simonyan, K., Vedaldi, A., & Zisserman, A. (2014). Synthetic Data and Artificial Neural Networks for Natural Scene Text Recognition. Computer Vision and Pattern Recognition. http://arxiv.org/abs/1406.2227
 2. Luo, C., Zhu, Y., Jin, L., & Wang, Y. (2020). Learn to augment: Joint data augmentation and network optimization for text recognition. Proceedings of the IEEE Computer Society Conference on Computer Vision and Pattern Recognition, 13743–13752. https://doi.org/10.1109/CVPR42600.2020.01376
 
-## 2.2. Traditional 
+## 3.2. Traditional 
 
 Traditional augmentation methods such as rotation, scaling and perspective transformation,
 
-## 2.3. Geometric / Spatial
+## 3.3. Geometric / Spatial
 
-## 2.4. 融合 augmentation 参数和网络参数
+## 3.4. 融合 augmentation 参数和网络参数
 
 
-# 3. Dataset
+# 4. Dataset
 
-## 3.1. Text spot
+## 4.1. Text spot
 
 3755 classes (Ievel-l set of GB2312-80) 
 
-### 3.1.1. Scene Text
+### 4.1.1. Scene Text
 
 * IIIT 5K-Words  (IIIT5K) contains 3000 cropped word images for testing.
 * Street View Text (SVT) consists of 647 word images for testing. Many images are severely corrupted by noise and blur.
@@ -156,12 +181,12 @@ cropped images for testing. Most of them are perspective distorted.
 * ICDAR 2013 (IC13) inherits most of its samples from IC03. It contains 1015 cropped images.
 * ICDAR 2015 (IC15) is obtained by cropping the words using the ground truth word bounding boxes and includes more than 200 irregular text images.
 
-### 3.1.2. Handwritten Text
+### 4.1.2. Handwritten Text
 
 * IAM contains more than 13,000 lines and 115,000 words written by 657 different writers.
 * RIMES contains more than 60,000 words written in French by over 1000 authors. 4.3.
 
-# 4. 网络结构 
+# 5. 网络结构 
 
 * 简单粗暴的方法来提高精度就是加深网络以及加宽网络, 缺点有
   * 容易过拟合
@@ -171,7 +196,7 @@ cropped images for testing. Most of them are perspective distorted.
 * 基础的方法是增加网络的稀疏性, 尽可能减少全连接层
 
 
-## 4.1. Recognition 分类网络 Backbone
+## 5.1. Recognition 分类网络 Backbone
 
 * AlexNet
   * 推广了 ReLU 和 Dropout
@@ -186,7 +211,7 @@ cropped images for testing. Most of them are perspective distorted.
 0. (1998)Gradient-based learning applied to document recognition
 1. 
 
-### 4.1.1. Alexnet
+### 5.1.1. Alexnet
 
 * ReLU 激活函数被应用在了所有卷积层和FC层的后面
 
@@ -275,7 +300,7 @@ class AlexNet(nn.Module):
         x = self.classifier(x)
         return x
 ```
-### 4.1.2. VGGNet
+### 5.1.2. VGGNet
 
 * 网络模型
   * 输入大小为 224*224 
@@ -293,7 +318,7 @@ class AlexNet(nn.Module):
   * 再加上随机水平翻转和色彩偏移
 
 
-### 4.1.3. GoogLeNet
+### 5.1.3. GoogLeNet
 
 GoogLeNet的发展共有四个版本  
 
@@ -329,7 +354,7 @@ Inception V3:
 * 高维特征信息包含的更多, 更容易加快训练
 
 
-### 4.1.4. ResNet
+### 5.1.4. ResNet
 
 * Residual Network
 * 灵感来源于: 如果使用恒等映射层, 那么网络的加深起码不会带来训练误差的上升
@@ -348,7 +373,7 @@ Inception V3:
 
 
 
-## 4.2. Detection 系列网络
+## 5.2. Detection 系列网络
 
 Detection 相比 Recognition 是更复杂的任务:
 1. Detection 的过程中往往也就顺带进行了分类识别
@@ -374,7 +399,7 @@ Detection 相比 Recognition 是更复杂的任务:
 3. (2014)Spatial Pyramid Pooling in Deep Convolutional Networks for Visual Recognition
 4. (2017)Faster R-CNN: Towards Real-Time Object Detection with Region Proposal Networks
 
-### 4.2.1. R-CNN
+### 5.2.1. R-CNN
 
 R-CNN算法可以分为四步:
 1. 候选区域选择, 即 Region Proposal
@@ -388,7 +413,7 @@ R-CNN算法可以分为四步:
 * CNN需要固定尺寸输入, 因此对候选区域的拉伸或截取会丢失信息
 * 候选区域存在重叠, 因此计算浪费
 
-### 4.2.2. SPP-Net
+### 5.2.2. SPP-Net
 
 由其他作者对RCNN的一个实质性的改进  
 1. 取消了 crop/warp 的图像归一化过程, 解决了图像变形导致的信息丢失
@@ -401,7 +426,7 @@ R-CNN算法可以分为四步:
 3. 在整个过程中，Proposal Region仍然很耗时。
 
 
-### 4.2.3. Fast-RCNN
+### 5.2.3. Fast-RCNN
 
 主要贡献在于对RCNN进行加速, 受SPP-Net启发而来  
 1. 借鉴了SPP-Net的思路, 提出了简化版的 ROI池化层 (注意并非金字塔), 加入了候选框映射功能, 使得网络可以反向传播, 解决了SPP的整体网络训练问题  
@@ -409,7 +434,7 @@ R-CNN算法可以分为四步:
 3. SVD加速全连接层的训练
 4. 
 
-### 4.2.4. FasterRCNN RPN
+### 5.2.4. FasterRCNN RPN
 
 Faster RCNN 基本实现了端到端的实时检测  
 
@@ -429,7 +454,7 @@ RPN网络过程
 
 
 
-## 4.3. 语义分割 Semantic Segmentation
+## 5.3. 语义分割 Semantic Segmentation
 
 图像分割: 让网络做像素级别的预测, 直接得出label map  
 
@@ -437,7 +462,7 @@ RPN网络过程
 
 
 
-### 4.3.1. FCN - Fully Convolutional Networks
+### 5.3.1. FCN - Fully Convolutional Networks
 
 深度学习应用在图像分割的代表成就
 * FCN 接受任意尺寸的输入图像
@@ -454,7 +479,7 @@ RPN网络过程
 * Feature map 经过该卷积层, 还是得到二维的 Feature map, 因此对输入图片的 size 没有了限制
 * 例: 全连接层 4096->4096->1000, 对应的卷积核 (4096,1,1)-> (4096,1,1)-> (1000,1,1)
 
-## 4.4. FPN - Feature Pyramid Networks
+## 5.4. FPN - Feature Pyramid Networks
 
 论文: Feature pyramid networks for object detection  
 一种获得多缩放特征( Multi-scale Feature )的方法, 独立于 Backbone 网络.  
@@ -478,10 +503,12 @@ RPN网络过程
   * 在merge后的特征图加一个3X3的卷积层, 用于消除升采样带来的误差
   * 最终获得了 P2~P5 的特征图
 
-# 5. RNN
+# 6. 序列建模 - 循环和递归网络
 
 * 普通的神经网络以及CNN, 都是假设元素之间是相互独立的, 输入与输出也是独立的
+  * CNN 专门用于处理网格化数据
 * 循环神经网络的特点: 拥有记忆能力, 输入依赖于当前的输出和记忆
+  * 处理序列数据
 
 定义:
 * Xt 表t时刻的输入
@@ -494,7 +521,7 @@ RPN网络过程
 * 网络中的所有细胞共享参数 $UVW$
 
 
-## 常见的序列网络即应用
+## 6.1. 常见的序列网络即应用
 
 网络结构:
 * Recurrent neural networks (RNN)
@@ -510,7 +537,7 @@ RPN网络过程
 
 
 
-# Attention
+# 7. Attention
 
 * Attention mechanism - 注意力机制, 一种思想
   * Self-attention (intra-attention)

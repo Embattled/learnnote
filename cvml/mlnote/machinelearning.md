@@ -14,8 +14,7 @@
 * Charting    : 可视化数据.
 
 
-### 1.1.1. 分析数据
-
+分析数据的过程：
 1. 确认dataset 中的可用 feature
 2. 确认features的类型, categorical or numerical or mixed 
    * 确认 distribution
@@ -23,38 +22,7 @@
 3. 修复数据
    * 确认哪些 features 可能会有 errors or `typos` 打印错误
    * 确认是否有 missing value
-
-# 2. Machine Learning 机器学习基础
-
-机器学习算法即 - 能够从数据中学习的算法  
-* 机器学习本质上属于应用统计学
-  * 统计学的两种主要方法
-    * 频率派估计
-    * 贝叶斯推理
-  * 大部分算法都具有超参数 (在算法之外定义)
-* 机器学习算法可以分成
-  * 监督学习    : 回归, 分类, 等结构化输出问题
-  * 无监督学习  : 密度估计等
-  * 半监督学习
-    * 一部分样本有监督目标, 另一部分没有
-    * 整个样本集合被标记为 正负, 但是单独的样本例没有标记
-
-## 学习算法
-
-* 给定经验 E , 应用于任务 T, 获得性能度量 P 的提升
-* 样本 (example) 是已经从事件中收集来的量化后的 特征(feature) 集合
-* 当前机器学习任务举例
-  * 分类
-    * 输入缺失分类
-  * 回归
-  * 结构化输出
-    * 转录 - OCR, NLP
-    * 机器翻译
-    * 图片标识 , segmentation, 文字表述图片
-
-机器学习的性能
-* 错误率 (errorrate) : 模型的 0-1 损失的期望
-  * 
+## 1.2. 面试QA
 
 Q: What is Cross-Validation?
 
@@ -72,11 +40,49 @@ The metric chosen to evaluate a model depends on various factors:
 
 Metrics: adjusted r-squared, MAE, MSE, accuracy, recall, precision, f1 score.
 
-Q: 
 
-# 监督学习算法 Supervised Learning
 
-## Support Vector Machines
+# 2. Machine Learning 机器学习基础
+
+机器学习算法即 - 能够从数据中学习的算法  
+* 机器学习本质上属于应用统计学
+  * 统计学的两种主要方法
+    * 频率派估计
+    * 贝叶斯推理
+  * 大部分算法都具有超参数 (在算法之外定义)
+* 机器学习算法可以分成
+  * 监督学习    : 回归, 分类, 等结构化输出问题
+  * 无监督学习  : 密度估计等
+  * 半监督学习
+    * 一部分样本有监督目标, 另一部分没有
+    * 整个样本集合被标记为 正负, 但是单独的样本例没有标记
+
+## 2.1. 学习算法
+
+* 给定经验 E , 应用于任务 T, 获得性能度量 P 的提升
+* 样本 (example) 是已经从事件中收集来的量化后的 特征(feature) 集合
+* 当前机器学习任务举例
+  * 分类
+    * 输入缺失分类
+  * 回归
+  * 结构化输出
+    * 转录 - OCR, NLP
+    * 机器翻译
+    * 图片标识 , segmentation, 文字表述图片
+
+机器学习的性能
+* 错误率 (errorrate) : 模型的 0-1 损失的期望
+
+
+## 拟合
+
+* 模型拟合各种函数的能力被称为 模型的容量 capacity
+  * 容量小的模型容易 欠拟合
+  * 容量大的模型容易 过拟合
+
+# 3. 监督学习算法 Supervised Learning
+
+## 3.1. Support Vector Machines
 
 * SVMs are a set of supervised learning methods used for classification, regression and outliers detection.
 * 优点
@@ -88,9 +94,9 @@ Q:
   * If the number of features is much greater than the number of samples, avoid over-fitting in choosing Kernel functions and regularization term is crucial.
   * SVMs do not directly provide probability estimates, these are calculated using an expensive five-fold cross-validation.
 
-# 3. 特征工程 - 抽出问题的特征向量
+# 4. 特征工程 - 抽出问题的特征向量
 
-## 3.1. 文本表示模型
+## 4.1. 文本表示模型
 
 * 文本, 一种非结构化数据, 非常重要
 * 文本数据的特征表示是非常重要的
@@ -98,7 +104,7 @@ Q:
   * 一般会对单词进行词干抽取 (Word Stemming)
 
 
-### 3.1.1. TF-IDF
+### 4.1.1. TF-IDF
 
 * TF-IDF 一般用来计算单词在文章中的权重
 * $TF-IDF(t,d)=TF(t,d)\times IDF(t)$
@@ -108,7 +114,7 @@ Q:
   * 即, 如果一个单词在各种文章中都出现, 那么该单词可能没什么特殊意思, 通用词汇
   * 但是如果一个单词出现的非常少, 说明该单词非常专门化
 
-### 3.1.2. Bag of Words 词袋模型
+### 4.1.2. Bag of Words 词袋模型
 
 * 最基础的文本表示模型
 * 将文章看成一袋子的单词
@@ -119,12 +125,12 @@ Q:
   * 将文章进行单词级别的划分, 但是没有考虑单词之间的组合含义
   * 容易丢失信息
   
-### 3.1.3. N-gram
+### 4.1.3. N-gram
 
 * 对词袋模型的改进
 * 将连续出现的 $n\quad(n\le N)$ 个单词组成的词组也作为一个单独的特征放到向量表中
 
-# 4. 模型评估 - 多种指标用于评估模型的性能
+# 5. 模型评估 - 多种指标用于评估模型的性能
 
 在模型应用中, 评估指标的选择问题是最容易被发现的问题, 也是最可能影响效果的因素.  
 除了模型的评估指标之外:  
@@ -142,14 +148,14 @@ Precision, recall, F1 score, P-R 曲线都是评价二分类的指标.
 - ROC  AOC  
   
 
-## 4.1. 准确率 Accuracy
+## 5.1. 准确率 Accuracy
 
 $Accuracy=n_{correct}/n_{total}$  
 准确率属于分类模型的指标, 表示分类正确的样本占总样本个数的比例  
 
 缺陷: 对样本比例的均衡有要求. Eg. 负样本占99%, 全部预测成负样本也有99%的准确度  
 
-## 4.2. 精确率 Precision 和 召回率 Recall 和 F1 score
+## 5.2. 精确率 Precision 和 召回率 Recall 和 F1 score
 
 常被用做排序问题的评价指标: 没有一个确定的阈值来把得到的结果判定为正或者负, 而是采用 Top N 返回的结果来进行性能评估.  
 - 精确率: 分类正确的正样本个数占分类器判定为正样本个数的比例
@@ -173,7 +179,7 @@ $Accuracy=n_{correct}/n_{total}$
 - F1 score 是由精准率和召回率派生而来的指标, 是精准率和召回率的调和平均值
 - $F1=\frac{2*precision*recall}{precision+recall}$
 
-## 4.3. RMSE 指标
+## 5.3. RMSE 指标
 
 Root Mean Squre Error  
 
@@ -188,7 +194,7 @@ $RMSE=\sqrt{\sum^n_{i=1}(y_i-\hat{y_i}^2)/n}$
 
 $MAPE=\sum_{i=1}^n|\frac{y_i-\hat{y_i}}{y_i}|*\frac{100}{n}$
 
-## 4.4. ROC曲线 Receiver Operating Characteristic Curve
+## 5.4. ROC曲线 Receiver Operating Characteristic Curve
 
 中文名 受试者工作特征曲线  
 * 横坐标: 假阳性率 False Positive Rate FPR=FP/N  N是负样本的个数
@@ -209,18 +215,18 @@ ROC对比 P-R 曲线:
 2. ROC更加适用于 排序, 广告, 推荐等领域, 因为负样本数量更多
 3. 对于研究者, P-R能够更清晰的看到模型在特定数据集上的表现, 更能反映其性能  
 
-## 余弦距离
+## 5.5. 余弦距离
 
 用于评估样本间的距离, 分析两个特征向量之间的相似性, 取值范围是 -1~1
 
-# 5. 降维
+# 6. 降维
 
 * 对原始数据提取的特征进行降维
   * 减少冗余和噪声
   * 提高特征的表达能力
   * 降低训练复杂度
 
-## 5.1. PCA Principal Components Analysis
+## 6.1. PCA Principal Components Analysis
 
 * 如何定义主成分
   * 三位空间中的点分布在同一个平面上, 用三维坐标会有冗余
@@ -231,7 +237,7 @@ ROC对比 P-R 曲线:
   * 加入核映射, 得到核主成分分析(KPCA)
   * 加入流形映射的降维方法, eg. 等距映射, 局部线性嵌入, 拉普拉斯特征映射
   
-### 5.1.1. 最大方差理论
+### 6.1.1. 最大方差理论
 
 * 根据信息理论, 信号具有较大方差, 噪声具有较小方差, 信号与噪声的比例成为信噪比
 * PCA 的目标即最大化投影方差, 让数据在主轴上的投影的方差最大
@@ -258,13 +264,13 @@ ROC对比 P-R 曲线:
 
 
 
-### 5.1.2. 最小平方误差理论
+### 6.1.2. 最小平方误差理论
 
-# 6. 优化算法
+# 7. 优化算法
 
 * 机器学习算法 = 模型表征 + 模型评估 + 优化算法
 
-## 6.1. 监督学习的损失函数
+## 7.1. 监督学习的损失函数
 
 * 损失函数定义了模型的评估指标
 * 没有损失函数就无法求解模型参数
@@ -311,7 +317,7 @@ ROC对比 P-R 曲线:
   * 在偏差较小时为平方损失, 偏差较大时为绝对损失
   * $$L_{Huber}(f,y)=\left\{\begin{aligned}(f-y)^2, |f-y|\le\delta\\2\delta|f-y|-\delta^2,|f-y|>\delta\end{aligned}\right.$$
 
-## 6.2. 机器学习算法优化基础
+## 7.2. 机器学习算法优化基础
 
 * 机器学习模型的参数都可以写成优化问题
 * 模型不同, 损失函数也不同, 对应的优化问题也不同
@@ -321,7 +327,7 @@ ROC对比 P-R 曲线:
   * 直接法: 利用数学直接求解出最优解
   * 迭代法: 迭代地修正对最优解的估计
 
-### 6.2.1. 凸优化
+### 7.2.1. 凸优化
 
 * 对于函数 $L(\cdot)$ , 函数图形为向下凹进去的
 * 对于任意两点 x,y和实数 lambda=(0~1)
@@ -337,7 +343,7 @@ ROC对比 P-R 曲线:
   * 容易看出 $\triangledown^2L_i(\theta) \ge 0$, 因此原函数为凸函数
 
 
-### 6.2.2. 非凸优化
+### 7.2.2. 非凸优化
 
 * 一般来说非凸优化被认为比较难求解, 但PCA是一个特例
 * 借助 SVD 可以直接得到主成分分析的全局极小值
@@ -351,7 +357,7 @@ ROC对比 P-R 曲线:
     * $0.5L(V^*)+0.5L((-V^*))=||X-V^{*T}V^*X||_F^2$
     * 易知式一大于式二, 两点连线上的值`小于`函数上的对应点
 
-### 6.2.3. 直接法求解最优解
+### 7.2.3. 直接法求解最优解
 
 * 直接法对于问题有严苛的两个限制, 因此应用场景非常小
   * 需要问题 $L(\cdot)$是凸函数, 即求导后=0即为最优解
