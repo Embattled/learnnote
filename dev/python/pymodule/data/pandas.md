@@ -144,7 +144,11 @@ cars=pd.read_csv("cars.csv",sep=';',index_col='Car',names=name)
 ```
 ## 2.2. csv写入
 
-  data.to_csv(write_file,index=False)
+  
+```py
+DataFrame.to_csv(path_or_buf=None, sep=',', na_rep='', float_format=None, columns=None, header=True, index=True, index_label=None, mode='w', encoding=None, compression='infer', quoting=None, quotechar='"', line_terminator=None, chunksize=None, date_format=None, doublequote=True, escapechar=None, decimal='.', errors='strict', storage_options=None)
+
+```
 
 # 3. Series 
 

@@ -19,6 +19,9 @@
     - [2.7.2. C++的 const](#272-c的-const)
     - [2.7.3. 类的 const 函数](#273-类的-const-函数)
     - [2.7.4. const 对象](#274-const-对象)
+- [C++ 异常 Exception](#c-异常-exception)
+  - [throw 手动异常](#throw-手动异常)
+  - [exceptionType exception类](#exceptiontype-exception类)
 
 # 1. C++ 特性
 
@@ -477,4 +480,57 @@ float getscore() const;
 const  class  object(params);
 class const object(params);
 ```
+
+# C++ 异常 Exception
+
+* C++的异常类使用需要调用 `<exception>`头文件
+
+```cpp
+try{
+    // 可能抛出异常的语句
+}catch(exceptionType variable1){
+    // 处理异常的语句
+}catch(exceptionType variable2){
+    //多级 catch
+}
+```
+
+* catch 部分可以看作一个没有返回值的函数, 异常发生后catch会被调用, 并且可以接受实参, 即异常数据
+* catch 和真正的函数调用相比, 多了一个「在运行阶段才将实参和形参匹配」的过程
+* 如果不希望catch 处理异常数据, 也可以将 variable 省略掉, 这样就不再会传递异常数据了
+* 多级catch在异常匹配的时候会进行向上转型, 因此父异常类要放在子异常类的后面
+
+
+
+## throw 手动异常
+
+```cpp
+throw exceptionData;
+
+
+// 异常规范 Exception specification 于 C++98提出, 于C++11抛弃
+// 当前编译器已经不再支持 异常规范
+// 该函数只能抛出 int 类型的异常
+double func (char param) throw (int);
+// 抛出多种异常
+double func (char param) throw (int, char, exception);
+// 不会抛出任何异常, 即写了 try 也会失效
+double func (char param) throw ();
+
+```
+* throw 关键字可以显式的抛出异常
+* exceptionData 是异常数据, 可以是任何类型
+  * int, float, bool, 指针等基本类型
+  * 数组, 字符串, 结构体, 类 等聚合类型也可以
+* throw除了写在函数体中代表实际抛出异常, 也可以写在函数头的部分
+  * 指明该函数可以抛出的异常类型, 这称为 `异常规范 (Exception specification) `
+  * 由于使用方法太过模糊, 已经被舍弃
+
+
+
+
+## exceptionType exception类
+
+* exceptionType 是异常类型, 代表指定当前 catch 可以处理什么异常
+* exception 类是所有异常类的基类, 用 exception 可以接受所有异常, 被称为标准异常 Standard Exception
 

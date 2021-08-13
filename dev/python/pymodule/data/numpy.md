@@ -49,6 +49,11 @@ numpy的二元基础运算都是元素层面的
 * 也有基础运算的全局函数版
 * `np.sin(A) np.exp(A)  np.add(A,B)`
 
+### clip 修正边界
+
+* numpy.clip(a, a_min, a_max, out=None, **kwargs) 
+* 将 array 限制在正确的范围里
+* 
 
 ## 2.3. Calculation 降维运算
 

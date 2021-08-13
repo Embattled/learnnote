@@ -50,7 +50,7 @@ rm -rf ~/.texlive2021
 1. 使用 `sudo perl install-tl` 进行安装, 不用 sudo 的话需要更改安装位置
 2. 大约7000mb空间, 一个小时时间
 
-## Latex 编译
+## 1.2. Latex 编译
                                                                                                                                                                      
 源文件:  
 * tex     : 即书写文档的 latex 文件
@@ -75,7 +75,7 @@ rm -rf ~/.texlive2021
    * 再次更新了 `.aux .log .pdf`
    * 生成了最终的 pdf 文件, 正文中的引用也标好了序号
 
-## 1.2. latex-workshop vscode
+## 1.3. latex-workshop vscode
 
 [url](https://github.com/James-Yu/LaTeX-Workshop/wiki/Install)
 
@@ -139,54 +139,99 @@ rm -rf ~/.texlive2021
 | 全等   | \equiv  | $\equiv$   |
 | 属于   | \in     | $\in$      |
 
-### 2.0.1. 特殊格式字符
+## 2.1. 基础数学commands
 
-| 名称         | 代码       | 显示         |
-| ------------ | ---------- | ------------ |
-| 实数集空心字 | \mathbb{R} | $\mathbb{R}$ |
+求和, 上下标等大部分数学符号都需要用命令来输入  
 
-范围运算
-| 名称     | 代码        | 显示              |
-| -------- | ----------- | ----------------- |
-| 求极限   | \lim        | $\lim_{x\o1}x^2$  |
-| 求积分   | \int        | $\int_{a}^{b}x^2$ |
-| 多重积分 | \多个i + nt | $\iiint$          |
-
-## 2.1. 上下标和根号
+### 2.1.1. 上下标和根号
 
 * 上下标的字符多于一个的时候, 需要用 {} 括起来
-  * ^ 表示商标
+  * ^ 表示上标
   * _ 表示下标
 * \sqrt表示开方, 类似于一个函数, 默认开平方
   * 完整写法是 `\sqrt[开方字符]`
 * $\sqrt[\alpha]\Gamma^{25}$
 
+### 2.1.2. 大运算符
+范围运算符号, 基本上表示范围的算是都是直接用上下标方法来输入
+| 名称     | 代码        | 显示              |
+| -------- | ----------- | ----------------- |
+| 求极限   | \lim        | $\lim_{x\rArr1}x^2$  |
+| 求积分   | \int        | $\int_{a}^{b}x^2$ |
+| 多重积分 | \多个i + nt | $\iiint$          |
+求和| \sum|$\sum_{n=1}^Na_n$
 
-## 2.2. 分数
+### 2.1.3. 特殊格式字符
+
+| 名称         | 代码       | 显示         |
+| ------------ | ---------- | ------------ |
+| 实数集空心字 | \mathbb{R} | $\mathbb{R}$ |
+
+
+
+### 2.1.4. 分数
 
 * 分数的表示也是类似函数, 需要填入两个空
   * `\frac{分子}{分母}`
   * 分数可以设置字号大小, 用引申出来的两个命令
-    * `\dfrac`命令把字号设置为独立公式中的大小 默认
+    * `\dfrac`命令把字号设置为独立公式中的大小 默认的 frac
     * `\tfrac`则把字号设置为行间公式中的大小
 
-## 2.3. 多行公式
+## 2.2. 公式环境
 
-```
+在正式的文本中书写公式需要引入公式环境
+
+简写公式环境, 不会产生公式编号：
+1. `$equation$`
+2. `$$equation$$`       该格式的公式会自动居中, 单独占一行, 不会嵌入到正文中
+3. `\[ equation \]`     该格式的公式会根据配置的全局对齐方式来对齐
+
+
+* 除了简写公式环境以外, 有公式专用的标准环境, 这些环境都会将里面的所有字符是做公式字符, 不用再在里面输入 `$ $`
+* 非简写公式环境都会自动参与编号, 编号会自动生成在最右边, 排版时可以认为页面的右边缘被向左移动了一个编号占用的距离
+* 不要参与编号的话就在环境名称结尾加一个星号`*`, begin 和 end 都要加
+1. align
+2. equation
+
+### 2.2.1. equation
+
+* equation 是最一般的公式环境, 表示一个公式, 默认表示一个单行的公式
+* 可以通过内嵌其他环境进行拓展, 例如对齐环境
+  
+```tex
 \begin{equation}
 	\begin{split}
 	\cos 2x &= \cos^2 x - \sin^2 x\\
-	\end{split
+	\end{split}
 \end{equation}
 
 
 \begin{equation}
 	D(x) = \begin{cases}
-0, &\text{如果} x \in \mathbb{R}\setminus\mathbb{Q}	
-		   \end{cases}%\text是为了在数学公式中处理中文
+            0, &\text{如果} x \in \mathbb{R}\setminus\mathbb{Q}	
+         \end{cases}   
+         %\text是为了在数学公式中处理中文
 \end{equation}
 
 ```
+
+### 2.2.2. align
+
+* align 是最基本的对齐环境, 而不能被称作标准公式环境, 因此可以说是公式环境的基础
+* align 和表格环境一样, 使用 `&` 分割单元, `\\` 换行
+* 每一行都是独立的公式, 都会独立的编号
+* `&` 分割出来的单元为单位进行对齐, 成为组, 每个组都可以指定特定排版, 相当于表格的列
+
+```
+\begin{align*}
+    f(x)  &= (x+a)(x+b)         \\
+          &= x^2 + (a+b)x + ab
+\end{align*}
+
+```
+
+
+
 
 # 3. latex 语法 Syntax
 
@@ -197,21 +242,6 @@ rm -rf ~/.texlive2021
 编译一个 tex 文档会有几个步骤
 * 会生成 `.aux .log .dvi` 几个文件 `.dvi` 是最终输出的可视化文件
 * `.dvi` 文件可以被转化成 `.ps .pdf` 文件
-
-### 3.0.1. preamble
-
-定义在 ` \begin{document}` 叫做 latex 的preamble, 一般包含了:
-1. the language
-2. load extra packages you will need
-3. set several parameters. 
-
-文章介绍,  在这里定义不会直接显示在文档中
-```
-\title{First document}
-\author{Hubert Farnsworth 
-\thanks{funded by the Overleaf team}}
-\date{February 2014}
-```
 
 
 ## 3.1. 基础class
@@ -313,6 +343,28 @@ packages:
 
 ## 3.2. Table
 
+latex中处理表格的环境有三种
+* tabular
+* tabularx
+* longtable
+* 其他相关环境
+  * table
+  * wraptable
+  * sidewaystable
+
+### 3.2.1. tabular
+
+* 环境指令 `\begin{tabular}[]{|l|c|r|}`
+  * 指定每列的字母用 `lcr`, 并包括在`|` 中, 分别代表左中右对齐
+  * `|` 其实代表每列用竖线分隔开
+* 在环境中
+  * 同一行的不同元素用 `&` 隔开
+  * 结束表格的一行用 `\\`
+  * `\hline` 用于在表格上画横线用于分隔行, 在内容的上下都应该加上
+```latex
+\begin{tabular}
+```
+
 
 # 4. 文章
 
@@ -327,7 +379,22 @@ First document.
 ```
 
 
-### 4.0.1. 显示文档标题
+## 4.1. preamble
+
+定义在 ` \begin{document}` 叫做 latex 的preamble, 一般包含了:
+1. the language
+2. load extra packages you will need
+3. set several parameters. 
+
+文章介绍,  在这里定义不会直接显示在文档中
+```
+\title{First document}
+\author{Hubert Farnsworth 
+\thanks{funded by the Overleaf team}}
+\date{February 2014}
+```
+
+### 4.1.1. 显示文档标题
 
 ```
 \title{First document}
@@ -347,9 +414,9 @@ In this document.
 * `\begin{titlepage} \end{titlepage}`  创建了一个名为 titlepage 的环境    
 *  `\maketitle` 语句一键以默认格式创建标题    
 *  `\thanks{}` 用于在作者中加入致谢, It will add a superscript and a footnote with the text inside the braces. 
-## 4.1. Formatting
+## 4.2. Formatting
 
-### 4.1.1. Sectional Units
+### 4.2.1. Sectional Units
 
 * 分段分章是文档的必备属性. 在不同类型的文章中有不同类型的编号体系  
 * 一般来说编号只编三级
@@ -365,7 +432,7 @@ article
 2. `\subsection{}`    1.1
 3. `\subsubsection{}` 1.1.1
 
-### 4.1.2. Label and Referring
+### 4.2.2. Label and Referring
 
 可以在任何位置分配label, 并使用 `\ref` 进行页内跳转
 1. `\label{key}`  分配名称
@@ -384,7 +451,7 @@ article
 * `\pageref{}` 显示成label所在的页码
 * 带有 `v` 的command,`\vref` 定义在了  varioref 保重
 
-### 4.1.3. 行与段落 lines and paragraphs
+### 4.2.3. 行与段落 lines and paragraphs
 
 在源文件中换行并不会使输出文档换行, 而是被识别成一个空格,  
 (因此源文件中为了书写整洁而换行时, 不需要在换行前加额外的空格)  
@@ -449,33 +516,9 @@ article
 * size
 
  
-# 6. 表格 Table
-
-latex中处理表格的环境有三种
-* tabular
-* tabularx
-* longtable
-* 其他相关环境
-  * table
-  * wraptable
-  * sidewaystable
-
-## 6.1. tabular
-
-* 环境指令 `\begin{tabular}[]{|l|c|r|}`
-  * 指定每列的字母用 `lcr`, 并包括在`|` 中, 分别代表左中右对齐
-  * `|` 其实代表每列用竖线分隔开
-* 在环境中
-  * 同一行的不同元素用 `&` 隔开
-  * 结束表格的一行用 `\\`
-  * `\hline` 用于在表格上画横线用于分隔行, 在内容的上下都应该加上
-```latex
-\begin{tabular}
 
 
-```
-
-# 7. 引用 Reference
+# 6. 引用 Reference
 
 文献引用有专门的环境, 以及多种不同的包对应引用, 最常用的有两种  
 1. thebibliography   环境    
@@ -486,12 +529,13 @@ latex中处理表格的环境有三种
 * `\cite[note]{}` 的额外可选参数, 用于对引用进行额外的补充说明, 一般是 `cite[pages 45-46]` 这样的页码说明
   * 在编译结果中显示为 `[25, pages 45–46]`
 
-引用的包
+可以引用的包
 1. overcite
    * 使用该包将会自动把所有引用作为上标显示, 不需要更改文档中的任何内容, 只需要 `\usepackage{overcite}`
    * 这个包不能和 `\cite[note]{}` 的可选参数 note 一起使用, 因为 note 不能放到上标处
 
-## 7.1. thebibliographic  环境
+
+## 6.1. thebibliographic  环境
 
 * 文献引用有专门的环境 `thebibliography` , 放在 `\end{document}` 之前即可
   * 较为原始, 不能区分 book 和 article
@@ -528,7 +572,7 @@ command
 \end{thebibliography}
 ```
 
-## 7.2. BibTex 
+## 6.2. BibTex 
 
 Latex 文档引用的参考文献管理库, 克服了 thebiblography 的所有缺点  
 同样是传入 bib 数据库, 但是只会显示文章中有 `cite` 的引用文献  
@@ -545,17 +589,19 @@ Latex 文档引用的参考文献管理库, 克服了 thebiblography 的所有�
   * 除了 key, 各个小项目都用大括号括起来
 
 使用方法
-* 在latex工作目录下新建一个 `.bib` 的文本文件
-* 在谷歌学术等网站上直接复制 `BibTex` 的参考文献格式并粘贴进去
-* 在 latex 文档中引入 `cite` 包 `\usepackage{cite}`
-* 在 latex 文档中导入参考文献
+1. 在latex工作目录下新建一个 `.bib` 的文本文件
+2. 在谷歌学术等网站上直接复制 `BibTex` 的参考文献格式并粘贴进去
+3. 在 latex 文档中引入 `cite` 包 `\usepackage{cite}`
+4. 在文章中使用引用`cite{name}`
+5. 在结尾处设置参考文件显示格式
   * `\bibliographystyle{plain}`    指定引用的显示格式
-  * `\bibliography{reffile}`       传入 `.bib` 文件的名称, 不需要后缀名
-  * 在文章最后会自动生成 reference
+6. 在结尾处设置参考文献
+  * `\bibliography{reffile}`   传入 `.bib` 文件的名称, 不需要后缀名
   * 使用 `\nocite{key}` 可以在文末的引用里加入没被在文章中具体引用的文献, 用于补充
+  * 在文章最后会自动生成 reference
 
 
-### 7.2.1. Bibliographic Styles 
+### 6.2.1. Bibliographic Styles 
 
 引用的显示格式举例:  
 * `plain`, 按字母的顺序排列，比较次序为作者、年度和标题；
@@ -570,14 +616,14 @@ Latex 文档引用的参考文献管理库, 克服了 thebiblography 的所有�
 在需要添加引用的部分使用 `\cite{name}`
 
 
-# 8. Define Macros
+# 7. Define Macros
 
 * command 和 environment 都属于 Macros 的一种, 都可以被用户自定义
 * Latex 预定义的内置宏也可以被用户复写
 * 宏的最初的目的就是为了减少重复使用的超长命令
 * 用户对宏的操作应该在 preamble 或者额外的 `.cls` 文件中
 
-## 8.1. 定义 command
+## 7.1. 定义 command
 
 定义一个新的 command `\newcommand{newc}{aval}` `\providecommand{newc}{aval}`
 * newc 是新定义的命令的名字
@@ -586,7 +632,7 @@ Latex 文档引用的参考文献管理库, 克服了 thebiblography 的所有�
   * `\newcommand` 会报错
   * `\providecommand` 会保留原本的命令, 且不会有任何提示, 所以不应该被使用
 
-### 8.1.1. 定义无参数命令
+### 7.1.1. 定义无参数命令
 
 无参数命令通常被用来简化输入, 直接替代成另一块字符
 
@@ -602,17 +648,17 @@ Latex 文档引用的参考文献管理库, 克服了 thebiblography 的所有�
 * 可以用 newcommand 来快速输入一串字符
 * 用户定义的命令字符末尾需要加上 `\`, 来保护在文本模式下紧挨着的空格生效
 
-### 8.1.2. 定义必须参数命令
+### 7.1.2. 定义必须参数命令
 
 `\newcommand{}[]{}` as `\newcommand{newc}[n]{..{#1}..{#2}..{#n}..}`
 * 方括号的 n 代表必须参数个数
 * 访问每个参数通过加大括号的  `{#1}` 来访问
 
-### 8.1.3. 定义可选参数命令
+### 7.1.3. 定义可选参数命令
 
 `\newcommand{}[][]{}` as `\newcommand{newc}[n][farg]{..{#1}..{#2}..{#n}..}` 
 * frag 是必须参数的默认值, 添加了默认值后该参数及变成可选参数
 * frag 会顺序赋值给 `#1 ,#2`
 
-## 8.2. 定义 environment
+## 7.2. 定义 environment
 

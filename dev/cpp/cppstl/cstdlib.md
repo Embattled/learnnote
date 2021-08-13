@@ -1,12 +1,39 @@
-
 # 1. stdlib.h /cstdlib
 
 因为该头文件的内容太杂, 单独列出文件
 This header provides miscellaneous utilities.   
 Symbols defined here are used by several library components.   
 
+过于重要, 一般的C程序都需要该头文件  
 
 # 2. Functions 函数
+
+## 进程控制
+
+## 内存控制
+
+内存分配函数:
+* `void* malloc( std::size_t size );`
+  * 分配未初始化的存储空间
+  * 成功时返回内存起始指针
+  * 失败时返回 NULL
+* `void* calloc( std::size_t num, std::size_t size );`
+  * 分配 num 个 size 大小的空间, 并初始化所有位为0
+  * 返回值同上
+* `void* realloc( void* ptr, std::size_t new_size );`
+  * 重分配内存, 传入的指针必须是由 `malloc calloc realloc` 创建的, 否则未定义
+  * 实际实现的处理可能是以下之一
+    * 若处理是收缩或者内存空间可以进行拓张, 旧内容保留
+    * 否则分配新的内存块, 并将旧内存的区域进行拷贝, 然后free旧块
+  * 若失败则返回空指针
+* `void* aligned_alloc( std::size_t alignment, std::size_t size );(C++17 起)`
+  * 分配对齐的内存空间, alignment是对齐量, size必须是 alignment的整数倍
+  * 
+* `void free( void* ptr );`
+  * 回收以上4个函数创建的内存空间
+  * 如果free并非由以上四个函数创建的指针, 则未定义
+  * 重复free某个指针的行为未定义
+  * 已经被free的指针的访问结果未定义
 
 ## 2.1. 随机数生成
 

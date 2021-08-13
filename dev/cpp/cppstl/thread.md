@@ -1,8 +1,14 @@
 # Thread support library
 
-C++ 内置了多线程编程的库  包括进程互斥 情况变量等内容   
+* C++11 内置了多线程编程的库  包括进程互斥 情况变量等内容   
+* C++11 新加入了和多线程相关的多个头文件
+  * `<thread>`
+  * `<mutex>`
+  * `<future>`
+  * `<condition_variable>`
+  * `<atomic>`
 
-# <thread>
+# thread
 
 * 从C++11 起加入标准
 * 包括了线程的类及其基本操作函数
