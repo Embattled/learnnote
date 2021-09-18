@@ -179,5 +179,5 @@ group.add_argument('--foo', action='store_true')
 group.add_argument('--bar', action='store_false')
 ```
 
-## Print help
+## 5.3. Print help
 

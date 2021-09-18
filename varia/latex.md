@@ -75,15 +75,45 @@ rm -rf ~/.texlive2021
    * 再次更新了 `.aux .log .pdf`
    * 生成了最终的 pdf 文件, 正文中的引用也标好了序号
 
+
+### 1.2.1. 多种编译器的区别
+
+* tex     : 编译 tex 源文件生成 dvi 文件
+* pdftex  : 编译 tex 源文件生成 dvi 文件
+* latex   : 编译 latex 源文件生成 dvi 文件
+* pdflatex: 编译 latex 源文件生成 pdf 文件
+* dvi2ps  : dvi 文件转换成 postscript 文件
+* dvipdf  : dvi 文件转化成 pdf 文件
+
+### 1.2.2. latex 家族
+
+根据使用语言的不同, latex 编译器被区分出来了数个家族
+
+p系列(中日韩)
+| 名称    | 说明                                                             |
+| ------- | ---------------------------------------------------------------- |
+| pTex    | pTex 汉字假名记号使用的是 日本的标准 (JIS X 0208)                |
+| upTex   | 在pTex 的基础上增加了 CJK和朝鲜语的支持, 以及utf-8编码的支持     |
+| e-upTex | 合并 upTex 和一些 eTex 的功能, 目前 upTex 已经完全合并了 e-upTex |
+即当前编译日文文章的话, 直接使用 uptex 即可
+
 ## 1.3. latex-workshop vscode
 
 [url](https://github.com/James-Yu/LaTeX-Workshop/wiki/Install)
 
+配置自定义的编译流程, 在 `settings.json` 中加入字段
+* `latex-workshop.latex.tools` 工具选项, 配置 tools
+* `latex-workshop.latex.recipes` 配置编译流程, 可以使用多个 tools
+
+
+
+
+
 # 2. latex 数学
 
 * latex 数学被称为 math-mode
-* 和文本模式 text-mode 是区分开的
-
+* 和文本模式 `text-mode` 是区分开的
+* 相关的环境会自动进入 `math-mode`
 
 * latex的特殊字符:
   * `# $ % & ~ _ ^ \ { }`
@@ -124,20 +154,22 @@ rm -rf ~/.texlive2021
 | omega   | \omega \Omega     | $\omega \Omega$     |
 
 特殊运算符:
-| 名称   | 代码    | 显示       |
-| ------ | ------- | ---------- |
-| 加减   | \pm     | $\pm$      |
-| 大乘   | \times  | $\times$   |
-| 大除   | \div    | $\div$     |
-| 点乘   | \cdot   | $\cdot$    |
-| 合     | \cap    | $\cap$     |
-| 并     | \cup    | $\cup$     |
-| 大于   | \gt \ge | $\gt \geq$ |
-| 小于   | \lt \le | $\lt \le$  |
-| 不等于 | \ne     | $\ne$      |
-| 约等于 | \approx | $\approx$  |
-| 全等   | \equiv  | $\equiv$   |
-| 属于   | \in     | $\in$      |
+| 名称   | 代码                 | 显示       |
+| ------ | -------------------- | ---------- |
+| 加减   | \pm                  | $\pm$      |
+| 大乘   | \times               | $\times$   |
+| 大除   | \div                 | $\div$     |
+| 点乘   | \cdot                | $\cdot$    |
+| 合     | \cap                 | $\cap$     |
+| 并     | \cup                 | $\cup$     |
+| 大于   | \gt \ge \textgreater | $\gt \geq$ |
+| 小于   | \lt \le \textless    | $\lt \le$  |
+| 不等于 | \ne                  | $\ne$      |
+| 约等于 | \approx              | $\approx$  |
+| 全等   | \equiv               | $\equiv$   |
+| 属于   | \in                  | $\in$      |
+| 存在   | \exists \exist       | $\exists$  |
+| 不存在 | \nexist \nexists     | $\nexists$ |
 
 ## 2.1. 基础数学commands
 
@@ -150,18 +182,30 @@ rm -rf ~/.texlive2021
   * _ 表示下标
 * \sqrt表示开方, 类似于一个函数, 默认开平方
   * 完整写法是 `\sqrt[开方字符]`
-* $\sqrt[\alpha]\Gamma^{25}$
+  * $\sqrt[\alpha]\Gamma^{25}$
+* 小撇直接用 ' 即可
+* 在字符正上方加点用 `\dot{}`, 多个点则重复 d 即可
+  * $\dot{x} \ddot{x}$
 
-### 2.1.2. 大运算符
+### 2.1.2. 大运算符 范围运算符
+
 范围运算符号, 基本上表示范围的算是都是直接用上下标方法来输入
-| 名称     | 代码        | 显示              |
-| -------- | ----------- | ----------------- |
-| 求极限   | \lim        | $\lim_{x\rArr1}x^2$  |
-| 求积分   | \int        | $\int_{a}^{b}x^2$ |
-| 多重积分 | \多个i + nt | $\iiint$          |
-求和| \sum|$\sum_{n=1}^Na_n$
+| 名称     | 代码        | 显示               |
+| -------- | ----------- | ------------------ |
+| 求积分   | \int        | $\int_{a}^{b}x^2$  |
+| 多重积分 | \多个i + nt | $\iiint$           |
+| 求和     | \sum        | $\sum_{n=1}^Na_n$  |
+| 求积     | \prod       | $\prod_{n=1}^Na_n$ |
 
-### 2.1.3. 特殊格式字符
+
+### 2.1.3. 特殊运算
+| 名称           | 代码        | 显示                      |
+| -------------- | ----------- | ------------------------- |
+| 导数           | \nabla{f}   | $\nabla{f}$               |
+| 微分           | \partial{y} | $\partial{y}$             |
+| 求极限         | \lim        | $\lim_{x\rArr1}x^2$       |
+| 文字置于正下方 | underset{}  | $\underset{x\to 0}{\lim}$ |
+### 2.1.4. 特殊格式字符
 
 | 名称         | 代码       | 显示         |
 | ------------ | ---------- | ------------ |
@@ -169,7 +213,7 @@ rm -rf ~/.texlive2021
 
 
 
-### 2.1.4. 分数
+### 2.1.5. 分数
 
 * 分数的表示也是类似函数, 需要填入两个空
   * `\frac{分子}{分母}`
@@ -177,7 +221,21 @@ rm -rf ~/.texlive2021
     * `\dfrac`命令把字号设置为独立公式中的大小 默认的 frac
     * `\tfrac`则把字号设置为行间公式中的大小
 
-## 2.2. 公式环境
+
+## 2.2. 界定符
+
+像是跨于多行的圆括号, 方括号, 用来表示矩阵等内容, 都可以用界定符的形式来描述 
+* 界定符可以是 `( [ ] ) | \{ \}` 大括号需要加转义字符
+* 左侧:
+  * `\left` 后面跟符号 `\left.` 代表空界定符
+  * `\bigl`
+  * `\Bigl`
+  * `\biggl`
+  * `\Biggl`
+* 右侧同理 `\right` 或者相应的 l 改为 r
+
+
+## 2.3. 公式环境
 
 在正式的文本中书写公式需要引入公式环境
 
@@ -191,9 +249,10 @@ rm -rf ~/.texlive2021
 * 非简写公式环境都会自动参与编号, 编号会自动生成在最右边, 排版时可以认为页面的右边缘被向左移动了一个编号占用的距离
 * 不要参与编号的话就在环境名称结尾加一个星号`*`, begin 和 end 都要加
 1. align
-2. equation
+2. equation   : 最基础
+3. eqnarray
 
-### 2.2.1. equation
+### 2.3.1. equation
 
 * equation 是最一般的公式环境, 表示一个公式, 默认表示一个单行的公式
 * 可以通过内嵌其他环境进行拓展, 例如对齐环境
@@ -215,7 +274,7 @@ rm -rf ~/.texlive2021
 
 ```
 
-### 2.2.2. align
+### 2.3.2. align
 
 * align 是最基本的对齐环境, 而不能被称作标准公式环境, 因此可以说是公式环境的基础
 * align 和表格环境一样, 使用 `&` 分割单元, `\\` 换行
@@ -231,9 +290,11 @@ rm -rf ~/.texlive2021
 ```
 
 
+# 3. latex 图
 
 
-# 3. latex 语法 Syntax
+
+# 4. latex Syntax 部件语法
 
 一个tex文件可以简单的分解成2部分
 * preamble  : 保存了全局的处理参数 `documentclass{}`
@@ -244,14 +305,14 @@ rm -rf ~/.texlive2021
 * `.dvi` 文件可以被转化成 `.ps .pdf` 文件
 
 
-## 3.1. 基础class
+## 4.1. 基础class
 
 Latex语法包含了两大类别:
 * latex command
 * latex environment
 * 定义在别的文件中的不属于标准文档类的 command 或者 environment 称为packages
 
-### 3.1.1. 基础字符
+### 4.1.1. 基础字符
 
 以下字符可以直接被打印到文档中
 1. 英文字母和数字
@@ -269,14 +330,14 @@ Latex语法包含了两大类别:
 * `--` 用于指定范围 A--B
 * `---` 用于补充说明
 
-### 3.1.2. commands
+### 4.1.2. commands
 
 latex command 的属性可以表示成:
 * 一般以 `\` 开始的一个指令
 * 指令一般都是以英文字母组成
 * 空参数后要接空格 `\command 字符` 或者`\command\ 字符`
 
-### 3.1.3. environment
+### 4.1.3. environment
 
 用于实现特殊功能 插入公式
 * ename作为一个环境名称, 开启一个环境用 `\begin{ename} \end{ename}`
@@ -284,7 +345,7 @@ latex command 的属性可以表示成:
 * 环境也是有参数的 `\begin{ename}{p1}{p2} \end{ename}`
 * 环境也是有可选参数的 `\begin{ename}[op]`
 
-### 3.1.4. packages
+### 4.1.4. packages
 
 packages:
 * 在文档的 preamble 里载入, 即 `\documentclass{}` 和 `\begin{document}` 的中间载入
@@ -297,7 +358,7 @@ packages:
 解包 utf8 编码, 一般都会用该编码, 基本都有这一句  
 
 
-### 3.1.5. documentclass
+### 4.1.5. documentclass
 
 作为一开始的语句, `\documentclass[]{}` 具有设置该文档种类的功能, latex最基础的几大class是  
 * letter
@@ -341,37 +402,23 @@ packages:
 \end{document}
 ```
 
-## 3.2. Table
+## 4.2. 界面宏
 
-latex中处理表格的环境有三种
-* tabular
-* tabularx
-* longtable
-* 其他相关环境
-  * table
-  * wraptable
-  * sidewaystable
+LaTex有一些方便布置表格和图片的界面宏, 用于快速指定宽度 
 
-### 3.2.1. tabular
+| 宏             | 功能               |
+| -------------- | ------------------ |
+| `\linewidth`   | 当前行的宽度       |
+| `\columnwidth` | 当前分栏的宽度     |
+| `\textwidth`   | 整个页面版芯的宽度 |
+| `\paperwidth`  | 整个页面纸张的宽度 |
 
-* 环境指令 `\begin{tabular}[]{|l|c|r|}`
-  * 指定每列的字母用 `lcr`, 并包括在`|` 中, 分别代表左中右对齐
-  * `|` 其实代表每列用竖线分隔开
-* 在环境中
-  * 同一行的不同元素用 `&` 隔开
-  * 结束表格的一行用 `\\`
-  * `\hline` 用于在表格上画横线用于分隔行, 在内容的上下都应该加上
-```latex
-\begin{tabular}
-```
-
-
-# 4. 文章
+# 5. 文章管理
 
 * `\documentclass{}`  定义在一开始, 说明文档的类型
 * `begin{document}` `\end{documnet}`  内容的开始与结束
 
-```
+```latex
 \documentclass[]{article}
 \begin{document}
 First document. 
@@ -379,7 +426,7 @@ First document.
 ```
 
 
-## 4.1. preamble
+## 5.1. preamble
 
 定义在 ` \begin{document}` 叫做 latex 的preamble, 一般包含了:
 1. the language
@@ -387,14 +434,14 @@ First document.
 3. set several parameters. 
 
 文章介绍,  在这里定义不会直接显示在文档中
-```
+```latex
 \title{First document}
 \author{Hubert Farnsworth 
 \thanks{funded by the Overleaf team}}
 \date{February 2014}
 ```
 
-### 4.1.1. 显示文档标题
+### 5.1.1. 显示文档标题
 
 ```
 \title{First document}
@@ -414,9 +461,11 @@ In this document.
 * `\begin{titlepage} \end{titlepage}`  创建了一个名为 titlepage 的环境    
 *  `\maketitle` 语句一键以默认格式创建标题    
 *  `\thanks{}` 用于在作者中加入致谢, It will add a superscript and a footnote with the text inside the braces. 
-## 4.2. Formatting
+## 5.2. Formatting
 
-### 4.2.1. Sectional Units
+文章的 formatting 最主要的就是分章分节  
+
+### 5.2.1. Sectional Units
 
 * 分段分章是文档的必备属性. 在不同类型的文章中有不同类型的编号体系  
 * 一般来说编号只编三级
@@ -432,7 +481,7 @@ article
 2. `\subsection{}`    1.1
 3. `\subsubsection{}` 1.1.1
 
-### 4.2.2. Label and Referring
+### 5.2.2. Label and Referring
 
 可以在任何位置分配label, 并使用 `\ref` 进行页内跳转
 1. `\label{key}`  分配名称
@@ -449,13 +498,14 @@ article
 
 其他的referance:
 * `\pageref{}` 显示成label所在的页码
-* 带有 `v` 的command,`\vref` 定义在了  varioref 保重
+* 带有 `v` 的command,`\vref` 定义在了  varioref 包中
 
-### 4.2.3. 行与段落 lines and paragraphs
+### 5.2.3. 行与段落 lines and paragraphs
 
 在源文件中换行并不会使输出文档换行, 而是被识别成一个空格,  
 (因此源文件中为了书写整洁而换行时, 不需要在换行前加额外的空格)  
 必须通过命令或者特定字符才能创建新行, 新行有两种类型, `分段`和`断行`
+
 * 分段:
   * 会将两个行认作是两个段, 段首缩进会分别应用在两个部分
   * `\par`
@@ -478,14 +528,193 @@ article
 相比于行, latex更推荐通过段落命令来控制文章
 * `\par` 无参数的, 使用默认首行缩进
   * 可以有附加命令跟在 `\par \附加命令` 后面用来指定别的格式
-  * (全局)`\parindent = ?mm` 手动指定首行缩进
-  * (全局)`\parskip ?mm`  段前空白
+  * (全局)`\parindent = ?mm` 手动指定首行缩进 , 会作用于该命令之后的全部段落
+  * (全局)`\parskip ?mm`  段上方的空白距离    , 会作用于该命令之后的全部段落
   * `\noindent` 无首行缩进
 * `\paragraph{} \subparagraph{}`
   * 段首会有加粗的字
   * subparagraph 会有更多的段首缩进 
+  * 在某些 cls 下会分配编号
 
-# 5. 文字格式
+
+# 6. 图表环境
+## 6.1. Table
+
+latex中处理表格的环境
+* 传统表格, 不能分配序列号和标题, 文本为基础的独立对象, 容易在创建超大表格的时候出问题
+  * tabular
+  * tabularx
+* longtable
+* 其他相关环境
+  * table
+  * wraptable
+  * sidewaystable
+
+### 6.1.1. tabular
+
+基础表格环境 tabular
+
+* 环境指令 `\begin{tabular}[]{acols}`
+  * `{acols} eg. {|l|c|r|}`参数用来指定每列的字母用 `lcr`, 并包括在`|` 中, 分别代表左中右对齐
+  * `|` 其实代表每列用竖线分隔开
+  * 注意 tabular的特点是所有列等宽, 宽度以所有列的最宽数据为基准
+* 在环境中
+  * 同一行的不同元素用 `&` 隔开
+  * 结束表格的一行用 `\\`
+  * `\hline` 用于在表格上画横线用于分隔行, 在内容的上下都应该加上
+```latex
+\begin{tabular}{|l|c|c|c|c|}
+  \hline Name & Math & Phy & Chem & English\\
+  \hline Robin & 80 & 68 & 60 & 57\\
+  \hline Julie & 72 & 62 & 66 & 63\\
+  \hline Robert & 75 & 70 & 71 & 69\\
+  \hline
+\end{tabular}
+```
+
+### 6.1.2. tabularx
+
+加强版的表格环境, 解决了
+1. tabular 的所有列等宽的问题, 通过自动计算所有列宽, 来减少表格越界的问题
+2. 可以指定表格的最终宽度
+
+用法
+* 环境指令 `\begin{tabularx}{awidth}{acols}`
+  * `{awidth}` : 指定表格的最终水平宽度
+  * `{acols}`  : 指定表格的列. 和 tabular 一样的参数
+    * `lcr`, 分别代表左中右对齐, 固定宽度的列
+    * `X`  , 自动计算宽度, 所有的`X`列等宽, 但是宽度是根据 `{awidth}` 来计算
+    * `X` , 列的文字是完全对齐, 容易不美观, 可以附加其他的对齐方式
+    * `>{\raggedright\arraybackslash}`, `>{\centering\arraybackslash}`, or `>{\raggedleft\arraybackslash}` before `X`
+    * `\arraybackslash` 是一个修正代码, 如果不使用的话, 可能导致表格中的 `\\`换行在某些情况下失效
+* 宏数据
+  * `\linewidth` 用来返回当前的页面宽度, 前面接倍数可以方便的指定表格宽度
+
+```latex
+\begin{tabularx}{0.8\linewidth}{|X|c|>{\raggedleft\arraybackslash}X|}
+  \hline {\bf Name} & {\bf Sex} & {\bf Points}\\
+  \hline  Milan & M & 1,500\\
+          Julie & F & 1,325\\
+          Sekhar & M & 922\\
+          Dipen & M & 598\\
+          Rubi & F & 99\\
+  \hline
+\end{tabularx}
+
+```
+
+### 6.1.3. table
+
+封装的较常用的表格环境, 基础的 tabular 会嵌套在该环境中, 主要用来为表格
+1. 将表格创建在分离的一段
+2. 为表格加入标题和编号
+3. 指定表格在页面的垂直位置
+
+* 指令 `\begin{table}[!hbt]`
+  * 可选参数 `eg. [!hbt]`, 用来指定表格的在页面的垂直位置, 该参数的正式名称是 `[avp]`
+  * `htb` 代表3个不同的表格位置, 三个位置可以任意单独或者组合输入, 组合输入时效果是无关顺序的
+  * `!`, 感叹号参数具有最高优先级, 如果使用了, 代表表格可以忽略一些限制来确保表格能够被正确放到对应位置上
+  * `h`, 代表 here, 也是默认参数, 放在当前位置, 如果当前位置没空间且位置参数只有 `h`, 则尝试放在下一页的 `t` , 当前页的剩余空白则填入源文件中表格后面的文字
+  * `t`, 代表 top, 表格尝试放在当前页的最上方
+  * `b`, 代表 bottom , 当前页的最下方
+  * 除了 `!htb` 以外, 在 `float` 包中还有一个独立的参数 `H`, 代表原本 `h`中, 表格没空间时, 当前页的剩余空白就那么空白着, 不填入表格后面的文字
+* 内容
+  * 对齐方法
+    * `\centering` : 表格居中
+    * `\flushleft \flushright` : 表格左右对齐
+  * 标题
+    * `\caption{}` 赋予序列号和标题, 标题是括号里的内容, 序列号则是`Table`后面跟自动的编号 `Table 1`
+      * 表的标题一般写在表内容的前面
+    * `\label{}`   一般用来给表格加入一个 label, 方便其他地方引用该表格 `\ref{}`
+      * 一般写在表格标题后面, 因为使用 `\ref` 的时候表格必须要有编号
+      * 没有 `\caption` 的话 `\label` 没有任何作用
+  * 双栏归一栏
+    * 双栏情况下, 当表格宽度过长时, 会导致表格覆盖到另一栏的文字
+    * 只需要将表格中 `table` 更改为 `table*` 即可
+    * 
+
+用法
+```latex
+\begin{table}[!hbt]
+\centering
+\caption{Obtained marks.}
+\label{tab-marks}
+    此处嵌入 tabular 表格环境, 写入表格内容
+\end{table}
+
+```
+
+## 6.2. Figure 插图
+
+* 往 Latex 文件中插图
+* 根据图片的格式, 需要使用不同的编译器, 尽量确保所有插图都是统一的格式
+  * latex : eps ps
+  * pdflatex: pdf jpeg tiff png
+
+### 6.2.1. epsfig
+
+eps 格式的图片可以使用专有的命令 epsfig, 该命令定义在 `epsfig` 的包中
+
+命令 ` \epsfig{file=fname,[其他属性]} 用于插入一个图片`
+* file=fname :用于指定插图的名称, 可以省略后缀名, 需要确保该图片是 eps 格式
+* width=  height= : 用于指定插图的显示大小, 省略则是原大小, 只指定一个则是按比例缩放, 指定两个则会相应的拉伸
+* angle= : 用于给定一个逆时针旋转的角度, 
+
+### 6.2.2. includegraphics
+
+更加通用的插图命令, 可以插入任何格式的图片, 定义在 `graphicx` 包中
+
+命令 `\includegraphics[aopt]{fname}`
+* fname: 图片的名称, 不带后缀名
+* aopt : 图片的属性, 包括 width height angle 用法同上
+
+### 6.2.3. figure
+
+同表格一样, 也是图片专用的环境, 使用 `begin{figure}[!hbt]` 进入环境来达成:
+1. 给予一个编号和标题
+2. 设定 label, 来方便文中其他地方的引用
+3. 设定图片在一页中的显示位置, 设定方法同上关于表格的说明一样
+
+side-by-side图片
+* 要想插入 side-by-side 的图片, 只需要连续写两个插入图片命令即可 (`\includegraphics`)
+* 命令之间不能有空行
+* 使用 `\hfill` 来将两张图的中间尽可能填入空白 (图片被放到最左端和最右端)
+* 两张图会被赋予同一个编号, 若想分别编号, 需要使用 `minipage` 环境
+
+```latex
+\begin{figure}[!hbt]
+\centering
+\epsfig{file=girl.eps, width=2.0cm, height=2.0cm}
+% 表的标题一般写在表内容的后面
+\caption{A girl.}  
+% label 只有标题存在的时候才能生效
+\label{girl1}
+\end{figure}
+
+```
+
+### 6.2.4. subfigure
+
+有时候需要将图片分组, 每个组有一个大标题, 然后图片有自己的小标题, 此时可以使用 subfigure
+* `subfigure[标题]{内容}`
+* 定义在 subfigure 包中, 使用 `\usepackage[tight]{subfigure}` 来导入
+* 同样的 `\hfill` 可以用来填充空白, `\\` 可以用来强制换行
+
+```latex
+\begin{figure}[!htb]
+\centering
+\subfigure[A girl.]
+{ \includegraphics[width=2.0cm]{girl}
+\label{girl}
+}\hfill
+\subfigure[A flower.]
+{ \includegraphics[width=2.0cm]{flower}
+\label{flower}
+}
+
+```
+
+# 7. 文字格式
 
 全局默认文字格式 (type of font):
 * medium series
@@ -518,7 +747,7 @@ article
  
 
 
-# 6. 引用 Reference
+# 8. 引用 Reference
 
 文献引用有专门的环境, 以及多种不同的包对应引用, 最常用的有两种  
 1. thebibliography   环境    
@@ -535,7 +764,7 @@ article
    * 这个包不能和 `\cite[note]{}` 的可选参数 note 一起使用, 因为 note 不能放到上标处
 
 
-## 6.1. thebibliographic  环境
+## 8.1. thebibliographic  环境
 
 * 文献引用有专门的环境 `thebibliography` , 放在 `\end{document}` 之前即可
   * 较为原始, 不能区分 book 和 article
@@ -572,7 +801,7 @@ command
 \end{thebibliography}
 ```
 
-## 6.2. BibTex 
+## 8.2. BibTex 
 
 Latex 文档引用的参考文献管理库, 克服了 thebiblography 的所有缺点  
 同样是传入 bib 数据库, 但是只会显示文章中有 `cite` 的引用文献  
@@ -601,7 +830,7 @@ Latex 文档引用的参考文献管理库, 克服了 thebiblography 的所有�
   * 在文章最后会自动生成 reference
 
 
-### 6.2.1. Bibliographic Styles 
+### 8.2.1. Bibliographic Styles 
 
 引用的显示格式举例:  
 * `plain`, 按字母的顺序排列，比较次序为作者、年度和标题；
@@ -616,14 +845,14 @@ Latex 文档引用的参考文献管理库, 克服了 thebiblography 的所有�
 在需要添加引用的部分使用 `\cite{name}`
 
 
-# 7. Define Macros
+# 9. Define Macros
 
 * command 和 environment 都属于 Macros 的一种, 都可以被用户自定义
 * Latex 预定义的内置宏也可以被用户复写
 * 宏的最初的目的就是为了减少重复使用的超长命令
 * 用户对宏的操作应该在 preamble 或者额外的 `.cls` 文件中
 
-## 7.1. 定义 command
+## 9.1. 定义 command
 
 定义一个新的 command `\newcommand{newc}{aval}` `\providecommand{newc}{aval}`
 * newc 是新定义的命令的名字
@@ -632,7 +861,7 @@ Latex 文档引用的参考文献管理库, 克服了 thebiblography 的所有�
   * `\newcommand` 会报错
   * `\providecommand` 会保留原本的命令, 且不会有任何提示, 所以不应该被使用
 
-### 7.1.1. 定义无参数命令
+### 9.1.1. 定义无参数命令
 
 无参数命令通常被用来简化输入, 直接替代成另一块字符
 
@@ -641,24 +870,24 @@ Latex 文档引用的参考文献管理库, 克服了 thebiblography 的所有�
 | `\newcommand{\bs}{$\backslash$}`               | ‘\bs’ to print ‘\’               |
 | `\newcommand{\xv}{\mbox{\boldmath$x$}}`        | ‘\xv’to print‘x’                 |
 | `\newcommand{\veps}{\ensuremath{\varepsilon}}` | ‘\veps’to print‘ε’               |
-| `\newcommand{\cg}{\it Center of Gravity\/}`     | ‘\cg’to print‘Center of Gravity’ |
+| `\newcommand{\cg}{\it Center of Gravity\/}`    | ‘\cg’to print‘Center of Gravity’ |
 
 命令详解:
 * `\backslash`  打印`\`
 * 可以用 newcommand 来快速输入一串字符
 * 用户定义的命令字符末尾需要加上 `\`, 来保护在文本模式下紧挨着的空格生效
 
-### 7.1.2. 定义必须参数命令
+### 9.1.2. 定义必须参数命令
 
 `\newcommand{}[]{}` as `\newcommand{newc}[n]{..{#1}..{#2}..{#n}..}`
 * 方括号的 n 代表必须参数个数
 * 访问每个参数通过加大括号的  `{#1}` 来访问
 
-### 7.1.3. 定义可选参数命令
+### 9.1.3. 定义可选参数命令
 
 `\newcommand{}[][]{}` as `\newcommand{newc}[n][farg]{..{#1}..{#2}..{#n}..}` 
 * frag 是必须参数的默认值, 添加了默认值后该参数及变成可选参数
 * frag 会顺序赋值给 `#1 ,#2`
 
-## 7.2. 定义 environment
+## 9.2. 定义 environment
 

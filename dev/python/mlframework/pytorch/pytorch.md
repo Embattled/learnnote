@@ -71,7 +71,7 @@ print(torch.__version__)
 * 布尔类型
   * torch.BoolTensor
 
-## 类属性
+## 2.2. 类属性
 
 * 所有的张量类都有三个基础属性
   * `torch.dtype`
@@ -104,8 +104,8 @@ print(torch.__version__)
 
 
 
-## 2.2. 类方法
-### 2.2.1. 类型转换
+## 2.3. 类方法
+### 2.3.1. 类型转换
 
 1. .item()   : Returns the value of this tensor as a standard Python number
    * 只在张量中只有一个元素时生效
@@ -115,7 +115,7 @@ print(torch.__version__)
 3. .numpy()  : Returns self tensor as a NumPy ndarray
    * 共享内存, 非拷贝
   
-### 2.2.2. view 变形
+### 2.3.2. view 变形
 
 `view(*shape) → Tensor`  
 * 返回一个更改了维度的 tensor
@@ -134,7 +134,7 @@ c = a.view(1, 3, 2, 4)
 # torch.Size([1, 3, 2, 4])
 ```
 
-### 2.2.3. transpose
+### 2.3.3. transpose
 
 `torch.transpose(input, dim0, dim1) → Tensor`  
 * transpose 可以解释为view的一种
@@ -147,7 +147,7 @@ c = a.view(1, 3, 2, 4)
 同 numpy 的 transpose 不同, numpy 的transpose 可以直接交换多个维度  
 
 
-## 2.3. 创建操作 Creation Ops
+## 2.4. 创建操作 Creation Ops
 
 基本上所有创建 tensor 的函数都位于 `torch.` 下  
 
@@ -155,7 +155,7 @@ c = a.view(1, 3, 2, 4)
 * `dtype  =`
 * `device =`
 
-### 2.3.1. torch.tensor
+### 2.4.1. torch.tensor
 
 * 从 python list 或者 numpy array 来创建张量
 * `torch.tensor()` 函数总是会进行数据拷贝
@@ -164,10 +164,10 @@ c = a.view(1, 3, 2, 4)
 torch.tensor(data, *, dtype=None, device=None, requires_grad=False, pin_memory=False) → Tensor
 ``` 
 
-### 2.3.2. 统一值 tensor
+### 2.4.2. 统一值 tensor
 
 
-### 2.3.3. 随机值 random
+### 2.4.3. 随机值 random
 
 函数参数 : `(*size, *, out=None, dtype=None, layout=torch.strided, device=None, requires_grad=False)`
 * size 指定大小
@@ -201,7 +201,7 @@ torch.tensor(data, *, dtype=None, device=None, requires_grad=False, pin_memory=F
 * set_rng_state   :Sets the random number generator state.
 
 
-### 2.3.4. _like 类方法
+### 2.4.4. _like 类方法
 
 需要获取一个不确定维度的 tensor, 即通过另一个 tensor 指定大小
 * rand_like
@@ -209,14 +209,14 @@ torch.tensor(data, *, dtype=None, device=None, requires_grad=False, pin_memory=F
 * randn_like
 
 
-### 2.3.5. torch.from_numpy
+### 2.4.5. torch.from_numpy
 
 `torch.from_numpy` 接受一个 ndarray 并转换成 tensor 没有任何参数  
 ```py
 torch.from_numpy(ndarray) → Tensor
 ```
 
-### 2.3.6. tensor复制
+### 2.4.6. tensor复制
 
 
 * `torch.clone(input, *, memory_format=torch.preserve_format) → Tensor`
@@ -228,7 +228,7 @@ torch.from_numpy(ndarray) → Tensor
 一般彻底的复制并脱离可以使用  `tensor.clone().detach()`  这也是官方推荐的方法  
 
 
-### 2.3.7. .new_ 方法
+### 2.4.7. .new_ 方法
 
 To create a tensor with similar type but different size as another tensor, use tensor.new_* creation ops.  
 
@@ -243,9 +243,9 @@ To create a tensor with similar type but different size as another tensor, use t
 
 
 
-## 2.4. 拼接与截取
+## 2.5. 拼接与截取
 
-### 2.4.1. torch.stack
+### 2.5.1. torch.stack
 `torch.stack(tensors, dim=0, *, out=None) → Tensor`  
 
 * 将多个 tensor 叠加到一起, 并产生一个新的 dimension
@@ -253,7 +253,7 @@ To create a tensor with similar type but different size as another tensor, use t
 * 因此所有 tensor 必须相同大小
 * dim 指定新的 dimension 的位置
 
-### 2.4.2. torch.cat
+### 2.5.2. torch.cat
 
 `torch.cat(tensors, dim=0, *, out=None) → Tensor`  
 
@@ -264,9 +264,9 @@ To create a tensor with similar type but different size as another tensor, use t
 
 
 
-## 2.5. 降维操作 Reduction Ops
+## 2.6. 降维操作 Reduction Ops
 
-### 2.5.1. max
+### 2.6.1. max
 1. torch.max(input) → Tensor 返回张量所有元素里的最大值
 2. torch.max(input, dim, keepdim=False, *, out=None) -> (Tensor, LongTensor) 即(values, indices) 
 
@@ -840,15 +840,69 @@ for input, target in dataset:
 
 ## 8.3. 动态 Learn Rate
 
-`torch.optim.lr_scheduler` 提供了一些方法用来根据 epoch 或者其他计算来调整学习速率
+
+
+`torch.optim.lr_scheduler` 提供了一些接口用来根据 epoch 或者其他计算来调整学习速率  
+`torch.optim.lr_scheduler.ReduceLROnPlateau` 则可以根据一些 validation measurements 来调整学习速率  
+
+pytorch提供的学习率调整器可以分成三大类:
+* 有序调整   : 等间隔(Step), 按需调整(MultiStep), 指数衰减 (Exponential), 余弦退火
+* 自适应调整 : ReduceLROnPlateau
+* 自定义调整 : LambdaLR
+
+
+调整器的使用方法:  
+```py
+# 定义优化器
+optimizer = SGD(model, 0.1)
+# 给优化器绑定动态学习速率
+scheduler = ExponentialLR(optimizer, gamma=0.9)
+
+# 使用方法: 一般学习速度的调整应该放在 optimizer 更新之后, 在 epoch 的循环里调整
+for epoch in range(100):
+    for input, target in dataset:
+      forward...
+      loss=...
+      loss.backward()
+      optimizer.step()
+  scheduler.step()
+```
+
+scheduler 的通用参数:
+* gamma : float, 乘法参数, 当前学习速率直接乘以该值 
+* last_epoch : 
+
+scheduler 的通用成员方法:
+* print_lr(is_verbose, group, lr, epoch=None)  : 打印当前的学习速率
+* get_last_lr() : 根据输入的参数计算最终的学习率
+
+
+scheduler 的种类:
+* torch.optim.lr_scheduler.StepLR : 最基础的种类, 每 `step_size` 个 epochs 时候降低一次学习速率
+* torch.optim.lr_scheduler.MultiStepLR : 同 Step, 只不过 step 变为数组
+* orch.optim.lr_scheduler.ExponentialLR : 学习率指数下降
+
+
+### 8.3.1. 有序调整
+
+
+* LambdaLr : 使用自定义函数来生成学习率
+  * 注意这里 Lambda 函数是一个单参数的函数, 传入当前 epoch 数
+  * 返回一个乘法因子, 用初始 lr 乘以该因子即更新后的学习率
 
 ```py
-# 使用方法: 一般学习速度的调整应该放在 optimizer 更新之后
-scheduler = ...
-for epoch in range(100):
-    train(...)
-    validate(...)
-    scheduler.step()
+# 1. StepLR
+# Assuming optimizer uses lr = 0.05 for all groups
+# lr = 0.05     if epoch < 30
+# lr = 0.005    if 30 <= epoch < 60
+# lr = 0.0005   if 60 <= epoch < 90
+scheduler = StepLR(optimizer, step_size=30, gamma=0.1)
+
+
+# 定义一个线性学习率降低
+endepoch=10
+liner_func=lambda epoch: max(0,1-(epoch/endepoch))
+optim.lr_scheduler.LambdaLR(optimizer,liner_func,**kwargs)
 ```
 
 ## 8.4. 定义自己的 optim

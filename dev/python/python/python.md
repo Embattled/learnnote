@@ -9,18 +9,19 @@
     - [2.3.1. 类型别名](#231-类型别名)
     - [2.3.2. 函数的类型注解](#232-函数的类型注解)
 - [3. 内置函数 Build-in Function](#3-内置函数-build-in-function)
-  - [类型确认函数](#类型确认函数)
-  - [3.1. 类型转换函数](#31-类型转换函数)
-  - [3.2. print()](#32-print)
-    - [3.2.1. 格式化输出](#321-格式化输出)
-    - [3.2.2. 控制输出方式](#322-控制输出方式)
-  - [3.3. input()](#33-input)
-  - [3.4. open() 基础文件操作](#34-open-基础文件操作)
-  - [3.5. range()](#35-range)
-  - [3.6. zip()](#36-zip)
-  - [3.7. reserved()](#37-reserved)
-  - [3.8. sorted()](#38-sorted)
-  - [3.9. enumerate() 遍历对象函数](#39-enumerate-遍历对象函数)
+  - [3.1. 类型确认函数](#31-类型确认函数)
+  - [3.2. 类型转换函数](#32-类型转换函数)
+  - [3.3. 作用域变量获取函数](#33-作用域变量获取函数)
+  - [3.4. print()](#34-print)
+    - [3.4.1. 格式化输出](#341-格式化输出)
+    - [3.4.2. 控制输出方式](#342-控制输出方式)
+  - [3.5. input()](#35-input)
+  - [3.6. open() 基础文件操作](#36-open-基础文件操作)
+  - [3.7. range()](#37-range)
+  - [3.8. zip()](#38-zip)
+  - [3.9. reserved()](#39-reserved)
+  - [3.10. sorted()](#310-sorted)
+  - [3.11. enumerate() 遍历对象函数](#311-enumerate-遍历对象函数)
 - [4. Python的操作符与变量](#4-python的操作符与变量)
   - [4.1. 基础类型](#41-基础类型)
   - [4.2. 转义字符](#42-转义字符)
@@ -79,12 +80,14 @@
     - [7.2.5. 自定义异常类](#725-自定义异常类)
 - [8. python 的函数](#8-python-的函数)
   - [8.1. 函数参数](#81-函数参数)
-  - [8.2. Python的可变参数](#82-python的可变参数)
-  - [8.3. 逆向参数收集](#83-逆向参数收集)
-  - [8.4. 函数的文档](#84-函数的文档)
-  - [8.5. yield 表达式](#85-yield-表达式)
-  - [8.6. lambda 表达式 匿名函数](#86-lambda-表达式-匿名函数)
-  - [8.7. 函数的异常处理](#87-函数的异常处理)
+    - [8.1.1. Python的可变参数](#811-python的可变参数)
+    - [8.1.2. 逆向参数收集](#812-逆向参数收集)
+    - [8.1.3. partial 偏函数](#813-partial-偏函数)
+    - [8.1.4. 闭包函数](#814-闭包函数)
+  - [8.2. 函数的文档](#82-函数的文档)
+  - [8.3. yield 表达式](#83-yield-表达式)
+  - [8.4. lambda 表达式 匿名函数](#84-lambda-表达式-匿名函数)
+  - [8.5. 函数的异常处理](#85-函数的异常处理)
 - [9. python 的类](#9-python-的类)
   - [9.1. 定义](#91-定义)
   - [9.2. self](#92-self)
@@ -93,10 +96,10 @@
   - [9.5. 类的描述符](#95-类的描述符)
   - [9.6. 类的封装](#96-类的封装)
     - [9.6.1. property()](#961-property)
-    - [@property 装饰器](#property-装饰器)
+    - [9.6.2. @property 装饰器](#962-property-装饰器)
   - [9.7. 类的继承和多态](#97-类的继承和多态)
     - [9.7.1. super](#971-super)
-    - [MRO Method Resolution Order](#mro-method-resolution-order)
+    - [9.7.2. MRO Method Resolution Order](#972-mro-method-resolution-order)
 - [10. python 的模块和包](#10-python-的模块和包)
   - [10.1. 导入模块或包](#101-导入模块或包)
   - [10.2. 自定义模块](#102-自定义模块)
@@ -339,13 +342,13 @@ compile() 	 	map()
 complex() 	hasattr() 	max() 	round()
 ```
 
-## 类型确认函数
+## 3.1. 类型确认函数
 
 * 确认一个变量的类型
   * isinstance(object, classinfo)   如果 object 的类型属于 classinfo 中的一种, 返回 True
 
 
-## 3.1. 类型转换函数
+## 3.2. 类型转换函数
 虽然 Python 是弱类型编程语言, 在一些特定场景中, 仍然需要用到类型转换  
 
 1. 因为python默认读入的内容都被识别为字符串, 因此需要类型转换
@@ -368,12 +371,13 @@ complex() 	hasattr() 	max() 	round()
    * int(x,n)  : 将一个整数 x 转换为一个十进制的字符串, n代表原本的进制
    * bin(x,n)  : 将一个整数 x 转换为一个二进制的字符串, n代表原本的进制
 
-5. 字典转换
+## 3.3. 作用域变量获取函数
+
    * vars(object) : 返回object 的 `__dict__` 属性, 如果object没有该属性则报异常
    * locals()    : 将局部空间的所有变量以字典形式返回, 等同于 `vars(空)`
    * globals()   : 将全局空间的所有变量以字典形式返回, 注意以本 module 为基准, 不包括调用的module
 
-## 3.2. print()
+## 3.4. print()
 
 `print (value,...,sep=' ',end='\n',file=sys.stdout,flush=False)`  
 
@@ -392,7 +396,7 @@ f = open("demo.txt","w")
 print('123456',file=f)
 ```
 
-### 3.2.1. 格式化输出
+### 3.4.1. 格式化输出
 
 类似于C语言的格式化输出, print() 函数提供了类似的功能
 
@@ -425,7 +429,7 @@ print("%s已经%d岁了, 它的网址是%s。" % (name, age, url))
 | %s     | 使用 str() 函数将表达式转换为字符串    |
 
 
-### 3.2.2. 控制输出方式
+### 3.4.2. 控制输出方式
 
 转换说明符的`%`和类型字符中间可以加入控制内容
 * 数字指定最小输出宽度  `%10d`
@@ -456,14 +460,14 @@ print("%+08.3f" % f)
 
 ```
 
-## 3.3. input()
+## 3.5. input()
 字符串形式接受用户输入  
 
 `str = input(tipmsg)`  
 * str   : 表示输入存入的变量
 * tipmsg: 表示在控制台中输出的提示信息, 提示输入什么内容
 
-## 3.4. open() 基础文件操作
+## 3.6. open() 基础文件操作
 
 open() 函数用于创建或打开指定文件, 返回一个 file object  
 `open(file, mode='r', buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None)`  
@@ -478,7 +482,7 @@ open() 函数用于创建或打开指定文件, 返回一个 file object
 * x 如果文件已存在则失败
 
 
-## 3.5. range()
+## 3.7. range()
 
 * range() 函数能够轻松地生成一系列的数字  
 * 函数的返回值并不直接是列表类型 list  而是 range
@@ -493,7 +497,7 @@ even_numbers = list(range(2,11,2))
 
 ```
 
-## 3.6. zip()
+## 3.8. zip()
 
 * 可以将多个序列（列表、元组、字典、集合、字符串以及 range() 区间构成的列表）“压缩”成一个 zip 对象
 * 所谓“压缩”, 其实就是将这些序列中对应位置的元素重新组合, 生成一个个新的元组
@@ -517,7 +521,7 @@ print([x for x in zip(my_pychar,my_shechar)])
 
 ```
 
-## 3.7. reserved()
+## 3.9. reserved()
 
 * `reversed(seq)` 并不会修改原来序列中元素的顺序
 * 对于给定的序列（包括列表、元组、字符串以及 range(n) 区间）, 该函数可以返回一个逆序列表的`迭代器`
@@ -531,7 +535,7 @@ print([x for x in reversed((1,2,3,4,5))])
 # [5, 4, 3, 2, 1]
 # 逆序元组, 返回的还是一个列表
 ```
-## 3.8. sorted()
+## 3.10. sorted()
 
 * `list = sorted(iterable, key=None, reverse=False)  `
 * iterable 表示指定的序列
@@ -555,7 +559,7 @@ chars=['http://c.biancheng.net',\
 # 传入 key 等于一个 lambda 函数
 print(sorted(chars,key=lambda x:len(x)))
 ```
-## 3.9. enumerate() 遍历对象函数
+## 3.11. enumerate() 遍历对象函数
 
 * 一般用在 for 循环中, 将一个可遍历的数据对象组合成一个索引序列  
 * 可以同时列出数据和数据下标
@@ -1032,7 +1036,7 @@ print(scores)
 5. `.popitem()`
    * 弹出dict内部的最后一个键值对
    * 表面上看是无序的
- * 
+
 
 
 
@@ -1474,7 +1478,7 @@ def 函数名(参数列表):
   * `print('a','b','c')` 在参数之间会默认隔一个空格
   * `print('a','b','c',seq=',')` 会输出 **a,b,c** 
 
-## 8.2. Python的可变参数
+### 8.1.1. Python的可变参数
 
 * 可变参数, 即允许定义参数个数可变的函数。这样当调用该函数时, 可以向其传入任意多个参数, 包括不传参数。  
 * `*args` 可变参数的值默认是空元组
@@ -1506,7 +1510,7 @@ dis_str("http://c.biancheng.net",\
 
 
 ```
-## 8.3. 逆向参数收集
+### 8.1.2. 逆向参数收集
 
 * 通过星符号, 直接将  "列表、元组" 和 "字典" 作为函数参数
 * Python 会将其进行拆分, 把其中存储的元素按照次序分给函数中的各个形参。
@@ -1525,9 +1529,59 @@ data = {'name':"Python教程",'add':"http://c.biancheng.net/python/"}
 #使用逆向参数字典收集方式传值
 dis_str(**data)
 
-
 ```
-## 8.4. 函数的文档
+
+### 8.1.3. partial 偏函数
+
+* partial关键字, 位于 `functools` 模块中
+* 是专门用于对函数进行二次封装的功能 : 定义偏函数
+* `偏函数名 = partial(func, *args, **kwargs)`
+
+所谓偏函数, 就是给部分参数预先绑定为指定值, 从而得到一个新的函数.  
+和一般的函数默认参数相比, 偏函数直接就隐藏了部分的参数, 减少了可变参数的数目,  
+而且可以在原本的单一函数上引申出复数个不同的函数, 使得调用更加简单  
+```py
+from functools import partial
+#定义个原函数
+def display(name,age):
+    print("name:",name,"age:",age)
+#定义偏函数，其封装了 display() 函数，并为 name 参数设置了默认参数
+GaryFun = partial(display,name = 'Gary')
+#由于 name 参数已经有默认值，因此调用偏函数时，可以不指定
+GaryFun(age = 13)
+```
+
+### 8.1.4. 闭包函数
+
+同偏函数一样, 闭包函数也是削减参数个数的一种函数封装方法,  
+闭包函数的定义有特殊的语法:
+* 在函数体中, 返回的不是一个具体的值, 而是一个函数
+* 给闭包函数传入一个自由变量, 获得一个自由变量确定的另一个函数
+
+从原理上来讲:
+* 对于闭包函数, 传入的自由变量会以另一种方式被记录
+* 闭包函数比普通函数多一个 `__closure__` 属性, 记录着自由变量的地址
+* `__closure__` 是一个元组, 代表可以记录多个自由变量
+```py
+#闭包函数，其中 exponent 称为自由变量
+def nth_power(exponent):
+    # 函数中定义另一个函数, 并固定了自由变量
+    def exponent_of(base):
+        return base ** exponent
+    # 返回值是 exponent_of 函数
+    return exponent_of 
+
+# 通过闭包函数, 获得了计算一个数的平方的函数
+square = nth_power(2) 
+
+# 计算平方
+print(square(2))
+
+# 查看 __closure__ 的值
+print(square.__closure__)
+```
+
+## 8.2. 函数的文档
 
 通过在合理的地方放置多行注释, python 可以方便的将其作为函数说明文档输出
 
@@ -1547,7 +1601,7 @@ help(str_max)
 print(str_max.__doc__)
 
 ```
-## 8.5. yield 表达式
+## 8.3. yield 表达式
 
 * yield 用来定义一个生成器函数或者异步生成器函数中
 * 因此只能被用在函数体的定义里, 使得该函数不再是一个普通函数
@@ -1618,10 +1672,13 @@ def read_file(fpath):
 ```
 
 
-## 8.6. lambda 表达式 匿名函数
+## 8.4. lambda 表达式 匿名函数
 
-lambda 表达式, 又称匿名函数, 常用来表示内部仅包含 1 行表达式的函数.  
-如果一个函数的函数体仅有 1 行表达式, 则该函数就可以用 lambda 表达式来代替。  
+* lambda 表达式, 又称匿名函数, 常用来表示内部仅包含 1 行表达式的函数.  
+* 如果一个函数的函数体仅有 1 行表达式, 则该函数就可以用 lambda 表达式来代替。  
+* 优点:
+  * 代码更加简洁
+  * 可以在局部域中定义, 使用完后立即释放, 提高程序的性能
 
 语法:    
 `name = lambda [list] : 表达式`  
@@ -1635,7 +1692,7 @@ def name(list):
 name(list)
 ```
 
-## 8.7. 函数的异常处理
+## 8.5. 函数的异常处理
 
 如果 `try` 子句中的代码发生了错误, 则程序立即到 `except` 中的代码去执行  
 
@@ -1846,7 +1903,7 @@ class CLanguage:
     name = property(getname, setname, delname, '指明出处')
 ```
 
-### @property 装饰器
+### 9.6.2. @property 装饰器
 
 * 同 property 的作用一样, 这个装饰器的目的也是一样, 方便调用代码的书写
 * 通过该装饰器可以让方法的调用变得和属性一样 - 即不带括号
@@ -1901,7 +1958,7 @@ print("删除后的area值为：",rect.area)
 
 `super().__init__(self,...)`
 
-### MRO Method Resolution Order
+### 9.7.2. MRO Method Resolution Order
 
 # 10. python 的模块和包
 

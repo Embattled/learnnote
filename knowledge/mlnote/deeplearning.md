@@ -5,8 +5,10 @@
     - [1.2.2. BN](#122-bn)
   - [1.3. Attention Mechanism](#13-attention-mechanism)
 - [2. 深度学习的训练 - 优化](#2-深度学习的训练---优化)
-  - [2.1. 基本算法](#21-基本算法)
-    - [2.1.1. 动态学习率](#211-动态学习率)
+  - [2.1. 基本概念](#21-基本概念)
+    - [2.1.1. 基本算法 SGD](#211-基本算法-sgd)
+    - [2.1.2. 动量 momentum](#212-动量-momentum)
+  - [2.2. 自适应学习率算法](#22-自适应学习率算法)
 - [3. Data Augmentation](#3-data-augmentation)
   - [3.1. Reference](#31-reference)
   - [3.2. Traditional](#32-traditional)
@@ -16,12 +18,13 @@
   - [4.1. Text spot](#41-text-spot)
     - [4.1.1. Scene Text](#411-scene-text)
     - [4.1.2. Handwritten Text](#412-handwritten-text)
-- [5. 网络结构](#5-网络结构)
-  - [5.1. Recognition 分类网络 Backbone](#51-recognition-分类网络-backbone)
+- [5. 网络结构 与模型](#5-网络结构-与模型)
+  - [5.1. Backbone网络](#51-backbone网络)
     - [5.1.1. Alexnet](#511-alexnet)
     - [5.1.2. VGGNet](#512-vggnet)
     - [5.1.3. GoogLeNet](#513-googlenet)
     - [5.1.4. ResNet](#514-resnet)
+    - [5.1.5. MobileNet 轻量化网络](#515-mobilenet-轻量化网络)
   - [5.2. Detection 系列网络](#52-detection-系列网络)
     - [5.2.1. R-CNN](#521-r-cnn)
     - [5.2.2. SPP-Net](#522-spp-net)
@@ -134,17 +137,51 @@ $b_{x,y}^k=a_{x,y}^k/(k+\alpha\sum_{i=max(0,x-n/2)}^{min(W,x+n/2)}\sum_{j=max(0,
 * 梯度下降      : 沿着梯度的负方向移动 函数参数, 可以被称为 最速下降 method of steepest descent
 
 
-## 2.1. 基本算法
+## 2.1. 基本概念 
+
+### 2.1.1. 基本算法 SGD
+
 * SGD stochastic gradient descent - 随机梯度下降
   * 提出了 minibatch 的概念
   * 相比于正规的梯度下降需要计算整个训练集上的平均损失, 然后计算梯度
   * SGD 表示仅使用 minibatch 的训练样本即可更新一次参数
+  * 就非常的简单
+* 在实际使用中
+  * 我们一般会设置线性衰减学习率 $\epsilon_k = (1-\alpha)\epsilon_0+\alpha\epsilon_\tau$
+  * 即在 $\tau$ 次迭代后, 学习率保持常数不再下降
 
-### 2.1.1. 动态学习率
+算法过程
+* 参数: 学习率 $\epsilon_k$ , 初始化的网络参数 $\theta$
+* while 循环条件 do
+* ---- 采集 minibatch 数据 $\{x^{(1)},...,x^{(m)}\}$
+* ---- 计算梯度 $\hat{g} \leftarrow +\frac{1}{m}\nabla_\theta \sum_iL(f(x^{(i)};\theta),y^{(i)})$
+* ---- 更新参数 $\theta \leftarrow \theta - \epsilon \hat{g}$
+* end while
 
-1. 线性衰减学习率
-   * 通过线性条件, 设置 处置学习率, 终止学习率, 衰减次数 3个变量来控制
-   * 在衰减次数之后的学习速率为常数
+### 2.1.2. 动量 momentum
+
+动量的概念是为了加速学习
+* 动量会积累 : 之前迭代梯度的 指数级衰减的 移动平均
+* 动量的表示 : $\upsilon$ 代表速度, 表示参数空间的 梯度方向和速率
+
+带梯度的 SGD算法过程
+* 参数: 学习率 $\epsilon_k$, 动量参数 $\alpha$, 初始化的网络参数 $\theta$
+* while 循环条件 do
+* ---- 采集 minibatch 数据 $\{x^{(1)},...,x^{(m)}\}$
+* ---- 计算梯度 $g \leftarrow +\frac{1}{m}\nabla_\theta \sum_iL(f(x^{(i)};\theta),y^{(i)})$
+* ---- 计算速度 $\upsilon \leftarrow \alpha\upsilon-\epsilon g$
+* ---- 更新参数 $\theta \leftarrow \theta + \upsilon$
+* end while
+* 拆开来看 带动量就是更新参数的时候既用梯度又用速度 
+  * $\theta \leftarrow \theta -\epsilon g+ \alpha\upsilon$
+  * $\upsilon \leftarrow \alpha\upsilon-\epsilon g$
+
+## 2.2. 自适应学习率算法
+
+基于 minibatch 的自适应学习率算法是目前应用最广的算法
+* AdaGrad : (2011)有较好的理论性质, 实际上会导致 有效学习率过早和过量的减少
+* RMSProp : (2012)基于 AdaGrad 算法, 有丢弃遥远梯度的结构, 有效且使用, 最常见算法之一
+* Adam    : (2014)引入梯度的一二阶矩, 对超参数的设置非常鲁棒
 
 
 # 3. Data Augmentation
@@ -186,7 +223,7 @@ cropped images for testing. Most of them are perspective distorted.
 * IAM contains more than 13,000 lines and 115,000 words written by 657 different writers.
 * RIMES contains more than 60,000 words written in French by over 1000 authors. 4.3.
 
-# 5. 网络结构 
+# 5. 网络结构 与模型
 
 * 简单粗暴的方法来提高精度就是加深网络以及加宽网络, 缺点有
   * 容易过拟合
@@ -196,7 +233,7 @@ cropped images for testing. Most of them are perspective distorted.
 * 基础的方法是增加网络的稀疏性, 尽可能减少全连接层
 
 
-## 5.1. Recognition 分类网络 Backbone
+## 5.1. Backbone网络 
 
 * AlexNet
   * 推广了 ReLU 和 Dropout
@@ -371,6 +408,31 @@ Inception V3:
 * 结果: 网络可以上升到百层
   * 改进的网络可以上升到千层
 
+### 5.1.5. MobileNet 轻量化网络
+
+* MobileNet 提出了同时注重速度和模型大小的网络结构, 更贴合实际应用
+* 提出了两个超参数用来管理网络结构 : width multiplier, resolution multiplier
+
+传统的卷积运算的参数和计算量:
+* 假设卷积核的大小为 K, 矩形输入特征图的大小为 F(同时假设输出特征图大小也为F), 输入输出通道数为 M N
+* 假设以 stride=1 进行卷积
+* 卷积核参数 $K^2\times M \times N$ 
+* 一次卷积的计算量 $K^2\times F^2 \times M \times N$
+
+其灵感来源于 depthwise separable convolutions, 是一种 factorized convolutions
+* 最早提出于 : 
+* 将原本的卷积预算分成了两个分开独立的步骤
+* filtering layer 进行 depthwise convolutions
+  * 不管输出通道数 N 是多少, 卷据核的个数都是输入通道数 M, 产生 M 通道的输出
+  * 卷积核参数 $K^2 \times M$
+  * 计算量为 $K^2\times F^2 \times M$
+  * 实际应用中, 产生的输出图已经进行了 resolution 变化
+* combining layer 进行 pointwise convolutions
+  * 相当于对每个像素进行独立的全连接映射,  $M\times F^2 \rightarrow N\times F^2$ 
+  * 每个像素的参数是 $M\times N$ 
+  * 卷积参数和计算量都为 为 $F^2\times M\times N$
+* 可以戏剧性的降低模型的运算和大小, 解除了 `输出通道数N` 和 `卷积核大小` 的乘法关系
+* 只牺牲了很小的精确率
 
 
 ## 5.2. Detection 系列网络
