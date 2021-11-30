@@ -49,7 +49,7 @@ numpy的二元基础运算都是元素层面的
 * 也有基础运算的全局函数版
 * `np.sin(A) np.exp(A)  np.add(A,B)`
 
-### clip 修正边界
+### 2.2.2. clip 修正边界
 
 * numpy.clip(a, a_min, a_max, out=None, **kwargs) 
 * 将 array 限制在正确的范围里
@@ -71,7 +71,7 @@ numpy的二元基础运算都是元素层面的
 * `dtype` 指定, 来保证运算时不会溢出, 默认是相同类型
 
 
-### 数学类
+### 2.3.1. 数学类
 * `ndarray.max()  numpy.amax()`
 * `ndarray.min()  numpy.amin()`
 * `ndarray.argmax() numpy.argmax()` 返回最大值对应的索引
@@ -160,12 +160,12 @@ a.shape 可以返回当前的 array 的形状
 * numpy.vsplit(a,3) 横着切, 沿着 vertical axis
 * numpy.array_split 指定切的方向
 
-### 升维 
+### 2.5.3. 升维 
 
 1. `arr=arr[:,:,np.newaxis`
 2. `arr=np.array([arr])`
 
-### 降维 
+### 2.5.4. 降维 
 
 
 * `np.squeeze(x)`
@@ -216,6 +216,8 @@ del a  # the memory of ``a`` can be released.
   - seed : None, int, array_like`[ints]`, SeedSequence, BitGenerator, Generator. 
 
 
+### 3.1.1. 生成器方法
+
 通过使用生成器对象的方法可以产生任意区间和分布的随机数
 * Simple random data 简单随机数
   * `integers(low[, high, size, dtype, endpoint])`
@@ -239,9 +241,73 @@ del a  # the memory of ``a`` can be released.
   * `random.Generator.uniform(low=0.0, high=1.0, size=None)`
     - 均一分布
 
-# 4. config
+# 4. numpy 常规功能
 
-## 4.1. np.set_printoptions
+## 4.1. numpy 的IO
+
+numpy 的数据IO可以简单分3类:
+* 二进制IO
+* txt IO
+* 与python 内置 string 的转换
+
+numpy 的 IO 也一定程度上基于 pickle, 具有一定的不安全性
+
+通用参数:
+* file : file-like object, string, or pathlib.Path
+  
+### 4.1.1. 类型转换
+
+在 numpy 官方文档中, ndarray 相关的类型转换也被归纳为 IO 的一部分
+
+* ndarray.tolist()
+  * 将 np array 转换成python自带的列表, 该函数是拷贝的
+  * 会把元素的类型也转成 python 自带的数字类型
+  * 对于 0-dim 的 array `np.array(1)`, 直接使用 list(a) 会报异常, 只能用 tolist()
+  * 相比与 list(a), a.tolist() 更加安全, 且附带了类型转换
+* ndarray.tofile(fid[, sep, format])
+
+
+### 4.1.2. numpy binary files
+
+最基础的保存方法, 因为是二进制的, 所以最好只通过 numpy 访问, 文件后缀为 `.npy`
+
+* load(file, mmap_mode=None, allow_pickle=False, fix_imports=True, encoding='ASCII')
+* save((file, arr, allow_pickle=True, fix_imports=True))
+* savez
+* savez_compressed
+
+### 4.1.3. text file
+
+txt 文件保存后的访问比较便捷, 也容易在其他应用间交互
+
+* numpy.savetxt 将一个 1D or 2D array_like 保存到 txt
+  * 注意只能作用在 1/2 维数组
+  * 该函数支持非 numpy 的 array (python 自带的数组也可以用)
+* numpy.loadtxt(fname, `dtype=<class 'float'>`, comments='#', delimiter=None, converters=None, skiprows=0, usecols=None, unpack=False, ndmin=0, encoding='bytes', max_rows=None, *, like=None)
+
+```py
+numpy.savetxt(fname, X, 
+  fmt='%.18e', delimiter=' ', newline='\n', 
+  header='', footer='', comments='# ', 
+  encoding=None)
+# fmt : str or [str..] : 用于指定数据的记录格式, 小数点等
+
+# delimiter : str, 列之间的分隔符
+# newline   : str, 行之间的分隔符
+
+# header    : str, 写在文件最开头的地方
+# footer    : str, 写在文件的末尾
+# comments  : str, 对于 header 和 footer 的注释符号, 主要用于 numpy.loadtxt 的识别
+
+# encoding : {None, str
+
+
+numpy.loadtxt(fname, `dtype=<class 'float'>`, comments='#', delimiter=None, converters=None, skiprows=0, usecols=None, unpack=False, ndmin=0, encoding='bytes', max_rows=None, *, like=None)
+```
+
+# 5. config
+
+## 5.1. np.set_printoptions
 
 1. 取消科学计数法显示数据 `np.set_printoptions(suppress=True)  `
 
@@ -250,9 +316,9 @@ del a  # the memory of ``a`` can be released.
 2. 取消省略超长数列的数据 ` np.set_printoptions(threshold=sys.maxsize)` 需要 sys 包
 
 
-### 4.1.1. numpy.shape
+### 5.1.1. numpy.shape
 
-### 4.1.2. numpy.dot()  矩阵点乘
+### 5.1.2. numpy.dot()  矩阵点乘
 
 np.diag(s)  将数组变成对角矩阵  
 使用numpy进行矩阵乘法   
@@ -283,9 +349,9 @@ print(np.shape(U), np.shape(s), np.shape(Vh))
 
 
 
-## 4.2. linalg 
+## 5.2. linalg 
 
-### 4.2.1. SVD 奇异值分解
+### 5.2.1. SVD 奇异值分解
 
 Singular Value Decomposition  
 * M = U * s * Vh  

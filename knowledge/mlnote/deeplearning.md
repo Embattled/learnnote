@@ -1,48 +1,223 @@
-- [1. Neuron Network 优化方法](#1-neuron-network-优化方法)
-  - [1.1. Activate Function](#11-activate-function)
-  - [1.2. LRN 和 BN](#12-lrn-和-bn)
-    - [1.2.1. LRN](#121-lrn)
-    - [1.2.2. BN](#122-bn)
-  - [1.3. Attention Mechanism](#13-attention-mechanism)
+- [1. Deep Learning 概念](#1-deep-learning-概念)
+  - [1.1. 卷积](#11-卷积)
+    - [1.1.1. Padding 策略](#111-padding-策略)
 - [2. 深度学习的训练 - 优化](#2-深度学习的训练---优化)
   - [2.1. 基本概念](#21-基本概念)
     - [2.1.1. 基本算法 SGD](#211-基本算法-sgd)
     - [2.1.2. 动量 momentum](#212-动量-momentum)
   - [2.2. 自适应学习率算法](#22-自适应学习率算法)
-- [3. Data Augmentation](#3-data-augmentation)
-  - [3.1. Reference](#31-reference)
-  - [3.2. Traditional](#32-traditional)
-  - [3.3. Geometric / Spatial](#33-geometric--spatial)
-  - [3.4. 融合 augmentation 参数和网络参数](#34-融合-augmentation-参数和网络参数)
-- [4. Dataset](#4-dataset)
-  - [4.1. Text spot](#41-text-spot)
-    - [4.1.1. Scene Text](#411-scene-text)
-    - [4.1.2. Handwritten Text](#412-handwritten-text)
-- [5. 网络结构 与模型](#5-网络结构-与模型)
-  - [5.1. Backbone网络](#51-backbone网络)
-    - [5.1.1. Alexnet](#511-alexnet)
-    - [5.1.2. VGGNet](#512-vggnet)
-    - [5.1.3. GoogLeNet](#513-googlenet)
-    - [5.1.4. ResNet](#514-resnet)
-    - [5.1.5. MobileNet 轻量化网络](#515-mobilenet-轻量化网络)
-  - [5.2. Detection 系列网络](#52-detection-系列网络)
-    - [5.2.1. R-CNN](#521-r-cnn)
-    - [5.2.2. SPP-Net](#522-spp-net)
-    - [5.2.3. Fast-RCNN](#523-fast-rcnn)
-    - [5.2.4. FasterRCNN RPN](#524-fasterrcnn-rpn)
-  - [5.3. 语义分割 Semantic Segmentation](#53-语义分割-semantic-segmentation)
-    - [5.3.1. FCN - Fully Convolutional Networks](#531-fcn---fully-convolutional-networks)
-  - [5.4. FPN - Feature Pyramid Networks](#54-fpn---feature-pyramid-networks)
-- [6. 序列建模 - 循环和递归网络](#6-序列建模---循环和递归网络)
-  - [6.1. 常见的序列网络即应用](#61-常见的序列网络即应用)
-- [7. Attention](#7-attention)
-# 1. Neuron Network 优化方法
+    - [2.2.1. AdaGrad](#221-adagrad)
+    - [2.2.2. RMSProp 和 Adadelta](#222-rmsprop-和-adadelta)
+    - [2.2.3. Adam](#223-adam)
+  - [2.3. Activate Function 激活函数](#23-activate-function-激活函数)
+  - [2.4. LRN 和 BN](#24-lrn-和-bn)
+    - [2.4.1. LRN](#241-lrn)
+    - [2.4.2. BN](#242-bn)
+  - [2.5. 训练的配置](#25-训练的配置)
+    - [2.5.1. AlexNet 训练](#251-alexnet-训练)
+    - [2.5.2. VGG 训练](#252-vgg-训练)
+    - [2.5.3. ResNet 训练 ImageNet](#253-resnet-训练-imagenet)
+    - [2.5.4. CRNN](#254-crnn)
+- [3. Attention Mechanism](#3-attention-mechanism)
+- [4. Data Augmentation](#4-data-augmentation)
+  - [4.1. Reference](#41-reference)
+  - [4.2. Traditional](#42-traditional)
+  - [4.3. Geometric / Spatial](#43-geometric--spatial)
+  - [4.4. 融合 augmentation 参数和网络参数](#44-融合-augmentation-参数和网络参数)
+- [5. Dataset](#5-dataset)
+  - [5.1. Text spot](#51-text-spot)
+    - [5.1.1. Scene Text](#511-scene-text)
+    - [5.1.2. Handwritten Text](#512-handwritten-text)
+- [6. 网络结构 与模型](#6-网络结构-与模型)
+  - [6.1. Backbone网络](#61-backbone网络)
+    - [6.1.1. Alexnet](#611-alexnet)
+    - [6.1.2. VGGNet](#612-vggnet)
+    - [6.1.3. GoogLeNet](#613-googlenet)
+    - [6.1.4. ResNet](#614-resnet)
+    - [6.1.5. MobileNet 轻量化网络](#615-mobilenet-轻量化网络)
+      - [6.1.5.1. MobileNetV1](#6151-mobilenetv1)
+      - [6.1.5.2. MobileNetV2](#6152-mobilenetv2)
+  - [6.2. Detection 系列网络](#62-detection-系列网络)
+    - [6.2.1. R-CNN](#621-r-cnn)
+    - [6.2.2. SPP-Net](#622-spp-net)
+    - [6.2.3. Fast-RCNN](#623-fast-rcnn)
+    - [6.2.4. FasterRCNN RPN](#624-fasterrcnn-rpn)
+  - [6.3. 语义分割 Semantic Segmentation](#63-语义分割-semantic-segmentation)
+    - [6.3.1. FCN - Fully Convolutional Networks](#631-fcn---fully-convolutional-networks)
+  - [6.4. FPN - Feature Pyramid Networks](#64-fpn---feature-pyramid-networks)
+- [7. 序列建模 - 循环和递归网络](#7-序列建模---循环和递归网络)
+  - [7.1. 常见的序列网络即应用](#71-常见的序列网络即应用)
+- [8. Attention](#8-attention)
+
+
+# 1. Deep Learning 概念
+
+## 1.1. 卷积
+
+### 1.1.1. Padding 策略
+
+* padding 是填充零的处理
+* 在实现中不同框架对 padding 的处理是不同的
+
+一般情况下 ：
+* padding时, 一般是对称地补, 左／右各padding一列 或者 上下各padding一行
+* 计算公式 `output_shape = (image_shape-filter_shape+2*padding)/stride + 1`
+
+
+对于 stride 是偶数, 而输入维度与卷积核的插值是奇数, 无法除尽的情况下:
+* 一般的处理是再次补一列 padding, 使得除法的结果能够向上取整: 
+  * caffe偷偷摸摸地把一行0补在上面 或者 把一列0补在左边
+  * tensorflow正好镜像对称，把一行0补在下面或者把一列0补在右边
+* 对于 Pytorch 
+  * padding 不存在隐式补零的情况, 输出维度会向下取整
+  * 相比tensorflow，PyTorch需要用户清楚的知道的自己的卷积核选取对结果的影响
+
+
+
+# 2. 深度学习的训练 - 优化
+
+相关名词:
+* 目标函数 objective function = 准则 criterion = 代价函数 cost function = 损失函数 loss function = 误差函数 error function
+* 导数为0 : 临界点 critical point = 驻点 stationary point
+  * 或者梯度为0
+* 梯度 gradient : 是一个多为函数 f 的所有偏导数的向量
+* 梯度下降      : 沿着梯度的负方向移动 函数参数, 可以被称为 最速下降 method of steepest descent
+
 
 * ReLU ( Rectified Linear Units) 在 Alexnet 中被发扬光大, 被证明在深层网络中远比 tanh 快, 成功解决了Sigmoid在网络较深时的梯度弥散问题
 * Dropout 在 Alexnet 被实用化, 验证了其避免模型过拟合的效果, 在 Alexnet 中主要是最后几个全连接层使用了 Dropout
 * MaxPool 在 Alexnet 中被发扬光大, 避免了平均池化的模糊效果, 并且池化核的步长比核的尺寸小, 让池化层的感受野有重叠, 提高了特征的丰富性
 
-## 1.1. Activate Function
+
+## 2.1. 基本概念 
+
+### 2.1.1. 基本算法 SGD
+
+* SGD stochastic gradient descent - 随机梯度下降
+  * 相比于正规的梯度下降需要计算整个训练集上的平均损失, 然后计算梯度
+  * 最早的 SGD 是对每一个样本单独计算梯度并立即更新
+  * 后来提出了 minibatch 的概念
+  * 现在通用的基本上指代 应用 minibatch 的SGD, 表示仅使用 minibatch 的训练样本即可更新一次参数
+* 在实际使用中
+  * 我们一般会设置线性衰减学习率 $\epsilon_k = (1-\alpha)\epsilon_0+\alpha\epsilon_\tau$
+  * 即在 $\tau$ 次迭代后, 学习率保持常数不再下降
+
+算法过程
+* 参数: 学习率 $\epsilon_k$ , 初始化的网络参数 $\theta$
+* while 循环条件 do
+* ---- 采集 minibatch 数据 $\{x^{(1)},...,x^{(m)}\}$
+* ---- 计算梯度 $\hat{g} \leftarrow +\frac{1}{m}\nabla_\theta \sum_iL(f(x^{(i)};\theta),y^{(i)})$
+* ---- 更新参数 $\theta \leftarrow \theta - \epsilon \hat{g}$
+* end while
+
+### 2.1.2. 动量 momentum
+
+动量的概念是为了加速学习
+* 动量会积累 : 之前迭代梯度的 指数级衰减的 移动平均
+* 动量的表示 : $\upsilon$ 代表速度, 表示参数空间的 梯度方向和速率
+* 动量在大部分情况都设置成 0.9
+
+带梯度的 SGD算法过程
+* 参数: 学习率 $\epsilon_k$, 动量参数 $\alpha$, 初始化的网络参数 $\theta$, 初始速度 $v$
+* while 循环条件 do
+* ---- 采集 minibatch 数据 $\{x^{(1)},...,x^{(m)}\}$
+* ---- 计算梯度 $g \leftarrow +\frac{1}{m}\nabla_\theta \sum_iL(f(x^{(i)};\theta),y^{(i)})$
+* ---- 计算速度 $\upsilon \leftarrow \alpha\upsilon-\epsilon g$
+* ---- 更新参数 $\theta \leftarrow \theta + \upsilon$
+* end while
+* 拆开来看 带动量就是更新参数的时候既用梯度又用速度 
+  * $\theta \leftarrow \theta -\epsilon g+ \alpha\upsilon$
+  * $\upsilon \leftarrow \alpha\upsilon-\epsilon g$
+
+
+
+Nesterov accelerated gradient(NAG): 带有预知的动量
+* Nesterov 动量对于RNN的学习有很大的帮助, 和普通动量一样常常和其他优化算法进行结合
+* 参数: 学习率 $\epsilon_k$, 动量参数 $\alpha$, 初始化的网络参数 $\theta$, 初始速度 $v$
+* while 循环条件 do
+* ---- 采集 minibatch 数据 $\{x^{(1)},...,x^{(m)}\}$
+* ---- 根据动量计算临时更新后的参数 $\tilde{\theta}\leftarrow \theta + \alpha v$
+* ---- 在临时点计算梯度 $g\leftarrow +\frac{1}{m}\nabla_{\tilde{\theta}}\sum_iL(f(x^{(i)};\tilde{\theta}),y^{(i)})$
+* ---- 计算速度 $\upsilon \leftarrow \alpha\upsilon-\epsilon g$
+* ---- 正式更新参数 $\theta \leftarrow \theta + \upsilon$
+
+
+## 2.2. 自适应学习率算法
+
+基于 minibatch 的自适应学习率算法是目前应用最广的算法
+
+* 自适应算法的核心是不再拥有全局统一的学习率, 而是根据每一个单独参数的梯度历史来动态调整对应参数自己的学习率
+* AdaGrad 几乎不需要手动调整学习速率, 因为真正的学习速率都是每次迭代重新计算的, 用默认的 0.01即可, 缺点就是容易学习率降低太快
+* Adadelta 和 RMSProp 是独立被研究的, 都是为了解决 AdaGrad学习率降速的问题
+  * RMSProp 推荐 学习率 0.001, 梯度累计衰减率 0.9
+  * Adadelta 在 RMSProp 的基础上再加入了参数更新量的累计, 直接省略了初始学习率的超参数
+
+### 2.2.1. AdaGrad
+
+AdaGrad : (2011)有较好的理论性质, Ian 的书中表示经验上 AdaGrad 实际上会导致 有效学习率过早和过量的减少(一直在累加梯度)
+* 适合应用在稀疏数据上
+* 对非频繁的参数应用大更新, 对频繁的参数应用小更新, 具体表现在对于参数 $\theta$ , 不再使用统一的学习率 $\epsilon$ , 而是对于每一个单独参数在每一次参数迭代应用单独的学习率
+* 参数: 全局学习率 $\epsilon_k$, 初始化的网络参数 $\theta$
+* 用于除数非零的一个常数 $\delta =10^{-7}$
+* 梯度累计变量 $r=0$
+* while 循环条件 do
+* ---- 采集 minibatch 数据 $\{x^{(1)},...,x^{(m)}\}$
+* ---- 计算梯度 $g \leftarrow +\frac{1}{m}\nabla_\theta \sum_iL(f(x^{(i)};\theta),y^{(i)})$
+* ---- 累计梯度的平方 $r\leftarrow r+g\odot g$
+* ---- 计算更新 $\Delta\theta\leftarrow -\frac{\epsilon}{\delta+\sqrt{r}}\odot g$
+* ---- 应用更新 $\theta \leftarrow \theta+\Delta\theta$
+
+### 2.2.2. RMSProp 和 Adadelta
+
+RMSProp : (2012)基于 AdaGrad 算法, 相比于一直累计梯度, RMSProp 指数级丢弃遥远梯度, 有效最常见算法之一
+* 参数: 全局学习率 $\epsilon_k$, 初始化的网络参数 $\theta$
+* 用于除数非零的一个常数 $\delta =10^{-6}$
+* 梯度累计变量 $r=0$ , 梯度累计的舍弃速度 $\rho =0.9$
+* while 循环条件 do
+* ---- 采集 minibatch 数据 $\{x^{(1)},...,x^{(m)}\}$
+* ---- 计算梯度 $g \leftarrow +\frac{1}{m}\nabla_\theta \sum_iL(f(x^{(i)};\theta),y^{(i)})$
+* ---- 累计梯度的平方 $r\leftarrow \rho r+(1-\rho)g\odot g$
+* ---- 计算更新 $\Delta\theta\leftarrow -\frac{\epsilon}{\delta+\sqrt{r}}\odot g$
+* ---- 应用更新 $\theta \leftarrow \theta+\Delta\theta$
+
+可以看出相比于 AdaGrad, RMSProp 只进行了很小的改变, 就是对梯度的累计进行了指数衰减
+
+Adadelta : (2012) 同样是为了解决 AdaGrad 莽撞的降低学习速率的设定, 在累积了历史梯度的同时, 还附加累计了参数的历史更新量
+* 参数: 初始化的网络参数 $\theta$, 完全不用设置初始学习速率
+* 用于除数非零的一个常数 $\delta =10^{-6}$
+* 梯度累计变量 $r=0$, 参数更新量的累计变量 $t=0$ , 两个累计的舍弃速度 $\rho =0.9$
+* while 循环条件 do
+* ---- 采集 minibatch 数据 $\{x^{(1)},...,x^{(m)}\}$
+* ---- 计算梯度 $g \leftarrow +\frac{1}{m}\nabla_\theta \sum_iL(f(x^{(i)};\theta),y^{(i)})$
+* ---- 累计梯度的平方 $r\leftarrow \rho r+(1-\rho)g\odot g$
+* ---- 用新的梯度累计和旧的参数更新累计来计算参数更新 $\Delta\theta\leftarrow -\frac{\delta+\sqrt{t}}{\delta+\sqrt{r}}\odot g$
+* ---- 累计更新量的平方 $t=\rho t +(1-\rho)\Delta\theta^2$
+* ---- 应用更新 $\theta \leftarrow \theta+\Delta\theta$
+
+### 2.2.3. Adam
+
+Adaptive Moment Estimation(Adam) : (2014)引入梯度的一二阶矩, 对超参数的设置非常鲁棒  
+Adam 用另一种方式实现了动量, 即将动量表示成梯度的一阶矩累计(相当于学习率=1 的动量)  
+
+* 参数: 全局学习率 $\epsilon_k=0.001$, 初始化的网络参数 $\theta$
+* 用于除数非零的一个常数 $\delta =10^{-8}$
+* 两个梯度累计变量 $r=0 s=0$
+* 两个梯度累计的舍弃速度 $\rho_1 =0.9, \rho_2=0.999$
+* 时间戳 $t$
+* while 循环条件 do
+* ---- 采集 minibatch 数据 $\{x^{(1)},...,x^{(m)}\}$
+* ---- 计算梯度 $g \leftarrow +\frac{1}{m}\nabla_\theta \sum_iL(f(x^{(i)};\theta),y^{(i)})$
+* ---- 时间戳 $t\leftarrow t+1$
+* ---- 累计梯度的一阶 $s\leftarrow \rho_1 s+(1-\rho_1)g$
+* ---- 修正一阶累计值 $\hat{s}\leftarrow\frac{s}{1-\rho_1^t}$
+* ---- 累计梯度的二阶 $r\leftarrow \rho_2 r+(1-\rho_2)g\odot g$
+* ---- 修正二阶累计值 $\hat{r}\leftarrow\frac{r}{1-\rho_2^t}$
+* ---- 根据修正值$\hat{s}\hat{r}$计算更新 $\Delta\theta\leftarrow -\frac{\epsilon}{\delta+\sqrt{\hat{r}}}\odot \hat{s}$
+* ---- 应用更新 $\theta \leftarrow \theta+\Delta\theta$ 
+
+
+
+## 2.3. Activate Function 激活函数
 
 * Sigmoid
   * 1/(1-e^(-z))
@@ -63,7 +238,7 @@
   * 其他层用 ReLU 或者 Leaky ReLU
 * 
 
-## 1.2. LRN 和 BN
+## 2.4. LRN 和 BN
 
 * LRN : 局部响应归一化 ( Local Response Normalization )
 * BN  : 批量归一化     ( Batch Normalization )
@@ -73,7 +248,7 @@
   * 输出层的值不会被限制在范围中 (tanh的 (-1,1)), 可以根据需要尽可能高的增长
 * 为了在一定程度上限制激活函数的输出值
 
-### 1.2.1. LRN
+### 2.4.1. LRN
 
 * Alexnet 架构中被引入, 一个不可训练的层
 * 为了鼓励 横向抑制 ( lateral inhibition )
@@ -95,7 +270,7 @@ $b_{x,y}^k=a_{x,y}^k/(k+\alpha\sum_{i=max(0,x-n/2)}^{min(W,x+n/2)}\sum_{j=max(0,
   * β 对比度常数
   * n 用于定义归一化的邻域长度
   
-### 1.2.2. BN
+### 2.4.2. BN
 
 * Batch Normalization, 同LRN不同, 这是一个可以被训练的层
   * 该层主要用于解决内部协变量偏移 ( Internal Covariate Shift ICS )
@@ -115,7 +290,45 @@ $b_{x,y}^k=a_{x,y}^k/(k+\alpha\sum_{i=max(0,x-n/2)}^{min(W,x+n/2)}\sum_{j=max(0,
     * $\hat{x}$ 代表完成0均值和单位方差归一化后的输出
     * $y_i=\gamma\hat{x}+\beta\equiv BN_{\gamma,\beta}(x_i)$
 
-## 1.3. Attention Mechanism
+
+## 2.5. 训练的配置
+
+涉及的概念:
+* 训练多少 epoch 
+* batchsize 多大
+* 设置初始学习速率, 动量, weight decay
+* 配置 学习速度下降策略
+* 什么时刻训练终止
+
+### 2.5.1. AlexNet 训练
+
+* SGD batchsize=128
+* LR=0.01, 除以10 每当 loss 不再下降
+* weight decay=0.0005, 动量 0.9
+* 简单的训练 90个 epoches, 数据量 1.2m
+
+### 2.5.2. VGG 训练
+
+* SGD batch size=256
+* weight delay 0.0005 动量 0.9
+* LR=0.01, 除以10 每当 loss 不再下降
+* 最多训练 370K 个迭代
+
+### 2.5.3. ResNet 训练 ImageNet
+
+* 设置 BN
+* SGD batchsize=256
+* LR=0.1  除以十每当 loss 不再下降
+* weight decay=0.0001 , 动量 0.9
+* 不使用 dropout
+* **最多训练 600k 个迭代**
+  
+### 2.5.4. CRNN
+
+* ADADELTA 
+* 
+
+# 3. Attention Mechanism
 
 * Attention 从出发点上说是用于提升基于 RNN 的S2S模型效果的机制
 * 目前广泛应用于机器翻译, 语音识别, 图像标注等领域
@@ -127,88 +340,31 @@ $b_{x,y}^k=a_{x,y}^k/(k+\alpha\sum_{i=max(0,x-n/2)}^{min(W,x+n/2)}\sum_{j=max(0,
   - Attention 可以帮助模型对输入的X的每个部分赋予不同的权重, 抽出更加关键的信息
   - 并不会对模型的计算和存储带来更大的开销
 
-# 2. 深度学习的训练 - 优化
-
-相关名词:
-* 目标函数 objective function = 准则 criterion = 代价函数 cost function = 损失函数 loss function = 误差函数 error function
-* 导数为0 : 临界点 critical point = 驻点 stationary point
-  * 或者梯度为0
-* 梯度 gradient : 是一个多为函数 f 的所有偏导数的向量
-* 梯度下降      : 沿着梯度的负方向移动 函数参数, 可以被称为 最速下降 method of steepest descent
-
-
-## 2.1. 基本概念 
-
-### 2.1.1. 基本算法 SGD
-
-* SGD stochastic gradient descent - 随机梯度下降
-  * 提出了 minibatch 的概念
-  * 相比于正规的梯度下降需要计算整个训练集上的平均损失, 然后计算梯度
-  * SGD 表示仅使用 minibatch 的训练样本即可更新一次参数
-  * 就非常的简单
-* 在实际使用中
-  * 我们一般会设置线性衰减学习率 $\epsilon_k = (1-\alpha)\epsilon_0+\alpha\epsilon_\tau$
-  * 即在 $\tau$ 次迭代后, 学习率保持常数不再下降
-
-算法过程
-* 参数: 学习率 $\epsilon_k$ , 初始化的网络参数 $\theta$
-* while 循环条件 do
-* ---- 采集 minibatch 数据 $\{x^{(1)},...,x^{(m)}\}$
-* ---- 计算梯度 $\hat{g} \leftarrow +\frac{1}{m}\nabla_\theta \sum_iL(f(x^{(i)};\theta),y^{(i)})$
-* ---- 更新参数 $\theta \leftarrow \theta - \epsilon \hat{g}$
-* end while
-
-### 2.1.2. 动量 momentum
-
-动量的概念是为了加速学习
-* 动量会积累 : 之前迭代梯度的 指数级衰减的 移动平均
-* 动量的表示 : $\upsilon$ 代表速度, 表示参数空间的 梯度方向和速率
-
-带梯度的 SGD算法过程
-* 参数: 学习率 $\epsilon_k$, 动量参数 $\alpha$, 初始化的网络参数 $\theta$
-* while 循环条件 do
-* ---- 采集 minibatch 数据 $\{x^{(1)},...,x^{(m)}\}$
-* ---- 计算梯度 $g \leftarrow +\frac{1}{m}\nabla_\theta \sum_iL(f(x^{(i)};\theta),y^{(i)})$
-* ---- 计算速度 $\upsilon \leftarrow \alpha\upsilon-\epsilon g$
-* ---- 更新参数 $\theta \leftarrow \theta + \upsilon$
-* end while
-* 拆开来看 带动量就是更新参数的时候既用梯度又用速度 
-  * $\theta \leftarrow \theta -\epsilon g+ \alpha\upsilon$
-  * $\upsilon \leftarrow \alpha\upsilon-\epsilon g$
-
-## 2.2. 自适应学习率算法
-
-基于 minibatch 的自适应学习率算法是目前应用最广的算法
-* AdaGrad : (2011)有较好的理论性质, 实际上会导致 有效学习率过早和过量的减少
-* RMSProp : (2012)基于 AdaGrad 算法, 有丢弃遥远梯度的结构, 有效且使用, 最常见算法之一
-* Adam    : (2014)引入梯度的一二阶矩, 对超参数的设置非常鲁棒
-
-
-# 3. Data Augmentation
+# 4. Data Augmentation
 
 Data augmentation is a low cost way.
 
-## 3.1. Reference
+## 4.1. Reference
 
 1. Jaderberg, M., Simonyan, K., Vedaldi, A., & Zisserman, A. (2014). Synthetic Data and Artificial Neural Networks for Natural Scene Text Recognition. Computer Vision and Pattern Recognition. http://arxiv.org/abs/1406.2227
 2. Luo, C., Zhu, Y., Jin, L., & Wang, Y. (2020). Learn to augment: Joint data augmentation and network optimization for text recognition. Proceedings of the IEEE Computer Society Conference on Computer Vision and Pattern Recognition, 13743–13752. https://doi.org/10.1109/CVPR42600.2020.01376
 
-## 3.2. Traditional 
+## 4.2. Traditional 
 
 Traditional augmentation methods such as rotation, scaling and perspective transformation,
 
-## 3.3. Geometric / Spatial
+## 4.3. Geometric / Spatial
 
-## 3.4. 融合 augmentation 参数和网络参数
+## 4.4. 融合 augmentation 参数和网络参数
 
 
-# 4. Dataset
+# 5. Dataset
 
-## 4.1. Text spot
+## 5.1. Text spot
 
 3755 classes (Ievel-l set of GB2312-80) 
 
-### 4.1.1. Scene Text
+### 5.1.1. Scene Text
 
 * IIIT 5K-Words  (IIIT5K) contains 3000 cropped word images for testing.
 * Street View Text (SVT) consists of 647 word images for testing. Many images are severely corrupted by noise and blur.
@@ -218,12 +374,12 @@ cropped images for testing. Most of them are perspective distorted.
 * ICDAR 2013 (IC13) inherits most of its samples from IC03. It contains 1015 cropped images.
 * ICDAR 2015 (IC15) is obtained by cropping the words using the ground truth word bounding boxes and includes more than 200 irregular text images.
 
-### 4.1.2. Handwritten Text
+### 5.1.2. Handwritten Text
 
 * IAM contains more than 13,000 lines and 115,000 words written by 657 different writers.
 * RIMES contains more than 60,000 words written in French by over 1000 authors. 4.3.
 
-# 5. 网络结构 与模型
+# 6. 网络结构 与模型
 
 * 简单粗暴的方法来提高精度就是加深网络以及加宽网络, 缺点有
   * 容易过拟合
@@ -233,7 +389,7 @@ cropped images for testing. Most of them are perspective distorted.
 * 基础的方法是增加网络的稀疏性, 尽可能减少全连接层
 
 
-## 5.1. Backbone网络 
+## 6.1. Backbone网络 
 
 * AlexNet
   * 推广了 ReLU 和 Dropout
@@ -248,7 +404,7 @@ cropped images for testing. Most of them are perspective distorted.
 0. (1998)Gradient-based learning applied to document recognition
 1. 
 
-### 5.1.1. Alexnet
+### 6.1.1. Alexnet
 
 * ReLU 激活函数被应用在了所有卷积层和FC层的后面
 
@@ -337,7 +493,7 @@ class AlexNet(nn.Module):
         x = self.classifier(x)
         return x
 ```
-### 5.1.2. VGGNet
+### 6.1.2. VGGNet
 
 * 网络模型
   * 输入大小为 224*224 
@@ -355,7 +511,7 @@ class AlexNet(nn.Module):
   * 再加上随机水平翻转和色彩偏移
 
 
-### 5.1.3. GoogLeNet
+### 6.1.3. GoogLeNet
 
 GoogLeNet的发展共有四个版本  
 
@@ -391,7 +547,7 @@ Inception V3:
 * 高维特征信息包含的更多, 更容易加快训练
 
 
-### 5.1.4. ResNet
+### 6.1.4. ResNet
 
 * Residual Network
 * 灵感来源于: 如果使用恒等映射层, 那么网络的加深起码不会带来训练误差的上升
@@ -408,9 +564,17 @@ Inception V3:
 * 结果: 网络可以上升到百层
   * 改进的网络可以上升到千层
 
-### 5.1.5. MobileNet 轻量化网络
+
+
+
+
+### 6.1.5. MobileNet 轻量化网络
 
 * MobileNet 提出了同时注重速度和模型大小的网络结构, 更贴合实际应用
+
+
+#### 6.1.5.1. MobileNetV1
+
 * 提出了两个超参数用来管理网络结构 : width multiplier, resolution multiplier
 
 传统的卷积运算的参数和计算量:
@@ -419,7 +583,8 @@ Inception V3:
 * 卷积核参数 $K^2\times M \times N$ 
 * 一次卷积的计算量 $K^2\times F^2 \times M \times N$
 
-其灵感来源于 depthwise separable convolutions, 是一种 factorized convolutions
+其灵感来源于 depthwise separable convolutions, 是一种 factorized convolutions  
+depthwise conv 可以看作 Group Conv 的极端, 即分组数 g = 输入通道数
 * 最早提出于 : 
 * 将原本的卷积预算分成了两个分开独立的步骤
 * filtering layer 进行 depthwise convolutions
@@ -434,8 +599,242 @@ Inception V3:
 * 可以戏剧性的降低模型的运算和大小, 解除了 `输出通道数N` 和 `卷积核大小` 的乘法关系
 * 只牺牲了很小的精确率
 
+#### 6.1.5.2. MobileNetV2
 
-## 5.2. Detection 系列网络
+* 通过结合 ResNet的 shoutcut连接, 实现了V2, 核心是 inverted residual block
+* residual block (ResNet) v.s. inverted residual block (MobileNetV2)
+  * 都使用了 `1*1 -> 3*3 -> 1*1` 的卷积模式
+  * 都使用了 shortcut 添加了将输入与输出直接相加的连接
+  * 通道数:
+    * ResNet 使用 `1*1` 进行降维, 卷积, 再用 `1*1` 升维 
+    * MobileNetV2 使用 `1*1` 进行升维到6倍通道, 卷积, 再用 `1*1` 降维到原本输出通道 
+    * 两边窄中间宽, 所以叫 inverted
+  * 所有3*3 卷积都是 depthwise conv
+  * 去掉了最后的ReLU
+
+* inverted residual block的导入原因
+  * ReLU的辨证探讨:
+    * ReLU会使得一些神经元失活
+    * 在高维通道数的ReLU可以保留低维特征的完整信息, 同时不损失非线性的特性
+    * 而在低维空间时则会破坏特征, 不如线性的效果好
+  * depthwise conv 本身没有改变输入通道的能力:
+    * 上一层输入多少通道, depthwise 就输出多少通道
+    * 使得卷积本身的次数太少, 特征提取的不够充分
+  * 采用 inverted 中间宽+两边宅的方式, 来确保输入的低维信息可以完整保留
+
+* V2的特点:
+  * 因为使用了 inverted residual block, 所以公式上的计算量增大了
+  * 在实际实现中, V2可以使用更低的通道数达到同样的效果, 所以实际上还是加速了
+  * 精度方面的提升并不明显
+
+
+Pytorch源代码:
+
+```py
+
+# 通道数标准化函数, 确保所有层的通道数都可以被8 (或者指定别的除数) 整除
+def _make_divisible(v: float, divisor: int, min_value: Optional[int] = None) -> int:
+    """
+    This function is taken from the original tf repo.
+    It ensures that all layers have a channel number that is divisible by 8
+    """
+    if min_value is None:
+        min_value = divisor
+    new_v = max(min_value, int(v + divisor / 2) // divisor * divisor)
+    # Make sure that round down does not go down by more than 10%.
+    if new_v < 0.9 * v:
+        new_v += divisor
+    return new_v
+
+# 将 Depth wise 卷积封装, 包括了一个 dw 卷积, batch norm 和 relu 激活函数
+class ConvBNActivation(nn.Sequential):
+    def __init__(
+        self,
+        in_planes: int,
+        out_planes: int,
+        kernel_size: int = 3,
+        stride: int = 1,
+        groups: int = 1,
+        norm_layer: Optional[Callable[..., nn.Module]] = None,
+        activation_layer: Optional[Callable[..., nn.Module]] = None,
+        dilation: int = 1,
+    ) -> None:
+        padding = (kernel_size - 1) // 2 * dilation
+        if norm_layer is None:
+            norm_layer = nn.BatchNorm2d
+        if activation_layer is None:
+            activation_layer = nn.ReLU6
+        super().__init__(
+            nn.Conv2d(in_planes, out_planes, kernel_size, stride, padding, dilation=dilation, groups=groups,
+                      bias=False),
+            norm_layer(out_planes),
+            activation_layer(inplace=True)
+        )
+        self.out_channels = out_planes
+
+# necessary for backwards compatibility
+ConvBNReLU = ConvBNActivation
+
+# 残差卷积 block
+class InvertedResidual(nn.Module):
+    def __init__(
+        self,
+        inp: int,
+        oup: int, 
+        stride: int,
+        expand_ratio: int,
+        norm_layer: Optional[Callable[..., nn.Module]] = None
+    ) -> None:
+        super(InvertedResidual, self).__init__()
+        self.stride = stride
+        assert stride in [1, 2]
+
+        if norm_layer is None:
+            norm_layer = nn.BatchNorm2d
+
+        hidden_dim = int(round(inp * expand_ratio))
+
+        self.use_res_connect = self.stride == 1 and inp == oup
+
+        layers: List[nn.Module] = []
+        if expand_ratio != 1:
+            # pw
+            # 1*1 卷积升维
+            layers.append(ConvBNReLU(inp, hidden_dim, kernel_size=1, norm_layer=norm_layer))
+        
+        layers.extend([
+            # dw 进行卷积, 这里直接 groups = hidden_dim 即 depthwise conv
+            ConvBNReLU(hidden_dim, hidden_dim, stride=stride, groups=hidden_dim, 
+              norm_layer=norm_layer),
+
+            # pw-linear, 1*1 卷积降维, 注意这里后面是没有接激活函数的 
+            nn.Conv2d(hidden_dim, oup, 1, 1, 0, bias=False),
+              norm_layer(oup),
+        ])
+        self.conv = nn.Sequential(*layers)
+        self.out_channels = oup
+        self._is_cn = stride > 1
+
+    def forward(self, x: Tensor) -> Tensor:
+        # 残差网络的设置方法, 输入值x + 传播值 conv(x)
+        if self.use_res_connect:
+            return x + self.conv(x)
+        else:
+            return self.conv(x)
+
+class MobileNetV2(nn.Module):
+    def __init__(
+        self,
+        num_classes: int = 1000,
+        width_mult: float = 1.0,
+        inverted_residual_setting: Optional[List[List[int]]] = None,
+        round_nearest: int = 8,
+        block: Optional[Callable[..., nn.Module]] = None,
+        norm_layer: Optional[Callable[..., nn.Module]] = None
+    ) -> None:
+        """
+        MobileNet V2 main class
+
+        Args:
+            num_classes (int): Number of classes
+            width_mult (float): Width multiplier - adjusts number of channels in each layer by this amount
+            inverted_residual_setting: Network structure
+            round_nearest (int): Round the number of channels in each layer to be a multiple of this number
+            Set to 1 to turn off rounding
+            block: Module specifying inverted residual building block for mobilenet
+            norm_layer: Module specifying the normalization layer to use
+        """
+        super(MobileNetV2, self).__init__()
+
+        if block is None:
+            block = InvertedResidual
+
+        if norm_layer is None:
+            norm_layer = nn.BatchNorm2d
+
+        input_channel = 32
+        last_channel = 1280
+
+        # 默认是 7 个block
+        if inverted_residual_setting is None:
+            inverted_residual_setting = [
+                # t, c, n, s
+                [1, 16, 1, 1],
+                [6, 24, 2, 2],
+                [6, 32, 3, 2],
+                [6, 64, 4, 2],
+                [6, 96, 3, 1],
+                [6, 160, 3, 2],
+                [6, 320, 1, 1],
+            ]
+
+        # only check the first element, assuming user knows t,c,n,s are required
+        if len(inverted_residual_setting) == 0 or len(inverted_residual_setting[0]) != 4:
+            raise ValueError("inverted_residual_setting should be non-empty "
+                             "or a 4-element list, got {}".format(inverted_residual_setting))
+
+        # 第一层网络, 无残差结构
+        # building first layer
+        input_channel = _make_divisible(input_channel * width_mult, round_nearest)
+        self.last_channel = _make_divisible(last_channel * max(1.0, width_mult), round_nearest)
+        features: List[nn.Module] = [ConvBNReLU(3, input_channel, stride=2, norm_layer=norm_layer)]
+
+
+        # building inverted residual blocks
+        # 建立 blocks
+        for t, c, n, s in inverted_residual_setting:
+            output_channel = _make_divisible(c * width_mult, round_nearest)
+            # n 代表重复的 block 次数
+            for i in range(n):
+                stride = s if i == 0 else 1
+                # 加入残差 block 
+                # expand_ratio=t , t 就是 inverted 残差block 的扩张倍数
+                features.append(block(input_channel, output_channel, stride, expand_ratio=t, norm_layer=norm_layer))
+                input_channel = output_channel
+
+        # building last several layers
+        # 最后一个 block 也是没有残差结构
+        features.append(ConvBNReLU(input_channel, self.last_channel, kernel_size=1, norm_layer=norm_layer))
+        # make it nn.Sequential
+        self.features = nn.Sequential(*features)
+
+        # building classifier
+        # 分类器直接使用 一个线性层, 带上 dropout
+        self.classifier = nn.Sequential(
+            nn.Dropout(0.2),
+            nn.Linear(self.last_channel, num_classes),
+        )
+
+        # weight initialization
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, mode='fan_out')
+                if m.bias is not None:
+                    nn.init.zeros_(m.bias)
+            elif isinstance(m, (nn.BatchNorm2d, nn.GroupNorm)):
+                nn.init.ones_(m.weight)
+                nn.init.zeros_(m.bias)
+            elif isinstance(m, nn.Linear):
+                nn.init.normal_(m.weight, 0, 0.01)
+                nn.init.zeros_(m.bias)
+
+    def _forward_impl(self, x: Tensor) -> Tensor:
+        # This exists since TorchScript doesn't support inheritance, so the superclass method
+        # (this one) needs to have a name other than `forward` that can be accessed in a subclass
+        x = self.features(x)
+        # Cannot use "squeeze" as batch-size can be 1
+        x = nn.functional.adaptive_avg_pool2d(x, (1, 1))
+        x = torch.flatten(x, 1)
+        x = self.classifier(x)
+        return x
+
+    def forward(self, x: Tensor) -> Tensor:
+        return self._forward_impl(x)
+
+```
+
+
+## 6.2. Detection 系列网络
 
 Detection 相比 Recognition 是更复杂的任务:
 1. Detection 的过程中往往也就顺带进行了分类识别
@@ -461,7 +860,7 @@ Detection 相比 Recognition 是更复杂的任务:
 3. (2014)Spatial Pyramid Pooling in Deep Convolutional Networks for Visual Recognition
 4. (2017)Faster R-CNN: Towards Real-Time Object Detection with Region Proposal Networks
 
-### 5.2.1. R-CNN
+### 6.2.1. R-CNN
 
 R-CNN算法可以分为四步:
 1. 候选区域选择, 即 Region Proposal
@@ -475,7 +874,7 @@ R-CNN算法可以分为四步:
 * CNN需要固定尺寸输入, 因此对候选区域的拉伸或截取会丢失信息
 * 候选区域存在重叠, 因此计算浪费
 
-### 5.2.2. SPP-Net
+### 6.2.2. SPP-Net
 
 由其他作者对RCNN的一个实质性的改进  
 1. 取消了 crop/warp 的图像归一化过程, 解决了图像变形导致的信息丢失
@@ -488,7 +887,7 @@ R-CNN算法可以分为四步:
 3. 在整个过程中，Proposal Region仍然很耗时。
 
 
-### 5.2.3. Fast-RCNN
+### 6.2.3. Fast-RCNN
 
 主要贡献在于对RCNN进行加速, 受SPP-Net启发而来  
 1. 借鉴了SPP-Net的思路, 提出了简化版的 ROI池化层 (注意并非金字塔), 加入了候选框映射功能, 使得网络可以反向传播, 解决了SPP的整体网络训练问题  
@@ -496,7 +895,7 @@ R-CNN算法可以分为四步:
 3. SVD加速全连接层的训练
 4. 
 
-### 5.2.4. FasterRCNN RPN
+### 6.2.4. FasterRCNN RPN
 
 Faster RCNN 基本实现了端到端的实时检测  
 
@@ -516,7 +915,7 @@ RPN网络过程
 
 
 
-## 5.3. 语义分割 Semantic Segmentation
+## 6.3. 语义分割 Semantic Segmentation
 
 图像分割: 让网络做像素级别的预测, 直接得出label map  
 
@@ -524,7 +923,7 @@ RPN网络过程
 
 
 
-### 5.3.1. FCN - Fully Convolutional Networks
+### 6.3.1. FCN - Fully Convolutional Networks
 
 深度学习应用在图像分割的代表成就
 * FCN 接受任意尺寸的输入图像
@@ -541,7 +940,7 @@ RPN网络过程
 * Feature map 经过该卷积层, 还是得到二维的 Feature map, 因此对输入图片的 size 没有了限制
 * 例: 全连接层 4096->4096->1000, 对应的卷积核 (4096,1,1)-> (4096,1,1)-> (1000,1,1)
 
-## 5.4. FPN - Feature Pyramid Networks
+## 6.4. FPN - Feature Pyramid Networks
 
 论文: Feature pyramid networks for object detection  
 一种获得多缩放特征( Multi-scale Feature )的方法, 独立于 Backbone 网络.  
@@ -565,7 +964,7 @@ RPN网络过程
   * 在merge后的特征图加一个3X3的卷积层, 用于消除升采样带来的误差
   * 最终获得了 P2~P5 的特征图
 
-# 6. 序列建模 - 循环和递归网络
+# 7. 序列建模 - 循环和递归网络
 
 * 普通的神经网络以及CNN, 都是假设元素之间是相互独立的, 输入与输出也是独立的
   * CNN 专门用于处理网格化数据
@@ -583,7 +982,7 @@ RPN网络过程
 * 网络中的所有细胞共享参数 $UVW$
 
 
-## 6.1. 常见的序列网络即应用
+## 7.1. 常见的序列网络即应用
 
 网络结构:
 * Recurrent neural networks (RNN)
@@ -599,7 +998,7 @@ RPN网络过程
 
 
 
-# 7. Attention
+# 8. Attention
 
 * Attention mechanism - 注意力机制, 一种思想
   * Self-attention (intra-attention)

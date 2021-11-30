@@ -1,15 +1,22 @@
-# Scene text detection and recognition
+# 1. Scene text detection and recognition
 
 Constructing a high-quality scene text recognition system is a non-trivial task.
 
-## Project link
+
+* printed Chinese character recognition (PCCR)
+* Handwritten Chinese character recognition (HCCR)
+
+
+
+## 1.1. Project link
 
 * MASTER
   * [link-Tensorflow](https://github.com/jiangxiluning/MASTER-TF)
   * [link-Torch](https://github.com/wenwenyu/MASTER-pytorch)
 * lmdb dataset
   * [deep-text-recognition-benchmark](https://github.com/clovaai/deep-text-recognition-benchmark)
-## Survey
+
+## 1.2. Survey
 
 * (2016) Scene text detection and recognition: recent advances and future trends 
 
@@ -18,20 +25,19 @@ Constructing a high-quality scene text recognition system is a non-trivial task.
 * Character as basic unit.
 
 
-### Future
-
+### 1.2.1. Future
 
 * Multi-orientation
 * Multi-laguage
 * Deep learning big data.
 
-### Application
+### 1.2.2. Application
 
 * Signboard for autonomous driving.
 * ID card scan for a bank.
 * Key information extraction in Robotic Process Automation.
 
-### Difficulty
+### 1.2.3. Difficulty
 
 
 1. Diversity of scene text
@@ -44,7 +50,7 @@ Constructing a high-quality scene text recognition system is a non-trivial task.
    * Complex clutter.
 
 
-### Direction
+### 1.2.4. Direction
 
 1. Text detection
    * Discover and locate the regions possibly contaioning text from natural images.
@@ -73,10 +79,10 @@ Irregular scene text recognition
 
 
 
-# Conventional methods
+# 2. Conventional methods
 
 
-## Text detection：  
+## 2.1. Text detection：  
 
 * Texture based method
   * Treat texts as a special type of texture.
@@ -92,7 +98,7 @@ Irregular scene text recognition
   * Firstly, extract candidate components through a variety of ways. (color clustering or extreme region extraction.)
   * Secondly, filter out non-text components using manually designed rules, or automatically trained classifiers.
 
-### Representation
+### 2.1.1. Representation
 
 Keywords:
 * Color similarity
@@ -106,25 +112,25 @@ Text Detection:
 
 
 
-### Title Memo
+### 2.1.2. Title Memo
 
 * (2012) Detecting texts of arbitrary orientations in natural images.
 * Robust scene text detection with convolu- tion neural network induced Mser trees.
 
 
-## Text Recognition
+## 2.2. Text Recognition
 
 Keywords:  
 * Automatically create character templates according to che characteristics of natural images.
 * Surface fitting classifier and specifically designed character recognition algorith,.
 
 
-## End-to-end 
+## 2.3. End-to-end 
 
 
-# Deep learning based methods
+# 3. Deep learning based methods
 
 
-## Attention-based
+## 3.1. Attention-based
 
 

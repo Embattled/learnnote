@@ -329,7 +329,8 @@ find_last_not_of
 
 
 | `memchr (ptr,ch,count)`  | 找字符第一次出现的位置, 没找到就返回`NULL`|
-| `memcmp (lhs,rhs,count)` | 与字符串比较类似|
+| `memcmp (lhs,rhs,count)` | 
+与字符串比较类似|
 | `memset (dest,ch,count)` | 注意 `int ch`|
 | `memcpy (dest,scr,c)`    | copies one buffer to another|
 | `memmove(dest,scr,c)`    | 函数的功能同memcpy基本一致|

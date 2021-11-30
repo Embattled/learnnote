@@ -54,23 +54,23 @@ Python 也提供了与数字和数学相关的一系列标准库
 * `random.sample(population, k, *, counts=None)`
   * 这个函数是 without replacement 的, 因此 k <= len(pop) , 否则会 raise error
   * 这个函数会返回新的序列, 原序列不受改变
-
+  * 从 population 中选 k 个元素作为新 list 返回
+  * counts 是 3.9 新加的参数, 可以手动指定 population 中的元素的重复个数
+    * `sample(['a', 'b'], counts=[4, 2], k=5)` is equivalent to 
+    * `sample(['a', 'a', 'a', 'a', 'b', 'b'], k=5)`.
 
 
 ## 2.3. 纯二进制序列生成 Functions for bytes
 
 ## 2.4. 种子操作 Bookkeeping functions
 
-* 种子操作使得一些运行可以复现
-* `random.choice(seq)`
-* `random.choices(population, weights=None, *, cum_weights=None, k=1)`
+种子操作使得一些运行可以复现
+*  `random.seed(a=None, version=2)`
+  *  输入种子, 默认会以当前系统时间为种子
 
-
-* `random.sample(population, k, *, counts=None)`
-  * 从 population 中选 k 个元素作为新 list 返回
-  * counts 是 3.9 新加的参数, 可以手动指定 population 中的元素的重复个数
-    * `sample(['a', 'b'], counts=[4, 2], k=5)` is equivalent to 
-    * `sample(['a', 'a', 'a', 'a', 'b', 'b'], k=5)`.
+*  `random.getstate()`
+   *  记录当前生成器的状态, 用于 `setstate()` 
+*  `random.setstate(state)`
 
 ## 2.5. Real-valued distributions
 

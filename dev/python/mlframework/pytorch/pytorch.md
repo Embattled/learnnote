@@ -46,7 +46,7 @@ print(torch.__version__)
 * `torch.Tensor` is an alias for the default tensor type (torch.FloatTensor).
 * `torch.` 里有许多便捷创建张量的函数
 * Tensor 类里面也有许多转换格式的方法
-* 几乎所有的类方法都有 torch.* 下的同名方法, 功能一样,第一个参数是输入 tensor   
+* 几乎所有的类方法都有 torch.* 下的同名方法, 功能一样, 多一个参数是输入 tensor   
 
 ## 2.1. torch.Tensor 的格式
 
@@ -149,25 +149,12 @@ c = a.view(1, 3, 2, 4)
 
 ## 2.4. 创建操作 Creation Ops
 
-基本上所有创建 tensor 的函数都位于 `torch.` 下  
-
-创建tensor 有许多通用的参数
-* `dtype  =`
-* `device =`
-
-### 2.4.1. torch.tensor
-
-* 从 python list 或者 numpy array 来创建张量
-* `torch.tensor()` 函数总是会进行数据拷贝
-  * 防止拷贝可以使用 `torch.as_tensor()`
-```py
-torch.tensor(data, *, dtype=None, device=None, requires_grad=False, pin_memory=False) → Tensor
-``` 
-
-### 2.4.2. 统一值 tensor
 
 
-### 2.4.3. 随机值 random
+### 2.4.1. 统一值 tensor
+
+
+### 2.4.2. 随机值 random
 
 函数参数 : `(*size, *, out=None, dtype=None, layout=torch.strided, device=None, requires_grad=False)`
 * size 指定大小
@@ -201,7 +188,7 @@ torch.tensor(data, *, dtype=None, device=None, requires_grad=False, pin_memory=F
 * set_rng_state   :Sets the random number generator state.
 
 
-### 2.4.4. _like 类方法
+### 2.4.3. _like 类方法
 
 需要获取一个不确定维度的 tensor, 即通过另一个 tensor 指定大小
 * rand_like
@@ -209,14 +196,14 @@ torch.tensor(data, *, dtype=None, device=None, requires_grad=False, pin_memory=F
 * randn_like
 
 
-### 2.4.5. torch.from_numpy
+### 2.4.4. torch.from_numpy
 
 `torch.from_numpy` 接受一个 ndarray 并转换成 tensor 没有任何参数  
 ```py
 torch.from_numpy(ndarray) → Tensor
 ```
 
-### 2.4.6. tensor复制
+### 2.4.5. tensor复制
 
 
 * `torch.clone(input, *, memory_format=torch.preserve_format) → Tensor`
@@ -228,7 +215,7 @@ torch.from_numpy(ndarray) → Tensor
 一般彻底的复制并脱离可以使用  `tensor.clone().detach()`  这也是官方推荐的方法  
 
 
-### 2.4.7. .new_ 方法
+### 2.4.6. .new_ 方法
 
 To create a tensor with similar type but different size as another tensor, use tensor.new_* creation ops.  
 
@@ -243,34 +230,6 @@ To create a tensor with similar type but different size as another tensor, use t
 
 
 
-## 2.5. 拼接与截取
-
-### 2.5.1. torch.stack
-`torch.stack(tensors, dim=0, *, out=None) → Tensor`  
-
-* 将多个 tensor 叠加到一起, 并产生一个新的 dimension
-* Concatenates a sequence of tensors along a new dimension.
-* 因此所有 tensor 必须相同大小
-* dim 指定新的 dimension 的位置
-
-### 2.5.2. torch.cat
-
-`torch.cat(tensors, dim=0, *, out=None) → Tensor`  
-
-* 将多个 tensor 链接, 沿着最外层 index 或者指定 dim 链接
-* All tensors must either have the same shape (except in the concatenating dimension) or be empty.
-* dim (int, optional) – the dimension over which the tensors are concatenated
-
-
-
-
-## 2.6. 降维操作 Reduction Ops
-
-### 2.6.1. max
-1. torch.max(input) → Tensor 返回张量所有元素里的最大值
-2. torch.max(input, dim, keepdim=False, *, out=None) -> (Tensor, LongTensor) 即(values, indices) 
-
-如果要返回的是最大值的索引的话, 必须使用第二种方法
 
 # 3. torch
 
@@ -332,6 +291,86 @@ torch.load('tensors.pt', map_location=torch.device('cpu'))
 * `torch.save(model, PATH)`
 * `model = torch.load(PATH)`
 
+## 3.2. Creation Ops
+
+基本上所有创建 tensor 的函数都位于 `torch.` 下  
+
+创建tensor 有许多通用的参数
+* `dtype  =`
+* `device =`
+
+### 3.2.1. torch.tensor
+
+* 从 python list 或者 numpy array 来创建张量
+* `torch.tensor()` 函数总是会进行数据拷贝
+  * 防止拷贝可以使用 `torch.as_tensor()`
+```py
+torch.tensor(data, *, dtype=None, device=None, requires_grad=False, pin_memory=False) → Tensor
+``` 
+
+## 3.3. Math operations
+
+提供对 tensor 的各种数学操作
+
+### 3.3.1. Pointwise Ops 元素为单位的操作
+
+### 3.3.2. Reduction Ops 元素之间的操作(降维)
+
+* 所有函数都默认对张量的全部元素进行运算
+* 提供了针对选定维度的修改运算, 参数为
+  * dim : 除非特殊说明都是int, 在该维度上进行运算, 对于其他维度的一个固定值, dim 维度的所有值视作一行, 有些函数支持 dim 为 tuple, 意味同时对多个维度进行降维
+  * keepdim: bool, 如果为 True, dim 维度将保留, 并且大小为 1, 否则 dim 将会被压缩而省略掉 
+
+
+简单函数:
+* 布尔类:
+  * torch.all() 是否全为 True
+  * torch.any() 是否存在 True
+* 基础运算 : dim 支持 tuple
+  * torch.mean() 均值
+  * torch.sum() 求和
+
+#### 3.3.2.1. 极值操作
+
+* max/min : 返回最大值, 默认对全元素进行, 可以输入单个整数 dim 来对某一维度进行运算, 此时会返回两个值, 第二个返回值是索引位置
+* argmax/argmin : 返回最大值的索引, 默认对全元素进行操作, 可以输入单个整数 dim 来对某一维度进行运算, 等同于 max/min 输入 dim 的第二个返回值
+* amax/amin : 返回最大值, 专门用来对指定维度进行运算, dim 是必须参数且可以是 int or tuple, 即可以对多个维度进行运算, 不会返回索引
+
+
+
+### 3.3.3. Comparison Ops
+
+专门用来比较的函数 
+
+
+#### 3.3.3.1. topk
+
+获取指定维度的 k 个最大值, 同时还能获得对应的 索引, 用在分类任务上  
+`torch.topk(input, k, dim=None, largest=True, sorted=True, *, out=None) -> (Tensor, LongTensor)`  
+* dim, int 只能指定单独维度, 默认会对最后一个维度进行操作
+* largest: bool, true 则选择最大的top, 否则选择最小的 top
+* sorted: bool, 是否按对应的顺序返回这k个值
+
+
+## 3.4. Indexing, Slicing, Joining, Mutating Ops 拼接与截取等
+
+### 3.4.1. torch.stack
+`torch.stack(tensors, dim=0, *, out=None) → Tensor`  
+
+* 将多个 tensor 叠加到一起, 并产生一个新的 dimension
+* Concatenates a sequence of tensors along a new dimension.
+* 因此所有 tensor 必须相同大小
+* dim 指定新的 dimension 的位置
+
+### 3.4.2. torch.cat
+
+`torch.cat(tensors, dim=0, *, out=None) → Tensor`  
+
+* 将多个 tensor 链接, 沿着最外层 index 或者指定 dim 链接
+* All tensors must either have the same shape (except in the concatenating dimension) or be empty.
+* dim (int, optional) – the dimension over which the tensors are concatenated
+
+
 # 4. Tensor views
 
 View 是一个数据的映射共享, 可以避免多余的数据拷贝  
@@ -364,8 +403,16 @@ These are the basic building block for graphs
   * Quantized Functions
   * Lazy Modules Initalization
 
+## 5.1. Containers 网络容器
+ 
+Module            Base class for all neural network modules.  
+Sequential        A sequential container.  
+ModuleList        Holds submodules in a list.  
+ModuleDict        Holds submodules in a dictionary.  
+ParameterList     Holds parameters in a list.  
+ParameterDict     Holds parameters in a dictionary.  
 
-## 5.1. torch.nn.Module 类
+### 5.1.1. torch.nn.Module 类
 
 * `class torch.nn.Module  `
   * 所有神经网络模块的基类 Base class for all neural network modules.
@@ -382,7 +429,8 @@ These are the basic building block for graphs
 2. 定义构造函数, 不需要做什么, 只需要: just calls the constructor for super.
 3. 定义 `forward` 函数, 
 
-基础方法:
+#### 5.1.1.1. 基础方法及应用
+
 * `cpu() `                : Moves all model parameters and buffers to the CPU.
 * `cuda(device: Union[int, torch.device, None] = None)`   :Moves all model parameters and buffers to the GPU
 * `forward(*input: Any)`  : Defines the computation performed at every call. Should be overridden by all subclasses.
@@ -415,13 +463,12 @@ net.train()
 
 ```
 
-### 5.1.1. 网络参数以及存取
+#### 5.1.1.2. 网络参数以及存取
 
 state_dict 是网络中所有层中的所有参数   
 官方推荐的模型存取方式:
 * `torch.save(model.state_dict(), PATH)`
 * `model.load_state_dict(torch.load(PATH))`
-
 
 ```py
 
@@ -445,17 +492,17 @@ NamedTuple with missing_keys and unexpected_keys fields
 """
 
 ```
+#### 5.1.1.3. 残差结构
+
 
 ## 5.2. Convolution Layers 卷积层 
 
 用于在神经网络中定义卷积层  
 
+基础卷积 : Applies a ?D convolution over an input signal composed of several input planes.
 * nn.Conv1d
-  * Applies a 1D convolution over an input signal composed of several input planes.
 * nn.Conv2d
-  * Applies a 2D convolution over an input signal composed of several input planes.
 * nn.Conv3d
-  * Applies a 3D convolution over an input signal composed of several input planes.
 
 * nn.ConvTranspose1d
   * Applies a 1D transposed convolution operator over an input image composed of several input planes.
@@ -472,9 +519,6 @@ NamedTuple with missing_keys and unexpected_keys fields
 
 
 ```py
-
-
-
 class LeNet(nn.Module):
   def __init__(self, input_dim=1, num_class=10):
     super(LeNet, self).__init__()
@@ -492,7 +536,6 @@ net = Model().cuda()
 print(net.conv1.weight.size()) 
 print(net.conv1.weight)
 print(net.conv1.bias)
-
 
 ```
 ## 5.3. Normalization Layers 归一化层
@@ -780,50 +823,7 @@ optimizer = optim.Adam([var1, var2], lr = 0.0001)
 
 ```
 
-
-## 8.1. optimization step
-
-重点: 所有 optimizers 必须实现 step 方法, 用来更新要优化的参数  
-
-1. optimizer.step()
-   * 大部分优化器都实现了的简单的版本, 在 `backward()` 方法之后调用
-```py
-for input, target in dataset:
-    # 初始化
-    optimizer.zero_grad()
-    # 前向传播
-    output = model(input)
-    # 计算误差
-    loss = loss_fn(output, target)
-    # 误差 backward
-    loss.backward()
-    # 优化器调用 step
-    optimizer.step()
-```
-
-2. optimizer.step(closure)
-   一部分优化器, 例如 ` Conjugate Gradient and LBFGS` 需要多次前向传播, 所以需要传入一个`closure`方法 来允许自己定义计算的模型.
-   `closure` 需要清空梯度, 然后计算 loss, 最后返回
-
-```py
-for input, target in dataset:
-    # 用closure 代替其他操作, 以函数的形式定义
-    def closure():
-        # 初始化
-        optimizer.zero_grad()
-        # 前向传播
-        output = model(input)
-        # 计算误差
-        loss = loss_fn(output, target)
-        # 误差 backward
-        loss.backward()
-        # 返回误差
-        return loss
-    # 将该函数传入 step 相当于在一条代码中整合了一整次更新参数的流程
-    optimizer.step(closure)
-
-```
-## 8.2. Algorithm
+## 8.1. 预定义 Algorithm
 
 优化方法, (参数各不相同, 一般都有 lr )
 * Adadelta
@@ -838,9 +838,7 @@ for input, target in dataset:
 * Rprop
 * SGD
 
-## 8.3. 动态 Learn Rate
-
-
+## 8.2. 动态 Learn Rate
 
 `torch.optim.lr_scheduler` 提供了一些接口用来根据 epoch 或者其他计算来调整学习速率  
 `torch.optim.lr_scheduler.ReduceLROnPlateau` 则可以根据一些 validation measurements 来调整学习速率  
@@ -883,7 +881,7 @@ scheduler 的种类:
 * orch.optim.lr_scheduler.ExponentialLR : 学习率指数下降
 
 
-### 8.3.1. 有序调整
+### 8.2.1. 有序调整
 
 
 * LambdaLr : 使用自定义函数来生成学习率
@@ -905,9 +903,10 @@ liner_func=lambda epoch: max(0,1-(epoch/endepoch))
 optim.lr_scheduler.LambdaLR(optimizer,liner_func,**kwargs)
 ```
 
-## 8.4. 定义自己的 optim
 
-### 8.4.1. Optimizer 基类
+## 8.3. 定义自己的 optim
+
+### 8.3.1. Optimizer 基类
 
 `class torch.optim.Optimizer(params, defaults)` 是所有优化器的基类, 定义了优化器的必须操作  
 * 参数
@@ -925,8 +924,50 @@ optim.lr_scheduler.LambdaLR(optimizer,liner_func,**kwargs)
     初始化所有梯度为0 
     `set_to_none` 设置初始化梯度不是0而是 `None` 这会带来一些性能优化,但同时会有一些其他后果 *懒得看了
 
+### 8.3.2. optimization step
 
-### 8.4.2. per-parameter options
+重点: 所有 optimizers 必须实现 step 方法, 用来更新要优化的参数  
+
+1. optimizer.step()
+   * 大部分优化器都实现了的简单的版本, 在 `backward()` 方法之后调用
+```py
+for input, target in dataset:
+    # 初始化
+    optimizer.zero_grad()
+    # 前向传播
+    output = model(input)
+    # 计算误差
+    loss = loss_fn(output, target)
+    # 误差 backward
+    loss.backward()
+    # 优化器调用 step
+    optimizer.step()
+```
+
+2. optimizer.step(closure)
+   一部分优化器, 例如 ` Conjugate Gradient and LBFGS` 需要多次前向传播, 所以需要传入一个`closure`方法 来允许自己定义计算的模型.
+   `closure` 需要清空梯度, 然后计算 loss, 最后返回
+
+```py
+for input, target in dataset:
+    # 用closure 代替其他操作, 以函数的形式定义
+    def closure():
+        # 初始化
+        optimizer.zero_grad()
+        # 前向传播
+        output = model(input)
+        # 计算误差
+        loss = loss_fn(output, target)
+        # 误差 backward
+        loss.backward()
+        # 返回误差
+        return loss
+    # 将该函数传入 step 相当于在一条代码中整合了一整次更新参数的流程
+    optimizer.step(closure)
+
+```
+
+### 8.3.3. per-parameter options
 
 To do this, instead of passing an iterable of `Variable` s, pass in an iterable of `dict` s.    
 * dict 中指定了不同的 parameter group, 并且需要使用 `params` 关键字
@@ -940,11 +981,6 @@ optim.SGD([
                 {'params': model.classifier.parameters(), 'lr': 1e-3}
             ], lr=1e-2, momentum=0.9)
 ```
-
-
-
-
-
 
 # 9. TorchScript
 

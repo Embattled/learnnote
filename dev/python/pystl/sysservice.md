@@ -15,7 +15,13 @@
 
 
 * 非常大的库
-* 
+  
+
+## Files and Directories
+
+os.mkdir(path, mode=0o777, *, dir_fd=None)
+
+os.makedirs(name, mode=0o777, exist_ok=False)
 
 ### 2.0.1. os.walk
 
@@ -177,6 +183,23 @@ group = parser.add_mutually_exclusive_group()
 
 group.add_argument('--foo', action='store_true')
 group.add_argument('--bar', action='store_false')
+```
+
+### 5.2.2. Argument groups 参数分组
+
+* 可以将不同的参数归到一组里,
+* 这个组在参数调用的时候没有任何卵用
+* 但是可以在程序帮助信息打印的时候更加清晰明确
+
+
+```py
+parser = argparse.ArgumentParser()
+group = argparse.add_argument_group(title=None, description=None)
+# 可以设置组的名称和说明 
+
+group.add_argument('--foo', action='store_true')
+group.add_argument('--bar', action='store_false')
+# 添加至这个组的参数在打印参数说明的时候会单独分隔开, 方便区分
 ```
 
 ## 5.3. Print help

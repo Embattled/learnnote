@@ -1,14 +1,17 @@
-# Data Types
+# 1. Data Types
 
-python stl 提供了很多特殊的数据类型, 最典型的例如时间序列类型  
+除了一些 build-in data types, in particular, dict, list, set and frozenset, and tuple.   
+在 python STL中还有很多特殊的数据类型  
 
+
+最典型的例如时间序列类型  
 DataTypes中的数据类型:
 * collections : 提供了几个特殊的容器
-* 
 
-# copy
 
-专门用来拷贝的库, 在python中赋值语句只会进行引用传递, 这个库中提供了两个对应的深浅拷贝函数
+# 2. copy
+
+专门用来拷贝的小库, 在python中赋值语句只会进行引用传递, 这个库中提供了两个对应的深浅拷贝函数
 
 import copy
 
@@ -23,14 +26,20 @@ import copy
 
 
 
-# datetime — Basic date and time types
+# 3. datetime — Basic date and time types
 
 
-# collections
+# 4. collections
 
 * 特殊的容器, 作为python内建类型的特殊替代场景
 
-## Counter 
+## 4.1. Counter 
 
+
+## 4.2. collections.abc
+
+Abstract Base Classes for Containers:
+* 正式的来说, 这个包属于 collections 的一部分, 但是内容区别较大
+* 提供了很多 抽象基类, 用于对各种类型进行功能检测
 
 

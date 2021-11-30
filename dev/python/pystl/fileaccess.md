@@ -14,7 +14,7 @@ The pathlib module offers high-level path objects.
 * 但是 os.path 用的非常多  
 * 内容非常简单
 
-## 2.1. 判断函数
+## 2.1. is 判断函数
 
 * os.path.isdir(path) 	判断路径是否为目录。
 * os.path.isfile(path) 	判断路径是否为文件。
@@ -22,11 +22,18 @@ The pathlib module offers high-level path objects.
   * linux 下即 `/` 开头
   * windows下即 盘符: 加反斜杠开头
 
+## 2.2. 路径检测
 
+* os.path.exists(path)
+  * 判断该路径是否存在
+  * 如果是 破坏掉的 link , 则返回 False
+* os.path.lexists(path)
+  * 对于 破坏掉的 link 也返回 True
+  * 只检测是否存在该文件
 
-## 2.2. 提取及转换函数
+## 2.3. 提取及转换函数
 
-一分为二  
+一分为二函数  
 * os.path.basename(path)  返回 path 路径中的最后一个成分
   * 如果 path 是文件路径, 就是文件名
   * 如果 path 是目录, 就是叶子文件夹名
@@ -39,7 +46,7 @@ The pathlib module offers high-level path objects.
   * 相当于 `os.path.normpath(os.path.join(os.getcwd(), path))`
   * 直接执行 `os.path.abspath('.')` 获取当前路径
 
-## 2.3. 路径操作
+## 2.4. 路径操作
 
 * os.path.join(paths) 该包最重要的函数, 自动生成路径, 不用考虑 `/` 的问题
   * 接受一系列的参数
@@ -52,24 +59,17 @@ The pathlib module offers high-level path objects.
   * 删除位于中间的 `..` 并进行逻辑重定位
 
 
-## 2.4. 路径生成
-
-* os.path.join(path, *paths)
-* 只能链接生成路径
-  * 每个输入的成员之间会加一个分隔符
-  * 最后一个成员不会加
-
 # 3. pathlib
 
 * The pathlib module was introduced in Python 3.4 .
-包含了一些类, 操作对象是各种操作系统中使用的路径  
+* 包含了一些类, 操作对象是各种操作系统中使用的路径  
+* 相比于os.path, pathlib 将路径进行了对象化, 并提供了遍历文件夹相关的操作
 
 ## 3.1. pathlib.PurePath
 
 pathlib模块中的基类, 将路径看作普通的字符串
 * 将多个指定的字符串拼接成适用于当前操作系统的路径格式
 * 判断两个路径是否相等
-
 
 PurePath作为该模块的基类, 提供了最基础的构造方法和实例属性
 1. 创建路径时, 直接创建 PurePath 对象即可, 解释器会自动根据操作系统返回 PurePosixPath或者 PureWindowsPath
@@ -99,7 +99,7 @@ print(path)
 | root     | 返回路径字符串中的根路径。                                                 |
 | anchor   | 返回路径字符串中的盘符和根路径。                                           |
 | parents  | 返回当前路径的全部父路径。                                                 |
-| parent   | 返回当前路径的上一级路径，相当于 `parents[0]` 的返回值。                     |
+| parent   | 返回当前路径的上一级路径，相当于 `parents[0]` 的返回值。                   |
 | name     | 返回当前路径中的文件名。                                                   |
 | suffixes | 返回当前路径中的文件所有后缀名。                                           |
 | suffix   | 返回当前路径中的文件后缀名。相当于 suffixes 属性返回的列表的最后一个元素。 |

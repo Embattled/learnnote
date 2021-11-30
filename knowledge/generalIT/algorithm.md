@@ -341,9 +341,9 @@ vector<int> manacher(const string &s) {
 ```
 
 
-# 树
+# 3. 树
 
-## 键树 查找树 Keyword Tree Search Tree
+## 3.1. 键树 查找树 Keyword Tree Search Tree
 
 用空间换时间的一种树
 * 可以不再拘泥于二叉树的形式, 根节点的子树>=2
@@ -351,20 +351,20 @@ vector<int> manacher(const string &s) {
 * 利用各个关键字的公共前缀来减少查询时间
 * 比哈希树快
 
-### 双链树
+### 3.1.1. 双链树
 
 仍然保持二叉树的形式, 左右两个子节点
 
 结点:
 * symbol : 存单个字符
 
-### Trie树 字典树
+### 3.1.2. Trie树 字典树
 
 
 
-# 3. 图
+# 4. 图
 
-## 3.1. 强连通分量 SCC
+## 4.1. 强连通分量 SCC
 
 Strongly Connected Componted  
 
@@ -373,7 +373,7 @@ Strongly Connected Componted
 * 对于一个图, 每两个顶点都强连通, 称为强连通图
 * 子图是强连通图称为强连通分量
 
-### 3.1.1. Kosaraju 算法
+### 4.1.1. Kosaraju 算法
 
 * 应用了原图G和反图GT
 * 原理: 转置图(反图, 所有边调转方向) 具有和原图一样的强连通分量
@@ -434,7 +434,7 @@ int Kosaraju_StronglyConnectedComponent()
 }
 ```
 
-### 3.1.2. Tarjan 算法
+### 4.1.2. Tarjan 算法
 
 * 同样是深度优先+栈
 * 原理: 任何一个强连通分量, 必定是原图的深度优先搜索树的子树
@@ -498,7 +498,7 @@ void tarjan(int v)
     }
 ```
 
-### 3.1.3. Gabow 算法
+### 4.1.3. Gabow 算法
 
 * 本质上是 Tarjan 的变形
 * 使用两个栈来辅助求出连通分量的根, 而不是使用两个数组
@@ -575,24 +575,53 @@ int Gabow_StronglyConnectedComponent()
 ```
 
 
-## 最短路径
+## 4.2. 最短路径
 
 求取一个图的最短路径, 有多种分类
 * 最短路. 最长路.
 * 是否有负值权值
 
-### Bellman-fold
+
+### 4.2.1. Bellman-fold
+
+专门用于求解单源最短路径的算法:  
+* 核心思想是对图进行 V-1 次松弛, 得到所有可能的最短路径
+* 相比于 Dijkstra 的优点是边权可以为负
+* 复杂度高 O(VE), 有很多优化后的衍生算法
 
 
+* 初始化所有边 `Distance[i]= MAX  Distance[0]=0`
+* for V-1 (V是顶点数) 
+* ---- for a,b in E  对所有的边, 注意是边
+* -------- 若`D[a]+w(a,b)<D[b]`, 则更新最短路径`D[b]`
+* 再次遍历一次, 若还有更新发生, 则有负权值边存在
+* 优化思想: 若某次遍历没有任何更新发生, 则已达到最优解 
 
 
-### SPFA
+### 4.2.2. SPFA
 
 * SPFA(Shortest Path Faster Algorithm)算法是求单源最短路径的一种算法
-* 是Bellman-ford的队列优化
+* 是Bellman-ford的队列优化算法的别称, 思想是动态逼近法
+  * 求含负权值边的单元最短路径
+  * 判定负权环
+* 注意: 在确定图为正权图时仍应该使用 Dijkstra 算法
+  * 正权图最坏情况下可以和朴素 Bellman-ford 相同为 O(VE)
+  * 负权图最坏情况会有指数级复杂度
 
 
-### 差分约束系统 System of Difference Constraints
+* 约定图不存在负权回路, 即保证最短路径存在
+* 数组 Distance 记录每个节点的估计最短路径 
+* 图用邻接表存储 E
+* 一个先进先出的队列 q 结构用于存储待优化的节点
+* While !q.empty()
+* ---- u = q.front() q.pop_front()
+* ---- for i in `E[u]`
+* -------- if `Distance[u]+w(u,i)< Distance[i]`
+* ------------ 更新 `Distance[i]`
+* ------------ q.pushback(i)
+* 负权回路判断: 记录每个顶点进入队列的次数, 如果达到 V 次, 则有负环
+
+### 4.2.3. 差分约束系统 System of Difference Constraints
 
 定义一个系统为差分约束系统:  
 * n 个变量, m 个约束条件
@@ -607,11 +636,11 @@ int Gabow_StronglyConnectedComponent()
 
 
 
-# 4. 数学
+# 5. 数学
 
-## 4.1. 质数
+## 5.1. 质数
 
-### 4.1.1. 埃拉托色尼筛选法 the Sieve of Eratosthenes
+### 5.1.1. 埃拉托色尼筛选法 the Sieve of Eratosthenes
 ```cpp
 void sieve(int n) {
     vector<int> divisor[n];

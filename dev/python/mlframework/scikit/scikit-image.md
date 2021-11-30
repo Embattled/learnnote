@@ -117,11 +117,67 @@ output_shape  : tuple or ndarray
 """
 ```
 
-# 4. feature
+# 4. morphology
+
+形态学变换的专用库
+
+返回值:  
+* uint8 array, same shape and type as image. 形态学变换的结果
+
+通用参数:  
+* image: ndarry. 输入图像
+* footprint: ndarry,opt. 用于形态学变换的匹配图. structuring element.
+  * The neighborhood expressed as an array of 1’s and 0’s.
+  * If None, use `cross-shaped footprint` (connectivity=1).
+  * 注意该参数在不同版本的名称是不同的, 旧版本要求是 2-D ndarray
+* out: ndarry, opt. 用于非返回值方式的结果获取.
+  * If None is passed, a new array will be allocated.
+* shift_x, shift_y: bool, opt. 设定是否平移中心点. 用于对应特殊的 footprint.
+
+## 4.1. generate footprint 
+
+用于快速生成一些 template  
+
+2D template :  
+* `skimage.morphology.disk(radius, dtype=<class 'numpy.uint8'>)`
+  * radius: int
+  * 专门用于生成一种圆盘形状的 footprint, 可以指定半径
+  * 各个点到原点的欧几里得距离不会大于 (<=) radius
+  * 返回的ndarray 是 (2*radius+1)^2 长度的 0,1 列
+* `skimage.morphology.square(width, dtype=<class 'numpy.uint8'>)`
+  * width: int
+  * 用于生成一个标准正方形的 footprint, 指定宽度
+  * radious = floor(width/2), 各个点到原点的棋盘距离不会大于 radious
+  * 其实就是直接返回一个 `np.ones((width, width))`
+* `skimage.morphology.diamond(radius, dtype=<class 'numpy.uint8'>)`
+  * radius: int
+  * 生成一个 菱形的 footprint, 指定半径
+  * 注意该函数在 radius=1,2 的时候和 disk 相同, 在 3 的时候才会不同
+* `skimage.morphology.octagon(m, n, dtype=<class 'numpy.uint8'>)`
+  * 生成一个八边形的 footprint, 注意这两个给定参数的意义 
+  * m :int. 水平和垂直的4个遍的长度
+  * n :int. 斜的四个边的长度, 实际的斜边长度是 n+1, n=0 的时候等于 square
+  * 最终会生成一个正方形的 ndarray, 具体的边长会通过 m,n 计算得出
+
+3D template :  
+* `skimage.morphology.cube(width, dtype=<class 'numpy.uint8'>)`
+* `skimage.morphology.ball(radius, dtype=<class 'numpy.uint8'>)`
+
+## 4.2. 通用 grayscale 变换
+
+Return grayscale morphological transformation of an image.
+
+* `skimage.morphology.dilation(image, footprint=None, out=None, shift_x=False, shift_y=False)`
+  * 对每个中心像素, 更新值为局部最大值
+* `skimage.morphology.erosion(image, footprint=None, out=None, shift_x=False, shift_y=False)`
+  * 对每个中心像素, 更新值为局部最小值  
+
+
+# 5. feature
 
 包含了多种特征提取函数, 一键调用
 
-## 4.1. hog
+## 5.1. hog
 
 输入:
 * image : (M, N[, C]) ndarray  注意维度, channel 在最后, 类型是 ndarray
@@ -166,11 +222,11 @@ hog_image   : (M, N) ndarray, optional
 """
 ```
 
-# util
+# 6. util
 
 提供了面对图像的各种基础工具化的操作方法  
 
-## random_noise
+## 6.1. random_noise
 
 `skimage.util.random_noise(image, mode='gaussian', seed=None, clip=True, **kwargs)`  
 * image : 一个 ndarry , 将会被转换成 float 类型

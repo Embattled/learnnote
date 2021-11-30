@@ -118,11 +118,15 @@ Pillow is the friendly PIL fork
 ### 2.1.3. PIL.Image.fromarray
 
 * `PIL.Image.fromarray(obj, mode=None)`
-* 提供了与 Numpy 的相互转换功能
+  * 提供了与 Numpy 的相互转换功能
   * obj , numpy 的实例
   * mode , 可以手动指定图像模式
-* PIL转为 np 的方法定义在了 np中 `np.asarray(PILimage)`
+  * 使用 `the buffer protocol`, 我还没搞懂这个协议是不是拷贝模式
 
+
+* PIL转为 np 的方法定义在了 np中 `np.asarray(PILimage)`
+  * asarray, 在数据类型匹配的情况下不会进行拷贝
+  * 不匹配的情况下会拷贝, 例如 int -> float
 
 
 ## 2.2. Image Class
@@ -149,6 +153,13 @@ Image class 拥有的成员属性:
   * is_animated
   * n_frames
 
+除了成员属性外, 还有一些方法也可以获得Image的属性:  
+* `im.getbands()`
+  * 获得成员的各个通道名称, 如果是RBG图像就会返回 `(“R”, “G”, “B”)`
+  * 源代码是直接返回 `ImageMode.getmode(self.mode).bands`
+  * 因为成员 size 不包括通道数, 因此可以通过 `len(im.getbands())` 获取图像的通道数
+
+
 ### 2.2.2. 基本操作 
 
 `im 为 image 实例对象`:
@@ -162,14 +173,12 @@ Image class 拥有的成员属性:
   * 第二个参数是格式, 默认通过文件名推断保存的格式
 
 * `Image.copy()`
-  * 返回一个赋值的 Image class 对象
+  * 返回一个拷贝的 Image class 对象
+  * 应该是深拷贝, 用于保存处理前的原图像
 
-
-除了成员属性外, 还有一些方法也可以获得Image的属性:  
-* `im.getbands()`
-  * 获得成员的各个通道名称, 如果是RBG图像就会返回 `(“R”, “G”, “B”)`
-  * 源代码是直接返回 `ImageMode.getmode(self.mode).bands`
-  * 因为成员 size 不包括通道数, 因此可以通过 `len(im.getbands())` 获取图像的通道数
+* `Image.crop(box=None)`
+  * 切取长方体, 
+  * box 是 4-tuple, 指代的是 左上角和右下角的 x,y 左边
 
 
 ### 2.2.3. 简单方法
