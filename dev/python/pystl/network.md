@@ -1,6 +1,7 @@
 # Networking and Interprocess Communication
 
 * 这个模块组存储了所有网络设备相关的内容, 包括内部的处理函数  
+* 算是比较低级的模组
 
 
 # socket - Low-level networking interface¶

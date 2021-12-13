@@ -93,21 +93,8 @@ Metrics: adjusted r-squared, MAE, MSE, accuracy, recall, precision, f1 score.
 3. 正则化方法: 对于传统的函数拟合, 将模型的权值大小加入到损失函数中 L1, L2
 4. 集成学习
 
-# 3. 监督学习算法 Supervised Learning
 
-## 3.1. Support Vector Machines
-
-* SVMs are a set of supervised learning methods used for classification, regression and outliers detection.
-* 优点
-  * Effective in high dimensional spaces.
-  * Still effective in cases where number of dimensions is greater than the number of samples.
-  * Uses a subset of training points in the decision function (called support vectors), so it is also memory efficient.
-  * Versatile: different Kernel functions can be specified for the decision function. 
-* 缺点
-  * If the number of features is much greater than the number of samples, avoid over-fitting in choosing Kernel functions and regularization term is crucial.
-  * SVMs do not directly provide probability estimates, these are calculated using an expensive five-fold cross-validation.
-
-# 4. 特征工程 - 抽出问题的特征向量
+# 3. 特征工程 - 抽出问题的特征向量
 
 特征工程: 对原始数据进行加工, 提炼为特征
 * 特征工程是一个表示和展现数据的过程
@@ -118,11 +105,11 @@ Metrics: adjusted r-squared, MAE, MSE, accuracy, recall, precision, f1 score.
 * 结构化数据: 关系型数据库的表
 * 非结构化数据: 图像, 音频, 视频
 
-## 4.1. 通用特征处理
+## 3.1. 通用特征处理
 
 对于表结构数据或者已经提取成向量的特征所进行的一系列预处理
 
-### 4.1.1. 特征归一化
+### 3.1.1. 特征归一化
 
 消除特征之间的量纲差别: 使得所有特征都统一到一个大致相同的数值区间  
 * 对于迭代类型的算法模型比较重要, 对于决策树模型则不太适用
@@ -137,7 +124,7 @@ Metrics: adjusted r-squared, MAE, MSE, accuracy, recall, precision, f1 score.
   * 定义归一化公式 $Z=\frac{x-\mu}{\sigma}$
   * 对于梯度下降来说, 可以让迭代空间呈现圆形, 降低到最优解的距离
 
-### 4.1.2. 类别型特征(数据)
+### 3.1.2. 类别型特征(数据)
 
 * 离散的特征(数据形式): 只能在有限选项内取值的特征
 * 除了决策树等少量算法, 大部分模型只支持数值类型的特征, 需要进行转化
@@ -149,7 +136,7 @@ Metrics: adjusted r-squared, MAE, MSE, accuracy, recall, precision, f1 score.
    * 不要让该编码导致特征向量维度过高, 适度进行特征筛选很有必要
 3. 二进制编码: 相当是对One-Hot的改进, 将各个种类编码成 $log_2n$ 维度的二进制特征
 
-### 4.1.3. 组合特征与降维处理
+### 3.1.3. 组合特征与降维处理
 
 对于类别型特征(离散特征)
 * 为了提高复杂关系的拟合能力, 
@@ -164,14 +151,14 @@ Metrics: adjusted r-squared, MAE, MSE, accuracy, recall, precision, f1 score.
 * $m\times k_1+n\times k_2$
 
 
-## 4.2. 文本表示模型
+## 3.2. 文本表示模型
 
 * 文本, 一种非结构化数据, 非常重要
 * 文本数据的特征表示是非常重要的
 * 在英文中, 同一个词有多种词形变化
   * 一般会对单词进行词干抽取 (Word Stemming)
 
-### 4.2.1. TF-IDF 单词权重计算
+### 3.2.1. TF-IDF 单词权重计算
 
 TF-IDF 一般用来计算单词在文章中的权重
 
@@ -183,7 +170,7 @@ TF-IDF 一般用来计算单词在文章中的权重
   * 但是如果一个单词出现的非常少, 说明该单词非常专门化
 
 
-### 4.2.2. Bag of Words 词袋模型
+### 3.2.2. Bag of Words 词袋模型
 
 * 最基础的文本表示模型
 * 将文章看成一袋子的单词
@@ -195,12 +182,12 @@ TF-IDF 一般用来计算单词在文章中的权重
   * 容易丢失信息
 
 
-### 4.2.3. N-gram
+### 3.2.3. N-gram
 
 * 对词袋模型的改进
 * 将连续出现的 $n\quad(n\le N)$ 个单词组成的词组也作为一个单独的特征放到向量表中
 
-### 4.2.4. Word2Vec 谷歌2013提出的词嵌入模型
+### 3.2.4. Word2Vec 谷歌2013提出的词嵌入模型
 
 词嵌入: 将词向量化的一类模型的统称
 * 将每个词都映射成低维空间 K (50~300维) 上的一个稠密向量
@@ -214,7 +201,7 @@ Word2Vec是谷歌提出的词嵌入模型, 是一个浅层的神经网络模型,
 * 
 
 
-## 4.3. 图像数据增强 过拟合防止
+## 3.3. 图像数据增强 过拟合防止
 
 此处为简单介绍, 在数据不足的情况下尽可能提升模型的效果
 
@@ -236,7 +223,7 @@ Word2Vec是谷歌提出的词嵌入模型, 是一个浅层的神经网络模型,
 * 生成式对抗网络得到合成数据
 * 迁移学习
 
-# 5. 模型评估 - 多种指标用于评估模型的性能
+# 4. 模型评估 - 多种指标用于评估模型的性能
 
 在模型应用中, 评估指标的选择问题是最容易被发现的问题, 也是最可能影响效果的因素.  
 除了模型的评估指标之外:  
@@ -254,7 +241,7 @@ Precision, recall, F1 score, P-R 曲线最早都是评价二分类的指标.
 - ROC  AOC  
   
 
-## 5.1. 准确率 Accuracy
+## 4.1. 准确率 Accuracy
 
 $Accuracy=n_{correct}/n_{total}$  
 准确率属于分类模型的指标, 表示分类正确的样本占总样本个数的比例  
@@ -262,7 +249,7 @@ $Accuracy=n_{correct}/n_{total}$
 * 缺陷: 对样本比例的均衡有要求. 
 * Eg. 负样本占99%, 全部预测成负样本也有99%的准确度  
 
-## 5.2. 精确率 Precision 和 召回率 Recall 和 F1 score
+## 4.2. 精确率 Precision 和 召回率 Recall 和 F1 score
 
 常被用做排序问题的评价指标: 没有一个确定的阈值来把得到的结果判定为正或者负, 而是采用 Top N 返回的结果来进行性能评估.  
 - 精确率 Precision  : 分类正确的正样本个数占分类器判定为正样本个数的比例
@@ -286,7 +273,7 @@ $Accuracy=n_{correct}/n_{total}$
 - F1 score 是由精准率和召回率派生而来的指标, 是精准率和召回率的调和平均值
 - $F1=\frac{2*precision*recall}{precision+recall}$
 
-## 5.3. RMSE 指标
+## 4.3. RMSE 指标
 
 Root Mean Squre Error  
 
@@ -301,7 +288,7 @@ $RMSE=\sqrt{\sum^n_{i=1}(y_i-\hat{y_i}^2)/n}$
 
 $MAPE=\sum_{i=1}^n|\frac{y_i-\hat{y_i}}{y_i}|*\frac{100}{n}$
 
-## 5.4. ROC曲线 Receiver Operating Characteristic Curve
+## 4.4. ROC曲线 Receiver Operating Characteristic Curve
 
 中文名 受试者工作特征曲线  
 * 横坐标: 假阳性率 False Positive Rate FPR=FP/N  N是负样本的个数
@@ -322,7 +309,7 @@ ROC对比 P-R 曲线:
 2. ROC更加适用于 排序, 广告, 推荐等领域, 因为负样本数量更多
 3. 对于研究者, P-R能够更清晰的看到模型在特定数据集上的表现, 更能反映其性能  
 
-## 5.5. 余弦距离
+## 4.5. 余弦距离
 
 用于评估样本间的距离, 分析两个特征向量之间的相似性, 
 * 余弦相似度  : 取值范围是 -1~1, 相同向量的相似度是1
@@ -348,7 +335,7 @@ ROC对比 P-R 曲线:
 * 余弦距离不满足三角不等式, 不属于标准距离
 * 在机器学习领域不满足于标准距离定义的其他量化还有很多 e.g. KL距离 (相对熵)
 
-## A/B 测试
+## 4.6. A/B 测试
 
 A/B 测试是验证新模块的有效性, 在机器学习中是验证模型最终效果的主要手段
 * 相比于模型开发适合的离线评测, A/B 测试属于线上评测
@@ -357,7 +344,7 @@ A/B 测试是验证新模块的有效性, 在机器学习中是验证模型最�
 * 直接比较新模型的 点击率, 存留时长等市场价值
 
 
-## 模型评估的抽样方法
+## 4.7. 模型评估的抽样方法
 
 样本分组为训练集和测试集, 存在多种分组方法  
 
@@ -371,14 +358,26 @@ A/B 测试是验证新模块的有效性, 在机器学习中是验证模型最�
   * 从没有被抽出过的样本作为验证集
   * 极限情况, 当 n = 无穷, 有大约 1/e 的样本没被抽样过
 
+
+
 # 6. 降维
 
 * 对原始数据提取的特征进行降维
   * 减少冗余和噪声
   * 提高特征的表达能力
   * 降低训练复杂度
+* PCA 主成分分析法  : 非监督, 将原始数据映射到一些方差较大的方向上
+* LDA 线性判别分析  : 有监督的降维方法, 会考虑标签. 最大化类间距 最小化类内距
+* 基本应用原则: 对无监督任务使用PCA, 对有监督任务使用LDA
+* PCA与LDA的联系
+  * 求解过程相似, 都是计算矩阵的特征向量作为最佳投影方向
+  * 语音识别
+    * 先PCA降维, 过滤固定频率
+    * 后LDA降维, 获取不同人的区分性特征
 
 ## 6.1. PCA Principal Components Analysis
+
+主成分分析法
 
 * 如何定义主成分
   * 三位空间中的点分布在同一个平面上, 用三维坐标会有冗余
@@ -388,6 +387,7 @@ A/B 测试是验证新模块的有效性, 在机器学习中是验证模型最�
   * 目标: 最大化投影方差, 让数据在主轴上投影的方差最大
   * 加入核映射, 得到核主成分分析(KPCA)
   * 加入流形映射的降维方法, eg. 等距映射, 局部线性嵌入, 拉普拉斯特征映射
+* 不论是最大方差还是最小化平方误差, 都能推导出相同的公式
   
 ### 6.1.1. 最大方差理论
 
@@ -397,7 +397,7 @@ A/B 测试是验证新模块的有效性, 在机器学习中是验证模型最�
 推导过程:
 1. 给定一组数据向量 $\{v_1,v_2,...,v_n \}$, 先将其中心化得到 $\{x_1,x_2,...,x_n \}$  
 2. 向量内积表示为第一个向量投影到第二个向量上的长度, 对于单位向量 $\omega$, 投影可以表示为 $(x_i,\omega)=x_i^T\omega$  
-3. 找到一个投影方向$\omega$, 使得$\{x_1,x_2,...,x_n \}$ 在该方向上的投影方差尽可能大. 且易知中心化后的向量投影后的均值也为0
+3. 找到一个投影方向$\omega$, 使得$\{x_1,x_2,...,x_n \}$ 在该方向上的投影方差尽可能大. 且因为进行了中心化, 易知中心化后的向量投影后的均值也为0
 
 - 投影后的方差为: $D(x)=\frac{1}{n}\sum_{i=1}^n(x_i^T\omega)^2=\omega^T(\frac{1}{n}\sum_{i=1}^nx_ix_i^T)\omega$  
 
@@ -410,13 +410,72 @@ A/B 测试是验证新模块的有效性, 在机器学习中是验证模型最�
 1. 对样本数据进行中心化处理
 2. 求样本的协方差矩阵
 3. 特征值分解, 并按大小排列
-4. 降维目标是d维的话, 就选择前 d个特征值的特征向量, 然后进行映射, 方差较小的特征(噪声)自动被舍弃  
+4. 降维目标是d维的话, 就选择前 d个特征值的特征向量作为投影方向, 然后进行映射得到d维特征值, 方差较小的特征(噪声)自动被舍弃  
 - $x_i'^T=[\omega_1^Tx_1,\omega_2^Tx_2,...,\omega_d^Tx_d]$
 - 容易得知降维后得信息占比: 
 
 
 
 ### 6.1.2. 最小平方误差理论
+
+PCA求解的最佳投影方向, 就是一个 d 维的平面
+* 若 d=1 就是求解一个最佳直线, 所有点到直线的距离平方和最小
+* 可以类比成线性回归问题
+
+计算过程
+* 对于某个d维超平面D, 可用 d 个标准正交准基 $W={\omega_1,\omega_2,...,\omega_d}$构成
+* 对于一个数据点$x_k$, 用$\tilde{x_k}$来表示到超平面 D 的投影
+* 根据线性代数理论, 可用基线性表示 $\tilde{x_k}=\sum_{i=1}^d(\omega_i^Tx_k)\omega_i$
+* 即, $\tilde{x_k}$就是$x_k$在W这组正交基下的坐标
+* 证明暂略
+
+
+
+## 6.2. LDA Linear Discriminant Analysis
+
+线性判别分析: 既是一种有监督学习算法, 同时也可以用来对数据进行降维  
+* 从出发点来看, LDA 是为了分类服务的
+* 找到一个投影方向, 使得投影后的样本尽可能按照原始类被分开
+
+从二分类问题:
+* 设样本类为 $C_1,C_2$, 两类样本的均值为$\mu_1,\mu_2$
+* 希望投影之后两类之间的距离尽可能大:
+  * 有两类的中心在$\omega$方向上的投影向量 $\tilde{\mu_1}=\omega^T\mu_1, \tilde{\mu_2}=\omega^T\mu_2$
+  * 有距离 $D(C_1,C_2)=||\tilde{\mu_1}-\tilde{\mu_2}||_2^2$
+  * 问题可以化为 $D(C_1,C_2)=max_\omega ||\omega^T(\mu_1-\mu_2)||_2^2$
+  * 可发现当 $\omega$ 与 $(\mu_1-\mu_2)$ 方向一致时, 距离可达到最大值
+  * 单纯要求类中心距离大容易导致样本特征重叠, 因此可引出第二个优化要求
+* 最小化类内距离
+  * 定义$D_1,D_2$为投影后的类内方差, 有 $D=\sum(\omega^Tx-\omega^T\mu_1)^2=\sum\omega^T(x-\mu_1)(x-\mu_1)^T\omega$
+  * 定义类间散度矩阵$S_B$, 类内散度矩阵 $S_w$
+  * 定义优化目标: $max_\omega J(\omega)=\frac{D(C_1,C_2)}{D_1+D_2}=\frac{\omega^TS_B\omega}{\omega^TS_w\omega}$
+  * 求解只需对 $\omega$求导, 令导数为0
+* 最大化的目标对应了一个矩阵的特征值, 因此LDA 的计算实际上就是求特征向量
+* 因为计算投影方向$\omega$ 不需要长度
+* 有 $\omega=S_w^{-1}(\mu_1-\mu_2)$ 即只需要样本均值和类内方差, 立刻可以得到最佳投影方向
+
+
+# 5. 监督学习基础算法 Supervised Learning
+
+## 5.1. Support Vector Machines
+
+* SVMs are a set of supervised learning methods used for classification, regression and outliers detection.
+* 优点
+  * Effective in high dimensional spaces.
+  * Still effective in cases where number of dimensions is greater than the number of samples.
+  * Uses a subset of training points in the decision function (called support vectors), so it is also memory efficient.
+  * Versatile: different Kernel functions can be specified for the decision function. 
+* 缺点
+  * If the number of features is much greater than the number of samples, avoid over-fitting in choosing Kernel functions and regularization term is crucial.
+  * SVMs do not directly provide probability estimates, these are calculated using an expensive five-fold cross-validation.
+
+# 非监督学习基础算法 Unsupervised Learning
+
+
+非监督学习主要包含两大类学习方法:
+* 数据聚类      : 通过多次迭代找到数据的最优分割
+* 特征变量关联  : 各种相关性分析找到变量之间的关系
+
 
 # 7. 优化算法
 

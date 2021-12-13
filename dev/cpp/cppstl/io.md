@@ -334,7 +334,7 @@ size_t fwrite(const void *ptr, size_t size_of_elements, size_t number_of_element
 
 
 
-### 1.11.1. 1.3 C 文件流的指针操作
+### 1.11.1.  C 文件流的指针操作
 
 **判断文件指针是否到末尾**
 `int feof(FILE *stream)`  当已经读到末尾时返回一个非零值  
@@ -716,7 +716,7 @@ sstream.str("");
 
 ```
 
-# <iostream> 标准流
+# 6. <iostream> 标准流
 
 只有在该文件中定义了标准输入输出  
 
@@ -739,11 +739,11 @@ sstream.str("");
 * wcerr
 * wclog
 
-# 6. <iomanip> 流格式控制
+# 7. <iomanip> 流格式控制
 
 该头文件里只有函数, 均是用于控制流格式的函数  
 
-## std::setw
+## 7.1. std::setw
 
 设置输出位宽  
 

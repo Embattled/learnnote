@@ -8,7 +8,7 @@
 * 目前有很多在线编辑的 TeX 服务, Papeeria, Overleaf, ShareLaTeX, Datazar, and LaTeX base 
 
 
-TeX的组成
+## 1.1. LaTeX 的组成
 
 1. Front ends and editors: 编辑器, 用于书写 TeX 文档
 2. Engines: 一个用于解释TeX脚本的应用程序, 例如 `TeX, pdfTeX, XeTeX, LuaTeX`.
@@ -16,6 +16,7 @@ TeX的组成
    * `LuaTeX` provides access to many internals via the embedded Lua language
 3. Formats: 指实际书写的TeX语言格式
    * 例如 `LaTeX, plain TeX`, 他们都是 TeX-based languages. 
+   * LaTeX 是建立在TeX基础之上的宏语言, 每一个命令会被转化成复数个TeX命令
    * (`LaTeX` has meant “LaTeX2e” for many years now)
 4. Packages: `geometry, lm`, … These are add-ons to the basic TeX system. 用于提供附加的 书写特性,字体,文档等.
    * 有些包可能与当前工作的 Engine 或者 Format 不兼容
@@ -31,9 +32,36 @@ TeX的组成
 
 TeX Live includes executables for TeX, LaTeX2e, ConTeXt, Metafont, MetaPost, BibTeX and many other programs.  
 
-## 1.1. 安装笔记
+### 1.1.1. Engines
 
-### 1.1.1. 目录地址
+1. TeX: 由 高纳德编写 Donald Ervin Knuth
+   - 1989年发布版本 3.0
+   - TeX 只有300个命令, 且晦涩难懂
+2. Plain TeX : 由 高纳德对 TeX 进行封装使之便于使用
+   - 约 600 个命令
+3. 基于 TeX 的系统, 由 Leslie Lamport 编写
+   - 1984 年将自己使用TeX编写的宏封装, 方便没有程序设计知识的用户
+   - 1993 年由 Latex3小组编写了 Latex2e, 并作为统一版本混乱局面的标准版本
+* e-Tex: 1992 年提出的改进的 TeX
+   - 没有推翻正式的 TeX 版本
+   - 作为 e-TeX 被保留, 同时后续的 TeX 引擎大多数都是基于 e-TeX
+* pdfTeX: TeX的附加组件
+   - 传统 TeX 是针对印刷的
+   - 该工具省略了 dvipdf 直接得到 pdf 文件
+* LuaTex: TeX的附加组件
+   - 由 pdfTex 的作者开发, 基于 pdfTex 并嵌入 Lua 脚本引擎
+   - 成功篡位了 pdfTex
+* XeTeX: 改进了原始 TeX 系统的字符集和字体缺陷
+   - 2004 年发布, 支持 Unicode字符集, 2006年支持Windows和Linux
+   - 2007 年纳入了 TeX Live 和 MikTeX 发行版
+* pTeX & upTeX : 日系引擎
+   - 由日本 ASCII公司的 大野和仓泽开发
+   - 在 Unicode 时代前实现了 TeX 系统的日语化
+   - upTeX 是pTeX 的 Unicode版本
+
+## 1.2. 安装笔记
+
+### 1.2.1. 目录地址
 
 如果要删除 
 
@@ -42,7 +70,7 @@ rm -rf /usr/local/texlive/2021
 rm -rf ~/.texlive2021
 ```
 
-### 1.1.2. 安装
+### 1.2.2. 安装
 
 - linux 下安装
 
@@ -50,7 +78,7 @@ rm -rf ~/.texlive2021
 1. 使用 `sudo perl install-tl` 进行安装, 不用 sudo 的话需要更改安装位置
 2. 大约7000mb空间, 一个小时时间
 
-## 1.2. Latex 编译
+## 1.3. Latex 编译
                                                                                                                                                                      
 源文件:  
 * tex     : 即书写文档的 latex 文件
@@ -76,7 +104,7 @@ rm -rf ~/.texlive2021
    * 生成了最终的 pdf 文件, 正文中的引用也标好了序号
 
 
-### 1.2.1. 多种编译器的区别
+### 1.3.1. 多种编译器的区别
 
 * tex     : 编译 tex 源文件生成 dvi 文件
 * pdftex  : 编译 tex 源文件生成 dvi 文件
@@ -85,7 +113,7 @@ rm -rf ~/.texlive2021
 * dvi2ps  : dvi 文件转换成 postscript 文件
 * dvipdf  : dvi 文件转化成 pdf 文件
 
-### 1.2.2. latex 家族
+### 1.3.2. latex 家族
 
 根据使用语言的不同, latex 编译器被区分出来了数个家族
 
@@ -97,7 +125,26 @@ p系列(中日韩)
 | e-upTex | 合并 upTex 和一些 eTex 的功能, 目前 upTex 已经完全合并了 e-upTex |
 即当前编译日文文章的话, 直接使用 uptex 即可
 
-## 1.3. latex-workshop vscode
+## latex 包总结
+
+文字格式
+* bm          定义 `\bm` 命令用于粗体化数学公式
+
+
+图
+* graphicx    高级插图命令
+* subfigure   大小子图命令
+
+
+引用
+* cite
+* overcite    所有引用自动作为上标
+
+
+特殊
+* comment     注释
+
+## 1.4. latex-workshop vscode
 
 [url](https://github.com/James-Yu/LaTeX-Workshop/wiki/Install)
 
@@ -757,7 +804,7 @@ side-by-side图片
   * emphasized
 * size
 
-## size 字号设置
+## 7.1. size 字号设置
 
 部分改变字号, 可以使用环境, 直接将字号代码写在 begin end 命令里
 
@@ -775,6 +822,12 @@ side-by-side图片
 | 一号   | 27.5pt  | 9.48mm   | \huge         |
 | 小初号 | 36pt    | 12.65mm  | \Huge         |
 
+
+## 注释 comment
+
+comment 包
+
+https://ftp.yz.yamagata-u.ac.jp/pub/CTAN/macros/latex/contrib/comment/comment.pdf
 
 # 8. 引用 Reference
 
@@ -922,4 +975,4 @@ Latex 文档引用的参考文献管理库, 克服了 thebiblography 的所有�
 
 ## 9.2. 定义 environment
 
-# documentclass 介绍  
+# 10. documentclass 介绍  
