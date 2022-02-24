@@ -59,18 +59,55 @@ TeX Live includes executables for TeX, LaTeX2e, ConTeXt, Metafont, MetaPost, Bib
    - 在 Unicode 时代前实现了 TeX 系统的日语化
    - upTeX 是pTeX 的 Unicode版本
 
-## 1.2. 安装笔记
+### 1.1.2. latex 的语法
 
-### 1.2.1. 目录地址
+* latex 语法一般都以反斜杠 `\` 开始, 后接一串字符, 非英文字母的字符一般都不会出现命令名中
+* latex 有一些内部语法, 它们以 `@` 开头, 要想正确处理 `@` 号来使用内部命令, 需要两个特殊命令
+  * `\makeatletter`  表示从此处开始 `@` 是一个普通字符, 因此可以调用内部命令了 
+  * `\makeatother`   表示对 `@` 视作普通字符的段落结束
+  * 一些特殊格式需要用到内部语法时, 需要将相关命令写在这两个命令中间
+
+
+## 1.2. Tex Live
+
+
+预定义的 texmf 目录树
+| 宏名           | 功能                                                     |
+| -------------- | -------------------------------------------------------- |
+| TEXMFDIST      | 存储除了二进制文件以外的几乎所有文件, 脚本, 宏包, 字体等 |
+| TEXMFSYSVAR    | 全局 VAR                                                 |
+| TEXMFVAR       | 用户 VAR                                                 |
+| TEXMFSYSCONFIG | 全局 config                                              |
+| TEXMFCONFIG    | 用户 config                                              |
+| TEXMFLOCAL     | 管理员用来安装供整个系统使用的额外的或更新过的宏包、字体 |
+| TEXMFHOME      | 用户存放它们自己独立安装的的宏包、字体                   |
+| TEXMFCACHE     | 保存运行时候的缓存数据, 默认等同于 TEXMFSYSVAR           |
+
+* 配置文件 config 管理的程序 : texconfig-sys, updmap-sys 和 fmtutil-sys
+
+
+* Tex系统目录
+  * Unix  : /usr/local/texlive/202* (不同版本的目录不同)
+    * bin  存放可执行文件, 根据平台的不同有不同的子文件
+      * x86_64-linux  GNU/Linux 二进制文件 (64 位)
+      * win32         Windows 二进制文件
+    * texmf-dist      TEXMFDIST, TEXMFMAIN
+    * texmf-var       TEXMFSYSVAR, TEXMFCACHE
+    * texmf-config    TEXMFSYSCONFIG
+
+* 用户目录 (个人生成和配置的数据)
+  * Unix  : ~/texlive202* (不同版本的目录不同)
+    * texmf-var       TEXMFVAR, TEXMFCACHE
+    * texmf-config    TEXMFCONFIG
+
+
 
 如果要删除 
+* rm -rf /usr/local/texlive/2021
+* rm -rf ~/.texlive2021
 
-```sh
-rm -rf /usr/local/texlive/2021
-rm -rf ~/.texlive2021
-```
 
-### 1.2.2. 安装
+### 1.2.1. 安装
 
 - linux 下安装
 
@@ -78,12 +115,29 @@ rm -rf ~/.texlive2021
 1. 使用 `sudo perl install-tl` 进行安装, 不用 sudo 的话需要更改安装位置
 2. 大约7000mb空间, 一个小时时间
 
+配置环境变量
+
+PATH=/usr/local/texlive/2020/bin/i386-linux:$PATH; export PATH
+MANPATH=/usr/local/texlive/2020/texmf-dist/doc/man:$MANPATH; export MANPATH
+INFOPATH=/usr/local/texlive/2020/texmf-dist/doc/info:$INFOPATH; export INFOPATH
+
+### 1.2.2. tlmgr  TexLive的管理程序
+
+管理安装后的系统: 
+* 列出 方案 (scheme)，集合和安装包；
+* 安装、升级、备份、恢复、卸载软件包，并且能自动计算依赖关系；
+* 查找和列出软件包以及它们的描述；
+* 列出、添加和删除不同平台的可执行文件；
+* 改变安装选项，比如纸张大小和源文件位置 (参见第 3.3.1 节)
+
+[完整文档](https://tug.org/texlive/doc/tlmgr.html#info)
+
 ## 1.3. Latex 编译
                                                                                                                                                                      
 源文件:  
 * tex     : 即书写文档的 latex 文件
-* cls     : 定义 latex 的格式文件, 定义了排版格局, 通过 `\documentclass{}` 导入
-* sty     : 宏包文件 `package` 使用 `\usepackage{}` 导入
+* cls     : 定义 latex 的格式文件, 定义了排版格局, 通过 `\documentclass{}` 导入, 称为类文件
+* sty     : 宏包文件 `package` 使用 `\usepackage{}` 导入, 称为风格文件
 * bst     : 参考文件的格式文件, 通过 `\bibliographystyle{}` 导入的就是这种文件
 * bib     : 用户定义的参考文献库, 通过 `\bibliography{}` 导入
 
@@ -110,10 +164,17 @@ rm -rf ~/.texlive2021
 * pdftex  : 编译 tex 源文件生成 dvi 文件
 * latex   : 编译 latex 源文件生成 dvi 文件
 * pdflatex: 编译 latex 源文件生成 pdf 文件
-* dvi2ps  : dvi 文件转换成 postscript 文件
-* dvipdf  : dvi 文件转化成 pdf 文件
 
-### 1.3.2. latex 家族
+### 1.3.2. 附带程序
+
+* bibtex, biber     : 参考文献支持
+* makeindex, xindy  : 索引支持
+
+* dvips             : dvi 文件转换成 postscript 文件
+* dvipdf            : dvi 文件转化成 pdf 文件
+* dvipdfmx          : dvi 转换成 pdf 的改进程序
+
+### 1.3.3. latex 家族
 
 根据使用语言的不同, latex 编译器被区分出来了数个家族
 
@@ -125,16 +186,23 @@ p系列(中日韩)
 | e-upTex | 合并 upTex 和一些 eTex 的功能, 目前 upTex 已经完全合并了 e-upTex |
 即当前编译日文文章的话, 直接使用 uptex 即可
 
-## latex 包总结
+## 1.4. latex 包总结
 
 文字格式
 * bm          定义 `\bm` 命令用于粗体化数学公式
 
+文章格式
+* titlesec    更改默认的 Section 等 格式
 
 图
+* epsfig      用于插 eps 格式的图片的专有包
 * graphicx    高级插图命令
 * subfigure   大小子图命令
 
+
+布局风格 上下栏
+* fancyheadings
+* fancyhdr
 
 引用
 * cite
@@ -144,14 +212,16 @@ p系列(中日韩)
 特殊
 * comment     注释
 
-## 1.4. latex-workshop vscode
+
+
+
+## 1.5. latex-workshop vscode
 
 [url](https://github.com/James-Yu/LaTeX-Workshop/wiki/Install)
 
 配置自定义的编译流程, 在 `settings.json` 中加入字段
 * `latex-workshop.latex.tools` 工具选项, 配置 tools
 * `latex-workshop.latex.recipes` 配置编译流程, 可以使用多个 tools
-
 
 
 
@@ -348,128 +418,217 @@ p系列(中日韩)
 ```
 
 
-# 3. latex 图
+## 2.4. latex 矢量图
 
 
 
-# 4. latex Syntax 部件语法
+# 3. 文字格式
 
-一个tex文件可以简单的分解成2部分
-* preamble  : 保存了全局的处理参数 `documentclass{}`
-* body      : 文档的内容        `\begin {document}`
+文字格式可以被分成四个模块
+1. family  字体                默认: serif family
+2. series  细, medium, 加粗    默认: medium
+3. shape   斜体等              默认: upright
+4. size    字号                默认: 10pt
 
-编译一个 tex 文档会有几个步骤
-* 会生成 `.aux .log .dvi` 几个文件 `.dvi` 是最终输出的可视化文件
-* `.dvi` 文件可以被转化成 `.ps .pdf` 文件
+标准库中的格式
+* family
+  * Serif 默认   
+  * Sans serif
+  * Typewriter
+* series
+  * Medium
+  * Boldface series
+* Shape
+  * Upright
+  * Italic
+  * Slanted
+  * Caps & Small cap
+  * emphasized
+* size
 
+## 3.1. size 字号设置
 
-## 4.1. 基础class
-
-Latex语法包含了两大类别:
-* latex command
-* latex environment
-* 定义在别的文件中的不属于标准文档类的 command 或者 environment 称为packages
-
-### 4.1.1. 基础字符
-
-以下字符可以直接被打印到文档中
-1. 英文字母和数字
-2. 两种括号 `[] ()`
-3. 5个数学符号 `+-*/=`
-4. 断句符号 `,:;!.?`
-5. 引号 ` " ' 
-6. at @
-
-其他的所有符号需要转义 `\verb""  或者 \verb!!` 写在两个引号or感叹号中间
+部分改变字号, 可以使用环境, 直接将字号代码写在 begin end 命令里
 
 
-横线有三种长度:
-* `-` 用于链接两个单词 multi-language
-* `--` 用于指定范围 A--B
-* `---` 用于补充说明
-
-### 4.1.2. commands
-
-latex command 的属性可以表示成:
-* 一般以 `\` 开始的一个指令
-* 指令一般都是以英文字母组成
-* 空参数后要接空格 `\command 字符` 或者`\command\ 字符`
-
-### 4.1.3. environment
-
-用于实现特殊功能 插入公式
-* ename作为一个环境名称, 开启一个环境用 `\begin{ename} \end{ename}`
-* 环境可以嵌套(必然)
-* 环境也是有参数的 `\begin{ename}{p1}{p2} \end{ename}`
-* 环境也是有可选参数的 `\begin{ename}[op]`
-
-### 4.1.4. packages
-
-packages:
-* 在文档的 preamble 里载入, 即 `\documentclass{}` 和 `\begin{document}` 的中间载入
-* 载入包的代码是 `\usepackage{pname}`
-* 加载一个包也有可选参数 `\usepackage[p1]{pname}`
-* 包的参数定义只对包中的feature生效, 而`\documentclass`是对整个文档生效, 包括加载的包
-
-`\usepackage[utf8]{inputenc}`
-指定要在该文档中使用的包  
-解包 utf8 编码, 一般都会用该编码, 基本都有这一句  
+| 名称   | pt      | mm       | 代码          |
+| ------ | ------- | -------- | ------------- |
+| 七号   | 5.25pt  | 1.845mm  | \tiny         |
+| 六号   | 7.875pt | 2.768mm  | \scriptsize   |
+| 小五号 | 9pt     | 3.163mm  | \footnotesize |
+| 五号   | 10.5pt  | 3.69mm   | \small        |
+| 小四号 | 12pt    | 4.2175mm | \normalsize   |
+| 四号   | 13.75pt | 4.83mm   | \large        |
+| 三号   | 15.75pt | 5.53mm   | \Large        |
+| 二号   | 21pt    | 7.38mm   | \LARGE        |
+| 一号   | 27.5pt  | 9.48mm   | \huge         |
+| 小初号 | 36pt    | 12.65mm  | \Huge         |
 
 
-### 4.1.5. documentclass
+## 3.2. 注释 comment
 
-作为一开始的语句, `\documentclass[]{}` 具有设置该文档种类的功能, latex最基础的几大class是  
-* letter
-* article
-* report
-* book
+comment 包
 
-1. 每一个文档类都有不同的可选参数, 以及对应的标准 commands 来生成该类文档的不同部分  
-2. 每一个文档类都是一个 `.cls` 的文件, `\documentclass{article}`代表引入了`article.cls`
+https://ftp.yz.yamagata-u.ac.jp/pub/CTAN/macros/latex/contrib/comment/comment.pdf
+
+# 4. 文章 layout / Style
+
+首先设置各种页面布局 (layout) 和风格  
+
+1 pt ≈ 0.3515 mm  
+1 英尺= 25.4 mm
+
+## 4.1. Page Layout
+
+用于定义物理上的纸张大小和各种页边距
+
+* `\documentclass[ 可选设置指定纸张大小 ]{ 必须参数指定文章类型 }`
+* 该命令应该放在源文件一开始
+* 纸张大小会影响对应边界设置等命令的效果 (因为命令的参数单位是 mm)
+* 除此之外 \paperheight and \paperwidth 用于指定特殊的纸张大小
+
+纸张大小的表
+
+| 纸张大小              | 具体 Size     | 具体 PT          |
+| --------------------- | ------------- | ---------------- |
+| a4paper               | 210 mm×297 mm | 595.35 x 841.995 |
+| a5paper               | 148 mm×210 mm | 419.58 x 595.35  |
+| b5paper               | 176 mm×250mm  |
+| letterpaper (default) | 216 mm×279 mm |
+| legalpaper            | 216 mm×356 mm |
+| executivepaper        | 184 mm×267 mm |
 
 
-这些都是标准库的commands, 并不是必须要使用, 只是可以被使用
-1. `\address{地址}` 送信人的地址, 会放到 top-right
-2. `\signature{签名}` 送信人的签名, bottom-centre
-3. `\begin{letter}{收信人地址}` 收信人地址会放到正文的左上
-4. `\opening{问候}` 信件开头的问候
-5. `\closing{Best regards,}` 信件结尾的问候
-6. `\cc{copy}` send copy
-7. `\encl{Enclosure}` 信件的附件
 
-* 地址和签名都不属于 letter 环境中的内容 
-* 信件类型的文档会默认自动插入日期, 可以通过 `\date{29/02/2016}` 命令更改
 
-```tex
-%File Name: myletter.tex
-\documentclass[a4paper,12pt]{letter}
+* 注意对纸张来说, 横纵各有1英尺的基础偏移 (25.4 mm)
+* \hoffset 和 \voffset 是控制各种命令的参考点的位置, 默认都为0, 定义了纸张坐上点为各种模块的参考点
+* 以此为基准来控制各种长度的表如下:
+* 该表中的命令为 Mathematical expression
+* 对应的命令 command 语句为  `\setlength{ \textwidth }{ 数值 }`
+| 模块           | 命令            | 功能                                                                                 |
+| -------------- | --------------- | ------------------------------------------------------------------------------------ |
+| 文本           | \textheight     | Height of main texts without header and footer                                       |
+| 文本           | \textwidth      | Width of main texts without marginal notes                                           |
+| 文本           | \oddsidemargin  | Blank space on the left margin of odd-numbered pages, if both-side printing is opted |
+| 文本           | \evensidemargin | Blank space on the left margin of even-numbered page                                 |
+| 列属性         | \columnsep      | Gap between two columns in multi-column mode                                         |
+| 列属性         | \columnseprule  | 在两列模式下中间加一个线用于区分两边, 默认是0代表不存在线                            |
+| 列属性         | \columnwidth    | Width of a column in multi-column mode ( 默认根据 \textwidth and \columnsep 来计算). |
+| 列属性         | \linewidth      | Width of the lines of texts (usually equal to \columnwidth)                          |
+| Header         | \headheight     | Height of the header                                                                 |
+| Header         | \headsep        | Vertical gap between the header and the first line of the main texts                 |
+| Header         | \topmargin      | Extra vertical space above the header.                                               |
+| Header         | \headrulewidth  | 定义 header 下方线的粗细                                                             |
+| Footer         | \footrulewidth  | 定义 footer 上方线的粗细                                                             |
+| Footer         | \footskip       | Vertical gap between the last line of the main texts and the footer.                 |
+| Marginal notes | \marginparwidth | Width of marginal notes.                                                             |
+| Marginal notes | \marginparsep   | Horizontal gap between the main texts and marginal notes                             |
+| Marginal notes | \marginparpush  | Vertical space between two successive marginal notes.                                |
 
-\begin{document}
+![效果图片](./latex_page_layout.png)
 
-\address{Sender’s Address}
-\signature{Sender’s Name}
 
-\begin{letter}{Recipient’s Address}
+## 4.2. Page Style
 
-\opening{Dear Sir,}Contents of the letter...
+本质上, Page Style 指代的是每一页的 header, footer, page number 等正文以外的修饰信息  
 
-\closing{Best regards,}
-\cc{1. Secretary\\2. Coordinator}
-\encl{1. Letter from CEO.\\2. Letter from MD.}
-\end{letter}
-\end{document}
+* `\pagestyle{ }`     command implements the chosen page style on the current page as well as on the succeeding page
+* `\thispagestyle{ }` works locally on the current page only
+  * `\thispagestyle{empty}` may be used in the title page of a book or a report.
+  * `\thispagestyle{plain}` is issued by the:
+    * document-classes of article, book, and report to the `\maketitle` command
+    * first page of major sectioning commands like `\part{ }` or `\chapter{ }`
+    * 为了阻止这个被自动调用的 plain 导致一些章标题页被加了页码, 需要在每个`\maketitle`, `\part{ }` or `\chapter{ }` 命令后 手动加上 `\thispagestype{} e.g. empty`
+
+| Page Stype | 功能                                                      | 存在的包      |
+| ---------- | --------------------------------------------------------- | ------------- |
+| empty      | head 和 foot 都为空, 也没有页码                           |
+| plain      | 没有 head, foot 只有页码, 是 article 和 report 的默认格式 |
+| headings   | 没有 foot, head 有页码和该页的标题                        |
+| myheadings | 同 headings, 但是 页标题需要用别的命令提供格式            |
+| fancy      | 完整用户自定义 header 和 footers                          | fancyheadings |
+| fancy      | 完整用户自定义 header 和 footers                          | fancyhdr      |
+
+
+* headings : 默认的带页标题的格式, 依据 documentclass 和是否是 twoside 文档来定义章标题的格式和页码的位置
+
+
+### 4.2.1. myheadings Style
+
+The only difference is that the style of the header under `headings` is predefined, while it is user-defined under `myheadings`.
+
+* 关于 header 中页标题的相关信息需要通过 marker 命令来设置
+* `\markboth{ aeven }{ aodd }` 只在 twoside 生效, 用于指定 左右页的不同的 style
+  * 页码在左页的时候会放在左边界
+  * 页码在右页的时候会放在右边界
+* `\markright{ acont }`  用于指定 oneside 时候的 style, 会作用在所有 page
+* 有时候左右页想显示的层级不同, 需要不同的信息, 通过以下两个命令的结合即可实现
+  *  `\markboth{aeven}{ }`
+  *  `\markright {aodd}`
+
+
+| 关联的命令       | marker 命令     |
+| ---------------- | --------------- |
+| `\chapter{ }`    | \chaptermark    |
+| `\section{ }`    | \sectionmark    |
+| `\subsection{ }` | \subsectionmark |
+
+* 由于 myheadings 是具有 predefined 的风格, 因此自定义风格的时候需要使用 `\renewcommand{ }[ ]{ }` 命令
+  * 可以在可选参数 `[]` 中设置为 `[1]`, 在命令定义中使用 `#1` 来导入 unit 的对应名字
+* 可以用到的相关 label 命令:
+  * `\chaptername` : generates the label-word Chapter
+  * `\thechapter`, `\thesection`, `\thesubsection` : generate the serial numbers of the current unit
+
+```latex
+% 用于 twoside 的风格定义 book / report
+
+% Chapter 1. Headers and Footers
+\renewcommand{\chaptermark}[1]{\markboth{\chaptername∼\thechapter. #1}{ }}
+
+% 1.2. Generating Headers
+\renewcommand{\sectionmark}[1]{\markright{\thesection. #1}}
+
+% 用于 oneside 的风格, article
+
+\renewcommand{\sectionmark}[1]{\markboth{\thesection. #1}{ }}
+\renewcommand{\subsectionmark}[1]{\markright{\thesubsection. #1}}
 ```
 
-## 4.2. 界面宏
+### 4.2.2. fancyheadings Style
 
-LaTex有一些方便布置表格和图片的界面宏, 用于快速指定宽度 
+定义在 fancyheadings 包里的 fancy Style 是完全自定义的
 
-| 宏             | 功能               |
-| -------------- | ------------------ |
-| `\linewidth`   | 当前行的宽度       |
-| `\columnwidth` | 当前分栏的宽度     |
-| `\textwidth`   | 整个页面版芯的宽度 |
-| `\paperwidth`  | 整个页面纸张的宽度 |
+给上下标画线
+* \headrulewidth  默认是 0.4 pt
+* \footrulewidth  默认是 0 pt
+
+fancyheadings 包的 Style 定义命令:
+* peven 选项只有 twoside 的时候才生效
+
+| Commands for headers  | Commands for footers  | Alignment |
+| --------------------- | --------------------- | --------- |
+| `\lhead[peven]{podd}` | `\lfoot[peven]{podd}` | Left      |
+| `\chead[peven]{podd}` | `\cfoot[peven]{podd}` | Center    |
+| `\rhead[peven]{podd}` | `\rfoot[peven]{podd}` | Right     |
+
+
+```latex
+% 导入包. 使用包
+\usepackage{fancyheadings}
+\pagestyle{fancy}
+
+
+% 先重定义 marker
+\renewcommand{\chaptermark}[1]{\markboth{\thechapter. #1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection. #1}}
+
+\lhead[\textbf{\thepage}]{\textbf{\rightmark}}
+\rhead[\textbf{\leftmark}]{\textbf{\thepage}}
+
+
+
+```
 
 # 5. 文章管理
 
@@ -596,9 +755,146 @@ article
   * subparagraph 会有更多的段首缩进 
   * 在某些 cls 下会分配编号
 
+## 5.3. titlesec 更改章节标题格式
 
-# 6. 图表环境
-## 6.1. Table
+* `\usepackage[center]{titlesec}`
+  * 可选参数 center 可使标题居中, raggedleft 默认居左, raggedright 居右
+* `\titleformat{command}[shape]{format}{label}{sep}{before}[after]`
+  * command : 要重新定义的标题命令, \part, \chapter, \section, \s section, \s s section, \paragraph, \s paragraph
+  * shape   : 设定段落形状, hang, block, display 等
+  * format  : 定义标题外观, 字体加粗等
+  * label   : 定义标题的标签, 即 标签内容前面的标号
+  * sep     : 定义标题的标签与标题内容之间的间隔距离
+  * before  : 在标题内容前加的内容
+  * after   : 在标题内容后加的内容
+
+一般使用的时候, 只会定义 format 和 label
+
+# 6. latex Syntax 部件语法
+
+一个tex文件可以简单的分解成2部分
+* preamble  : 保存了全局的处理参数 `documentclass{}`
+* body      : 文档的内容        `\begin {document}`
+
+编译一个 tex 文档会有几个步骤
+* 会生成 `.aux .log .dvi` 几个文件 `.dvi` 是最终输出的可视化文件
+* `.dvi` 文件可以被转化成 `.ps .pdf` 文件
+
+
+## 6.1. 基础class
+
+Latex语法包含了两大类别:
+* latex command
+* latex environment
+* 定义在别的文件中的不属于标准文档类的 command 或者 environment 称为packages
+
+### 6.1.1. 基础字符
+
+以下字符可以直接被打印到文档中
+1. 英文字母和数字
+2. 两种括号 `[] ()`
+3. 5个数学符号 `+-*/=`
+4. 断句符号 `,:;!.?`
+5. 引号 ` " ' 
+6. at @
+
+其他的所有符号需要转义 `\verb""  或者 \verb!!` 写在两个引号or感叹号中间
+
+
+横线有三种长度:
+* `-` 用于链接两个单词 multi-language
+* `--` 用于指定范围 A--B
+* `---` 用于补充说明
+
+### 6.1.2. commands
+
+latex command 的属性可以表示成:
+* 一般以 `\` 开始的一个指令
+* 指令一般都是以英文字母组成
+* 空参数后要接空格 `\command 字符` 或者`\command\ 字符`
+
+### 6.1.3. environment
+
+用于实现特殊功能 插入公式
+* ename作为一个环境名称, 开启一个环境用 `\begin{ename} \end{ename}`
+* 环境可以嵌套(必然)
+* 环境也是有参数的 `\begin{ename}{p1}{p2} \end{ename}`
+* 环境也是有可选参数的 `\begin{ename}[op]`
+
+### 6.1.4. packages
+
+packages:
+* 在文档的 preamble 里载入, 即 `\documentclass{}` 和 `\begin{document}` 的中间载入
+* 载入包的代码是 `\usepackage{pname}`
+* 加载一个包也有可选参数 `\usepackage[p1]{pname}`
+* 包的参数定义只对包中的feature生效, 而`\documentclass`是对整个文档生效, 包括加载的包
+
+`\usepackage[utf8]{inputenc}`
+指定要在该文档中使用的包  
+解包 utf8 编码, 一般都会用该编码, 基本都有这一句  
+
+
+### 6.1.5. documentclass
+
+作为一开始的语句, `\documentclass[]{}` 具有设置该文档种类的功能, latex最基础的几大class是  
+* letter
+* article
+* report
+* book
+
+1. 每一个文档类都有不同的可选参数, 以及对应的标准 commands 来生成该类文档的不同部分  
+2. 每一个文档类都是一个 `.cls` 的文件, `\documentclass{article}`代表引入了`article.cls`
+
+
+这些都是标准库的commands, 并不是必须要使用, 只是可以被使用
+1. `\address{地址}` 送信人的地址, 会放到 top-right
+2. `\signature{签名}` 送信人的签名, bottom-centre
+3. `\begin{letter}{收信人地址}` 收信人地址会放到正文的左上
+4. `\opening{问候}` 信件开头的问候
+5. `\closing{Best regards,}` 信件结尾的问候
+6. `\cc{copy}` send copy
+7. `\encl{Enclosure}` 信件的附件
+
+* 地址和签名都不属于 letter 环境中的内容 
+* 信件类型的文档会默认自动插入日期, 可以通过 `\date{29/02/2016}` 命令更改
+
+```tex
+%File Name: myletter.tex
+\documentclass[a4paper,12pt]{letter}
+
+\begin{document}
+
+\address{Sender’s Address}
+\signature{Sender’s Name}
+
+\begin{letter}{Recipient’s Address}
+
+\opening{Dear Sir,}Contents of the letter...
+
+\closing{Best regards,}
+\cc{1. Secretary\\2. Coordinator}
+\encl{1. Letter from CEO.\\2. Letter from MD.}
+\end{letter}
+\end{document}
+```
+
+## 6.2. 界面宏
+
+LaTex有一些方便布置表格和图片的界面宏, 用于快速指定宽度 
+
+| 宏             | 功能               |
+| -------------- | ------------------ |
+| `\linewidth`   | 当前行的宽度       |
+| `\columnwidth` | 当前分栏的宽度     |
+| `\textwidth`   | 整个页面版芯的宽度 |
+| `\paperwidth`  | 整个页面纸张的宽度 |
+
+
+
+# 7. 图表环境
+
+
+## 7.1. Table
 
 latex中处理表格的环境
 * 传统表格, 不能分配序列号和标题, 文本为基础的独立对象, 容易在创建超大表格的时候出问题
@@ -610,7 +906,7 @@ latex中处理表格的环境
   * wraptable
   * sidewaystable
 
-### 6.1.1. tabular
+### 7.1.1. tabular
 
 基础表格环境 tabular
 
@@ -632,7 +928,7 @@ latex中处理表格的环境
 \end{tabular}
 ```
 
-### 6.1.2. tabularx
+### 7.1.2. tabularx
 
 加强版的表格环境, 解决了
 1. tabular 的所有列等宽的问题, 通过自动计算所有列宽, 来减少表格越界的问题
@@ -663,7 +959,7 @@ latex中处理表格的环境
 
 ```
 
-### 6.1.3. table
+### 7.1.3. table
 
 封装的较常用的表格环境, 基础的 tabular 会嵌套在该环境中, 主要用来为表格
 1. 将表格创建在分离的一段
@@ -704,14 +1000,15 @@ latex中处理表格的环境
 
 ```
 
-## 6.2. Figure 插图
+## 7.2. Figure 插图
 
 * 往 Latex 文件中插图
 * 根据图片的格式, 需要使用不同的编译器, 尽量确保所有插图都是统一的格式
   * latex : eps ps
   * pdflatex: pdf jpeg tiff png
+* 通过使用较新的 graphicx 包可以方便的插入任何格式的图片
 
-### 6.2.1. epsfig
+### 7.2.1. epsfig
 
 eps 格式的图片可以使用专有的命令 epsfig, 该命令定义在 `epsfig` 的包中
 
@@ -720,15 +1017,9 @@ eps 格式的图片可以使用专有的命令 epsfig, 该命令定义在 `epsfi
 * width=  height= : 用于指定插图的显示大小, 省略则是原大小, 只指定一个则是按比例缩放, 指定两个则会相应的拉伸
 * angle= : 用于给定一个逆时针旋转的角度, 
 
-### 6.2.2. includegraphics
 
-更加通用的插图命令, 可以插入任何格式的图片, 定义在 `graphicx` 包中
 
-命令 `\includegraphics[aopt]{fname}`
-* fname: 图片的名称, 不带后缀名
-* aopt : 图片的属性, 包括 width height angle 用法同上
-
-### 6.2.3. figure
+### 7.2.2. figure
 
 同表格一样, 也是图片专用的环境, 使用 `begin{figure}[!hbt]` 进入环境来达成:
 1. 给予一个编号和标题
@@ -753,7 +1044,7 @@ side-by-side图片
 
 ```
 
-### 6.2.4. subfigure
+### 7.2.3. subfigure
 
 有时候需要将图片分组, 每个组有一个大标题, 然后图片有自己的小标题, 此时可以使用 subfigure
 * `subfigure[标题]{内容}`
@@ -773,61 +1064,28 @@ side-by-side图片
 }
 
 ```
+## 7.3. includegraphics graphicx
 
-# 7. 文字格式
-
-全局默认文字格式 (type of font):
-* medium series
-* serif family
-* upright shape
-* 10pt size
-
-文字格式可以被分成四个模块
-1. family  字体
-2. series  细, medium, 加粗
-3. shape   斜体等
-4. size    字号
-
-标准库中的格式
-* family
-  * Serif 默认   
-  * Sans serif
-  * Typewriter
-* series
-  * Medium
-  * Boldface series
-* Shape
-  * Upright
-  * Italic
-  * Slanted
-  * Caps & Small cap
-  * emphasized
-* size
-
-## 7.1. size 字号设置
-
-部分改变字号, 可以使用环境, 直接将字号代码写在 begin end 命令里
+更加通用的插图命令, 可以插入任何格式的图片, 定义在 `graphicx` 包中
+* graphics 是标准的包
+* graphicx 是基于以上进行拓展的图片包, 二者在使用时的参数格式有区别
+* 以下以 graphicx 为主进行学习
 
 
-| 名称   | pt      | mm       | 代码          |
-| ------ | ------- | -------- | ------------- |
-| 七号   | 5.25pt  | 1.845mm  | \tiny         |
-| 六号   | 7.875pt | 2.768mm  | \scriptsize   |
-| 小五号 | 9pt     | 3.163mm  | \footnotesize |
-| 五号   | 10.5pt  | 3.69mm   | \small        |
-| 小四号 | 12pt    | 4.2175mm | \normalsize   |
-| 四号   | 13.75pt | 4.83mm   | \large        |
-| 三号   | 15.75pt | 5.53mm   | \Large        |
-| 二号   | 21pt    | 7.38mm   | \LARGE        |
-| 一号   | 27.5pt  | 9.48mm   | \huge         |
-| 小初号 | 36pt    | 12.65mm  | \Huge         |
+命令 `\includegraphics*[aopt]{fname}`
+* 如果命令带有星号*, 则图片会被裁剪的插入, 如果没有星号, 则图片超出边界的部分会和文字重叠 
+* fname: 图片的名称, 不带后缀名
+* aopt : 图片的属性, graphicx 的命令格式是所有命令都写在一个方括号内, 用逗号隔开
 
 
-## 注释 comment
+参数说明
+* Bounding Box 设置, 包括两种兼容性的命令格式
+  * `bb=x y h w` 用空格隔开的用于设置边界的参数
+  * bblx, bbly, bburx, bbury. 分别等用于上面的 bb中的依次参数
+  * natwidth, natheight . 等同于设置成 `bb=0 0 natheight natwidth`
+* pagebox, 因为 pdf 文件没有 BoundingBox, 所以通过别的方法设置边界, 可以选择下面的任意一项
+  * me
 
-comment 包
-
-https://ftp.yz.yamagata-u.ac.jp/pub/CTAN/macros/latex/contrib/comment/comment.pdf
 
 # 8. 引用 Reference
 
@@ -936,14 +1194,18 @@ Latex 文档引用的参考文献管理库, 克服了 thebiblography 的所有�
 * 宏的最初的目的就是为了减少重复使用的超长命令
 * 用户对宏的操作应该在 preamble 或者额外的 `.cls` 文件中
 
-## 9.1. 定义 command
 
-定义一个新的 command `\newcommand{newc}{aval}` `\providecommand{newc}{aval}`
+
+## 9.1. newcommand renewcommand
+
+定义一个新的 command `\newcommand{newc}[num]{aval}` `\providecommand{newc}{aval}`
 * newc 是新定义的命令的名字
 * aval 是命令的参数
 * 如果 newc 是一个已存在的命令 
   * `\newcommand` 会报错
   * `\providecommand` 会保留原本的命令, 且不会有任何提示, 所以不应该被使用
+* `\renewcommand` 用于修改一个命令的定义, 语法相同
+
 
 ### 9.1.1. 定义无参数命令
 
@@ -973,6 +1235,17 @@ Latex 文档引用的参考文献管理库, 克服了 thebiblography 的所有�
 * frag 是必须参数的默认值, 添加了默认值后该参数及变成可选参数
 * frag 会顺序赋值给 `#1 ,#2`
 
-## 9.2. 定义 environment
+## 9.2. def
+
+同 newcommand 相比, `\def` 是 Tex原生的低级命令
+* 功能同 newcommand 等价
+* 不会检查命令是否存在
+
+
+删除一个宏:
+* `\let\mymacro\undefined`
+* `\let\mymacro\donothing`
+
+## 9.3. 定义 environment
 
 # 10. documentclass 介绍  

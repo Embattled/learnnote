@@ -250,11 +250,16 @@ Secure Digital Memory Card/SD card
 
 
 SD 卡的规格
-* SD 1.0 , 按CD-ROM的150kB/s为1倍速的速率, 称为 X 记速法, 已经被舍弃, 不需要记
+* SD 1.0 , 按CD-ROM的150kB/s为1倍速的速率, 称为 X 倍记速法, 已经被舍弃, 不需要记
 * SD 2.0 , 分成了 Class 2 4 6 10 四个等级, Class11 13 是民间的, 没有被正式采纳为标准
 * SD 3.01, 分成了 UHS-1,和 UHS-2, 同样也有分类下的 class 等级, 符号是数字包括在 U 字中
 * SD2.0 标准的 Class 是写入的最低速度, 而 3.0 标准的速度指标是最大读取速度
   * 目前 3.0 UHS class 的数字代表了最低写入速度为 X0 MB/s
+* SD 5.0 , 新增了视频速度等级标准 Video Speed Class, 分为V6/V10/V30/V60/V90
+
+应用表现等级 AX (Application Performance Class)
+* A1    ：10MB/s Sequential 连续读写, 1500 Read IOPS（随机读取）, 500 Write IOPS（随机写入）
+* A2    : 10MB/s Sequential 连续读写, 4000 Read IOPS（随机读取）, 2000 Write IOPS（随机写入）
 
 | 速度等级 | 速度(MB/秒)             |
 | -------- | ----------------------- |
@@ -265,6 +270,10 @@ SD 卡的规格
 | Class 10 | 最低写入10              |
 | UHS-I    | 写入50以内/读取104以内  |
 | UHS-II   | 写入156以内/读取312以内 |
+| V10      | 最低写入10              |
+| V90      | 最低写入90              |
+A1,U1,Class10速度差距不大
+
 
 SD 卡的容量规格 : 区别于速度规格, 容量目前也有不同的名称规格
 * SD    : ~2GB

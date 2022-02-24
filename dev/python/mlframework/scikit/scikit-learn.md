@@ -430,6 +430,12 @@ plt.show()
 
 # 8. preprocessing
 
+用于各种预处理数据, 各个方法之间比较独立
+
+includes scaling, centering, normalization, binarization methods
+
+
+
 ## 8.1. scale
 
 ```py
