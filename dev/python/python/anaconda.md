@@ -69,6 +69,7 @@ anaconda-clean --yes
 ## 1.4. 降级
 
 conda config --set allow_conda_downgrades true
+
 # 2. conda 包管理和环境管理
 
 conda 是 anaconda 下包管理和环境管理的工具  
@@ -223,10 +224,10 @@ conda create --name <new_env_name> --clone <copied_env_name>
 ```shell
 #激活虚拟环境
 activate python36   # windows 平台
-source activate python36 # linux/mac 平台
+conda activate python36 # linux/mac 平台
 
 #退出当前虚拟环境
-deactivate python36 
+conda deactivate python36 
 
 ```
 
