@@ -1,20 +1,21 @@
-# 1. 安装Git
+# 1. Git config
 
-## 1.1. 在Windows上安装
+## 1.1. 自报家门
 
+Git是分布式版本控制系统，所以，每个机器都必须自报家门：你的名字和Email地址  
 安装程序完成后需要在命令行输入
 ```
 git config --global user.name "Your Name"
 git config --global user.email "email.example.com"
+
+git config -l  # 测试编辑好的机器信息
 ```
-Git是分布式版本控制系统，所以，每个机器都必须自报家门：你的名字和Email地址。
 
 注意`git config`命令的`--global` 参数，用了这个参数，表示你这台机器上所有的Git仓库都会使用这个配置，当然也可以对某个仓库指定不同的用户名和Email地址
 
 ## 1.2. 定义Git全局的 .gitignore 文件
-创建相应的 .gitignore 文件，可以放在任意位置。然后在使用以下命令配置Git:  
+创建针对所有库的全局的 .gitignore 文件，可以放在任意位置。然后在使用以下命令配置Git:  
 `git config --global core.excludesfile ~/.gitignore`
-
 
 # 2. 版本库操作
 
