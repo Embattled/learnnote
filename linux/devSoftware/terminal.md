@@ -76,3 +76,9 @@ tmux 允许新建多个窗口
 * `{ }` : 当前窗格与上/下一个窗格交换位置 
 
 
+# Windows Terminal
+
+wt.exe  
+
+微软独立于 cmd 和 Powershell 的单独终端程序, 同时具有一定
+

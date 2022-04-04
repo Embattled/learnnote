@@ -5,13 +5,11 @@ GNU Make
 ## 1.1. 命令
 
 * `-j [N], --jobs[=N]`
-    * Allow N jobs at once; infinite jobs with no arg.
+    * Allow N jobs at once; infineite jobs with no arg.
     * 允许并行编译
     * 不指定数字的时候自动探测最大的可用CPU
 * `-f, --file` 
     * 当 makefile 文件不是默认的时候, 用该参数来指定要执行的 makefile 文件
-
-
 
 # 2. makefile
 
