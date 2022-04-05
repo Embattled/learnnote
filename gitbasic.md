@@ -1,5 +1,19 @@
 # 1. Git config
 
+**一些基础的Linux命令**
+* `mkdir learngit` 创建一个文件夹  
+* `cd learngit` 进入文件夹  
+* `pwd`  输出当前所在目录 
+* `ls -ah` ls用来输出当前文件夹的所有文件及文件夹  -ah用来输出包括被隐藏的全部
+
+
+
+git配置文件有三个位置:
+1. `/etc/gitconfig` 系统配置文件，对应git config --system
+2. `~/.gitconfig` 用户全局配置文件，对应git config --global
+3. 项目目录中`.git/config` 仅该项目配置文件，对应git config --local
+
+
 ## 1.1. 自报家门
 
 Git是分布式版本控制系统，所以，每个机器都必须自报家门：你的名字和Email地址  
@@ -14,25 +28,25 @@ git config -l  # 测试编辑好的机器信息
 注意`git config`命令的`--global` 参数，用了这个参数，表示你这台机器上所有的Git仓库都会使用这个配置，当然也可以对某个仓库指定不同的用户名和Email地址
 
 ## 1.2. 定义Git全局的 .gitignore 文件
+
 创建针对所有库的全局的 .gitignore 文件，可以放在任意位置。然后在使用以下命令配置Git:  
 `git config --global core.excludesfile ~/.gitignore`
 
+## 1.3. 更换默认编辑器
+
+`git config --global core.editor` <编辑器, 例如 vim>
+
 # 2. 版本库操作
 
+* `git init` 在当前目录创建 git 内部文件, 使当前路径称为一个 git 项目
 
-## 2.1. 新建版本库
+* 工作区    : 就是电脑里能看到的目录  
+* 暂存区    : 在使用`git add`的时候,就是把文件修改添加到暂存区  
+* 隐藏目录  : `.git`不算工作区,而是版本库  
 
-* `git init`
+而`git commit`就是把暂存区的内容正式提交到分支上
 
-
-**一些基础的Linux命令**
-* `mkdir learngit` 创建一个文件夹  
-* `cd learngit` 进入文件夹  
-* `pwd`  输出当前所在目录 
-* `ls -ah` ls用来输出当前文件夹的所有文件及文件夹  -ah用来输出包括被隐藏的全部
-
-
-## 2.2. gitignore 过滤文件
+## 2.1. gitignore 过滤文件
 在根目录新建 `.gitignore` 来过滤不想跟踪的文件  
   * 以斜杠`/`结尾表示目录  `mtk/` 过滤整个文件夹  `/mtk/do.c` 过滤某个具体文件  `!/mtk/one.txt` 追踪(不过滤)某个具体文件
   * 以星号`*`通配多个字符  `*.zip` 过滤所有.zip文件  
@@ -48,110 +62,102 @@ git config -l  # 测试编辑好的机器信息
 
 
 如果新添加了过滤关键字, 而相关文件已经被推送, 可以用 `--cashed` 命令  
-
 1. `git rm -r --cached .`  点`.` 表示所有文件  
 2. 以缓存形式删除所有文件, 并不会真的删除系统中的文件  
 3. 再 `git add -A` 提交推送即可
 
 
-## 2.3. add
+## 2.2. 身兼数职的 checkout
 
-**`add`**命令用来添加新文件或者对文件的新修改到暂存区
-* `git add readme.txt`  
+0. 在 git 2.23 版本以前, 对于丢弃工作区的修改
+   * git 会提示使用 `git checkout -- file`
+   * 事实上 `checkout` 还兼任了切换分支的功能, 这容易导致操作混淆
+1. 在 Git 2.23 版本开始引入了两个新的命令 `switch` 和 `restore`
+   * 通过直接访问 `man git` 可以查看到最新版本对这 3 个命令的定义
+   * `git-checkout(1)   Switch branches or restore working tree files.`
+   * `git-switch(1)     Switch branches.`
+   * `git-restore(1)                Restore working tree files.`
+2. 可以看到两个新的命令完美替换掉了 checkout, 因此应该尽量避免使用 checkout
 
-`git add .` 会监控工作区的状态树，使用它会把工作时的所有变化提交到暂存区，包括*文件内容修改(modified)* 以及*新文件(new)*，但**不包括被删除的文件**。
+## 2.3. 文件更改 未commit下的
 
-`git add -u ` 仅监控**已经被add的文件（即tracked file）**，他会将被修改的文件提交到暂存区。add -u **不会提交新文件（untracked file）**。（git add --update的缩写,提交被修改(modified)和被删除(deleted)文件，不包括新文件(new)）
+1. `add` 命令用来添加新文件或者对文件的新修改到暂存区
+   * `git add readme.txt`  单独提交一个文件  
+   * `git add .` 会监控工作区的状态树, 提交文件修改(modified), 以及新文件(new), 但不包括被删除的文件
+   * `git add -u[pdate] ` 仅监控已经被add的文件(tracked file) 他会将被修改的文件提交到暂存区, 不会提交新文件 (untracked file), 提交被修改(modified)和被删除(deleted)文件, 不包括新文件(new)
+   * `add .` 和 `add -u` 有着微妙的区别, 在于对新文件和删除文件的态度上
+   * `git add -A[ll] ` 是上面两个功能的合集 (提交所有变化)
 
-`git add -A ` 是上面两个功能的合集（git add --all的缩写）(提交所有变化)
+2. `rm` 用于 git 追踪的删除文件
+   * `git rm readme.txt`   用来添加一个删除文件的修改到暂存区
+   * `git rm --cached txt` 用于缓存的删除, 即不更改文件
+
+3. `mv`  追踪下的 重命名 移动文件, 直接在文件系统重命名或移动会导致无法跟踪 
+   * `git mv <old_name> <new_name>`来重命名文件  
+   * `git mv -f * *` 来进行一个强制重命名, 这会覆盖原本名为`new_name`的文件  
+   * 使用 `git mv string.c src/` 来将一个文件移入文件夹,使用 `/` 来代表目录
+
+4. `status` 状态查看, 主要查看有哪些文件被修改但是还没提交
+   * `git status` 
+
+5. `diff` 直接在命令行里查看改动
+   *  `git diff` 默认比较的是工作区和暂存区, 即如果刚刚 `git add -A` 了后是看不到改动的
+   *  `git diff [<options>] [<commit> [<commit>]] [--] [<path>...]` 完整命令
+      *  输入一个 commit 则是工作区和参数 commit
+      *  输入两个 commit 则是参数 commit 之间的比较
+      *  `--path` 用来指定文件进行改动查看
+
+6. `restore` 撤销修改
+   * 默认是回到将工作区的内容还原为到暂存区, 即舍弃所有更改
+   * 也可以使  版本库中的文件覆盖暂存区的文件, 即回退 `add`
+   * `git restore [<options>] [--source=<branch>] <file>...` 完整使用方法
+   * `git restore <file>`撤销工作区的修改, 使这个文件回到暂存区的样子 (上一次`add`或者`commit`的状态)
+   * `git restore --staged <file>` 将暂存区的内容(已经add的)撤销掉 (unstage)
+     * 撤销掉 add 的内容还可以使用 `git reset HEAD <files>`, 是冗余的命令
 
 
-## 2.4. 删除文件
+## 2.4. 版本提交与回退
 
-`git rm readme.txt`   用来添加一个删除文件的修改到暂存区
-`git rm --cached txt` 用于缓存的删除, 即不更改文件
-
-
-## 2.5. 重命名 移动文件
-
-直接在文件系统重命名会导致无法跟踪  
-使用 `git mv <old_name> <new_name>`来重命名文件  
-使用 `git mv -f * *` 来进行一个强制重命名,这会覆盖原本名为<new_name>的文件  
-
-使用 `git mv string.c src/` 来将一个文件移入文件夹,使用 `/` 来代表目录
-
-
-## 2.6. commit
-
-* `git commit` 提交更改,将暂存区的内容提交到版本库  
-* ` git commit -m "wrote a readme file"`  
-* 每一次commit都是一个保存点,可以从这里还原版本库  
-
-
-* 如果commit注释写错了，只是想改一下注释，只需要：
-    `git commit --amend`
-* 提交后发现忘记了暂存某些需要的修改，可以像下面这样操作：
-
+1. `commit` 将暂存区的内容提交到版本库, 每一次commit都是一个保存点,可以从这里还原版本库  
+   * `git commit -c <commit>` 懒人代码, 直接复制参数 commit 的 log msg
+   * `git commit -C <commit>` 复制参数 commit 的 log msg 并进入编辑界面
+   * ` git commit -m "wrote a readme file"`  
+   * 如果commit注释写错了，只是想改一下注释，只需要：
+   * `git commit --amend` 用于提交后发现忘记了暂存某些需要的修改
+     * 相当于 `git reset --soft HEAD^` 再重新提交 `git commit -c ORIG_HEAD`
+     * 使用示例
 ```sh
 $ git commit -m 'initial commit'
 $ git add forgotten_file
 $ git commit --amend
 ```
+  
+2. `log` 查看 commit 的历史
+   * `git log` 用来查看全部版本的更新时间以及说明
+   * 后面加上 `--pretty=oneline` 使得输出只有一行,更简洁
 
-## 2.7. 版本查看
+3. `reflog` 查看 每一个操作的 log 历史
+   * 相比较于 `log`, 记录的操作更加详细, 主要用于 restore
 
-查看 commit 的历史
+4. `reset` 版本穿梭, 退回指定版本, 即撤销 commit
+   * Git的版本回退仅仅是更改一个名为`HEAD`的内部指针,HEAD指向的版本就是当前的版本
+   * `git reset HEAD <files>` 回到最新版本, 是一个冗余的命令
+     * 主要用于把暂存区的修改回退到工作区
+     * 该命令相当于 `git restore --staged <file_name>`
+   * `git reset HEAD^` 回到当前版本的上一个版本
+     * 可以填入版本号,版本号不必写全
+     * 可以填入 `HEAD^`, 代表上一个版本, `^` 的个数代表上 N 个版本
+     * `HEAD~N` , N是数字, 代表返回上N个版本, 用于不适合用 `^` 表示的过早的版本
+   * 对工作区的影响参数
+     * `--hard` , 删除工作空间改动的代码, 即代码文件也会被返回
+     * `--mixed`, 默认的参数, 不删除工作区代码, 撤销 commit 和 add
+     * `--soft` , 不改动代码, 只撤销 commit, git add 也不会撤销
+   * 重做(撤销刚才的撤销动作):
+     * 在命令行窗口还没关掉的时候,寻找`commit id` 可以根据id来回到具体的哪一个版本  
+     * `git reset --hard 1094a`  
+     * `git reset commitID test.txt`    
+     * 若忘记了想要退回的版本id,使用 `git reflog`  
 
-1. 查看状态
-   `git status` 用来查看当前的状态,例如有哪些文件被修改但是还没提交
-
-2. 查看区别
-   `git diff` 用来查看difference,这里比较的是**工作区**和**暂存区**   
-   注意!显示的格式是<u>**Unix通用的diff格式**</u>  
-
-`git diff HEAD --readme.txt` 可以查看**工作区**和**版本库**里面最新版本的区别
-
-3. 查看版本**
-   `git log` 用来查看最新三个版本的更新时间以及说明
-   后面加上 `--pretty=oneline` 使得输出只有一行,更简洁
-
-
-## 2.8. 版本穿梭
-
-* Git的版本回退仅仅是更改一个名为`HEAD`的内部指针,HEAD指向的版本就是当前的版本
-* 要想退回上一个版本, 即撤销commit ,使用命令  `git reset HEAD^`
-
-参数说明
-1. HEAD
-   * 可以填入版本号,版本号不必写全
-   * 可以填入 HEAD^, 代表上一个版本
-   * HEAD~N , N是数字, 代表返回上N个版本
-2. 工作区参数
-   * --hard , 删除工作空间改动的代码, 即代码文件也会被返回
-   * --mixed, 默认的参数, 不删除工作区代码, 撤销 commit 和 add
-   * --soft , 不改动代码, 只撤销 commit, git add 也不会撤销
-
-重做(撤销刚才的撤销动作):
-在命令行窗口还没关掉的时候,寻找`commit id` 可以根据id来回到具体的哪一个版本  
-* `git reset --hard 1094a`  
-* `git reset commitID test.txt`    
-
-若忘记了想要退回的版本id,使用  
-`git reflog`  
-
-## 2.9. 工作区和暂存区
-
-* 工作区    : 就是电脑里能看到的目录  
-* 暂存区    : 在使用`git add`的时候,就是把文件修改添加到暂存区  
-* 隐藏目录  : `.git`不算工作区,而是版本库  
-
-而`git commit`就是把暂存区的内容提交到分支上
-
-## 2.10. 撤销修改
-
-`git restore <file>`撤销工作区的修改,使这个文件回到暂存区的样子,(`add`或者`commit`的状态)
-
-`git restore --staged <file>`可以把已经`add`的内容撤销,将暂存区的内容撤销掉(unstage),重新放回工作区  
 
 
 # 3. 云
@@ -215,8 +221,16 @@ GitHub给出的地址不止一个，还可以用`https://github.com/Embattled/le
 
 
 # 4. Git的分支管理
+
+`man git` 的 分支相关的命令说明
+ * switch              Switch branches.
+ * branch              List, create, or delete branches.
+ * merge               Join two or more development histories together.
+ * (deprecate)checkout Switch branches or restore working tree files.
+
 ## 4.1. 分支的基础操作
-### 4.1.1. 创建分支
+
+1. `branch` 分支管理
 使用  `git checkout -b <分支名称>`  
 `-b`参数代表创建并切换,相当于  
 `git branch <分支名称>`新建一个分支  
@@ -224,13 +238,11 @@ GitHub给出的地址不止一个，还可以用`https://github.com/Embattled/le
 
 `git branch`  命令会列出所有分支,并在当前分支前方标识一个 <kbd>*</kbd>  
 
-### 4.1.2. 切换分支
+2. `switch` 切换分支
 由于`checkout`还具有撤销修改的功能,所以防止迷惑性,可以使用更科学的命令 `switch`  
 `git switch -c dev` 创建并切换
 
 
-### 4.1.3. 合并一个分支
-使用 `git merge <分支名称>` 来将分支的工作成果合并到`master` 分支上
 
 ### 4.1.4. 删除一个分支
 合并完成后,原有的分支就不需要了  
@@ -238,8 +250,10 @@ GitHub给出的地址不止一个，还可以用`https://github.com/Embattled/le
 
 因为创建、合并和删除分支非常快，所以Git鼓励你使用分支完成某个任务，合并后再删掉分支，这和直接在master分支上工作效果是一样的，但过程更安全。
 
-## 4.2. 2.解决分支的冲突
+## 4.2. 解决分支的冲突
 
+1. `merge` 合并一个分支
+使用 `git merge <分支名称>` 来将分支的工作成果合并到`master` 分支上
 当Git无法执行`快速合并`，只能试图把各自的修改合并起来，但这种合并就可能会有冲突  
 必须手动解决冲突后再提交
 
