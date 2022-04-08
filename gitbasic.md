@@ -9,9 +9,9 @@
 
 
 git配置文件有三个位置:
-1. `/etc/gitconfig` 系统配置文件，对应git config --system
-2. `~/.gitconfig` 用户全局配置文件，对应git config --global
-3. 项目目录中`.git/config` 仅该项目配置文件，对应git config --local
+1. `/etc/gitconfig` 系统配置文件,            对应git config --system
+2. `~/.gitconfig` 用户全局配置文件,          对应git config --global
+3. 项目目录中`.git/config` 仅该项目配置文件,  对应git config --local
 
 
 ## 1.1. 自报家门
@@ -25,7 +25,7 @@ git config --global user.email "email.example.com"
 git config -l  # 测试编辑好的机器信息
 ```
 
-注意`git config`命令的`--global` 参数，用了这个参数，表示你这台机器上所有的Git仓库都会使用这个配置，当然也可以对某个仓库指定不同的用户名和Email地址
+注意`git config`命令的`--global` 参数，用了这个参数，表示该用户在这台机器上所有的Git仓库都会使用这个配置，当然也可以对某个仓库指定不同的用户名和Email地址
 
 ## 1.2. 定义Git全局的 .gitignore 文件
 
@@ -36,7 +36,7 @@ git config -l  # 测试编辑好的机器信息
 
 `git config --global core.editor` <编辑器, 例如 vim>
 
-# 2. 版本库操作
+# 2. 离线操作
 
 * `git init` 在当前目录创建 git 内部文件, 使当前路径称为一个 git 项目
 
@@ -45,6 +45,7 @@ git config -l  # 测试编辑好的机器信息
 * 隐藏目录  : `.git`不算工作区,而是版本库  
 
 而`git commit`就是把暂存区的内容正式提交到分支上
+
 
 ## 2.1. gitignore 过滤文件
 在根目录新建 `.gitignore` 来过滤不想跟踪的文件  
@@ -76,7 +77,7 @@ git config -l  # 测试编辑好的机器信息
    * 通过直接访问 `man git` 可以查看到最新版本对这 3 个命令的定义
    * `git-checkout(1)   Switch branches or restore working tree files.`
    * `git-switch(1)     Switch branches.`
-   * `git-restore(1)                Restore working tree files.`
+   * `git-restore(1)    Restore working tree files.`
 2. 可以看到两个新的命令完美替换掉了 checkout, 因此应该尽量避免使用 checkout
 
 ## 2.3. 文件更改 未commit下的
@@ -132,15 +133,20 @@ $ git add forgotten_file
 $ git commit --amend
 ```
   
-2. `log` 查看 commit 的历史
+2. `log` 查看 commit 的历史, 还可以画图来体现项目的 merge 历史
    * `git log` 用来查看全部版本的更新时间以及说明
    * 后面加上 `--pretty=oneline` 使得输出只有一行,更简洁
+   * `--graph` 可以画分支图
+   * `--abbrev-commit` 可以简化commit的ID
+   * `git log --graph --pretty=oneline --abbrev-commit`  
 
-3. `reflog` 查看 每一个操作的 log 历史
+
+1. `reflog` 查看 每一个操作的 log 历史
    * 相比较于 `log`, 记录的操作更加详细, 主要用于 restore
 
-4. `reset` 版本穿梭, 退回指定版本, 即撤销 commit
-   * Git的版本回退仅仅是更改一个名为`HEAD`的内部指针,HEAD指向的版本就是当前的版本
+2. `reset` 版本穿梭, 退回指定版本, 即撤销 commit
+   * Reset current HEAD to the specified state.
+   * Git reset 的版本回退仅仅是更改一个名为`HEAD`的内部指针,HEAD指向的版本就是当前的版本
    * `git reset HEAD <files>` 回到最新版本, 是一个冗余的命令
      * 主要用于把暂存区的修改回退到工作区
      * 该命令相当于 `git restore --staged <file_name>`
@@ -158,12 +164,59 @@ $ git commit --amend
      * `git reset commitID test.txt`    
      * 若忘记了想要退回的版本id,使用 `git reflog`  
 
+3. `revert` Revert some existing commits.
+   * 同 reset 最大的不同是, reset 是真正意义上的版本穿梭, revert 则是礼貌的回退
+     * revert是用一次新的commit来回滚之前的commit, 此次提交之后的commit都会被保留
+     * reset是版本库回退到某次 commit , 此commit id之后的修改都会被删除
+   * revert 的真正用于是 删除某一个版本的所有改动
+     * 在某个版本添加或删除的文件将被复原
+     * 对于持续更改的文件, 很容易引起冲突, 需要手动消除冲突
 
 
 # 3. 云
-## 3.1. 使用Github
 
-### 3.1.1. 第一次的初始化
+## 3.1. 远程版本库
+
+1. `remote` 命令用于管理和远程相关的事物
+   * 使用`git remote`查看远程库的名称  
+   * 使用`git remote -v`可以显示包括url的详细信息  
+   * 使用`git remote add <命名远程库> <url>`  添加一个远程库
+     * `git remote add origin  https://github.com/embattled/learnnote.git`  
+     * origin是默认的远程库叫法,也可以自定义
+
+2. `push` 命令用于推送所有 commit 到远程版本库
+   * `git push <远程库名称> <分支名称>`
+   * `-f  --force` 参数用于强制推送, 可以用于撤销已经 push 的 commit
+   * `-u --set-upstream`   set upstream for git pull/status
+     * 一般用于执行第一次推送
+     * `git push -u origin master` 命令来第一次推送  
+     * `-u` 在将本地分支推送到远程的基础上,还将本地和远程的该分支关联了起来,在以后的推送或者拉去时可以简化命令
+     * 在这之后的推送使用  `git push origin master`即可
+     * 该配置在 branch 上有必要
+
+3. `clone` 用于克隆版本库
+   * `git clone git@github.com:Embattled/learnnote.git`  
+   * `-b, --branch <branch>` 指定要克隆的分支
+
+4. `fetch` 用于从远端拉取代码
+   * Download objects and refs from another repository.
+   * `git fetch [<options>] [<repository> [<refspec>...]]` or `git fetch [<options>] <group>`
+   * `git fetch origin master` 为默认操作
+   * `git fetch origin master:tmp` 用 冒号来指定下载的目标分支, 默认是 `远端名/分支名`
+
+5. `pull` 用于懒人的拉取代码, 会自动merge到本地工作区上
+   * Fetch from and integrate with another repository or a local branch.
+   * 相当于先 fetch 再 `git merge origin/master`
+     * 先从远程的origin的master主分支下载最新的版本到origin/master分支上
+     * 然后比较本地的master分支和origin/master分支的差别并合并
+   * 实际使用中, 用 fetch 更加安全, 因为在中间可以更精细化的比较什么改动被 fetch 下来了
+     * `git fetch origin master:tmp`
+     * `git diff tmp `
+     * `git merge tmp`
+
+## 3.2. 使用Github
+
+
 
 本地Git仓库和GitHub仓库之间的传输是通过SSH加密的  
 
@@ -173,52 +226,12 @@ $ git commit --amend
   * 在`.ssh`目录中找到<kbd>id_ras.pub</kbd>,就是SSH公钥
 * 在github上将自己的SSH KEY公钥添加
 
-### 3.1.2. 添加远程版本库
-
-使用`git remote`查看远程库的名称  
-使用`git remote -v`可以显示包括url的详细信息  
-
-**添加一个新的远程库**
-`git remote add <命名远程库> <url>`  
-例如  
-`git remote add origin  https://github.com/embattled/learnnote.git`  
-origin是默认的远程库叫法,也可以自定义
 
 
-
-### 3.1.3. 推送到远程库
-
-`git push <远程库名称> <分支名称>`
-使用  
-`git push -u origin master` 命令来第一次推送  
-`master`代表推送的是master分支  
-`-u` 在将本地分支推送到远程的基础上,还将本地和远程的该分支关联了起来,在以后的推送或者拉去时可以简化命令
-
-在这之后的推送使用  
-`git push origin master`即可
-
-如果两个库有不相干的历史记录而无法合并，这时我们可以加上一个参数  
-`--allow-unrelated-histories `  
-即可成功pull：  
-`$ git pull origin master --allow-unrelated-histories`  
-这时会可能会提示必须输入提交的信息，默认会打开vim编辑器  
-
-###  3.1.4. 从远端克隆一个项目
-
-`git clone git@github.com:Embattled/learnnote.git`  
 GitHub给出的地址不止一个，还可以用`https://github.com/Embattled/learnnote.git`这样的地址。实际上，Git支持多种协议，默认的`git://`使用`ssh`，但也可以使用https等其他协议。
 
 使用ssh的话，在github中保存公钥了后不用输入密码  
 使用http的话需要每次输入密码  
-
-### 3.1.5. 从远端更新代码
-
-克隆后,若要更新代码,使用git pull
-
-## 3.2. 使用gitlab
-
-
-
 
 # 4. Git的分支管理
 
@@ -228,43 +241,60 @@ GitHub给出的地址不止一个，还可以用`https://github.com/Embattled/le
  * merge               Join two or more development histories together.
  * (deprecate)checkout Switch branches or restore working tree files.
 
+- 通常`master`分支是用来发布稳定版本的
+- `dev`分支是用来保存不稳定版本的  
+- 在此之下才是各个团队工作人员自己的分支
+- 开发一个新的feature,最好新建一个分支  
+
+
 ## 4.1. 分支的基础操作
 
+
+
 1. `branch` 分支管理
-使用  `git checkout -b <分支名称>`  
-`-b`参数代表创建并切换,相当于  
-`git branch <分支名称>`新建一个分支  
-`git checkout <分支名称>`切换到这个分支  
+   * 默认会打印所有本地分支 并在当前分支前方标识一个 <kbd>*</kbd>  
+     * `git branch [<options>] [-r | -a] [--merged | --no-merged]`
+   * 创建分支
+     * `git branch [<options>] [-l] [-f] <branch-name> [<start-point>]`
+     * `-f` 用于覆盖的创建分支
+   * 重命名 `-m -M`  复制 `-c  -C`  `[<old-branch>] <new-branch>`
+     * 使用 `-m/c` 对一个已存在的分支进行重命名, 或复制出一个新的分支
+     * 大写的 字母 用于覆盖目标名称原本的分支
+   * 删除 `-d -D`
+     * ` git branch [<options>] [-r] (-d | -D) <branch-name>...`
+     * 因为创建、合并和删除分支非常快，所以Git鼓励你使用分支完成某个任务，合并后再删掉分支，这和直接在master分支上工作效果是一样的，但过程更安全。
+     * 使用 `git branch -d <分支名称>`可以删除一个分支
+     * `-D` 命令用于强制删除一个还没有被 merge 的分支
+   * 链接远程分支
+     * 对于一个分支,也需要指定本地与远端的链接
+     * `git branch --set-upstream-to dev origin/dev`  
 
-`git branch`  命令会列出所有分支,并在当前分支前方标识一个 <kbd>*</kbd>  
 
-2. `switch` 切换分支
-由于`checkout`还具有撤销修改的功能,所以防止迷惑性,可以使用更科学的命令 `switch`  
-`git switch -c dev` 创建并切换
-
+2. `switch` 切换分支  不建议使用 `checkout` 命令
+   * `git switch [<options>] [<branch>]`
+   * `git switch -c dev` 创建并切换, 省去 `branch` 命令, 同理 `-C` 也是覆盖的创建
 
 
-### 4.1.4. 删除一个分支
-合并完成后,原有的分支就不需要了  
-使用 `git branch -d <分支名称>`可以删除一个分支
+## 4.2. 分支合并
 
-因为创建、合并和删除分支非常快，所以Git鼓励你使用分支完成某个任务，合并后再删掉分支，这和直接在master分支上工作效果是一样的，但过程更安全。
-
-## 4.2. 解决分支的冲突
 
 1. `merge` 合并一个分支
-使用 `git merge <分支名称>` 来将分支的工作成果合并到`master` 分支上
+   * `git merge [<options>] [<commit>...]`
+   * 出现冲突时:
+     * `git merge --abort` 用于放弃本次合并
+     * `git merge --continue` 用于手动处理好冲突后再次合并
+   * 使用 `git merge <分支名称>` 来将分支的工作成果合并到`master` 分支上
+
+
+
+
+
 当Git无法执行`快速合并`，只能试图把各自的修改合并起来，但这种合并就可能会有冲突  
 必须手动解决冲突后再提交
 
 使用`git status`可以告诉我们冲突的文件
 Git用<kbd><<<<<<<</kbd>，<kbd>=======</kbd>，<kbd>>>>>>>></kbd>标记出不同分支的内容
 
-用带参数的`git log`也可以看到分支的合并情况
-
-` git log --graph --pretty=oneline --abbrev-commit`  
-* `--graph` 可以画分支图
-* `--abbrev-commit` 可以简化commit的ID
 
 ## 4.3. 分支管理策略
 
@@ -274,23 +304,6 @@ Git用<kbd><<<<<<<</kbd>，<kbd>=======</kbd>，<kbd>>>>>>>></kbd>标记出不�
 `git merge --no-ff` 来强制禁用 `fast forward`模式,这种模式就会在`merge`的时候自动生成新的`commit`,因此还应加上`-m`来描述这个提交  
 `git merge --no-ff -m "merge with no-ff" dev`
 
-
-通常`master`分支是用来发布稳定版本的,而`dev`分支是用来保存不稳定版本的  
-在此之下才是各个团队工作人员自己的分支
-
-开发一个新的feature,最好新建一个分支  
-如果要丢弃一个没有被合并过的分支,可以通过  
-`git branch -D <name>`强行删除  
-
-### 4.3.1. 团队协作
-在团队中,对于dev分支,同事的的最新提交和你试图推送的提交有冲突  
-
-对于一个分支,也需要指定本地与远端的链接
-`git branch --set-upstream-to dev origin/dev`  
-此时会提示  
-`Branch 'dev' set up to track remote branch 'dev' from 'origin'.`  
-
-链接好后即可pull,   使用`git pull`将远端的分支抓取下来,在本地合并,解决冲突后再提交  
 
 
 ## 4.4. Bug处理以及现场保存
@@ -310,20 +323,6 @@ git提供了一个保存现场的功能
 使用`git stash list`命令查看现场列表  
 在多次stash后,可以指定要恢复的`stash`  
 `git stash apply stash@{0}
-
-### 4.4.1. 小结 
-
-* 查看远程库信息，使用`git remote -v`
-
-* 本地新建的分支如果不推送到远程，对其他人就是不可见的
-
-* 从本地推送分支，使用`git push origin branch-name`,如果推送失败，先用`git pull`抓取远程的新提交
-
-* 在本地创建和远程分支对应的分支，使用`git checkout -b branch-name origin/branch-name`,本地和远程分支的名称最好一致
-
-* 建立本地分支和远程分支的关联，使用`git branch --set-upstream <branch-name> <origin/branch-name>`
-
-* 从远程抓取分支，使用`git pull`，如果有冲突，要先处理冲突。
 
 
 ### 4.4.2. Bug处理

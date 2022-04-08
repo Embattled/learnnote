@@ -1,12 +1,12 @@
-# Archive Software
+# 1. Archive Software
 
-## 压缩格式
+## 1.1. 压缩格式
 
 
 
-## Linux下的压缩程序
+## 1.2. Linux下的压缩程序
 
-### 7-Zip
+### 1.2.1. 7-Zip
 
 7-Zip 是一款拥有极高压缩比的开源压缩软件  
 p7zip - Linux/Posix 平台的命令行移植版本  
@@ -15,12 +15,12 @@ p7zip - Linux/Posix 平台的命令行移植版本
 压缩:  7z, XZ, BZIP2, GZIP, TAR, ZIP and WIM
 解压:  ARJ, CAB, CHM, CPIO, CramFS, DEB, DMG, FAT, HFS, ISO, LZH, LZMA, MBR, MSI, NSIS, NTFS, RAR, RPM, SquashFS, UDF, VHD, WIM, XAR, Z
 
-## 5.3. 文件打包和压缩
+## 1.3. 文件打包和压缩
 
 * 归档 : 也称打包, 指的是不经过压缩的文件或目录的几何
 * 压缩 : 使用了压缩算法
 
-### 5.3.1. tar 命令
+### 1.3.1. tar 命令
 
 Linux中最常用的打包命令
 * 使用 tar 命令归档的包成为 tar 包, 文件以 .tar 结尾
@@ -49,7 +49,7 @@ Linux中最常用的打包命令
 | -v      | 显示打包过程                             |
 
 
-### 5.3.2. zip 命令
+### 1.3.2. zip 命令
 
 zip是 windows 和 linux 通用的文件压缩方法, 属于主流之一
 * zip 类型的压缩和解压缩的命令是分开的
@@ -77,6 +77,6 @@ unzip命令表
 | -t            | 测试压缩文件有无损坏，但并不解压。                         |
 | -x 文件名列表 | 解压文件，但不包含文件列表中指定的文件。                   |
 
-### rar 命令
+### 1.3.3. rar 命令
 
 rar 是一种专利文件格式, 通常情况比ZIP压缩比高, 但压缩/解压缩速度较慢
