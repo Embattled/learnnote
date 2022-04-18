@@ -6,6 +6,8 @@ OpenCV (Open Source Computer Vision Library) :
 3. OpenCV 2.x API is essentially a C++ API.
 
 
+
+
 ## 1.1. Modular Structure
 
 1. Core functionality (core)        : Basic data structures.
@@ -18,7 +20,9 @@ OpenCV (Open Source Computer Vision Library) :
 8. High-level GUI (highgui) 
 
 
-## Install on linux
+## 1.2. opencv C++
+
+### 1.2.1. Install on linux
 
 只能通过自己编译并安装的方法安装OpenCV, apt 中没有索引  
 
@@ -57,13 +61,26 @@ cmake -DCMAKE_INSTALL_PREFIX=$HOME/.local
 
 ```
 
-## configuration options
+### 1.2.2. configuration options
 
 管理 OpenCV
 
 
 
-### Installation layout
+### 1.2.3. Installation layout
 
 
+
+## 1.3. opencv python
+
+* OpenCV now supports a multitude of algorithms related to Computer Vision and Machine Learning and is expanding day by day.  
+
+* OpenCV-Python is the Python API for OpenCV, combining the best qualities of the OpenCV C++ API and the Python language.
+* OpenCV-Python is a Python wrapper for the original OpenCV C++ implementation.
+
+**Numpy**
+* OpenCV-Python makes use of Numpy. And OpenCV-Python requires **only Numpy**.
+* All the OpenCV array structures are converted to and from Numpy arrays. 
+* This also makes it easier to integrate with other libraries that use Numpy.
+  * such as **SciPy** and **Matplotlib**.
 

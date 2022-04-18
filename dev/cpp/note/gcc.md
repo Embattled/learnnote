@@ -89,7 +89,7 @@ gcc hello.c -Wall
 gcc -lstdc++ hello.cpp
 
 # 对于c文件 
-gcc hello.c -lm -L /usr/lib -l /usr/include
+gcc hello.c -lm -L /usr/lib -I /usr/include
 ```
 * -lm 指的是libm.so或libm.a这个函数库文件；
 * -L 后面接的路径是刚才上面那个函数库的搜索目录；

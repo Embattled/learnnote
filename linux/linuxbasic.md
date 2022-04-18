@@ -235,8 +235,83 @@ Linux系统的启动过程并不复杂, 其过程可以分为5个阶段：
     运行级别5：X11控制台, 登陆后进入图形GUI模式
     运行级别6：系统正常关闭并重启, 默认运行级别不能设为6, 否则不能正常启动
 
+## 1.8. 命令行管道 xargs
+
+### 1.8.1. 管道与重定向
+
+相关的 3 个符号
+* `|` : 管道, 将上一个命令的输出传递到下一个命令
+  * 上一条命令的结果将会跳过屏幕输出
+  * `|` 左边的命令应该有标准输出, 而右边的命令需要接受标准输入
+* `>` : 输出重定向, 将命令结果输出到文件
+  * 同管道不同, `>` 号右边的只能是文件
+  * 左边的命令需要有标准输出
+  * 同标准输出不同的还有一个错误输出, 这两个输出流可以是可以分别重定向的
+  * `2>` 重定向错误输出流
+  * `>>` 追加写入, 单个符号的是覆盖写入
+  * `&>>` 追加写入标准输出流和错误输出流
+* `<` : 文件内容提取作为命令的输入参数
+  * 同理, 左边的命令要能接受标准输入
+  * 右边的仍然只能是文件
+* 管道会触发两个进程分别执行前后命令, 而重定向只是在一个进程中进行
+* `命令 < 文件1 > 文件2` : 文件1作为输入传入命令, 命令的结果再重定向到文件2 
 
 
+### 1.8.2. xargs
+xargs: eXtended ARGuments, 是给命令传递参数的一个过滤器, 也是组合多个命令的工具
+* `somecommand |xargs -item  command` 
+* 将管道或标准输入(stdin)转换成命令行参数, 或从文件的输出中读取数据
+* 将单行或多行文本输入转换为其他格式, 多行 `<->` 单行
+* 因为很多命令不支持 管道来传递参数, 所以才有了该命令
+* 用于补足管道的功能限制, 所以一般和管道一起使用
+
+xargs的参数  
+* `-a file`   : 从文件中读入作为 stdin
+* `-i or -I`  : 将 xargs 的每一项, 分行的赋值给命令里的 `{}`
+* `-t`        : 执行前先打印
+* `-e flag`   : 指 xargs 检测到含有 `flag` 的时候就中止
+* `-n num`    : 指命令在执行一次命令的时候用几个 argument, 一般是直接用完所有
+* `-d 分隔符` : 指 xargs 用什么来区别出不同的 argument
+  * 默认是用回车, 然后在输出的时候用空格来间隔 argument
+  * 可以修改成别的用来分割字符串
+
+```shell
+find /sbin -perm +700 |ls -l       #这个命令是错误的
+find /sbin -perm +700 |xargs ls -l   #这样才是正确的
+
+# xargs 文本多行转单行
+cat test.txt
+a b c d e f g
+h i j k l m n
+
+cat test.txt | xargs
+a b c d e f g h i j k l m n o p q r s t u v w x y z
+
+# 单行转多行, -n 选项多行输出
+cat test.txt | xargs -n3
+a b c
+d e f
+g h i
+
+# 用 xargs 分割字符串
+echo "nameXnameXnameXname" | xargs -dX -n2
+
+name name
+name name
+
+# -i 参数替换, 使得每一个 argument 都被用来执行一条命令
+cat arg.txt | xargs -I {} # ./sk.sh -p {} -l
+
+-p aaa -l
+-p bbb -l
+-p ccc -l
+
+# 查找所有的 jpg 文件，并且压缩它们：
+find . -type f -name "*.jpg" -print | xargs tar -czvf images.tar.gz
+
+# 有一个文件包含了很多你希望下载的 URL
+cat url-list.txt | xargs wget -c
+```
 
 # 2. Linux 工作管理
 
@@ -298,7 +373,7 @@ jobs 命令可以用来查看**当前终端**放入后台的工作
 
 
   
-## 定时执行
+## 2.3. 定时执行
 
 * at    定时执行任务
 * atrm  提供相应的工作 ID, 删除某个工作
@@ -331,7 +406,7 @@ at 命令选项及含义
 | -f 脚本文件   | 指定所要提交的脚本文件                                  |
 
 
-## crond服务 定时循环执行
+## 2.4. crond服务 定时循环执行
 
 
 
@@ -1063,7 +1138,7 @@ useradd 命令创建用户的过程, 其实就是修改了与用户相关的几�
 
 
 
-# 7. 查找字符文件
+# 7. 查找与匹配
 
 ## 7.1. 通配符
 要注意通配符与正则表达式的区别  
@@ -1079,16 +1154,38 @@ useradd 命令创建用户的过程, 其实就是修改了与用户相关的几�
 | [!c1-c2]或[^c1-c2]    | 匹配不在c1-c2的任意字符                     | a[!0-9]b 如acb adb                                                                 |
 | {string1,string2,...} | 匹配 sring1 或 string2 (或更多)其一字符串   | a{abc,xyz,123}b 列出aabcb,axyzb,a123b                                              |
 
-## 7.2. 查找文件
+## 7.2. find
 
-    find 命令功能非常强大,通常用来在 特定的目录下 搜索 符合条件的文件  
-`find [路径] -name "*.py"`  查找指定路径下扩展名是 .py 的文件,包括子目录
+find 命令功能非常强大,通常用来在 `特定的目录下` 搜索 `符合条件的文件`
+* `find [路径] -name "*.py"`  查找指定路径下扩展名是 .py 的文件,包括子目录
+* 如果省略路径,表示在当前文件夹下查找
+* 之前学习的通配符,在使用 find 命令时同时可用
 
-    
-    如果省略路径,表示在当前文件夹下查找
-    之前学习的通配符,在使用 find 命令时同时可用
 
-## 7.3. 正则表达式
+常用参数:
+* `-type f`      : 用于指定只查找文件, 不涉及文件夹
+* `-name <name>` : 指定查找对象的文件名, 可以使用通配符
+* 
+* `-exec`        : 比较特殊的参数, 后面跟一条命令, 执行 find 后执行该命令
+  * 该命令以 `\;` 结束
+  * 例: `find . -type f -name "cron*" -exec grep -l log {} \;`
+  * `{}` 代表 find 出来的结果
+  * `grep -l log {}` : 子命令, 该命令的意思是查找文件是否含有 `log` 字符
+
+## 7.3. 字符查找 grep
+
+ `grep `(global search regular expression(RE) and print out the line,全面搜索正则表达式并把行打印出来)  
+
+`grep [OPTION]... PATTERNS [FILE]...`
+
+**例子**   
+
+    查找文件test中出现单词hi,并且若干字符后出现单词Jerry的行
+    grep -E "\<hi\>.+\<Jerry\>" test
+
+
+
+## 7.4. 正则表达式
 
 针对文件内容的文本过滤工具里,大都用到正则表达式,如vi,grep,awk,sed等  
 其他的一些编程语言,如C++（c regex,c++ regex,boost regex）,java,python等都***有自己的正则表达式库***.
@@ -1128,17 +1225,6 @@ useradd 命令创建用户的过程, 其实就是修改了与用户相关的几�
 | {n,}  | 必须匹配n次或以上           |
 | {n,m} | 匹配次数在n到m之间,包括边界 |
 
-
-### 7.3.1. 字符查找 grep
-
- `grep `(global search regular expression(RE) and print out the line,全面搜索正则表达式并把行打印出来)  
-
-`grep [OPTION]... PATTERNS [FILE]...`
-
-**例子**   
-
-    查找文件test中出现单词hi,并且若干字符后出现单词Jerry的行
-    grep -E "\<hi\>.+\<Jerry\>" test
 
 
 # 8. Shell基础  

@@ -2,6 +2,15 @@
 
 用于处理文件路径  
 
+## 1.1. path-like object
+
+一类对象, 用于代表 python 路径相关的 常见的可能参数
+* `str` or `bytes` object representing a path
+*  an object implementing the `os.PathLike` protocol
+*  实现了 `os.PathLike` 的对象可以通过 os 下的 `os.fspath()` 转换成 str or bytes
+
+
+
 # 2. os.path
 
 `os.path` 是一整个模块名, 从 `os` 模组中被分离出来
@@ -213,4 +222,72 @@ dir_path.replace(dir_path.parent / dir_path2)
 
 
 # 4. shutil - High-level file operations
+
+
+# 5. 简单功能模组
+
+* fnmatch
+* glob
+
+## 5.1. fnmatch - Unix filename pattern matching
+
+该模组支持 Unix-shell 的通配符: `* ? [seq] [!seq]`, 但不支持完整正则表达式
+* 作为 glob 的底层函数, 用于验证一个路径是否满足 pattern
+
+`fnmatch.fnmatch(filename, pattern)`
+* Test whether the filename string matches the pattern string.
+* Returning `True` or `False`.
+* 该比较是大小写不敏感的 (内部通过对两个参数应用 `os.path.normcase()` 来实现)
+
+`fnmatch.fnmatchcase(filename, pattern)->bool`
+* 大小写敏感的比较
+
+```py
+import fnmatch
+import os
+
+for file in os.listdir('.'):
+    if fnmatch.fnmatch(file, '*.txt'):
+        print(file)
+```
+
+`fnmatch.filter(names, pattern)`
+* names 是一个可迭代的对象, 过滤掉不满足 pattern 的元素, 返回新的 `list`
+* 相当于 `[n for n in names if fnmatch(n, pattern)]` 
+
+
+`fnmatch.translate(pattern)`
+* 因为 shell 的三类通配符和 正则表达式的语法规则不一致
+* 该函数用于将 shell-stype 的 pattern 转化成对应的 正则表达式, 可以用于 `re.match()` 中
+* `*.txt` -> `'(?s:.*\\.txt)\\Z'` (这块复制的没看懂, 可能是 windows 下的正则路径)
+
+## 5.2. glob - Unix style pathname pattern expansion
+
+
+glob 模组提供查找对应 pattern 的路径的功能， 该模组顺从 Unix shell 的规则
+* results are returned in arbitrary order
+* 可以使用 `* ? []`三类通配符 (wildcards)
+* 底层实现是通过 `os.scandir()` 和 `fnmatch.fnmatch()` 来实现的, 并不是真的调用一个 subshell
+* 相比于 `fnmatch.fnmatch()`, glob 会把 `.` 开头的文件识别为 特殊 cases
+
+
+`glob.glob(pathname, *, root_dir=None, dir_fd=None, recursive=False)`
+* 返回满足 pathname 的路径 list, 可能会返回空 list
+* 注意 broken symlinks 也会被返回
+  * `pathname`  : 必须是str, 可以是绝对 or 相对路径, 可以使用三类通配符
+  * `root_dir`  : None, or path-like, 指定要搜索的目录根路径, 相当于在执行 glob 之前使用 cd, 同理只在 pathname 为相对路径的时候有作用
+  * `recursive` : True 的时候, the pattern “**” will match any files and zero or more directories, subdirectories and symbolic links to directories.
+
+
+
+`glob.iglob(pathname, *, root_dir=None, dir_fd=None, recursive=False)`
+* 功能和参数完全一致
+* 返回值为 `iterator`, 即不会同时存储所有值在内存中
+
+
+
+`glob.escape(pathname)`
+* 用于服务 glob 的函数
+* 直接转义 pathname 中的所有特殊符号 `*?[]`
+* 对于想查找可能包含特殊符号的文件, 但又不知道怎么写转义符的时候很有用
 

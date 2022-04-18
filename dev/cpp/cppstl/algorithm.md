@@ -10,6 +10,8 @@
 * 相比自己编写循环结构，直接调用算法函数的代码更加简洁明了。
 * 使用算法函数编写的程序，可扩展性更强，更容易维护；
 
+本章内容学习:
+* 需要结合 containers 中的迭代器相关知识
 
 # 2. Non-modifying sequence operations 非修改序列操作
 
@@ -328,40 +330,110 @@ int main()
 
 STL 有很多排序算法, 用于适用不同的应用场景  
 
+应用场景总结:
+1. 如果需要对所有元素进行排序，则选择 `sort()` 或者 `stable_sort()` 函数；
+2. 如果需要保持排序后各元素的相对位置不发生改变，就只能选择 `stable_sort()` 函数，而另外 3 个排序函数都无法保证这一点；
+3. 如果需要对最大（或最小）的 n 个元素进行排序，则优先选择 `partial_sort()` 函数；
+4. 如果只需要找到最大或最小的 n 个元素，但不要求对这 n 个元素进行排序，则优先选择 `nth_element()` 函数。
+
+nth_element() > partial_sort() > sort() > stable_sort()       <--从左到右，性能由高到低  
+
+
+## 4.1. 有序验证 (C++11)
+
+本就是一组有序的数据, 如果我们恰巧需要这样的升序序列, 就没有必要再执行排序操作.  
+因此, 当程序中涉及排序操作时, 我们应该为其包裹一层判断语句  
+
+* `is_sorted (first, last)`: 检测 `[first, last)` 范围内是否已经排好序, 默认检测是否按升序排序。                              
+* `is_sorted_until (first, last)` 如果没有排好序, 则该函数会返回指向首个不遵循排序规则的元素的迭代器。   
+  * first 和 last 都为正向迭代器（这意味着该函数适用于大部分容器）
+  * [first, last) 用于指定要检测的序列
+  * comp 用于指定自定义的排序规则。 
+
+完整函数定义和示例
+* 是否使用自定义的比较函数
+* 17和20有不同的异常抛出
+```cpp
+if (!is_sorted(mylist.begin(), mylist.end())) {
+  // 需要排序
+}
+
+if (is_sorted_until(myvector.begin(), myvector.end(),mycomp2()) != myvector.end()){
+  // 需要排序
+}
+
+// 函数原型: 
+
+// C++11 ~ C++20
+// 基础两个函数原型 (是否使用自定义比较函数)
+//判断 [first, last) 区域内的数据是否符合 std::less<T> 排序规则 (升序)
+template< class ForwardIt >
+bool is_sorted( ForwardIt first, ForwardIt last );
+
+//判断 [first, last) 区域内的数据是否符合 comp 排序规则  
+template< class ForwardIt, class Compare >
+bool is_sorted( ForwardIt first, ForwardIt last, Compare comp );
+
+// C++20~
+// 加入新特性 constexpr
+template< class ForwardIt >
+constexpr bool is_sorted( ForwardIt first, ForwardIt last );
+
+template< class ForwardIt, class Compare >
+constexpr bool is_sorted( ForwardIt first, ForwardIt last, Compare comp );
+
+
+// C++17
+// 加入 ExecutionPolicy 的函数原型
+template< class ExecutionPolicy, class ForwardIt >
+bool is_sorted( ExecutionPolicy&& policy, ForwardIt first, ForwardIt last );
+
+template< class ExecutionPolicy, class ForwardIt, class Compare >
+bool is_sorted( ExecutionPolicy&& policy, ForwardIt first, ForwardIt last,
+                Compare comp );
+
+
+// C++11 ~ C++20
+template< class ForwardIt >
+ForwardIt is_sorted_until( ForwardIt first, ForwardIt last );
+
+template< class ForwardIt, class Compare >
+ForwardIt is_sorted_until( ForwardIt first, ForwardIt last,
+                           Compare comp );
+
+// C++20~
+template< class ForwardIt >
+constexpr ForwardIt is_sorted_until( ForwardIt first, ForwardIt last );
+
+template< class ForwardIt, class Compare >
+constexpr ForwardIt is_sorted_until( ForwardIt first, ForwardIt last,
+                                     Compare comp );
+// C++17
+template< class ExecutionPolicy, class ForwardIt >
+ForwardIt is_sorted_until( ExecutionPolicy&& policy,
+                           ForwardIt first, ForwardIt last );
+
+template< class ExecutionPolicy, class ForwardIt, class Compare >
+ForwardIt is_sorted_until( ExecutionPolicy&& policy,
+                           ForwardIt first, ForwardIt last, Compare comp );
+```
+
+
+
+## 4.2. sort stable_sort 普通排序和稳定排序
+
 * `sort (first, last)`
-  * 对容器或普通数组中 [first, last) 范围内的元素进行排序，默认进行升序排序。                                                                                                                        
+  * 对容器或普通数组中 [first, last) 范围内的元素进行排序，默认进行升序排序。                                                                                                       
   * `stable_sort (first, last)` 函数功能相似，稳定排序
 * `partial_sort (first, middle, last)`
   * 从 [first,last) 范围内，筛选出 `muddle-first` 个最小的元素并排序存放在 [first，middle) 区间中。
 * `partial_sort_copy (first, last, result_first, result_last)`
   * 从 [first, last) 范围内筛选出 result_last-result_first 个元素排序并存储到 [result_first, result_last) 指定的范围中。
-* `is_sorted (first, last)  `
-  * 检测 [first, last) 范围内是否已经排好序，默认检测是否按升序排序。                              
-  * `is_sorted_until (first, last)` 如果没有排好序，则该函数会返回指向首个不遵循排序规则的元素的迭代器。                   
-* `void nth_element (first, nth, last)`
-  * 找到 [first, last) 范围内按照排序规则（默认按照升序排序）应该位于第 nth 个位置处的元素，并将其放置到此位置。
-  * 同时使该位置左侧的所有元素都比其存放的元素小，该位置右侧的所有元素都比其存放的元素大。
-  * 类似于快速排序内部的单词迭代
-
-应用场景总结:
-1. 如果需要对所有元素进行排序，则选择 sort() 或者 stable_sort() 函数；
-2. 如果需要保持排序后各元素的相对位置不发生改变，就只能选择 stable_sort() 函数，而另外 3 个排序函数都无法保证这一点；
-3. 如果需要对最大（或最小）的 n 个元素进行排序，则优先选择 partial_sort() 函数；
-4. 如果只需要找到最大或最小的 n 个元素，但不要求对这 n 个元素进行排序，则优先选择 nth_element() 函数。
-
-nth_element() > partial_sort() > sort() > stable_sort()       <--从左到右，性能由高到低  
+                
 
 
-sort 函数受到底层实现方式的限制 需要有以下三个条件才能使用
-5. 容器支持的迭代器类型必须为**随机访问迭代器**。这意味着，sort() 只对 `array、vector、deque` 这 3 个容器提供支持.
-   当操作对象为 `list` 或者 `forward_list` 序列式容器时，其容器模板类中都提供有 `sort()` 排序方法，借助此方法即可实现对容器内部元素进行排序。
-6. 如果对容器中指定区域的元素做默认升序排序，则元素类型必须支持<小于运算符；
-   同样，如果选用标准库提供的其它排序规则，元素类型也必须支持该规则底层实现所用的比较运算符；
-7. sort() 函数在实现排序时，需要交换容器中元素的存储位置。
-   如果容器中存储的是自定义的类对象，则该类的内部必须提供移动构造函数和移动赋值运算符。
 
-
-### 4.0.1. sort() 
+### 4.3. sort() 
 
 sort() 是基于快速排序实现的  复杂度:N*log2(N)    
 
@@ -397,7 +469,7 @@ std::sort(myvector.begin(), myvector.end(), mycomp2());
 
 ```
 
-### 4.0.2. stable_sort()
+### 4.4. stable_sort()
 
 stable_sort() 和 sort() 具有相同的使用场景，就连语法格式也是相同的  
 
@@ -405,7 +477,22 @@ stable_sort() 和 sort() 具有相同的使用场景，就连语法格式也是�
 
 当可用空间足够的情况下，该函数的时间复杂度可达到`O(N*log2(N))`；反之，时间复杂度为`O(N*log2(N^2))`
 
-### 4.0.3. partial_sort()  partial_sort_copy()
+## 
+
+
+
+
+
+sort 函数受到底层实现方式的限制 需要有以下三个条件才能使用
+5. 容器支持的迭代器类型必须为**随机访问迭代器**。这意味着，sort() 只对 `array、vector、deque` 这 3 个容器提供支持.
+   当操作对象为 `list` 或者 `forward_list` 序列式容器时，其容器模板类中都提供有 `sort()` 排序方法，借助此方法即可实现对容器内部元素进行排序。
+6. 如果对容器中指定区域的元素做默认升序排序，则元素类型必须支持<小于运算符；
+   同样，如果选用标准库提供的其它排序规则，元素类型也必须支持该规则底层实现所用的比较运算符；
+7. sort() 函数在实现排序时，需要交换容器中元素的存储位置。
+   如果容器中存储的是自定义的类对象，则该类的内部必须提供移动构造函数和移动赋值运算符。
+
+
+## 4.5. partial_sort()  partial_sort_copy()
 
 假设这样一种情境，有一个存有 100 万个元素的容器，但我们只想从中提取出值最小的 10 个元素  
 使用 sort() 或者 stable_sort() 排序函数, 仅仅为了提取 10 个元素，却要先对 100 万个元素进行排序，可想而知这种实现方式的效率是非常低的。  
@@ -442,69 +529,58 @@ RandomAccessIterator partial_sort_copy (InputIterator first,InputIterator last,
 
 ```
 
-### 4.0.4. nth_element() 
+## 4.6. nth_element()  快速定位分割
 
-在有序序列中，我们可以称第 n 个元素为整个序列中“第 n 大”的元素  
+定位 n-th 元素的值后应用单次快速排序操作
 
-nth_element() 函数的功能，当采用默认的升序排序规则（`std::less<T>`）时  
-该函数可以从某个序列中找到第 n 小的元素 K，并将 K 移动到序列中第 n 的位置处。  
-不仅如此，整个序列经过 nth_element() 函数处理后，所有位于 K 之前的元素都比 K 小，所有位于 K 之后的元素都比 K 大。  
+在有序序列中，我们可以称第 n 个元素为整个序列中 `第 n 大` 的元素  
+* `nth_element()`: 当采用默认的升序排序规则（`std::less<T>`）时
+* 从某个序列中找到第 n 小的元素 K, 并将 K 移动到序列中第 n 的位置处。  
+* 且所有位于 K 之前的元素都比 K 小, 所有位于 K 之后的元素都比 K 大。  
 
-应用场景: 如果只需要找到最大或最小的 n 个元素，但不要求对这 n 个元素进行排序，则优先选择 nth_element() 函数  
 
-```cpp
-//排序规则采用默认的升序排序
-void nth_element (RandomAccessIterator first,
-                  RandomAccessIterator nth,
-                  RandomAccessIterator last);
-//排序规则为自定义的 comp 排序规则
-void nth_element (RandomAccessIterator first,
-                  RandomAccessIterator nth,
-                  RandomAccessIterator last,
-                  Compare comp);
+应用场景: 
+* 只需要找到最大或最小的 n 个元素
+* 不要求对这 n 个元素进行排序
+* 使用的是能够获取到 `随机迭代器` 的容器
 
-```
-
-* first 和 last：都是随机访问迭代器，[first, last) 用于指定该函数的作用范围（即要处理哪些数据）；
-* nth：也是随机访问迭代器，其功能是令函数查找“第 nth 大”的元素，并将其移动到 nth 指向的位置；
-* comp：用于自定义排序规则。
-
-### 4.0.5. is_sorted() 和 is_sorted_until()
-
-本就是一组有序的数据，如果我们恰巧需要这样的升序序列，就没有必要再执行排序操作。  
-
-因此，当程序中涉及排序操作时，我们应该为其包裹一层判断语句  
+参数: 三者都是容器的随机迭代器
+* first,last：`[first, last)` 用于指定该函数的作用范围, 即要处理哪些数据
+* nth       : 其功能是令函数查找 `n-th` 大 的元素，并将其移动到 `nth` 指向的位置；
+* comp      : 用于自定义排序规则。
 
 ```cpp
-if (!is_sorted(mylist.begin(), mylist.end())) {
-  // 需要排序
-}
-
-if (is_sorted_until(myvector.begin(), myvector.end(),mycomp2()) != myvector.end()){
-  // 需要排序
-}
-
-// 定义
-//判断 [first, last) 区域内的数据是否符合 std::less<T> 排序规则，即是否为升序序列
-bool is_sorted (ForwardIterator first, ForwardIterator last);
-
-//判断 [first, last) 区域内的数据是否符合 comp 排序规则  
-bool is_sorted (ForwardIterator first, ForwardIterator last, Compare comp);
+// ~C++20
+template< class RandomIt >
+void nth_element( RandomIt first, RandomIt nth, RandomIt last );
 
 
-//排序规则为默认的升序排序
-ForwardIterator is_sorted_until (ForwardIterator first, ForwardIterator last);
-//排序规则是自定义的 comp 规则
-ForwardIterator is_sorted_until (ForwardIterator first,
-                                 ForwardIterator last,
-                                 Compare comp);
+template< class RandomIt, class Compare >
+void nth_element( RandomIt first, RandomIt nth, RandomIt last,
+                  Compare comp );
+
+// C++20~
+template< class RandomIt >
+constexpr void nth_element( RandomIt first, RandomIt nth, RandomIt last );
+
+template< class RandomIt, class Compare >
+constexpr void nth_element( RandomIt first, RandomIt nth, RandomIt last,
+                            Compare comp );
+
+// C++17
+template< class ExecutionPolicy, class RandomIt >
+void nth_element( ExecutionPolicy&& policy,
+                  RandomIt first, RandomIt nth, RandomIt last );
+
+template< class ExecutionPolicy, class RandomIt, class Compare >
+void nth_element( ExecutionPolicy&& policy,
+                  RandomIt first, RandomIt nth, RandomIt last,
+                  Compare comp );
 ```
 
-* first 和 last 都为正向迭代器（这意味着该函数适用于大部分容器）
-* [first, last) 用于指定要检测的序列；
-* comp 用于指定自定义的排序规则。 
 
-## 4.1. 自定义排序规则的优化 
+
+## 4.7. 自定义排序规则的优化 
 
 数对象可以理解为伪装成函数的对象，根据以往的认知，函数对象的执行效率应该不如普通函数。但事实恰恰相反;   
 将普通函数定义为更高效的内联函数，其执行效率也无法和函数对象相比。  
@@ -590,5 +666,5 @@ constexpr bool binary_search( ForwardIt first, ForwardIt last, const T& value, C
 ```
 
 
-# Heap operations 对操作
+# 6. Heap operations 对操作
 

@@ -33,7 +33,6 @@ STL是Standard Template Library 的简称
 C++ 标准库并不止 容器库
 
 
-
 1. C标准库            首字母带C的C语言库
 2. 流库               `iostream iomanip ios sstream fstream` 以及C语言兼容的 `cstdio cwchar`
 3. 数值操作库         `complex valarray numeric cmath cstdlib`
@@ -60,7 +59,7 @@ C++ 标准库并不止 容器库
 
 从网站上拷贝的最全的标准库
 
-1. Language Support
+1. Language Support, 即C语言的兼容库
 
 ```cpp
 #include <cstddef>
@@ -243,7 +242,7 @@ C++ 标准库并不止 容器库
 3. 虽然图像被视为一维处理，但是从可读性的角度来看，应该认真地以二维阵列的形式在双循环中处理。
 4. 注意要经常使用 unsign 
 5. 在多重循环中使用条件分歧会对速度产生不利影响
-6. 在内存限制不严重的情况下， 不要用float类型
+6. 在内存限制不严重的情况下， 不要用单精度的 float 类型
 
 ## 3.2. 关于 new 的检查
 

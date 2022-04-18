@@ -4,3 +4,6 @@
 * provides platform libraries that allow you to manage native activities
 * access physical device components, such as sensors and touch input. 
 
+
+## ndk-build
+
