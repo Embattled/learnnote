@@ -48,19 +48,15 @@ Opencv4, Main Modules: 除此之外还有 other
 
 ## 1.2. opencv C++
 
-### API Concepts 
+### 1.2.1. API Concepts 
 
 * 尽管从文档上, OpenCV 分成了数个模组
 * 事实上整个 OpenCV 库都放在了 `cv` 的命名空间中
 * 有些函数会和 STL 冲突, 因此有时候需要特殊指定
 
-```cpp
-#include "opencv2/core.hpp"
+` #include "opencv2/core.hpp" `
 
-
-```
-
-### 1.2.1. Install on linux
+### 1.2.2. Install on linux
 
 只能通过自己编译并安装的方法安装OpenCV, apt 中没有索引  
 
@@ -99,16 +95,6 @@ cmake -DCMAKE_INSTALL_PREFIX=$HOME/.local
 
 ```
 
-### 1.2.2. configuration options
-
-管理 OpenCV
-
-
-
-### 1.2.3. Installation layout
-
-
-
 ## 1.3. opencv python
 
 * OpenCV-Python is a Python wrapper for the original OpenCV C++ implementation.
@@ -127,30 +113,28 @@ opencv-python 的 API 都定义在了 cv2 包中, 为了保证代码的可执行
 
 
 
-# core
+# 2. core
 
 定义了 OpenCV 中最核心的类 (图像), 以及一些数学上的操作 
 
-## mat  core/mat.hpp
+## 2.1. mat  core/mat.hpp
 
 同 numpy 一样, opencv并没有特地的图片类, 而是用矩阵来表示 -> `cv::Mat`  
 
 
-
-
-# imgcodecs  Image file reading and writing 
+# 3. imgcodecs  Image file reading and writing 
 
 同 Image Process 不同, 该模组中的函数都是图像 IO 相关的  
 
 `#include <opencv2/imgcodecs.hpp>` 
 
-## Flags used for image file reading and writing
+## 3.1. Flags used for image file reading and writing
 
 用作图片 IO 的参数, 一般都是枚举类型, 用于指定图片的规格等
 
 
 
-## 基础图像读写
+## 3.2. 基础图像读写
 
 `imread()` 用于从一个文件路径中读取图像
 * filename  :Name of file to be loaded.
@@ -181,4 +165,245 @@ cv.imread(filename[, flags]	) -> 	retval
 
 cv.imwrite(	filename, img[, params]	) -> 	retval
 ```
+
+# 4. imgproc  Image Processing
+
+`#include <opencv2/imgproc.hpp>`  
+
+对读取的图像进行处理
+
+注意:
+* 对于图形处理函数
+  * C++ 的 dst 一般都在参数里
+  * Python 的 dst 可以是参数也可以是返回值
+
+
+## 4.1. 色彩空间转换 Color Space Conversions
+
+opencv 支持近乎所有的图形格式之间·`互相`转换  
+
+### 4.1.1. cvtColor
+
+```cpp
+void cv::cvtColor 	( 	InputArray  	src,
+		OutputArray  	dst,
+		int  	code,
+		int  	dstCn = 0 
+	) 		
+Python:
+	cv.cvtColor(	src, code[, dst[, dstCn]]	) -> 	dst
+```
+
+参数:
+* src	: 输入图像
+* code	: 转换模式
+* dstCn	: dst图像的通道数. 一般置零用来自动判定
+
+
+### 4.1.2. ColorConversionCodes
+
+通过 `enum cv::ColorConversionCodes` 枚举类型来表示转换的模式, 以下列出所有支持的图片格式的名称, 转换模式即为 `<A>2<B>` 
+* BGR RGB LRGB LBGR
+  * 565
+  * 555
+  * 
+* BGRA
+* RGBA
+* GRAY
+* XYZ
+* YCrCb
+* Lab
+* Luv
+* HSV
+  * HSV_FULL
+* HLS
+  * HLS_FULL
+* Bayer
+* 太多了算了
+
+## 4.2. Image Filtering 滤波函数
+
+用于对 2D 图像进行各种 线性/非线性 的filtering 操作
+* 对于图像中的每个像素 (x,y), 通过其周围像素的值来决定该像素新的值
+* 通道之间将会分开来计算, 即可以保证输出图像具有和输入图像相同的通道数
+
+
+通用参数
+* src
+* dst
+* ddepth
+`when ddepth=-1, the output image will have the same depth as the source. `
+
+
+
+
+## 4.3. Geometric Image Transformations
+
+存放了重要的几何变换函数, 包括最基础的 resize
+
+一些更加泛用的操作函数在文档中没有放在这里, 而是放在了 core/operations on arrays 中
+
+
+### 4.3.1. Affine 和 Perspective
+
+经典几何变换
+* cv::getAffineTransform
+* cv::warpAffine
+* cv::getPerspectiveTransform 
+* cv::warpPerspective
+
+注意: Python 下, 传入的点坐标需要是 `numpy.array([4,2], dtype='float32')` 类型, 否则会报错
+
+```cpp
+
+// OpenCV 的 Affine 可以通过三个点对来计算投影矩阵
+Mat cv::getAffineTransform 	( 	const Point2f  	src[],
+		const Point2f  	dst[] 
+	) 		
+Python:
+	cv.getAffineTransform(	src, dst	) -> 	retval
+
+// 应用Affine变换
+void cv::warpAffine 	( 	InputArray  	src,
+		OutputArray  	dst,
+		InputArray  	M,
+		Size  	dsize, // 输出图像的解析度, 这里传入的是一个 pair
+		int  	flags = INTER_LINEAR,
+		int  	borderMode = BORDER_CONSTANT,
+		const Scalar &  	borderValue = Scalar() 
+	) 		
+Python:
+	cv.warpAffine(	src, M, dsize[, dst[, flags[, borderMode[, borderValue]]]]	) -> 	dst
+
+// OpenCV 的投影则是通过 4 个点对计算
+Mat cv::getPerspectiveTransform 	( 	InputArray  	src,
+		InputArray  	dst,
+		int  	solveMethod = DECOMP_LU 
+	) 		
+Python:
+	cv.getPerspectiveTransform(	src, dst[, solveMethod]	) -> 	retval
+
+```
+
+
+
+## 4.4. 杂项 Miscellaneous Image Transformations 
+
+### 4.4.1. 二值化 threshold
+
+
+`double cv::threshold`
+* 固定 level 的阈值函数
+* 从一个 grayscale 获取一个 bi-level (二值) 图像
+
+`cv::adaptiveThreshold`
+* 应用自适应的 threshold 到一个数列上, 每个像素 (x,y) 的阈值都是单独通过 `T(x,y)` 计算的
+* 从一个 grayscale 获取一个 bi-level (二值) 图像
+
+函数原型  
+```cpp
+double cv::threshold 	( 	InputArray  	src,
+		OutputArray  	dst,
+		double  	thresh,   // 指定的阈值
+		double  	maxval,
+		int  	type 
+	) 	
+// Returns : the computed threshold value if Otsu's or Triangle methods used.
+
+// 注意, dst 作为返回值是第二个, 需要用两个变量接受 
+Python:
+	cv.threshold(	src, thresh, maxval, type[, dst]	) -> 	retval, dst
+
+
+// 自动计算阈值
+void cv::adaptiveThreshold 	( 	InputArray  	src,
+		OutputArray  	dst,
+		double  	maxValue,
+		int  	adaptiveMethod,
+		int  	thresholdType,
+		int  	blockSize,
+		double  	C 
+	) 		
+Python:
+	cv.adaptiveThreshold(	src, maxValue, adaptiveMethod, thresholdType, blockSize, C[, dst]	) -> 	dst
+```
+
+参数:
+* src	    : Source 8-bit single-channel image. 
+* dst	    : Destination image of the `same size` and the `same type` as src. 
+* thresh	: 指定的阈值
+  * 如果使用了 OTSU 或者 TRIANGLE 阈值类型, 阈值会自动计算, 该输入置零即可
+* maxval  : 像素值高于阈值后更新的像素值
+* type/thresholdType : 查看 `cv::ThresholdTypes` 枚举类型
+* 自适应参数
+  * blockSize: 自适应函数要参照的区块大小, 该参数需要是 奇数
+  * adaptiveMethod: 根据区块内的像素值来计算当前像素的阈值
+    * `ADAPTIVE_THRESH_MEAN_C` : 区块内像素的均值
+    * `ADAPTIVE_THRESH_GAUSSIAN_C ` : 区块内像素的高斯权重和
+
+
+#### 4.4.1.1. ThresholdTypes
+
+```cpp
+enum  	cv::ThresholdTypes {
+  cv::THRESH_BINARY = 0,
+  cv::THRESH_BINARY_INV = 1,
+  cv::THRESH_TRUNC = 2,
+  cv::THRESH_TOZERO = 3,
+  cv::THRESH_TOZERO_INV = 4,
+  cv::THRESH_MASK = 7,
+  cv::THRESH_OTSU = 8,			// 目前只能应用在 8-bit 灰度图像
+  cv::THRESH_TRIANGLE = 16 	 	// 目前只能应用在 8-bit 灰度图像
+}
+
+```
+
+#### AdaptiveThresholdTypes
+
+```cpp
+enum  	cv::AdaptiveThresholdTypes {
+  cv::ADAPTIVE_THRESH_MEAN_C = 0,
+  cv::ADAPTIVE_THRESH_GAUSSIAN_C = 1
+}
+
+```
+
+# 5. highgui  High-level GUI
+
+独立于具体图像处理之外的 GUI 功能, 可以用来显示图像等调试功能
+
+`#include <opencv2/highgui.hpp>`
+
+## 5.1. imshow() 显示图片在窗口中
+
+```cpp
+void cv::imshow 	( 	const String &  	winname,
+		InputArray  	mat 
+	) 		
+Python:
+	cv.imshow(	winname, mat	) -> 	None
+```
+
+参数:
+* winname  : Name of the window. 可以是提前创建好的. 如果没有提前创建, 则会应用 ` cv::WINDOW_AUTOSIZE`
+* mat      : 要显示的图片
+
+特点:
+* 会根据图片规格的不同, 用对应的方式将像素值映射到 RGB888 里并显示
+
+使用:
+* 该函数必须后接一个 `cv::waitKey or cv::pollKey` 来保证窗口可操作
+* `waitKey(0)` will display the window infinitely until any keypress
+
+# 6. objdetect Object Detection 最常用的物体检测模型
+
+## 6.1. Cascade 模型 Cascade Classifier for Object Detection
+
+一个经典的级联传统机器学习模型
+
+`class  	cv::CascadeClassifier`  
+
+官方示例: https://docs.opencv.org/4.x/db/d28/tutorial_cascade_classifier.html
+
+预训练模型的下载地址 : https://github.com/opencv/opencv/blob/4.x/samples/python/tutorial_code/objectDetection/cascade_classifier/objectDetection.py
 

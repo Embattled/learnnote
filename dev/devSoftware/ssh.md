@@ -50,7 +50,7 @@ $ sudo chmod 600 .ssh/authorized_keys
 通过 `-t` 可以指定密钥的算法(类型) , 默认的是 `rsa-sha2-512`
 
 
-## 管理命令
+## 2.2. 管理命令
 
 * 删除host的密钥缓存
   * `-R hostname | [hostname]:port`

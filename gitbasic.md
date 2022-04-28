@@ -9,9 +9,9 @@
 
 
 git配置文件有三个位置:
-1. `/etc/gitconfig` 系统配置文件,            对应git config --system
-2. `~/.gitconfig` 用户全局配置文件,          对应git config --global
-3. 项目目录中`.git/config` 仅该项目配置文件,  对应git config --local
+1. `/etc/gitconfig` 系统配置文件,            对应 `git config --system`
+2. `~/.gitconfig` 用户全局配置文件,          对应 `git config --global`
+3. 项目目录中`.git/config` 仅该项目配置文件,  对应 `git config --local`
 
 
 ## 1.1. 自报家门
@@ -45,6 +45,7 @@ git config -l  # 测试编辑好的机器信息
 * 隐藏目录  : `.git`不算工作区,而是版本库  
 
 而`git commit`就是把暂存区的内容正式提交到分支上
+
 
 
 ## 2.1. gitignore 过滤文件
@@ -214,6 +215,17 @@ $ git commit --amend
      * `git diff tmp `
      * `git merge tmp`
 
+6. `rebase` 非记录分支的 merge
+   * 在团队协作的时候, 如果总使用 `pull` 或者 `merge` 来拉取更改, 会因为有许多 merge 导致分支图上不是一条直线, 有许多无意义的分支
+   * rebase 用于将最新更改合并到当前工作区中, 但是不创建 commit
+   * `git pull --rebase` 能够实现 `get fetch + git rebase` 的作用
+   * 对于合并时候的冲突
+     * 文件里解决冲突
+     * `git add `
+     * `git rebase --continue`
+   * `git rebase --continue | --abort | --skip | --edit-todo`
+   * 
+
 ## 3.2. 使用Github
 
 
@@ -284,6 +296,7 @@ GitHub给出的地址不止一个，还可以用`https://github.com/Embattled/le
      * `git merge --abort` 用于放弃本次合并
      * `git merge --continue` 用于手动处理好冲突后再次合并
    * 使用 `git merge <分支名称>` 来将分支的工作成果合并到`master` 分支上
+   * 分支本身也会作为一个 commit 被记录
 
 
 
@@ -333,3 +346,24 @@ git提供了一个保存现场的功能
 此时git会自动给dev分支进行一次提交,该commit会获得一个不同的ID, 使用该命令可以省去重复修复bug的过程
 
 
+# Git 的标签管理 tag
+
+tag是git版本库的一个标记, 指向某个 commit
+* branch 对应一系列commit, 是很多点连成的一根线
+* tag 对应某次commit, 是一个点
+* tag主要用于发布版本的管理. 一个版本发布后可以打上 v.1.0.1 的标签
+
+1. `git tag`
+   * `git tag [-a | -s | -u <key-id>] [-f] [-m <msg> | -F <file>] <tagname> [<head>]` : 创建 tag
+     * `-f` 强制创建, 会覆盖已存在的 tag
+     * `-m <msg> | -F <file>` : 给 tag 添加描述信息
+   * `git tag -l` : 列出 tag 信息
+   * `git tag -d <tagname>` : 删除对应 tag
+
+2. `git push origin <tagName>`
+   * 因为 tag 是基于本地分支的 commit, 与分支的推送是默认分开的
+   * 如果需要执行 tag 推送, 需要单独的命令
+   * `git push origin --tags` 推送本地所有标签
+   * `git push origin :refs/tags/<tagName>` 推送一个 tag 的删除操作
+
+3. `git branch <branchName> <tagName>`: 依照 tag 对应的 commit 来建立分支
