@@ -13,6 +13,7 @@ OpenCV 的历史:
 * Python
 * js
 
+整个库的功能实现仍然是 C++, 但是提供了对Python 的语言接口
 
 ## 1.1. Modular Structure
 
