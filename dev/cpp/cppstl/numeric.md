@@ -83,10 +83,19 @@ The floating-point environment access and modification is only meaningful when #
 
 ```
 
-# 4. <cmath> 通用数学函数
+# 4. cmath math.h 通用数学函数
 
 包括了从 C语言继承来的一些 通用数学运算  
 
+`cmath` 和 `math.h` 的差异
+* 库中的函数分类大致相同
+* 因为C语言没有重载, 所以 cmath 里有一些独有的方便函数, 面向多类型重载
+* 有些函数是 C99 中加入到 math.h 里的, 但是在 C++11里才被加入到 cmath, 需要注意
+
+
+对于末尾不加类型修饰的函数名
+* C 语言版本针对 double
+* C++ 语言版本为多类型重载对应
 
 ## 4.1. 类型
 
@@ -366,8 +375,33 @@ Promoted    hypot ( Arithmetic1 x, Arithmetic2 y, Arithmetic3 z );
 * atan          没有象限判断的版本, 返回值为正负二分之派
 * atan2         有象限判断的版本, 返回值为正负派
 
+## 4.7. 最近整数运算 Nearest integer floating-point operations 
 
-# 5. <random> 随机数
+版本信息:  
+* 原生函数只有 `ceil()` 和 `floor()`, 其他剩余所有都是 C++11 (cmath) 或 C99 (math.h) 提供
+* 返回值的类型基本输入类型相同, 并不是整数类型, 需要再次手动转换, 除了 rint 和 nearbyint 的 ll 形式
+
+
+标准最近值, 有另外的 `f` `l` 版本, 分别针对 float 类型和 long double 
+* ceil        : 天花板
+* floor       : 地板
+* trunc       : 直接删除掉小数部分的整数
+* nearbyint   : 根据 `fenv.h/ cfenv` 中的模式来返回
+  * `int fesetround( int round );` 设定模式
+  * `int fegetround();` 获取模式
+  * 四种模式分别是
+    * `FE_DOWNWARD`   = floor
+    * `FE_TONEAREST`  不等于 round, 是 五舍五入, 确保结果是偶数
+    * `FE_TOWARDZERO` = trunc
+    * `FE_UPWARD`     = ceil
+
+
+特殊最近值
+* round : 标准四舍五入, rounding away from zero in halfway cases 
+* rint  : 五舍五入相当于 nearbyint, 但是有拥有返回值是整数的派生函数
+* round 和 rint 具有返回值是整数类型的函数 函数名首追加 `l` long, `ll` long long 
+
+# 5. random 随机数
 
 C语言的随机数定义在 `cstdlib` 中
 * 如果学习了 C++的随机数, 就不推荐再使用C的随机数生成器了

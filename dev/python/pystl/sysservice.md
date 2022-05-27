@@ -17,13 +17,13 @@
 * 非常大的库
   
 
-## Files and Directories
+## 2.1. Files and Directories
 
 os.mkdir(path, mode=0o777, *, dir_fd=None)
 
 os.makedirs(name, mode=0o777, exist_ok=False)
 
-### 2.0.1. os.walk
+### 2.1.1. os.walk
 
 - `os.walk(top, topdown=True, onerror=None, followlinks=False)`
 - 遍历一个文件目录下的所有子目录(包括该文件目录本身), 一直遍历到没有子目录

@@ -4,10 +4,13 @@ This project is established for storing learn note written by Yongzhen Long, all
 Most of the content is copied or translated from Internet resources, without identifying the source.  
 Most of the content comes from the official doc and http://c.biancheng.net.  
 
+This readme is rarely updated, links in this file may expired.
+
 该项目用于保存我的个人笔记, 全部为英文或者中文书写.  
 绝大部分内容复制或者翻译自互联网资源, 没有在内容中标明来源, 不做商业用途.  
 大部分内容来源于项目官方文档和[C语言中文网](http://c.biancheng.net).  
 
+Readme的更新频率极低, 其中的链接常有失效.
 
 Basic knowledge of this node:
 

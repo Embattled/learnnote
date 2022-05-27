@@ -6,8 +6,6 @@
   - [2.1. Python 书写规范 (PEP 8)](#21-python-书写规范-pep-8)
   - [2.2. Python 保留字](#22-python-保留字)
   - [2.3. python 的类型提示](#23-python-的类型提示)
-    - [2.3.1. 类型别名](#231-类型别名)
-    - [2.3.2. 函数的类型注解](#232-函数的类型注解)
   - [2.4. 作用域](#24-作用域)
 - [3. 内置函数 Build-in Function](#3-内置函数-build-in-function)
   - [3.1. 类函数](#31-类函数)
@@ -75,7 +73,7 @@
       - [5.4.2.6. 识别转换方法 **str.extract()**](#5426-识别转换方法-strextract)
       - [5.4.2.7. str.get_dummies()](#5427-strget_dummies)
   - [5.5. Iterator](#55-iterator)
-    - [Generator Types](#generator-types)
+    - [5.5.1. Generator Types](#551-generator-types)
 - [6. Python 流程控制](#6-python-流程控制)
   - [6.1. 逻辑流程](#61-逻辑流程)
     - [6.1.1. `if` 表达式](#611-if-表达式)
@@ -290,22 +288,17 @@ with
 - python 本身的运行时不强制执行函数和变量类型注解
 - 但是加入类型注解可以辅助 IDE 等第三方工具的错误检查
 
-### 2.3.1. 类型别名
+详情查看 typing 包 [相对链接](../pystl/devtools.md#typing)
+
 
 - 把类型赋予一个别名, 相当于 typedef
 - 可以用于简化复杂的类型签名
+- 输入参数和返回值都可以进行注解
 
 ```py
 # 将 Vector 代表一个浮点数的列表
 Vector = list[float]
 
-```
-
-### 2.3.2. 函数的类型注解
-
-- 输入参数和返回值都可以进行注解
-
-```py
 def greeting(name: str) -> str:
     return 'Hello ' + name
 ```
@@ -765,6 +758,25 @@ Python是弱类型语言
    - `max = a if a>b else b`
 
 # 5. python Built-in Types
+
+Built-in Types 代表那些包括在了 python 解释器里的变量, 不需要任何包(包括STL), 即可正确处理
+
+主要的 built-in type 可以按照以下分类:
+* numerics
+* sequences
+* mappings
+* classes
+* instances
+* exceptions
+
+这些数据类型包括集合类型, 也有成员可变集合类型
+
+所有的内置成员变量都实现了以下功能
+* 可以互相之间比较 equality
+* Truth Value Testing
+* 转换成 string 类型, 包括
+  * str()  , 作为 print() 的参数被输出时会隐式调用
+  * repr()
 
 ## 5.1. 序列
 
@@ -1360,7 +1372,7 @@ python 的迭代器概念:
 * Return an iterator object.
 * 每太看懂, 可能是所谓的 container 类的内部实现是通过定义别的 iterator 对象, 所以该方法就是返回该类内部具体的 迭代对象attribute
 
-### Generator Types
+### 5.5.1. Generator Types
 
 
 

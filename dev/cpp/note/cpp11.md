@@ -7,45 +7,6 @@
 
 # 2. 新关键字
 
-## 2.1. decltype
-
-* decltype ( entity )
-* decltype ( expression )
-
-获取一个表达式的类型, 依据表达式的内容有多种结果 `template <T a>`
-* 传入值是 右值, 返回类型 T
-* 传入值是 左值, 返回类型 T&
-* 
-
-使用方法:
-```cpp
-int i=1;
-// 通过类型推导来定义新的变量
-decltype(i) j = i *2;
-
-
-auto f = [](int a, int b) -> int
-{
-    return a * b;
-};
-// 对 lambda 函数使用 decltype 
-decltype(f) g = f;
-
-
-// 定义一个结构体
-struct A { double x; };
-// 定义一个指针
-const A* a;
- 
-//  
-decltype(a->x) y;       // type of y is double (declared type)
-// 
-decltype((a->x)) z = y; // type of z is const double& (lvalue expression)
-
-
-
-
-```
 
 ## 2.2. noexcept
 

@@ -8,7 +8,6 @@
 * 可以通过注释来添加类型标识, 解释器层面不会进行检查, 但是可以用于 IDE 来帮助检查
 * 简单来说就是符合语法的各种注释写法
 
-
 The most fundamental support consists of the types `Any, Union, Tuple, Callable, TypeVar, and Generic`
 
 ## 2.1. Special typing primitives

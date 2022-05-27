@@ -115,12 +115,44 @@ opencv-python 的 API 都定义在了 cv2 包中, 为了保证代码的可执行
 
 # 2. core
 
-定义了 OpenCV 中最核心的类 (图像), 以及一些数学上的操作 
+定义了 OpenCV 中最核心的类 (图像), 以及一些对于 array 的数学上的操作 
+* 有些图像处理的功能可能没有定义在图像部分, 而是在 array 对象的更原始的层面里实现了
+
 
 ## 2.1. mat  core/mat.hpp
 
 同 numpy 一样, opencv并没有特地的图片类, 而是用矩阵来表示 -> `cv::Mat`  
 
+## 2.2. Operations on arrays
+
+所有和 array 相关的基础处理方法
+* 该模组在 C++ 中比较有意义
+* Opencv-Python 因为是基于 Numpy 实现的, 因此有很多函数其实和 Numpy 的功能重复了
+
+### 2.2.1. addWeighted 权重加
+
+```cpp
+void cv::addWeighted 	( 	InputArray  	src1,
+		double  	alpha,
+		InputArray  	src2,
+		double  	beta,
+		double  	gamma,
+		OutputArray  	dst,
+		int  	dtype = -1 
+	) 		
+Python:
+	cv.addWeighted(	src1, alpha, src2, beta, gamma[, dst[, dtype]]	) -> 	dst
+
+```
+
+类似于 PIL 的 paste 函数在opencv 里是以 array 对象实现的
+* 这里的权重可以是RGBA的 alpha 通道
+* 因为函数不会意识到图像, 所以要求输入图像都是相同维度以及相同大小 `src1.shape==src2.shape`
+* dst(I)=saturate(src1(I)∗alpha+src2(I)∗beta+gamma)
+* 参数
+  * alpha , beta 分别是 src1 src2 的透明度通道
+  * gamma 是最后的标量
+  * 由此可见对于 RGBA 图像, 需要先将 alpha 通道独立出来
 
 # 3. imgcodecs  Image file reading and writing 
 
@@ -132,13 +164,52 @@ opencv-python 的 API 都定义在了 cv2 包中, 为了保证代码的可执行
 
 用作图片 IO 的参数, 一般都是枚举类型, 用于指定图片的规格等
 
+* 在C++下, OpenCV 会以内建的 Mat 类来处理图像
+* 在 Python OpenCV 中则使用 numpy.ndarry 来处理, 因此 Mat 类的方法在 Python 下不能使用
 
+### ImreadModes
+
+用于读取时候的模式
+
+EXIF : 图像格式标记, 包括了该图像正确的展示方向, OpenCV 读取的时候会默认参考该标记得到正确的显示方向
+
+此处省略 `IMREAD_`
+* UNCHANGED			: 原汁原味, 返回原本的图像 (其实区别就是对待 png 图片时会有 alpha 通道). Ignore EXIF orientation. 
+* GRAYSCALE			: 灰度 , 读取的时候会自动进行色彩转换
+* COLOR				: 默认 , 总是自动转换成 BGR 三通道
+* ANYDEPTH			: 高深度图像, 支持输入 16-bit 或 32bit 色深图像
+* ANYCOLOR			: 任意颜色格式 (不太懂, 是不进行BGR转换的意思?)
+* LOAD_GDAL 		: 使用 gdal driver for loading the image (不懂)
+* IGNORE_ORIENTATION: 忽视 Exif 的方向标签
+* REDUCE 系列, 在读取的时候自动将图片的大小降低对应系数
+  * REDUCED_GRAYSCALE_2 
+  * REDUCED_COLOR_2 
+  * REDUCED_GRAYSCALE_4 
+  * REDUCED_COLOR_4 
+  * REDUCED_GRAYSCALE_8 
+  * REDUCED_COLOR_8 
+
+
+位表记
+| 位  | 对应 Flag          |
+| --- | ------------------ |
+| 全0 | GRAYSCALE          |
+| 1   | COLOR              |
+| 2   | ANYDEPTH           |
+| 4   | ANYCOLOR           |
+| 8   | LOAD_GDAL          |
+| 16  | REDUCE_2           |
+| 32  | REDUCE_4           |
+| 64  | REDUCE_8           |
+| 128 | IGNORE_ORIENTATION |
+| 255 | UNCHANGED          |
 
 ## 3.2. 基础图像读写
 
 `imread()` 用于从一个文件路径中读取图像
 * filename  :Name of file to be loaded.
 * flags     :Flag that can take values of `cv::ImreadModes`
+  * 默认的读取模式是 `IMREAD_COLOR`
 
 `imwrite()` 用于把一个 `cv::Mat` 类写入到硬盘中
 * filename	:Name of the file.
@@ -158,9 +229,9 @@ bool cv::imwrite 	(
 	InputArray  	img,
 	const std::vector< int > &  	params = std::vector< int >() 
 )
-```
 
-```python
+
+// python
 cv.imread(filename[, flags]	) -> 	retval
 
 cv.imwrite(	filename, img[, params]	) -> 	retval
@@ -240,11 +311,38 @@ Python:
 ## 4.3. Geometric Image Transformations
 
 存放了重要的几何变换函数, 包括最基础的 resize
+* 一些更加泛用的操作函数在文档中没有放在这里, 而是放在了 core/operations on arrays 中
+* 凡是需要意识到图像的, 都放在这里, 例如 resize 需要进行插值所以
 
-一些更加泛用的操作函数在文档中没有放在这里, 而是放在了 core/operations on arrays 中
+
+### 4.3.1. InterpolationFlags
+
+插值方法标志 
 
 
-### 4.3.1. Affine 和 Perspective
+### 4.3.2. resize
+
+更改图像的尺寸
+
+```cpp
+void cv::resize 	( 	InputArray  	src,
+		OutputArray  	dst,
+		Size  	dsize,
+		double  	fx = 0,
+		double  	fy = 0,
+		int  	interpolation = INTER_LINEAR 
+	) 		
+Python:
+	cv.resize(	src, dsize[, dst[, fx[, fy[, interpolation]]]]	) -> 	dst
+```
+* src 		: 原图像
+* dsize 	: 输出的大小, 如果为0 (None in python), 则使用 fx, fy 来缩放
+  * 注意输入是 (width, height)
+  * 与 opencv-python 下 img.shape 得到的顺序相反
+* fx, fy	: 代表 横, 纵 的缩放比例
+
+
+### 4.3.3. Affine 和 Perspective
 
 经典几何变换
 * cv::getAffineTransform
@@ -292,6 +390,34 @@ Python:
 ### 4.4.1. 二值化 threshold
 
 
+#### 4.4.1.1. 阈值类型
+
+```cpp
+enum  	cv::ThresholdTypes {
+  cv::THRESH_BINARY = 0,
+  cv::THRESH_BINARY_INV = 1,
+  cv::THRESH_TRUNC = 2,
+  cv::THRESH_TOZERO = 3,
+  cv::THRESH_TOZERO_INV = 4,
+  cv::THRESH_MASK = 7,
+  cv::THRESH_OTSU = 8,			// 目前只能应用在 8-bit 灰度图像
+  cv::THRESH_TRIANGLE = 16 	 	// 目前只能应用在 8-bit 灰度图像
+}
+
+```
+
+AdaptiveThresholdTypes
+
+```cpp
+enum  	cv::AdaptiveThresholdTypes {
+  cv::ADAPTIVE_THRESH_MEAN_C = 0,
+  cv::ADAPTIVE_THRESH_GAUSSIAN_C = 1
+}
+
+```
+#### 4.4.1.2. threshold 和 自适应 adaptive
+
+
 `double cv::threshold`
 * 固定 level 的阈值函数
 * 从一个 grayscale 获取一个 bi-level (二值) 图像
@@ -310,7 +436,7 @@ double cv::threshold 	( 	InputArray  	src,
 	) 	
 // Returns : the computed threshold value if Otsu's or Triangle methods used.
 
-// 注意, dst 作为返回值是第二个, 需要用两个变量接受 
+// 注意, python 中 dst 作为返回值是第二个, 直接用返回值接受的话 需要用两个变量接受 
 Python:
 	cv.threshold(	src, thresh, maxval, type[, dst]	) -> 	retval, dst
 
@@ -342,31 +468,6 @@ Python:
     * `ADAPTIVE_THRESH_GAUSSIAN_C ` : 区块内像素的高斯权重和
 
 
-#### 4.4.1.1. ThresholdTypes
-
-```cpp
-enum  	cv::ThresholdTypes {
-  cv::THRESH_BINARY = 0,
-  cv::THRESH_BINARY_INV = 1,
-  cv::THRESH_TRUNC = 2,
-  cv::THRESH_TOZERO = 3,
-  cv::THRESH_TOZERO_INV = 4,
-  cv::THRESH_MASK = 7,
-  cv::THRESH_OTSU = 8,			// 目前只能应用在 8-bit 灰度图像
-  cv::THRESH_TRIANGLE = 16 	 	// 目前只能应用在 8-bit 灰度图像
-}
-
-```
-
-#### AdaptiveThresholdTypes
-
-```cpp
-enum  	cv::AdaptiveThresholdTypes {
-  cv::ADAPTIVE_THRESH_MEAN_C = 0,
-  cv::ADAPTIVE_THRESH_GAUSSIAN_C = 1
-}
-
-```
 
 # 5. highgui  High-level GUI
 

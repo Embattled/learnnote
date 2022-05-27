@@ -7,3 +7,13 @@
 
 ## ndk-build
 
+
+## Address Sanitizer (asan)
+
+一种基于 编译器 的工具, 用于检测内存相关的 bug
+* 检测 stack 和 global objects 的overflows 
+* 占用内存少
+* 处理快
+* !! 不能检测内存泄漏以及访问未定义内存
+
+https://developer.android.com/ndk/guides/asan

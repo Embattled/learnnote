@@ -35,6 +35,13 @@ import copy
 
 ## 4.1. Counter 
 
+A counter tool is provided to support convenient and rapid tallies, dict subclass for counting hashable objects.
+* `class collections.Counter([iterable-or-mapping])`  用一个可以迭代的对象建立一个 Counter
+* 对象的元素必须是 hashable
+
+
+
+
 
 ## 4.2. collections.abc
 

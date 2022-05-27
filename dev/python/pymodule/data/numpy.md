@@ -24,7 +24,18 @@ NumPy’s array class is called `ndarray`. It is also known by the alias `array`
 * itemsize  : 元素大小 bytes
 * data      : 指向实际数据的 `array` 一般不需要使用
 
-## 2.2. 元素运算
+## 2.2. scalars 
+
+Python 为了便于书写, 对于整数和小数, 各自只定义了一种数据类型: integer float  
+
+numpy 由于需要应用在科学运算上, 数据的类型变得十分重要
+* numpy 定义了总计 24 种数据类型  
+* 这些数据类型主要基于 C 语言以及 Cpython
+* 还有一些数据类型用于保持与 python 内建类型的兼容性
+
+
+
+## 2.3. 元素运算
 
 1. 基础数学运算都是元素为单位的, 一个新的 array 会生成并返回
    * 加减乘除, 乘法会进行元素乘
@@ -43,19 +54,19 @@ numpy的二元基础运算都是元素层面的
 * `*`乘法也是元素层面, 两个矩阵使用 `*`  不会进行矩阵乘法
 * 组合运算符 `+= -=` 会进行直接结果替换
 
-### 2.2.1. universal function
+### 2.3.1. universal function
 
 * 基础运算之外, 在numpy 包中有一些其他的数学运算, 也是元素层面的
 * 也有基础运算的全局函数版
 * `np.sin(A) np.exp(A)  np.add(A,B)`
 
-### 2.2.2. clip 修正边界
+### 2.3.2. clip 修正边界
 
 * numpy.clip(a, a_min, a_max, out=None, **kwargs) 
 * 将 array 限制在正确的范围里
-* 
 
-## 2.3. Calculation 降维运算
+
+## 2.4. Calculation 降维运算
 
 对元素进行某种会带来降维的运算操作, 也可以指定维度 
 
@@ -71,7 +82,7 @@ numpy的二元基础运算都是元素层面的
 * `dtype` 指定, 来保证运算时不会溢出, 默认是相同类型
 
 
-### 2.3.1. 数学类
+### 2.4.1. 数学类
 * `ndarray.max()  numpy.amax()`
 * `ndarray.min()  numpy.amin()`
 * `ndarray.argmax() numpy.argmax()` 返回最大值对应的索引
@@ -79,21 +90,21 @@ numpy的二元基础运算都是元素层面的
 * .cumsum() 累加该 array
 
 
-### 2.3.2. 布尔类
+### 2.4.2. 布尔类
 
-* numpy.all 是否全部为 True
-* numpy.any 是否有 True
+* numpy.all() 是否全部为 True
+* numpy.any() 是否有 True
 
-## 2.4. creation
+## 2.5. creation
 
-### 2.4.1. numpy.array()
+### 2.5.1. numpy.array()
 
 从既存的序列或者元组来创建  
 `numpy.array(object, dtype=None, *, copy=True, order='K', subok=False, ndmin=0, like=None)`
   * 必须以序列的形式传入第一个参数, 即用方括号包住
   * 元素类型会被自动推导, 或者用`dtype=`指定类型
 
-### 2.4.2. 生成函数
+### 2.5.2. 生成函数
 
 1. 使用基础矩阵生成函数, 默认是 float64, 也可以指定类型
    * one()
@@ -120,7 +131,25 @@ array([[ 0,  1,  2,  3,  4],
 
 ```
 
-## 2.5. 形态转换 Shape Manipulation
+## 2.6. Copies and Views
+
+* 普通赋值不进行拷贝       `a=b`
+* view不进行数据拷贝       `c=a.view()` 算是绑定了一个引用, 可以用来操纵数据
+* copy方法会进行完整拷贝   `d=a.copy()`
+
+对于截取数据中的有用片段, 删除无用片段时, 需要进行拷贝
+```py
+a = np.arange(int(1e8))
+b = a[:100].copy()
+del a  # the memory of ``a`` can be released.
+```
+
+
+# 3. Routines 常规操作 API
+
+## 3.1. Array creation
+
+## 3.2. Array manipulation 形态转换
 
 a.shape 可以返回当前的 array 的形状
 
@@ -144,30 +173,48 @@ a.shape 可以返回当前的 array 的形状
 扁平化索引, 不需要用多重方括号索引值
 * `a.flat[1]`
 
-### 2.5.1. 拼接 stacking together
+### 3.2.1. Joining arrays 拼接
 
-* numpy.vstack((a,b)) == numpy.row_stack() 
-  * 上下拼接
-* numpy.hstack((a,b))
-  * 左右拼接
-* numpy.column_stack((a,b))
+```py
+numpy.concatenate((a1, a2, ...), axis=0, out=None, dtype=None, casting="same_kind")
+```
+`numpy.concatenate()` 指定维度拼接:
+* tup   : 除了 `axis` 指定的维度, 其他维度必须相同
+* axis  : 维度, 默认是0 (最外层)
+
+
+
+
+简单拼接
+* `numpy.vstack(tup)` 上下拼接
+* `numpy.row_stack(tup)` == vstack
+* `numpy.hstack(tup)` 左右拼接
+* `numpy.column_stack(tup)`
   * 将 1D array 视作列进行左右拼接
   * 在处理 2D array 时与 hstack 相同
 
-### 2.5.2. 拆分 splitting
+### 3.2.2. Splitting arrays 拆分 
 
 * numpy.hsplit(a,3) 竖着切3分
 * numpy.vsplit(a,3) 横着切, 沿着 vertical axis
 * numpy.array_split 指定切的方向
 
-### 2.5.3. 升维 
+
+### Changing dimensions 维度操作
+
+朴素升降维:
+* `numpy.expand_dims(a, axis)`
+  * axis 的范围是 (0,a.ndim)
+  * 被插入的维度的位置 == axis , 意思是其后的维度会被顺延
+* `numpy.squeeze(a, axis=None)`
+  * 删掉 shape 为 1 的维度
+  * axis 可以指定, 但是指定的维度必须确保 shape == 1
+
 
 1. `arr=arr[:,:,np.newaxis`
 2. `arr=np.array([arr])`
 
-### 2.5.4. 降维 
-
-
+降维 
 * `np.squeeze(x)`
 * 删掉维度数为1的轴
 * Remove axes of length one from a.
@@ -182,22 +229,16 @@ a.shape 可以返回当前的 array 的形状
 (1, 3)
 ```
 
-## 2.6. Copies and Views
+## 3.3. Sorting, Searching, Counting 排序 搜索 统计
 
-* 普通赋值不进行拷贝       `a=b`
-* view不进行数据拷贝       `c=a.view()` 算是绑定了一个引用, 可以用来操纵数据
-* copy方法会进行完整拷贝   `d=a.copy()`
+### 3.3.1. 逻辑处理
 
-对于截取数据中的有用片段, 删除无用片段时, 需要进行拷贝
-```py
-a = np.arange(int(1e8))
-b = a[:100].copy()
-del a  # the memory of ``a`` can be released.
-```
+`numpy.where(condition, [x, y, ]/)`
+* 用于根据某个判断语句 在两个 array 之间选择对应的元素 得到新的 array
+* x, y : 作为输入数组, 需要相同的 shape , 或者可以 broadcastable to same shape.
 
 
-
-# 3. numpy.random
+# 4. numpy.random
 
 * numpy 的随机包是独立出来的 `numpy.random`
 * 比 Pystl 的 random 包通用性更广, 值得学习
@@ -209,14 +250,14 @@ del a  # the memory of ``a`` can be released.
 4. RandomState: 已经被淘汰的旧版生成器, 只能基于一种 BitGenerators
    - RandomState 目前直接作为一个对象被放入了 该命名空间
 
-## 3.1. Generator
+## 4.1. Generator
 
 基本生成器
 * `default_rng(seed=None)`  : 被官方推荐的生成器, 使用 `PCG64` , 效果优于 `MT19937`
   - seed : None, int, array_like`[ints]`, SeedSequence, BitGenerator, Generator. 
 
 
-### 3.1.1. 生成器方法
+### 4.1.1. 生成器方法
 
 通过使用生成器对象的方法可以产生任意区间和分布的随机数
 * Simple random data 简单随机数
@@ -241,9 +282,9 @@ del a  # the memory of ``a`` can be released.
   * `random.Generator.uniform(low=0.0, high=1.0, size=None)`
     - 均一分布
 
-# 4. numpy 常规功能
+# 5. numpy 常规功能
 
-## 4.1. numpy 的IO
+## 5.1. numpy 的IO
 
 numpy 的数据IO可以简单分3类:
 * 二进制IO
@@ -255,7 +296,7 @@ numpy 的 IO 也一定程度上基于 pickle, 具有一定的不安全性
 通用参数:
 * file : file-like object, string, or pathlib.Path
   
-### 4.1.1. 类型转换
+### 5.1.1. 类型转换
 
 在 numpy 官方文档中, ndarray 相关的类型转换也被归纳为 IO 的一部分
 
@@ -267,7 +308,7 @@ numpy 的 IO 也一定程度上基于 pickle, 具有一定的不安全性
 * ndarray.tofile(fid[, sep, format])
 
 
-### 4.1.2. numpy binary files
+### 5.1.2. numpy binary files
 
 最基础的保存方法, 因为是二进制的, 所以最好只通过 numpy 访问, 文件后缀为 `.npy`
 
@@ -276,7 +317,7 @@ numpy 的 IO 也一定程度上基于 pickle, 具有一定的不安全性
 * savez
 * savez_compressed
 
-### 4.1.3. text file
+### 5.1.3. text file
 
 txt 文件保存后的访问比较便捷, 也容易在其他应用间交互
 
@@ -305,9 +346,9 @@ numpy.savetxt(fname, X,
 numpy.loadtxt(fname, `dtype=<class 'float'>`, comments='#', delimiter=None, converters=None, skiprows=0, usecols=None, unpack=False, ndmin=0, encoding='bytes', max_rows=None, *, like=None)
 ```
 
-# 5. config
+# 6. config
 
-## 5.1. np.set_printoptions
+## 6.1. np.set_printoptions
 
 1. 取消科学计数法显示数据 `np.set_printoptions(suppress=True)  `
 
@@ -316,9 +357,9 @@ numpy.loadtxt(fname, `dtype=<class 'float'>`, comments='#', delimiter=None, conv
 2. 取消省略超长数列的数据 ` np.set_printoptions(threshold=sys.maxsize)` 需要 sys 包
 
 
-### 5.1.1. numpy.shape
+### 6.1.1. numpy.shape
 
-### 5.1.2. numpy.dot()  矩阵点乘
+### 6.1.2. numpy.dot()  矩阵点乘
 
 np.diag(s)  将数组变成对角矩阵  
 使用numpy进行矩阵乘法   
@@ -349,9 +390,9 @@ print(np.shape(U), np.shape(s), np.shape(Vh))
 
 
 
-## 5.2. linalg 
+## 6.2. linalg 
 
-### 5.2.1. SVD 奇异值分解
+### 6.2.1. SVD 奇异值分解
 
 Singular Value Decomposition  
 * M = U * s * Vh  
