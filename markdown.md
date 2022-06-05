@@ -1,19 +1,71 @@
-# 1. Markdown 语言语法
+# 1. Markdown 语言
 
-## 1.1. 显示保留字符
+`John Gruber` and `Aaron Swartz` created Markdown in 2004
+* 在 `John Gruber` 的个人网站 [daringfireball](https://daringfireball.net) 于 2004 年被创建 (ver 1.0.1)
+* 目的是  text-to-HTML conversion tool for web writers
+* Markdown 在发布的时候
+  * 包括了一整套语法
+  * 包括一个工具, 由 Perl 语言编写, 用于将纯文本 markdown 文件转化为 HTML
+  * 并不是一个标准的规范, 因此官方版本迅速被各种衍生兼容版埋没
+  * Gruber 本人也拒绝为 Markdown 定义一套规范, 而是赞成根据各自需求自己定义
+  * 原版 Markdown 保留了花括号的定义, 用于各种实现根据需求去设定功能 
+* 目前唯一的 Markdown 官方网站仍然是他的个人博客 [Markdown Offical](https://daringfireball.net/projects/markdown/)
+
+和同类型的其他语言相比, Markdown 是 Lightweight Markup Language (LML) 语言中最出名的
+* Markdown 的名称由来就是为了与标记语言(Markup)相反, 例如 RTF 或者 HTML
+
+
+目前 Markdown语言已经被列入 RFC中 
+* Internet media type	: `text/markdown` (RFC 7763)
+* 其他变种 (RFC 7764)
+
+
+## 1.1. CommonMark
+
+`Jeff Atwood` and `John MacFarlane` 于 2012 年发起的项目[官网](https://spec.commonmark.org/)
+* 该项目旨在: 定义一个 Markdown 兼容的标准, 但是消除原版语法中的所有歧义
+* 该项目引起了原作者 `John Gruber` 的强烈反感, 并使得该项目进行了多次重命名 `Standard Markdown` -> `Commom Markdown` -> `CommonMark`
+
+* Internet media type	: `text/markdown; variant=CommonMark`
+
+* 目前各个网站以及项目中的 Markdown 大多都基于 CommonMark
+  * Discourse
+  * GitHub
+  * GitLab
+  * Reddit
+  * Qt
+  * Stack Exchange (Stack Overflow)
+  * Swift
+
+## 1.2. GitHub Flavored Markdown GFM
+
+Github 于2009年开始使用了自己的 Markdown 变种, 用于
+* support for additional formatting such as tables and nesting block content inside list elements
+* as well as GitHub-specific features such as auto-linking references to commits, issues, usernames
+* 一直到 2017 年, Github 正式将自己的 Markdown 变种 GFM 的正式规范
+  * 相比于 CommonMark 更加严格
+
+
+## 1.3. Markdown Extra
+
+加入了非常多的功能, 基于 PHP, Python, Ruby 的 Markdown 实现而开发的
+
+
+# 2. 语法
+## 2.1. 显示保留字符
 在字符前加反斜杠代表正常显示  
 `\* \#`  
 可以正常显示星号和井号  
-## 1.2. 标题
+## 2.2. 标题
 使用`#`号可以表示1-6级标题，一级对应一个`#`号  
 `# 一级标题`  
 `## 二级标题`  
-## 1.3. 段落
+## 2.3. 段落
 Markdown的段落没有特殊的格式，要换行需要在末尾加上两个空格再回车  
 `文字  (跟两个空格再加回车)`  
 或者直接两个回车，在代码中空一行代表重新开始一个新段落
 
-### 1.3.1. 字体
+### 2.3.1. 字体
 `*斜体文本*` *斜体*  
 使用一个星号包围表示斜体文本 
 
@@ -24,7 +76,7 @@ Markdown的段落没有特殊的格式，要换行需要在末尾加上两个空
 `***粗斜体***` ***粗斜体***  
 三个星号代表粗斜体
 
-### 1.3.2. 分割线
+### 2.3.2. 分割线
 可以在一行中用三个以上的星号、减号、底线来建立一个分隔线，行内不能有其他东西。  
 也可以在星号或是减号中间插入空格。下面每种写法都可以建立分隔线：  
 `***`  
@@ -37,18 +89,18 @@ Markdown的段落没有特殊的格式，要换行需要在末尾加上两个空
 在分隔线中的文字
 ***
 
-### 1.3.3. 删除线
+### 2.3.3. 删除线
 在文字上添加删除横线，使用双波浪线包围  
 `~~文字~~`  
 ~~要删除的文字~~
 
 
-### 1.3.4. 下划线
+### 2.3.4. 下划线
 下划线需要通过HTML的`<u>`标签实现  
 `<u>带下划线的文本</u>`  
 <u>带下划线的文本</u>
 
-### 1.3.5. 脚注
+### 2.3.5. 脚注
 对文本提供补充说明，当鼠标移动到文本上时显示额外说明  
 鼠标移动到[^这里]  
 [^这里]: 脚注就出现了
@@ -61,7 +113,7 @@ Markdown的段落没有特殊的格式，要换行需要在末尾加上两个空
 生成一个脚注2[^foot].  
 [^foot]: 这里是**脚注2**的*内容*.
 
-## 1.4. 列表
+## 2.4. 列表
 Markdown支持有序列表和无序列表
 
 **无序列表**可以使用`*`或者`+`或者`-`来表示
@@ -80,7 +132,7 @@ Markdown支持有序列表和无序列表
 `1. 第一项`
 1. 第一项
 
-## 1.5. 区块
+## 2.5. 区块
 在段落开头使用 `>` 符号，再跟一个空格
 > 最外层嵌套
 >>第二层
@@ -93,7 +145,7 @@ Markdown支持有序列表和无序列表
 > > 1. 嵌套第一项
 > > + 嵌套无序项
 
-## 1.6. 代码
+## 2.6. 代码
 `printf()` 函数
 
 **代码区块**
@@ -101,7 +153,7 @@ Markdown支持有序列表和无序列表
 for(i=0;i<=5;i++)
 ```
 
-## 1.7. 超链接
+## 2.7. 超链接
 [链接名称](链接地址)  
 
 `这是一个链接 [菜鸟教程](https://www.runoob.com)`  
@@ -146,7 +198,7 @@ Markdown功能简洁
 还没有办法指定图片的高度与宽度，如果你需要的话，你可以使用普通的 <img> 标签。  
 `<img src="http://static.runoob.com/images/runoob-logo.png" width="50%">`
 
-## 1.8. 表格
+## 2.8. 表格
 Markdown使用 `|`来制作表格 `-` 来分隔表头和其他行  
 ```markdown
 表头|表头
@@ -174,14 +226,14 @@ Markdown使用 `|`来制作表格 `-` 来分隔表头和其他行
 
 `:`代表内容 `--`代表空白
 
-## 1.9. 高级技巧  
+## 2.9. 高级技巧  
 
-### 1.9.1. 支持使用HTML元素
+### 2.9.1. 支持使用HTML元素
 目前支持的 HTML 元素有：`<kbd> <b> <i> <em> <sup> <sub> <br>`等  
 `使用 <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Del</kbd> 重启电脑`
 使用 <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Del</kbd> 重启电脑
 
-### 1.9.2. TeX LaTeX 数学公式
+### 2.9.2. TeX LaTeX 数学公式
 
 * 使用 `$公式内容$` 表示行内公式
   * $c = \sqrt{a^{2}+b_{xy}^{2}+e^{x}}$

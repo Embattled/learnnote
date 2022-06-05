@@ -168,7 +168,7 @@ Python:
 * 在C++下, OpenCV 会以内建的 Mat 类来处理图像
 * 在 Python OpenCV 中则使用 numpy.ndarry 来处理, 因此 Mat 类的方法在 Python 下不能使用
 
-### ImreadModes
+### 3.1.1. ImreadModes
 
 用于读取时候的模式
 
@@ -497,9 +497,230 @@ Python:
 * 该函数必须后接一个 `cv::waitKey or cv::pollKey` 来保证窗口可操作
 * `waitKey(0)` will display the window infinitely until any keypress
 
-# 6. objdetect Object Detection 最常用的物体检测模型
+# 6. videoio Video I/O
 
-## 6.1. Cascade 模型 Cascade Classifier for Object Detection
+除了面向视频文件的API, 与摄像头设备有关的接口也定义在了该模组中
+
+
+
+## 6.1. OpenCV VideoIO 构成
+
+视频文件的处理还算简单, 但是与摄像头的交互因为涉及到系统接口层面, 有很多底层内容
+
+这里列出 OpenCV IO的构成方法
+* 最底层- 源
+  * 视频文件
+  * 摄像头
+  * 网络流
+* 操作系统
+  * 制造商库文件
+  * Backends 后端库文件
+  * CODECS(fourcc)
+  * O.S. 库文件
+* 中层
+  * OpenCV API
+    * VideoCaputre
+    * VideoWriter
+  * 其他制造商驱动 (C/C++ 等API)
+* 用户软件
+
+## 6.2. class VideoCaputre
+
+不论是视频文件还是摄像头或者网络提供的图像流, 在OpenCV的上层接口里都被认为是相同的类型, 使用相同的类来处理  
+
+### 6.2.1. 构造函数 VideoCapture () open()
+
+构造函数, 共有五个重载, 同理在 python 中则是不同的输入形式  
+
+* 空构造函数 `VideoCapture ()` 用于实现定义好一个对象, 之后再通过方法 `open()` 来打开设备
+* `VideoCapture.open()` 的4个重载的参数和剩下的四个构造函数完全一致, 因此不赘述
+* `open()` 也可以用来 reinitializes , 返回的是初始化是否成功
+
+
+```cpp
+cv::VideoCapture::VideoCapture 	( 		) 	
+cv::VideoCapture::VideoCapture 	( 	
+		const String &  	filename,
+		int  	apiPreference = CAP_ANY 
+	) 		
+cv::VideoCapture::VideoCapture 	( 	
+		const String &  	filename,
+		int  	apiPreference,
+		const std::vector< int > &  	params 
+	)
+cv::VideoCapture::VideoCapture 	( 	
+		int  	index,
+		int  	apiPreference = CAP_ANY 
+	)
+cv::VideoCapture::VideoCapture 	( 	
+		int  	index,
+		int  	apiPreference,
+		const std::vector< int > &  	params 
+	)
+
+Python:
+	cv.VideoCapture(		) -> 	<VideoCapture object>
+	cv.VideoCapture(	filename[, apiPreference]	) -> 	<VideoCapture object>
+	cv.VideoCapture(	filename, apiPreference, params	) -> 	<VideoCapture object>
+	cv.VideoCapture(	index[, apiPreference]	) -> 	<VideoCapture object>
+	cv.VideoCapture(	index, apiPreference, params	) -> 	<VideoCapture object>
+```
+
+参数:  
+* filename		: 虽然参数名叫做 filename, 事实上也包含了网络流
+  * 视频文件的地址 `video.avi`
+  * 一连串的图片文件, 需要加入通配符 `img_%02d.jpg`, 代表了 `img_00.jpg` 开始的一系列图片
+  * 视频流的URL	 `protocol://host:port/script_name?script_params|auth`
+  * GStreamer pipeline string in gst-launch tool format 看不懂
+* apiPreference : 可以从几个OpenCV实现的图像流 reader 中选择
+  * 定义在了 `VideoCaptureAPIs` 中, 如果有需要再去单独参考
+  * 默认是自动检测, 应该足够用了
+  * OpenCV定义了几十种 reader , 针对了不同的设备
+* params		: 用于附加的配置参数
+  * 尽管该参数的接受类型是 `vector<int>`, 但实际传入的时候是键值对顺序排列的形式
+    * `{key1,value1,key2,value2,...}`
+  * 代码中的名称是 `VideoCaptureProperties` 
+  * 该参数的配置内容都是非常底层的, 是否有效都是根据硬件的条件以及底层驱动相关的
+* index			: 主要用于摄像头模式
+  * 该参数用于选择当前计算机已连接的摄像头设备
+  * 默认值0 , 代表跟随当前系统的默认摄像头
+
+
+### 6.2.2. 读取帧
+
+读取下一帧图像在 OpenCV 中也有多层实现
+* `grab()` 	: 仅仅只是读取, 返回值是 bool, 代表读取是否成功
+* `retrieve()`	: decode 刚才读取的帧
+  * 注意返回值是解码是否成功, 图像信息在另外的参数
+  * C++和 python 的返回形式不同
+* `read()`	: 上述两个函数的结合, 抓取并解码
+  * 
+
+```cpp
+virtual bool cv::VideoCapture::grab 	( 		) 	
+virtual bool cv::VideoCapture::read 	( 	OutputArray  	image	) 	
+virtual bool cv::VideoCapture::retrieve 	( 	OutputArray  	image,
+		int  	flag = 0 
+	) 		
+
+Python:
+	cv.VideoCapture.grab(		) -> 	retval
+	cv.VideoCapture.retrieve(	[, image[, flag]]	) -> 	retval, image
+	cv.VideoCapture.read(	[, image]	) -> 	retval, image
+```
+
+
+### 6.2.3. 配置参数管理
+
+* `get()` 方法不是取帧, 而是获取对应的配置参数
+* `set()` 用于设置配置参数
+
+```cpp
+virtual double cv::VideoCapture::get 	( 	int  	propId	) 	const
+
+Python:
+	cv.VideoCapture.get(	propId	) -> 	retval
+
+virtual bool cv::VideoCapture::set 	( 	int  	propId,
+		double  	value 
+	) 		
+Python:
+	cv.VideoCapture.set(	propId, value	) -> 	retval
+```
+
+
+## 6.3. class VideoWriter
+
+Video writer class.  
+The class provides C++ API for writing video files or image sequences. 
+
+
+
+Default constructors.  
+The constructors/functions initialize video writers.
+
+    On Linux FFMPEG is used to write videos;
+    On Windows FFMPEG or MSWF or DSHOW is used;
+    On MacOSX AVFoundation is used.
+
+
+### 6.3.1. 构造函数  open()
+
+类的构造函数  
+* 同 VideoCapture 的形式一样, 通过空构造函数预先定义对象, 再通过 `open()` 进行初始化
+* `open()` 方法的参数也是完全一样, 因此不赘述, 返回的是初始化是否成功
+* `open()` 也可以用来重新初始化一个对象 reinitializes 
+
+```cpp
+cv::VideoWriter::VideoWriter 	( 		) 	
+cv::VideoWriter::VideoWriter 	( 	const String &  	filename,
+		int  	fourcc,
+		double  	fps,
+		Size  	frameSize,
+		bool  	isColor = true 
+	) 	
+cv::VideoWriter::VideoWriter 	( 	const String &  	filename,
+		int  	apiPreference,
+		int  	fourcc,
+		double  	fps,
+		Size  	frameSize,
+		bool  	isColor = true 
+	) 	
+cv::VideoWriter::VideoWriter 	( 	const String &  	filename,
+		int  	fourcc,
+		double  	fps,
+		const Size &  	frameSize,
+		const std::vector< int > &  	params 
+	) 	
+cv::VideoWriter::VideoWriter 	( 	const String &  	filename,
+		int  	apiPreference,
+		int  	fourcc,
+		double  	fps,
+		const Size &  	frameSize,
+		const std::vector< int > &  	params 
+	) 	
+
+
+Python:
+	cv.VideoWriter(		) -> 	<VideoWriter object>
+	cv.VideoWriter(	filename, fourcc, fps, frameSize[, isColor]	) -> 	<VideoWriter object>
+	cv.VideoWriter(	filename, apiPreference, fourcc, fps, frameSize[, isColor]	) -> 	<VideoWriter object>
+	cv.VideoWriter(	filename, fourcc, fps, frameSize, params	) -> 	<VideoWriter object>
+	cv.VideoWriter(	filename, apiPreference, fourcc, fps, frameSize, params	) -> 	<VideoWriter object>
+```
+
+参数:
+* filename		: Name of the output video file.
+  * 该类除了老老实实的写入视频之外, 还可以以一连串图片的格式输出 video, 类似于与 VideoCapture 相对应
+    * filename 带通配符, eg. `img_%02d.jpg` `img_%02d.BMP`
+    * `fourcc=0` or `fps=0`
+* fourcc		: Four Character Code, 用于指代视频流压缩方法
+  * fource=-1 代表通过系统诊断来自动选择方法
+* fps			: 视频帧率
+* frameSize		: 视频的分辨率
+* isColor		: 如果该值为 false, 则输出是灰度影片
+* apiPreference	: 同 VideoCapture
+* params 		: 同 VideoCapture
+
+
+### 6.3.2. 写入 write
+
+```cpp
+virtual void cv::VideoWriter::write 	( 	InputArray  	image	) 	
+
+Python:
+	cv.VideoWriter.write(	image	) -> 	None
+```
+
+# 7. video Video Analysis
+
+涉及到视频的分析在OpenCV中实装了两个方向
+* Motion Analysis 动作(运动)分析
+* Object Tracking 物体追踪
+
+# 8. objdetect Object Detection 最常用的物体检测模型
+
+## 8.1. Cascade 模型 Cascade Classifier for Object Detection
 
 一个经典的级联传统机器学习模型
 
@@ -509,3 +730,43 @@ Python:
 
 预训练模型的下载地址 : https://github.com/opencv/opencv/blob/4.x/samples/python/tutorial_code/objectDetection/cascade_classifier/objectDetection.py
 
+
+
+# 9. photo Computational Photography 计算图像处理
+
+包括了几个基于计算的图像处理领域的算法实现
+
+该模组下实现的算法列表, 方便后续单独查找学习:
+* inpainting
+  * Navier-Stokes based method
+  * Alexandru Telea
+    * Alexandru Telea. An image inpainting technique based on the fast marching method. Journal of graphics tools, 9(1):23–34, 2004.
+
+
+## 9.1. inpainting
+
+图像补全, 该分类下只有一个函数
+
+
+```cpp
+void cv::inpaint 	( 	InputArray  	src,
+		InputArray  	inpaintMask,
+		OutputArray  	dst,
+		double  	inpaintRadius,
+		int  	flags 
+	) 		
+Python:
+	cv.inpaint(	src, inpaintMask, inpaintRadius, flags[, dst]	) -> 	dst
+```
+
+参数介绍:
+* src 			: 8-bit 3-channel image, or 8-bit, 16-bit unsigned or 32-bit float 1-channel
+* inpaintMask 	: 用于标记哪些像素要被补全 
+  * 8-bit 1-channel image.
+  * Non-zero pixels indicate the area that needs to be inpainted.
+* dst			: Output image with the same size and type as src . 
+* inpaintRadius	: Radius of a circular neighborhood of each point inpainted that is considered by the algorithm.
+  * 补全算法的响应半径
+* flags			: 补全算法选择
+  * `cv::INPAINT_NS`
+  * `cv::INPAINT_TELEA`

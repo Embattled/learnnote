@@ -107,8 +107,14 @@ args = parser.parse_args() # 翻译传入的命令行参数
 ```
 
 * `parser.parse_args()` 一般就是直接无参数调用, 会直接翻译传入的命令行参数, 返回一个 `Namespace` object
-* `Namespace` 就是定义在 argparse 包中的一个简单的类, 和字典类似, 但是 print()更加可读, 可以使用 `vars()` 方法进行转换成字典
+  * `Namespace` 就是定义在 argparse 包中的一个简单的类, 和字典类似, 但是 print()更加可读, 可以使用 `vars()` 方法进行转换成字典
   * `args.*` 用点号进行对应的参数访问
+
+## class argparse.ArgumentParser
+
+整个库的核心类, 在 CLI 处理的一开始定义, 有很多参数   
+
+
 
 ## 5.1. add_argument()
 
@@ -169,7 +175,30 @@ group.add_argument("-q", "--quiet", action="store_true")
 
 ## 5.2. 高级 args
 
-### 5.2.1. mutual exclusion 矛盾参数
+除了基础的直接对 parser 里添加参数外, 还有其他特殊的参数类别  
+
+### 5.2.1. Argument groups 参数分组
+
+* 可以将不同的参数归到一组里,
+* 这个组在参数调用的时候没有任何卵用
+* 但是可以在程序帮助信息打印的时候更加清晰明确
+  * `title` 和 `descripition` 参数用于清晰打印
+  * 如果二者都为空, 那么在组之间只会有空行
+
+
+
+```py
+parser = argparse.ArgumentParser()
+group = argparse.add_argument_group(title=None, description=None)
+# 可以设置组的名称和说明 
+
+group.add_argument('--foo', action='store_true')
+group.add_argument('--bar', action='store_false')
+# 添加至这个组的参数在打印参数说明的时候会单独分隔开, 方便区分
+```
+
+
+### 5.2.2. mutual exclusion 矛盾参数
 
 * 可以将不同的参数归到一组里, 这个组的参数只能出现一种
 * 每次调用该参数会返回一个类似于`ArgumentParser` 的对象, 通过调用该对象的 add_argument来实现矛盾参数
@@ -185,22 +214,6 @@ group.add_argument('--foo', action='store_true')
 group.add_argument('--bar', action='store_false')
 ```
 
-### 5.2.2. Argument groups 参数分组
-
-* 可以将不同的参数归到一组里,
-* 这个组在参数调用的时候没有任何卵用
-* 但是可以在程序帮助信息打印的时候更加清晰明确
-
-
-```py
-parser = argparse.ArgumentParser()
-group = argparse.add_argument_group(title=None, description=None)
-# 可以设置组的名称和说明 
-
-group.add_argument('--foo', action='store_true')
-group.add_argument('--bar', action='store_false')
-# 添加至这个组的参数在打印参数说明的时候会单独分隔开, 方便区分
-```
 
 ## 5.3. Print help
 

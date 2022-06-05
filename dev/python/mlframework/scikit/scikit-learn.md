@@ -29,8 +29,10 @@
   - [6.2. PCA](#62-pca)
 - [7. manifold](#7-manifold)
     - [7.0.1. TSNE](#701-tsne)
-- [8. preprocessing](#8-preprocessing)
-  - [8.1. scale](#81-scale)
+- [8. Dataset transformations](#8-dataset-transformations)
+  - [8.1. preprocessing](#81-preprocessing)
+    - [8.1.1. scale](#811-scale)
+    - [polynomial features 多项式特征](#polynomial-features-多项式特征)
 - [9. collections](#9-collections)
 # 1. scikit-learn introduction
 
@@ -427,16 +429,33 @@ for target in np.unique(ground_truth):
 plt.show()
 
 ```
+# 8. Dataset transformations
 
-# 8. preprocessing
+用于对数据进行各种预处理, 类似于:
+* clean
+* reduce
+* expand
+* generate feature representations
+
+尽管是数据预处理, 为了保持代码统一性
+* 用 `.fit()` 的形式来学习数据库的各种数学特性
+* 用 `.transform()` 来实际执行数据处理
+* 或者 `.fit_transform()` 来一次性达成
+
+## 8.1. preprocessing
+
+`sklearn.preprocessing`  
+* provides several common utility functions and transformer classes
+* to change raw feature vectors into a representation 
+* that is more suitable for the downstream estimators.
+
 
 用于各种预处理数据, 各个方法之间比较独立
-
 includes scaling, centering, normalization, binarization methods
 
+### 8.1.1. scale
 
 
-## 8.1. scale
 
 ```py
 digits = pd.read_csv('digits.csv')
@@ -456,8 +475,24 @@ evr = pca.explained_variance_ratio_
 print(f'Explained variance {evr}')
 
 ```
+### polynomial features 多项式特征
+
+增加输入数据的非线性特征
+
+将原本 (n,m) 维的数据扩展到 (n, k(m)) 维
+* For example, if an input sample is two dimensional and of the form [a, b], the degree-2 polynomial features are [1, a, b, a^2, ab, b^2].
 
 
+```py
+class sklearn.preprocessing.PolynomialFeatures(degree=2, *, 
+    interaction_only=False, 
+    include_bias=True, 
+    order='C')
+```
+
+参数:
+* degreeint or tuple (min_degree, max_degree), default=2
+* 
 
 # 9. collections
 

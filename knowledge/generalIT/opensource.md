@@ -1,10 +1,10 @@
-# 开源协议  
+# 1. 开源协议  
 
 和开源相关的概念:
 * open source software : 使用一种协议, 将源代码公开, 同时使用了协议保证了著作权
 * free software : 仅仅是使用免费, 不公开源代码
 * public domain software : 作者放弃了著作权的软件, 完全公共化
-* 
+
 
 
 世界上现在有 60 多种被开源促进组织（Open Source Initiative）认可的开源许可协议来保证开源工作者的权益。  
@@ -14,16 +14,24 @@
 
 ![选择示意图](http://c.biancheng.net/uploads/allimg/190328/1-1Z32QI643931.gif)  
 
-## 1.GUN  GPL
+## 1.1. 1.GUN  GPL  最严格的开源协议 保证开源永远传承
 
 GNU General Public License GNU通用公共许可证  
 
-只要软件中包含了遵循 GPL 协议的产品或代码，该软件就必须也遵循 GPL 许可协议，也就是必须开源免费，不能闭源收费，因此这个协议并不适合商用软件。  
+* 只要软件中包含了遵循 GPL 协议的产品或代码，该软件就必须也遵循 GPL 许可协议，也就是必须开源免费，不能闭源收费，因此这个协议并不适合商用软件。  
+* 修改自由:允许开发人员增加或删除软件的功能，但软件修改后**必须依然基于GPL许可协议授权**
 
 收费传播:允许在各种媒介上出售该软件，但必须提前让买家知道这个软件是可以免费获得的；因此，一般来讲，开源软件都是通过为用户提供有偿服务的形式来盈利的。  
-修改自由:允许开发人员增加或删除软件的功能，但软件<u>**修改后必须依然基于GPL许可协议授权**</u>。
 
-## 2. BSD
+## 1.2. MIT
+
+Massachusetts Institute of Technology 协议  
+目前限制最少的开源许可协议之一（比 BSD 和 Apache 的限制都少），只要程序的开发者在修改后的源代码中保留原作者的许可信息即可，因此普遍被商业软件所使用。  
+
+使用 MIT 协议的软件有 PuTTY、X Window System、Ruby on Rails、Lua 5.0 onwards、Mono 等。   
+
+## 1.3. BSD　第二宽松的协议 保护原作者
+
 Berkeley Software Distribution，伯克利软件发布版 协议
 
 BSD 协议基本上允许用户**为所欲为**  
@@ -35,7 +43,7 @@ BSD 协议基本上允许用户**为所欲为**
 
 BSD 对商业比较友好，很多公司在选用开源产品的时候都首选 BSD 协议，因为可以完全控制这些第三方的代码，甚至在必要的时候可以修改或者二次开发。
 
-## 3. Apache 
+## 1.4. Apache 
 Apache License Version  协议  
 
     1. 该软件及其衍生品必须继续使用 Apache 许可协议。
@@ -43,14 +51,9 @@ Apache License Version  协议
     3. 若软件是基于他人的源代码编写而成的，则需要保留原始代码的协议、商标、专利声明及其他原作者声明的内容信息。
     4. 如果再发布的软件中有声明文件，则需在此文件中标注 Apache 许可协议及其他许可协议。
 
-## 4. MIT
 
-Massachusetts Institute of Technology 协议  
-目前限制最少的开源许可协议之一（比 BSD 和 Apache 的限制都少），只要程序的开发者在修改后的源代码中保留原作者的许可信息即可，因此普遍被商业软件所使用。  
 
-使用 MIT 协议的软件有 PuTTY、X Window System、Ruby on Rails、Lua 5.0 onwards、Mono 等。   
-
-## 5. GUN LGPL
+## 1.5. GUN LGPL
 
 LGPL 是 GPL 的一个衍生版本，也被称为 GPL V2，该协议主要是为类库设计的开源协议。  
 

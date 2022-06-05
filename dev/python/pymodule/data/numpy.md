@@ -147,6 +147,10 @@ del a  # the memory of ``a`` can be released.
 
 # 3. Routines 常规操作 API
 
+对 Array 数据的各种常规操作
+
+* 尽量明确各个函数的返回值是 copy 的还是只是映射
+
 ## 3.1. Array creation
 
 ## 3.2. Array manipulation 形态转换
@@ -200,7 +204,7 @@ numpy.concatenate((a1, a2, ...), axis=0, out=None, dtype=None, casting="same_kin
 * numpy.array_split 指定切的方向
 
 
-### Changing dimensions 维度操作
+### 3.2.3. Changing dimensions 维度操作
 
 朴素升降维:
 * `numpy.expand_dims(a, axis)`
@@ -228,14 +232,155 @@ numpy.concatenate((a1, a2, ...), axis=0, out=None, dtype=None, casting="same_kin
 >>> np.squeeze(x, axis=(2,)).shape
 (1, 3)
 ```
+## Mathematical function 数学操作
 
-## 3.3. Sorting, Searching, Counting 排序 搜索 统计
+绝大多数常用函数都属于该分类
 
-### 3.3.1. 逻辑处理
+### Trigonometric functions 三角函数
+
+### Exponents and logarithms 指数
+
+### Rounding 最近值
+
+### Rational routines 最大公因数 最小公倍数
+
+### Extrema Finding 极值寻找
+
+### 杂项
+
+有时候需要的很特殊的功能
+
+#### convolve 卷积
+
+Returns the discrete, linear convolution of two one-dimensional sequences.
+* 常用在信号处理中
+* 一维卷积
+
+`numpy.convolve(a, v, mode='full')`  
+* a, v 是两个一维array , 需要 a 比 v 长, 否则会在计算前交换顺序
+* mode : str
+  * full :  the convolution at each point of overlap, with an output shape of (N+M-1).
+    * 相当于从左端只有一个元素重合开始, 向右平移 v 直到再次只有一个元素重合 
+    * 得到 N+M-1 个值
+  * same : returns output of length max(M, N). 
+    * 相当于从左端对齐开始, 向右平移 v 直到只有1个元素overlap
+    * 得到 N 个值
+  * valid: 
+    * 没有任何边际值
+    * 只计算 a 和 v 完全 overlap 的卷积
+    * 得到   max(M, N) - min(M, N) + 1. 个值
+
+
+## 3.3. Sorting, Searching, Counting 排序 搜索 计数
+
+这里的 counting 都是很简单的函数, 更详细的统计在 statistics 模块
+
+
+### 3.3.1. Sorting 排序
+
+#### 3.3.1.1. 基础排序
+
+* `msort(a)` : Return a copy of an array sorted along the first axis.
+
+
+* `sort(a[, axis, kind, order])`      : Return a sorted copy of an array.
+* `ndarray.sort([axis, kind, order])` : Sort an array in-place.
+* `argsort(a[, axis, kind, order])`   : Returns the indices that would sort an array.
+
+参数:
+* axis    : (default -1) int or None, optional
+  * None, 全局排序, 会自动将数据 flatten
+  * int , 按照指定维度的数据排序, 默认值 -1 代表按照最后一个维度排序
+* kind    : {‘quicksort’, ‘mergesort’, ‘heapsort’, ‘stable’}, optional
+  * 排序方法
+  * default : None  = quicksort
+* order   : str or list of str, optional
+  * 主要用于结构体的 array
+  * 用于通过 结构体字段的名称或者名称list来指定排序比较的顺序
+
+
+#### 3.3.1.2. 部分有序
+
+* partition(a, kth[, axis, kind, order])    :  Return a partitioned copy of an array.
+* argpartition(a, kth[, axis, kind, order]) : 
+
+### 3.3.2. Searching 元素查找
+
+#### 3.3.2.1. 最大值选择
+
+* `argmax(a[, axis, out, keepdims])`
+  * Returns the indices of the maximum values along an axis.
+  * 一般用于机器学习通过可信度得到最终 label
+
+
+#### 3.3.2.2. 逻辑选择值 where
 
 `numpy.where(condition, [x, y, ]/)`
 * 用于根据某个判断语句 在两个 array 之间选择对应的元素 得到新的 array
 * x, y : 作为输入数组, 需要相同的 shape , 或者可以 broadcastable to same shape.
+
+
+## 3.4. Statistics 统计
+
+更加完整的统计函数定义在了这里
+
+### 3.4.1. Averages and variances 平均和方差
+
+### 3.4.2. Histograms
+
+
+直方图统计, 不止一种
+
+```py
+numpy.histogram(a, bins=10, range=None, normed=None, weights=None, density=None)
+```
+
+参数:
+* a     : array_like , 输入数据, 会被自动 flatten
+* bins  : (default=10) int or sequence of scalars or str, 梯度区间.
+  * 整数代表固定宽度区间的个数, 具体的区间会根据 range 来计算
+  * sequence 代表指定的单调递增区间, 定义了 len(bins)-1个区间, 最后一个区间是闭区间
+  * str : 特殊方法的自动计算 edge, 定义在 `histogram_bin_edges`
+* range : (float, float), optional
+  * 用于定义完整的直方图区间
+  * 默认是 (a.min, a.max)
+* weights : array_like, optional
+  * 和输入数据 a 的shape 一模一样, 用于定义每单个元素的权值
+* density : bool, optional
+  * 类似于标准化, False 的时候就是普通的统计个数
+  * True, 直方图的值会被标准化, sum = 1
+
+
+返回值 有两个:
+* hist  : array
+* bin_edges : 因为 bins 可能是整数或者别的省略的输入方法, 该返回值用于标识完整的区间序列
+  * 注意 len(bin_edges) = len(hist)+1 
+
+#### bincount 原子统计
+
+直方图的简化版本
+
+
+
+
+## 3.5. Set 集合
+
+### 3.5.1. unique
+
+寻找一组数据中的唯一元素, 可以用来统计元素的种类数  
+除了返回独立的元素种类, 还可以返回
+* 各个独立元素在原数据中的索引
+* (没看懂)the indices of the unique array that reconstruct the input array 
+* 各个unique元素在原数据中的出现次数
+
+`numpy.unique(ar, return_index=False, return_inverse=False, return_counts=False, axis=None)`
+* ar    : 数据, 会自动转换成 1-D, 除非指定 axis, 所以不需要提前 flatten()
+* return_index  : bool, 是否返回元数据中索引
+* return_inverse: bool, 是否返回索引 (用于 reconstruct ar)
+* return_counts : bool, 是否返回统计 (1.9.0 新功能)
+* axis          : 用于指定轴
+
+
 
 
 # 4. numpy.random
