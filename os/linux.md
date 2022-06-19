@@ -786,109 +786,8 @@ $ ln -s /lib/systemd/system/rc.local.service /etc/systemd/system/
 
 # 6. Linux 的文件和目录管理
 
-## 6.1. Linux的目录详解
 
-Linux 基金会的 FHS标准 制定了文件目录的标准  
-`（Filesystem Hierarchy Standard）`  
-
-规定了 Linux 系统中**所有**一级目录以及部分二级目录（/usr 和 /var）的用途  
-
-### 6.1.1. 根目录 /
-
-```shell
-
-# 存放系统命令,所有用户都可以执行,包括单用户模式  
-# 放置一些系统的必备执行档例如： cat、cp、chmod df、dmesg、gzip、kill、ls、mkdir、more、mount、rm、su、tar等
-/bin/
-
-# 保存与系统环境设置相关的命令
-# 主要放置一些系统管理的必备程式例如： cfdisk、dhcpcd、dump、e2fsck、fdisk、halt、ifconfig、ifup、 ifdown、init、insmod、lilo、lsmod、mke2fs、modprobe、quotacheck、reboot、rmmod、 runlevel、shutdown等
-/sbin/
-
-
-# 系统启动目录, 包括内核文件和启动引导程序 grub
-/boot/
-
-# 设备文件  
-# ** 注意 /dev 下的文件是真实的设备 由UDEV在运行时创建
-# udev 是Linux kernel 2.6系列的设备管理器。它主要的功能是管理/dev目录底下的设备节点
-/dev/ 
-
-# /sys/class 是由kernel在运行时导出的,目的是通过文件系统暴露出硬件的层级关系
-/sys/class
-# 使用示例 查看网络接口的名称
-$ ls /sys/class/net
-
-
-# 配置文件 服务的启动脚本  采用默认安装方式的服务配置文件在此之中 
-/etc/
-
-# 主目录
-/home/
-
-# *系统* 调用的函数库保存位置 
-/lib/
-
-# 虽然系统准备了三个默认挂载目录 /media/、/mnt/、/misc/,但是到底在哪个目录中挂载什么设备可以由管理员自己决定
-# 挂载媒体设备, 如软盘和光盘
-/media/
-# 挂载目录, 如U盘,移动硬盘,*其他操作系统的分区*
-/mnt/
-# 挂载NFS服务的共享目录  
-/misc/
-
-# root用户的主目录,和用户的/home/123/类似
-/root/
-
-# 服务数据目录,保存服务启动后的数据
-/srv/
-
-
-
-```
-### 6.1.2. 软件目录 /usr
-
-注意不是 user, 全称为 `Unix Software Resource`  
-FHS 建议所有开发者,应把软件产品的数据`合理的放置在 /usr 目录下的各子目录中`  
-而不是为他们的产品创建单独的目录  
-类似 Windows 系统中` C:\Windows\ + C:\Program files\` 两个目录的综合体
-
-```shell
-# 存放系统命令, 除了单用户以外的所有用户可以执行
-# 主要放置一些应用软体工具的必备执行档例如： c++、g++、gcc、chdrv、diff、dig、du、eject、elm、free、gnome*、 gzip、htpasswd、kfm、ktop、last、less、locale、m4、make、man、mcopy、ncftp、 newaliases、nslookup passwd、quota、smb*、wget等
-/usr/bin/
-
-# 同样是根文件系统不需要的系统管理命令,只有root可以执行
-# 放置一些网路管理的必备程式例如： dhcpd、httpd、imap、in.*d、inetd、lpd、named、netconfig、nmbd、samba、sendmail、squid、swap、tcpd、tcpdump等
-/usr/sbin/
-
-# 应用程序调用的函数库位置
-/usr/lib/
-
-# 图形界面系统保存位置
-/usr/XllR6/ 
-
-#  手工安装的软件保存位置。我们一般建议源码包软件安装在这个位置
-/usr/local/
-
-# 应用程序的资源文件保存位置,如帮助文档、说明文档和字体目录
-/usr/share/
-
-# 我们手工下载的源码包和内核源码包都可以保存到这里
-# 不过笔者更习惯把手工下载的源码包保存到 /usr/local/src/ 目录中
-# 把内核源码保存到 /usr/src/linux/ 目录中
-/usr/src/
-
-# C/C++ 等编程语言头文件的放置目录
-/usr/include/
-
-```
-
-### 6.1.3. /var 目录 
-
-目录用于存储动态数据,例如缓存、日志文件、软件运行过程中产生的文件等  
-
-## 6.2. 软硬链接文件 ln 命令
+## 6.1. 软硬链接文件 ln 命令
 
 
 **ext4 文件系统**
@@ -946,19 +845,20 @@ In -s /root/bols /tmp
 
 
 
-## 6.3. Linux 的文件系统
+## 6.2. Linux 的文件系统
 
 查看各种文件的情况, 大小等
 * ls 文件查看, 文件夹也会被当成文件, 因此无法衡量文件夹大小
 * du 查看文件夹, 目录查看
 * df 磁盘查看, 可以看一级文件夹大小
+* stat  : display file or file system status
 
 
 | 通用 OPTION | 功能         |
 | ----------- | ------------ |
 | -h          | 人类易读格式 |
 
-### 6.3.1. ls 文件情况查看
+### 6.2.1. ls 文件情况查看
 
 List information about the FILEs. 默认查看当前位置  
 
@@ -970,7 +870,7 @@ List information about the FILEs. 默认查看当前位置
 | -l     | 长格式打印     |
 | -s     | 打印文件的大小 |
 
-### 6.3.2. du 目录情况查看
+### 6.2.2. du 目录情况查看
 
 `du [OPTION]... [FILE]...`  
 该命令默认会递归输出所有子文件  
@@ -982,7 +882,7 @@ List information about the FILEs. 默认查看当前位置
 | -d     | 指定递归打印深度, -d 0 等同于 -s         |
 
 
-### 6.3.3. df 磁盘情况查看
+### 6.2.3. df 磁盘情况查看
 
 * df 用于显示系统中各文件系统的硬盘使用情况
 * 包括文件系统所在的硬盘分区的总容量, 已使用的容量, 剩余容量等
@@ -1946,7 +1846,7 @@ SELinux 的配置命令
 * `sestatus`   : 查看较为详细的 SELinux 的状态, 包括 config 文件中 SELinux 的配置设定
 * `setenforce <0/1>` : 在 permissive `0`, 和 enforce `1` 状态中切换, 不能用该命令关闭 SELinux
 
-## 上下文
+## 10.3. 上下文
 
 通过 `Z` 选项来执行上下文相关的显示
 
@@ -1966,3 +1866,143 @@ SELinux 的配置命令
 * `-u` 打印 user
 * `-r` 打印 role
 * `-t` 类型 type
+
+
+# 11. Linux文件目录解释
+
+Linux 基金会的 FHS标准 制定了文件目录的标准  
+`（Filesystem Hierarchy Standard）`  
+
+规定了 Linux 系统中**所有**一级目录以及部分二级目录（/usr 和 /var）的用途  
+
+## 11.1. 基本目录
+
+### 11.1.1. 根目录 /
+
+```shell
+
+# 存放系统命令,所有用户都可以执行,包括单用户模式  
+# 放置一些系统的必备执行档例如： cat、cp、chmod df、dmesg、gzip、kill、ls、mkdir、more、mount、rm、su、tar等
+/bin/
+
+# 保存与系统环境设置相关的命令
+# 主要放置一些系统管理的必备程式例如： cfdisk、dhcpcd、dump、e2fsck、fdisk、halt、ifconfig、ifup、 ifdown、init、insmod、lilo、lsmod、mke2fs、modprobe、quotacheck、reboot、rmmod、 runlevel、shutdown等
+/sbin/
+
+
+# 系统启动目录, 包括内核文件和启动引导程序 grub
+/boot/
+
+# /sys/class 是由kernel在运行时导出的,目的是通过文件系统暴露出硬件的层级关系
+/sys/class
+# 使用示例 查看网络接口的名称
+$ ls /sys/class/net
+
+
+# 配置文件 服务的启动脚本  采用默认安装方式的服务配置文件在此之中 
+/etc/
+
+# 主目录
+/home/
+
+# *系统* 调用的函数库保存位置 
+/lib/
+
+# 虽然系统准备了三个默认挂载目录 /media/、/mnt/、/misc/,但是到底在哪个目录中挂载什么设备可以由管理员自己决定
+# 挂载媒体设备, 如软盘和光盘
+/media/
+# 挂载目录, 如U盘,移动硬盘,*其他操作系统的分区*
+/mnt/
+# 挂载NFS服务的共享目录  
+/misc/
+
+# root用户的主目录,和用户的/home/123/类似
+/root/
+
+# 服务数据目录,保存服务启动后的数据
+/srv/
+
+```
+### 11.1.2. 软件目录 /usr
+
+注意不是 user, 全称为 `Unix Software Resource`  
+FHS 建议所有开发者,应把软件产品的数据`合理的放置在 /usr 目录下的各子目录中`  
+而不是为他们的产品创建单独的目录  
+类似 Windows 系统中` C:\Windows\ + C:\Program files\` 两个目录的综合体
+
+```shell
+# 存放系统命令, 除了单用户以外的所有用户可以执行
+# 主要放置一些应用软体工具的必备执行档例如： c++、g++、gcc、chdrv、diff、dig、du、eject、elm、free、gnome*、 gzip、htpasswd、kfm、ktop、last、less、locale、m4、make、man、mcopy、ncftp、 newaliases、nslookup passwd、quota、smb*、wget等
+/usr/bin/
+
+# 同样是根文件系统不需要的系统管理命令,只有root可以执行
+# 放置一些网路管理的必备程式例如： dhcpd、httpd、imap、in.*d、inetd、lpd、named、netconfig、nmbd、samba、sendmail、squid、swap、tcpd、tcpdump等
+/usr/sbin/
+
+# 应用程序调用的函数库位置
+/usr/lib/
+
+# 图形界面系统保存位置
+/usr/XllR6/ 
+
+#  手工安装的软件保存位置。我们一般建议源码包软件安装在这个位置
+/usr/local/
+
+# 应用程序的资源文件保存位置,如帮助文档、说明文档和字体目录
+/usr/share/
+
+# 我们手工下载的源码包和内核源码包都可以保存到这里
+# 不过笔者更习惯把手工下载的源码包保存到 /usr/local/src/ 目录中
+# 把内核源码保存到 /usr/src/linux/ 目录中
+/usr/src/
+
+# C/C++ 等编程语言头文件的放置目录
+/usr/include/
+
+```
+
+### 11.1.3. /var 目录 
+
+目录用于存储动态数据,例如缓存、日志文件、软件运行过程中产生的文件等  
+
+## 11.2. /dev/  设备文件  
+
+* /dev 下的文件是真实的设备 由UDEV在运行时创建
+* udev 是Linux kernel 2.6系列的设备管理器, 它主要的功能是管理/dev目录底下的设备节点
+
+
+### 11.2.1. /dev/null 丢弃
+
+只有一个用途, 就是丢弃各种输出流
+* 使用if来转储无用的数据, 在其中输出, 这样它就不会占用系统内存和处理能力
+* 甚至可以通过将无用的文件直接移动到 /dev/null/ 来删除它们
+* 根据需要, 将 stderr 流 或者 stdout 流重定向至这里, 可以减少 debug 的时间
+
+设备特点:
+* 这个文件的大小是0字节大小, 所有人都有读写权限, 没有执行权限
+* 由于它没有执行权限, 不是一个可执行文件, 所以不能使用管道符 | 来接 /dev/null
+* 它会吸收任何输入, 并且不返回任何内容,   
+* 如果你使用 cat 去读取这个文件, 那么它只会返回文件终点
+
+###  11.2.2. 存储
+
+/dev/sda 可能是您的主硬盘驱动器
+
+/dev/sdb 可能是您现在正在使用的笔记本驱动器的文件
+
+## 11.3. /etc/  Editable Text Configuration
+
+FHS规定用来放配置文件
+
+### 11.3.1. /etc/resolv.conf - resolver configuration file
+
+The file is designed to be human readable and contains a list of keywords with values that provide various types of resolver information.  
+
+* software  : resolver
+* default situation (this file does not exist):
+  *  only the name server on the local machine will be queried
+  *  and the search list contains the local domain name determined from the hostname.
+
+options :
+* nameserver  : Name server IP address
+* search      : Search list for host-name lookup

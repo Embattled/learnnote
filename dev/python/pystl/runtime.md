@@ -25,7 +25,7 @@
 用于指定 python 自己的相关控制参数  
 
 
-# inspect
+# 4. inspect
 
 审查模组
 * 获取活动对象的信息, (模组, 类, 方法, 函数等)
@@ -35,20 +35,20 @@
     4. get all the information you need to display a detailed traceback.
 
 
-## 类型以及成员
+## 4.1. 类型以及成员
 
 
 
-### 对象自带属性
+### 4.1.1. 对象自带属性
 在该模组的文档中有 python 所有对象的自带属性的[说明](https://docs.python.org/3/library/inspect.html)
 
-## 获取源代码
+## 4.2. 获取源代码
 
 * getsource(obj)
 
-## 
+## 4.3. 
 
 
-# traceback 用于异常溯源
+# 5. traceback 用于异常溯源
 
 

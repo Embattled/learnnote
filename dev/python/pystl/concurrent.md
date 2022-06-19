@@ -9,7 +9,7 @@ The appropriate choice of tool will depend on the:
 
 同时, 关于嵌套调用的新模组也放在该章节 (subprocess)
 
-# 2. subprocess - Subprocess management
+# 2. subprocess - Subprocess management 子进程
 
 `subprocess` 模组允许程序创建一个新的 子进程, 并同时链接其 input/output/error 流, 获取其返回代码
 
@@ -17,19 +17,37 @@ The appropriate choice of tool will depend on the:
 * `os.system`
 * `os.spawn*`
 
+全局简介
+* subprocess.run : 阻塞调用子进程
+
 ## 2.1. Older high-level API
 
 由于 run 是3.5 才被加入的, 所以 older api 也很重要, 用来保持与旧版本的兼容性
 
 `subprocess.call(args, *, stdin=None, stdout=None, stderr=None, 参数省略)`
-* 阻塞调用紫禁城
+* 阻塞调用子进程
 * 返回 `returncode` 属性
 
 `subprocess.check_call(args, *, stdin=None, stdout=None, stderr=None, 参数省略)` 
 
 
 
-## 2.2. class subprocess.Popen
+## 2.2. subprocess.run
+
+尽管是最关键的函数,  run 其实是 python3.5 才加入的功能
+
+具有的新功能:
+* 捕获子进程的 stdout 和 stderr
+* 
+
+`subprocess.run(args, *, 其他参数, **other_popen_kwargs)`
+* Run the command described by args. Wait for command to complete, then return a `CompletedProcess` instance.
+  * args 是系统终端命令
+  * 该函数默认是阻塞的
+  * 返回的是一个实例
+
+
+## 2.3. class subprocess.Popen
 
 整个 subprocess 模组最终要的类, 作为其他类和函数的底层实现, 用于实际上的创建和管理子线程  
 * 模组的其他紫禁城相关函数, 都是传入该类的构造函数中
@@ -74,24 +92,19 @@ The appropriate choice of tool will depend on the:
 * `pipesize=- 1`
 
 
-## 2.3. subprocess.run
-
-尽管是最关键的函数,  run 其实是 python3.5 才加入的功能
-
-具有的新功能:
-* 捕获子进程的 stdout 和 stderr
-* 
-
-`subprocess.run(args, *, 其他参数, **other_popen_kwargs)`
-* Run the command described by args. Wait for command to complete, then return a `CompletedProcess` instance.
-  * args 是系统终端命令
-  * 该函数默认是阻塞的
-  * 返回的是一个实例
-
-
 
 ## 2.4. class subprocess.CompletedProcess
 
 The return value from run(), representing a process that has finished.
 
+
+# 3. threading — Thread-based parallelism 基于线程的并行
+
+
+# 4. multiprocessing — Process-based parallelism 基于进程的并行
+
+API的构造上和 threading 相似
+* 支持  both local and remote concurrency
+* Effectively side-stepping the Global Interpreter Lock by using subprocesses instead of threads.
+* Fully leverage multiple processors on a given machine.
 

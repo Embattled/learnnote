@@ -306,8 +306,97 @@ Python:
 * ddepth
 `when ddepth=-1, the output image will have the same depth as the source. `
 
+### 4.2.1. Smoothing Filtering
+
+平滑图片, 即 smoothing, 常被用来:
+* reduce noise
 
 
+* `cv.blur()`				: 均值滤波
+* `cv.GaussianBlur()`		: 高斯滤波
+* `cv.medianBlur()`			: 中值滤波
+* `cv.bilateralFilter()`	: 双边滤波, 是一种结合了高斯滤波和密度的滤波, 可以模糊区域但是保留图像边缘, 非线性
+  * 核函数是空间域核与像素范围域核的综合结果
+  * 空间域核: 根据边缘像素和中心像素的欧氏距离来确定权重, 可以是 mean 也可以是 二维Gaussian
+  * 像素范围域核: 根据边缘像素和中心像素的像素值差来确定权重, 是一个 f(0)=1 的二次凸函数, 差值越大权重越接近0, 可以是 一维Gaussian
+  * 整体权重是 两个权重的乘积, 即如果区域内像素值差距小, 则会被应用很强的 smoothing
+  * Sigma values: CV里两个域核应该都是高斯函数, 推荐范围是 (10~150)
+  * d : Large filters (d > 5) are very slow, so it is recommended to use d=5 for real-time applications, and perhaps d=9 for offline applications that need heavy noise filtering.
+
+
+### 4.2.2. Morphological Transformation 形态学变化
+
+OpenCV 的形态学变化也放在了 Filtering 模块中
+
+通用参数:
+* src		: input image, 支持任意 channel
+* dst		: (大概是C++用的)output image of the same size and type as src.
+* kernel	: structuring element. 可以用函数 `getStructuringElement()` 创建
+* anchor	: 应用 kernel 的锚点, 默认值(-1,-1)不代表任何具体坐标, 会被转换成 kernel 的中心
+* iterations: 可以直接在函数参数中设置重复执行多次  
+
+
+#### 4.2.2.1. 基础 膨胀腐蚀
+
+* dilate() 	膨胀
+* erode()	腐蚀
+* morphologyEx()
+
+```cpp
+void cv::dilate 	( 	InputArray  	src,
+		OutputArray  	dst,
+		InputArray  	kernel,
+		Point  	anchor = Point(-1,-1),
+		int  	iterations = 1,
+		int  	borderType = BORDER_CONSTANT,
+		const Scalar &  	borderValue = morphologyDefaultBorderValue() 
+	) 		
+Python:
+	cv.dilate(	src, kernel[, dst[, anchor[, iterations[, borderType[, borderValue]]]]]	) -> 	dst
+
+void cv::erode 	( 	InputArray  	src,
+		OutputArray  	dst,
+		InputArray  	kernel,
+		Point  	anchor = Point(-1,-1),
+		int  	iterations = 1,
+		int  	borderType = BORDER_CONSTANT,
+		const Scalar &  	borderValue = morphologyDefaultBorderValue() 
+	) 		
+Python:
+	cv.erode(	src, kernel[, dst[, anchor[, iterations[, borderType[, borderValue]]]]]	) -> 	dst
+```
+
+#### 4.2.2.2. 高级组合操作
+
+Performs advanced morphological transformations. 
+
+```cpp
+void cv::morphologyEx 	( 	InputArray  	src,
+		OutputArray  	dst,
+		int  	op,
+		InputArray  	kernel,
+		Point  	anchor = Point(-1,-1),
+		int  	iterations = 1,
+		int  	borderType = BORDER_CONSTANT,
+		const Scalar &  	borderValue = morphologyDefaultBorderValue() 
+	) 		
+Python:
+	cv.morphologyEx(	src, op, kernel[, dst[, anchor[, iterations[, borderType[, borderValue]]]]]	) -> 	dst
+```
+
+op 是一个枚举类型, 除了组合的形态学变化也把基础的变化加入进去了
+* MORPH_ERODE 
+* MORPH_DILATE 
+* MORPH_OPEN 			: `dilate(erode(src,element))`
+* MORPH_CLOSE 			: `erode(dilate(src,element))`
+* MORPH_GRADIENT 		: `dilate(src,element)−erode(src,element)`
+* MORPH_TOPHAT 			: `src−open(src,element)`
+* MORPH_BLACKHAT 		: `close(src,element)−src`
+* MORPH_HITMISS 		: 只支持 CV_8UC1 binary images 
+
+### 4.2.3. 通用自定义 Filtering
+
+...
 
 ## 4.3. Geometric Image Transformations
 

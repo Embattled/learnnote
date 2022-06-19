@@ -252,15 +252,45 @@ conda env remove  -n python36
 conda 的包管理功能可 pip 是一样的，当然你选择 pip 来安装包也是没问题的。  
 
 ```shell
-
-# 查看已安装的包
 # Check to see if the newly installed program is in this environment:
-conda list 
 
 # 搜索一个包 获取所有的版本的信息
 conda search scipy
+```
+### conda list 
 
+查看当前环境已安装的包
+```shell
+usage: conda list [-h] [-n ENVIRONMENT | -p PATH] [--json] [-v] [-q]
+                  [--show-channel-urls] [-c] [-f] [--explicit] [--md5] [-e]
+                  [-r] [--no-pip]
+                  [regex]
+```
+* -e, --export : Output requirement string only (output may be used by conda create --file).
+
+
+### conda install
+
+```shell
+usage: conda install [-h] [--revision REVISION] [-n ENVIRONMENT | -p PATH]
+                     [-c CHANNEL] [--use-local] [--override-channels]
+                     [--repodata-fn REPODATA_FNS] [--strict-channel-priority]
+                     [--no-channel-priority] [--no-deps | --only-deps]
+                     [--no-pin] [--copy] [-C] [-k] [--offline] [-d] [--json]
+                     [-q] [-v] [-y] [--download-only] [--show-channel-urls]
+                     [--file FILE]
+                     [--experimental-solver {classic,libmamba,libmamba-draft}]
+                     [--force-reinstall]
+                     [--freeze-installed | --update-deps | -S | --update-all | --update-specs]
+                     [-m] [--clobber] [--dev]
+                     [package_spec [package_spec ...]]
+```
+* --file requirements.txt
+
+
+```shell
 # 安装 matplotlib 到当前环境
+
 conda install matplotlib
 # 包更新
 conda update matplotlib

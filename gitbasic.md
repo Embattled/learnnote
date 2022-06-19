@@ -401,3 +401,17 @@ tag是git版本库的一个标记, 指向某个 commit
    * `git push origin :refs/tags/<tagName>` 推送一个 tag 的删除操作
 
 3. `git branch <branchName> <tagName>`: 依照 tag 对应的 commit 来建立分支
+
+# git-lfs Large File Storage (LFS)
+
+replaces large files such as audio samples, videos, datasets, and graphics with `text pointers` inside Git.
+
+配置好的 git-lfs 会截取 push 中的那些被追踪的大文件, 然后用 text pointers 替换他们, 并将原本的大文件发送到 `git lfs 服务器`
+
+
+基础操作
+1. 安装该插件(各用户执行单词) `git lfs install`
+2. 追踪指定文件 `git lfs track "*.psd"`
+3. 查看当前 track 的目录或类型 `git lfs track`
+4. track 后, 需要再通过普通的 git add/ commit 方式进行版本管理
+5. 查看被 track 的具体的文件 `git lfs ls-files`

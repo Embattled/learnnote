@@ -1,6 +1,8 @@
 # 1. File and Directory Access
 
-用于处理文件路径  
+用于处理磁盘上的文件以及目录
+
+* pathlib — Object-oriented filesystem paths
 
 ## 1.1. path-like object
 
@@ -68,11 +70,14 @@ The pathlib module offers high-level path objects.
   * 删除位于中间的 `..` 并进行逻辑重定位
 
 
-# 3. pathlib
+# 3. pathlib — Object-oriented filesystem paths
+
+* 尽管 pathlib 实现了 str() 函数, 但该路径对象对其他非标准库的兼容性并不好
 
 * The pathlib module was introduced in Python 3.4 .
 * 包含了一些类, 操作对象是各种操作系统中使用的路径  
 * 相比于os.path, pathlib 将路径进行了对象化, 并提供了遍历文件夹相关的操作
+
 
 ## 3.1. pathlib.PurePath
 
@@ -226,8 +231,11 @@ dir_path.replace(dir_path.parent / dir_path2)
 
 # 5. 简单功能模组
 
-* fnmatch
-* glob
+* filecmp   : 面向路径的字符串比较
+* fnmatch   : 通配符匹配路径
+* glob      : 同样的是查找路径. 比 fnmatch 高级
+
+* tempfile  : 方便的创建临时文件
 
 ## 5.1. fnmatch - Unix filename pattern matching
 
@@ -291,3 +299,40 @@ glob 模组提供查找对应 pattern 的路径的功能， 该模组顺从 Unix
 * 直接转义 pathname 中的所有特殊符号 `*?[]`
 * 对于想查找可能包含特殊符号的文件, 但又不知道怎么写转义符的时候很有用
 
+## tmpfile
+
+只负责临时文件的全部, 分为 
+* low-level : which require manual cleanup. 需要手动删除使用完毕的 temp 文件
+  * mkstemp()
+  * mkdtemp()
+* high-level: which provide automatic cleanup and can be used as context managers
+  * TemporaryFile
+  * NamedTemporaryFile
+  * TemporaryDirectory
+  * SpooledTemporaryFile
+
+### 部件命令
+
+创建随机文件名
+* gettempprefix()   : Return the filename prefix used to create temporary files
+* gettempprefixb()  : return value is in bytes.
+
+### 基础命令
+
+* mkstemp : Creates a temporary file in the most secure manner possible.
+* mkdtemp : Creates a temporary directory in the most secure manner possible.
+
+```py
+tempfile.mkstemp(suffix=None, prefix=None, dir=None, text=False)
+# returns a tuple containing an OS-level handle to an open file (as would be returned by os.open()) 
+# and the absolute pathname of that file
+# in that order.
+tempfile.mkdtemp(suffix=None, prefix=None, dir=None)
+# returns the absolute pathname of the new directory.
+
+# 参数
+# suffix  : 文件(夹)的后缀名, 如果是文件类型, 需要手动加入 `.`
+# prefix  : 文件(夹)的后缀名, 默认不为空, 而是  gettempprefix() or gettempprefixb() 的结果
+# dir     : 文件(夹)的路径, 有 dir 则会在该路径创建, 否则会检查环境变量 TMPDIR, TEMP or TMP, 最后是根据系统来确定 tmp 路径
+# text    : 该临时文件是否被文本模式打开, 如果 false 则是二进制模式
+```

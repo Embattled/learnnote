@@ -90,10 +90,7 @@ numpy的二元基础运算都是元素层面的
 * .cumsum() 累加该 array
 
 
-### 2.4.2. 布尔类
 
-* numpy.all() 是否全部为 True
-* numpy.any() 是否有 True
 
 ## 2.5. creation
 
@@ -145,83 +142,104 @@ del a  # the memory of ``a`` can be released.
 ```
 
 
+## 2.7. Indexing routines 
+
+有很多包函数没有放在 numpy routines, 而是放在该部分, 以后再读   
+
+
 # 3. Routines 常规操作 API
 
 对 Array 数据的各种常规操作
 
 * 尽量明确各个函数的返回值是 copy 的还是只是映射
 
-## 3.1. Array creation
-
-## 3.2. Array manipulation 形态转换
-
-a.shape 可以返回当前的 array 的形状
-
 函数可以分为
 1. 类方法和全局函数
-2. 返回改变后的值和改变自身
+2. 返回改变后的值和改变自身(inplace)
 
 
-以下函数都有 类方法和全局函数, 类方法没有第一个参数 array
-1. resize  (a, tuple )  更改这个 array 自身
-2. reshape (a, tuple )  返回更改后的 array
-3. 如果某个维度的值是 -1, 则该维度的值会根据 array的数据量和其他维度的值推算出来
+## 3.1. Array creation
 
-类方法
-* a.T         返回 transposed 的 array
+## 3.2. Array manipulation 操纵更改 Array
+
+获取 array 的形态
+* `a.shape`
+* `np.shape(a)`
+
+拷贝array
+* `numpy.copyto(dst, src, casting='same_kind', where=True)`  
+  * 把一个 array 的值复制到另一个 array
+  * 不同于普通的 copy, 这里 dst 也是提前存在的, 会进行 broadcasting
+  * where : array of bool, 附加的元素选择
+  * casting : cast模式, 在别的地方应该能学到此处略
+
+### 3.2.1. Transpose-like operations 转置操作
+
+普通转置
+* `a.T`
+* `a.transpose(*axes)`
+  * 返回 view of the array with axes transposed.
+* `numpy.transpose(a, axes=None)`
+  * 返回 A view is returned whenever possible.
+* `axes` 默认是 `range(a.ndim)[::-1]` 用于完整颠倒 order of the axes, 如果指定的话则必须是permutation of `[0,1,..,N-1]` 
+
+### 3.2.2. Changing array shape 形态转换
+
+除了转置以外的其他各种形态操作  
+
+标准形态转换 reshape
+* `numpy.reshape(a, newshape, order='C'`  
+* `ndarray.reshape(shape, order='C')`
+* newshape : int or tuple of ints
+  * 如果是单个整数, 则 1-D array of that length
+  * 如果是元组, 则 The new shape should be compatible with the original shape. 
+  * 元组的情况下, 允许有一个维度为 -1, 此时该维度会自动被计算.
+* order: 
+  * 内存布局
+  * C : C语言布局, 末尾的维度变化最快, 内存连续
+  * F : Fortran-like, 首位维度变化最快
+  * A : 自动根据内存布局选择
+* 返回新的 array:
+  *  will be a new view object if possible
+  *  otherwise, will be a copy 
+
 
 扁平化array
-1. numpy.ravel(a)          返回 flattened 的 array 
-2. a.flatten()             返回 flattened 的 array
-
-扁平化索引, 不需要用多重方括号索引值
-* `a.flat[1]`
-
-### 3.2.1. Joining arrays 拼接
-
-```py
-numpy.concatenate((a1, a2, ...), axis=0, out=None, dtype=None, casting="same_kind")
-```
-`numpy.concatenate()` 指定维度拼接:
-* tup   : 除了 `axis` 指定的维度, 其他维度必须相同
-* axis  : 维度, 默认是0 (最外层)
-
-
-
-
-简单拼接
-* `numpy.vstack(tup)` 上下拼接
-* `numpy.row_stack(tup)` == vstack
-* `numpy.hstack(tup)` 左右拼接
-* `numpy.column_stack(tup)`
-  * 将 1D array 视作列进行左右拼接
-  * 在处理 2D array 时与 hstack 相同
-
-### 3.2.2. Splitting arrays 拆分 
-
-* numpy.hsplit(a,3) 竖着切3分
-* numpy.vsplit(a,3) 横着切, 沿着 vertical axis
-* numpy.array_split 指定切的方向
+1. `numpy.ravel(a, order='C')`
+  * Return a contiguous flattened array.
+  * A copy is made only if needed.
+  * 返回值的 shape 等同于 a.size
+2. `a.flatten(order='C')`
+  * 返回 flattened 的 array
+  * copy 的返回 
+3. a.flat  : 不是函数, 而是一个 iterator 对象
+  * 扁平化索引, 不需要用多重方括号索引值
+  * `a.flat[1]`
 
 
 ### 3.2.3. Changing dimensions 维度操作
+
+
+
+
+#### 3.2.3.1. expand_dims 升维
 
 朴素升降维:
 * `numpy.expand_dims(a, axis)`
   * axis 的范围是 (0,a.ndim)
   * 被插入的维度的位置 == axis , 意思是其后的维度会被顺延
-* `numpy.squeeze(a, axis=None)`
-  * 删掉 shape 为 1 的维度
-  * axis 可以指定, 但是指定的维度必须确保 shape == 1
-
+  * return : `View` of a with the number of dimensions increased.
 
 1. `arr=arr[:,:,np.newaxis`
 2. `arr=np.array([arr])`
 
-降维 
-* `np.squeeze(x)`
-* 删掉维度数为1的轴
-* Remove axes of length one from a.
+
+#### 3.2.3.2. squeeze 压缩维度 
+* `numpy.squeeze(a, axis=None)`
+  * 删掉 shape 为 1 的维度
+  * axis 可以指定, 但是指定的维度必须确保 shape == 1
+  * return : This is always a itself or a `view` into a. 
+    * Note that if all axes are squeezed, the result is a 0d array and not a scalar.
 
 ```py
 >>> x = np.array([[[0], [1], [2]]])
@@ -232,25 +250,93 @@ numpy.concatenate((a1, a2, ...), axis=0, out=None, dtype=None, casting="same_kin
 >>> np.squeeze(x, axis=(2,)).shape
 (1, 3)
 ```
-## Mathematical function 数学操作
+
+### 3.2.4. Joining arrays 拼接
+
+```py
+numpy.concatenate((a1, a2, ...), axis=0, out=None, dtype=None, casting="same_kind")
+```
+`numpy.concatenate()` 指定维度拼接:
+* all the input arrays must have same number of dimensions
+* tup   : 除了 `axis` 指定的维度, 其他维度的shape必须相同
+* axis  : 维度, 默认是0 (最外层)
+
+
+简单拼接
+* `numpy.vstack(tup)` 上下拼接
+* `numpy.row_stack(tup)` == vstack
+* `numpy.hstack(tup)` 左右拼接
+* `numpy.column_stack(tup)`
+  * 将 1D array 视作列进行左右拼接
+  * 在处理 2D array 时与 hstack 相同
+
+### 3.2.5. Splitting arrays 拆分 
+
+* numpy.hsplit(a,3) 竖着切3分
+* numpy.vsplit(a,3) 横着切, 沿着 vertical axis
+* numpy.array_split 指定切的方向
+
+
+
+### 3.2.6. Adding and removing elements 修改元素
+
+将 np.ndarray 以类似于普通 list 的视角操作
+
+### 3.2.7. append
+
+该函数不存在 in-place 模式
+
+* `numpy.append(arr, values, axis=None)` 
+  * arr : Values are appended to a `copy` of this array.
+  * values: array_like. 维度 ndim 必须和 arr 一样
+  * axis : None 要被插入的维度
+    * values : 必须是 correct shape (the same shape as arr, excluding axis).
+    * if axis = None, values can be any shape and will be flattened before use
+    * If axis is None, out is a flattened array.
+  * return : A copy of arr with values appended to axis. 
+  
+
+#### 3.2.7.1. resize 强行更改 shape
+
+不同于 reshape 的resize
+* 会带有填充以及裁剪的更改 array 形态
+* 以 C-order进行
+* `numpy.resize(a, new_shape)` : 不足的地方用 a 的重复来填充, 返回新的 array
+* `ndarray.resize(new_shape, refcheck=True)` in-place 的修改, 不足的地方会用 0 填充
+  * 如果 refcheck 是True, 那么如果该 array 有别的引用的话会发生 raise 来停止该操作
+* 
+
+
+
+## Logic functions 逻辑操作
+
+包括 ndarray 之间的逻辑运算以及自身元素的检查逻辑
+
+### Truth value testing
+
+只有两个函数
+* `numpy.all(a, axis=None, out=None, keepdims=<no value>, *, where=<no value>)` 是否全部为 True
+* `numpy.any(a, axis=None, out=None, keepdims=<no value>, *, where=<no value>)` 是否有 True
+
+## 3.3. Mathematical function 数学操作
 
 绝大多数常用函数都属于该分类
 
-### Trigonometric functions 三角函数
+### 3.3.1. Trigonometric functions 三角函数
 
-### Exponents and logarithms 指数
+### 3.3.2. Exponents and logarithms 指数
 
-### Rounding 最近值
+### 3.3.3. Rounding 最近值
 
-### Rational routines 最大公因数 最小公倍数
+### 3.3.4. Rational routines 最大公因数 最小公倍数
 
-### Extrema Finding 极值寻找
+### 3.3.5. Extrema Finding 极值寻找
 
-### 杂项
+### 3.3.6. 杂项
 
 有时候需要的很特殊的功能
 
-#### convolve 卷积
+#### 3.3.6.1. convolve 卷积
 
 Returns the discrete, linear convolution of two one-dimensional sequences.
 * 常用在信号处理中
@@ -271,14 +357,14 @@ Returns the discrete, linear convolution of two one-dimensional sequences.
     * 得到   max(M, N) - min(M, N) + 1. 个值
 
 
-## 3.3. Sorting, Searching, Counting 排序 搜索 计数
+## 3.4. Sorting, Searching, Counting 排序 搜索 计数
 
 这里的 counting 都是很简单的函数, 更详细的统计在 statistics 模块
 
 
-### 3.3.1. Sorting 排序
+### 3.4.1. Sorting 排序
 
-#### 3.3.1.1. 基础排序
+#### 3.4.1.1. 基础排序
 
 * `msort(a)` : Return a copy of an array sorted along the first axis.
 
@@ -299,34 +385,75 @@ Returns the discrete, linear convolution of two one-dimensional sequences.
   * 用于通过 结构体字段的名称或者名称list来指定排序比较的顺序
 
 
-#### 3.3.1.2. 部分有序
+#### 3.4.1.2. 部分有序
 
 * partition(a, kth[, axis, kind, order])    :  Return a partitioned copy of an array.
 * argpartition(a, kth[, axis, kind, order]) : 
 
-### 3.3.2. Searching 元素查找
+### 3.4.2. Searching 元素查找
 
-#### 3.3.2.1. 最大值选择
+大概可以分成
+* 极值查找
+  * argmax
+  * argmin
+  * 
+* 逻辑查找
+  * where
+* 非零查找
+  * argwhere
+  * nonzero
+  * flatnonzero
+
+#### 3.4.2.1. 最大值选择
 
 * `argmax(a[, axis, out, keepdims])`
   * Returns the indices of the maximum values along an axis.
   * 一般用于机器学习通过可信度得到最终 label
+* `argmin(a[, axis, out, keepdims])`
+  * Returns the indices of the minimum values along an axis.
 
 
-#### 3.3.2.2. 逻辑选择值 where
+
+#### 3.4.2.2. 逻辑选择值 where
+
+`numpy.extract(condition, arr)`
+* 根据 condition 选择元素, 等同于 
+  * `np.compress(ravel(condition), ravel(arr))`
+  * 如果 condition is an array of boolean 则等同于`arr[condition]`
+* 完全的与 `numpy.place` 功能相反的函数
+* 返回 : 所提取的元素组成的 1-D array
+
+
 
 `numpy.where(condition, [x, y, ]/)`
 * 用于根据某个判断语句 在两个 array 之间选择对应的元素 得到新的 array
 * x, y : 作为输入数组, 需要相同的 shape , 或者可以 broadcastable to same shape.
+* 返回 : 与x,y 的broadcast结果相同 shape 的 array
 
 
-## 3.4. Statistics 统计
+
+#### 3.4.2.3. 非零选择
+
+* `nonzero(a)`        : Return the indices of the elements that are non-zero.
+  * 返回 a tuple of arrays
+  * tuple 每个元素是对应 array 元素在该 dim 上的索引
+  * 即 len(tuple) == a.ndim
+  * `len(tuple[0])` == 非0元素的个数
+* `flatnonzero(a)`    : Return indices that are non-zero in the flattened version of a.
+  * 最好理解, 将数据扁平化后再查找非0的元素索引, 返回的 array 也是一维的
+  * 功能上完全等同于 `np.nonzero(np.ravel(a))[0].`
+* `argwhere(a)`       : Find the indices of array elements that are non-zero.
+  * `grouped by element.` 每条 index 都作为一行数据返回
+  * 功能上几乎等同于 `np.transpose(np.nonzero(a))`  but produces a result of the correct shape for a 0-D array.
+
+
+## 3.5. Statistics 统计
 
 更加完整的统计函数定义在了这里
 
-### 3.4.1. Averages and variances 平均和方差
+### 3.5.1. Averages and variances 平均和方差
 
-### 3.4.2. Histograms
+### 3.5.2. Histograms
 
 
 直方图统计, 不止一种
@@ -356,16 +483,16 @@ numpy.histogram(a, bins=10, range=None, normed=None, weights=None, density=None)
 * bin_edges : 因为 bins 可能是整数或者别的省略的输入方法, 该返回值用于标识完整的区间序列
   * 注意 len(bin_edges) = len(hist)+1 
 
-#### bincount 原子统计
+#### 3.5.2.1. bincount 原子统计
 
 直方图的简化版本
 
 
 
 
-## 3.5. Set 集合
+## 3.6. Set 集合
 
-### 3.5.1. unique
+### 3.6.1. unique
 
 寻找一组数据中的唯一元素, 可以用来统计元素的种类数  
 除了返回独立的元素种类, 还可以返回

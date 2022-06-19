@@ -28,7 +28,7 @@ linux的ip命令和ifconfig类似，但前者功能更强大，并旨在取代�
 
 添加修改移除默认路由  
 ```shell
- $ sudo ip route add default via 192.168.1.2 dev eth0
+$ sudo ip route add default via 192.168.1.2 dev eth0
 $ sudo ip route replace default via 192.168.1.2 dev eth0
 $ sudo ip route del 172.16.32.0/24 
 ```
