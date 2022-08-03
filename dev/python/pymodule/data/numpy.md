@@ -160,6 +160,45 @@ del a  # the memory of ``a`` can be released.
 
 ## 3.1. Array creation
 
+numpy.array 的各种创建函数
+* 所有函数都有 `dtype` 参数
+* 所有函数都有 `order` 参数
+* 部分函数里有 `like`  参数 : array_like, optional, 用于将返回值创建成 np.array 以外的数据类型
+
+
+### From shape or value
+
+基础创建函数, 需要指定 array 的 shape
+* `*_like` 版本函数, 输入的不再是 shape 而是另一个 array, 相当于 `func(a.shape,...)` 的另一种写法
+  * 该版本创建的 array 默认数据类型同原本的 array 一致
+* `ones(shape[, dtype, order, like])`
+* `ones_like(a[, dtype, order, subok, shape])`
+* `zeros(shape[, dtype, order, like])`
+* `zeros_like(a[, dtype, order, subok, shape])`
+* `full(shape, fill_value[, dtype, order, like])`
+* `full_like(a, fill_value[, dtype, order, ...])`
+* `empty(shape[, dtype, order, like])`  不初始化对应内存区域
+* `empty_like(prototype[, dtype, order, subok, ...])`
+
+特殊 array
+* `identity(n[, dtype, like])`    Return the identity array. 只能是2D正方形, 所以传入的 shape 是单个整数
+* `eye(N[, M, k, dtype, order, like])`  创建2d对角线矩阵, 传入的 shape 可以是长方形, k 代表对角线的偏移
+
+
+### From existing data
+
+从既存的数据中创建一个 array
+
+
+`numpy.fromfile(file, dtype=float, count=- 1, sep='', offset=0, *, like=None)`  文件读取
+* `file`  : Open file object or str or Path, 1.17.0 pathlib.Path objects are now accepted.
+* `dtype` : 用于指定 array 类型, 同时对于 binary 文件还决定了读取的步长 (即单个 item 的大小)
+* `count` : 用于指定要读取的 item 的数量, -1代表读完整个文件
+* `sep`   : 指定了该文件是否是 binary 或者 text file, 默认是空字符代表了二进制文件, 如果是空格分隔符 ` `, 则代表 text 文件, 同时分割匹配符会匹配1到多个空白字符
+* `offset`: 读取时候的向后偏移, 只在 binary 的时候起作用
+
+
+
 ## 3.2. Array manipulation 操纵更改 Array
 
 获取 array 的形态
@@ -257,12 +296,14 @@ del a  # the memory of ``a`` can be released.
 numpy.concatenate((a1, a2, ...), axis=0, out=None, dtype=None, casting="same_kind")
 ```
 `numpy.concatenate()` 指定维度拼接:
-* all the input arrays must have same number of dimensions
+* all the input arrays must have same `number of dimensions`
 * tup   : 除了 `axis` 指定的维度, 其他维度的shape必须相同
-* axis  : 维度, 默认是0 (最外层)
+* 注意 ndim 必须相同, 也就是一般来说需要先扩张维度
+* axis  : 要拼接的维度, 默认是0 (最外层)
 
 
 简单拼接
+* `numpy.stack(arrays, axis=0, out=None)`       直接在新维度拼接, 该方法不需要提前扩充维度
 * `numpy.vstack(tup)` 上下拼接
 * `numpy.row_stack(tup)` == vstack
 * `numpy.hstack(tup)` 左右拼接

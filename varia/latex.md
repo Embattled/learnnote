@@ -271,23 +271,24 @@ p系列(中日韩)
 | omega   | \omega \Omega     | $\omega \Omega$     |
 
 特殊运算符:
-| 名称       | 代码                 | 显示       |
-| ---------- | -------------------- | ---------- |
-| 加减       | \pm                  | $\pm$      |
-| 大乘       | \times               | $\times$   |
-| 大除       | \div                 | $\div$     |
-| 点乘       | \cdot                | $\cdot$    |
-| Hadamard积 | \odot                | $\odot$    |
-| 合         | \cap                 | $\cap$     |
-| 并         | \cup                 | $\cup$     |
-| 大于       | \gt \ge \textgreater | $\gt \geq$ |
-| 小于       | \lt \le \textless    | $\lt \le$  |
-| 不等于     | \ne                  | $\ne$      |
-| 约等于     | \approx              | $\approx$  |
-| 全等       | \equiv               | $\equiv$   |
-| 属于       | \in                  | $\in$      |
-| 存在       | \exists \exist       | $\exists$  |
-| 不存在     | \nexist \nexists     | $\nexists$ |
+| 名称         | 代码                 | 显示       |
+| ------------ | -------------------- | ---------- |
+| 加减         | \pm                  | $\pm$      |
+| 大乘         | \times               | $\times$   |
+| 大除         | \div                 | $\div$     |
+| 点乘         | \cdot                | $\cdot$    |
+| Hadamard积   | \odot                | $\odot$    |
+| 合           | \cap                 | $\cap$     |
+| 并           | \cup                 | $\cup$     |
+| 大于         | \gt \ge \textgreater | $\gt \geq$ |
+| 小于         | \lt \le \textless    | $\lt \le$  |
+| 不等于       | \ne                  | $\ne$      |
+| 约等于       | \approx              | $\approx$  |
+| 波浪号, 相关 | \sim                 | $\sim$     |
+| 全等         | \equiv               | $\equiv$   |
+| 属于         | \in                  | $\in$      |
+| 存在         | \exists \exist       | $\exists$  |
+| 不存在       | \nexist \nexists     | $\nexists$ |
 
 ## 2.1. 基础数学commands
 
@@ -304,13 +305,15 @@ p系列(中日韩)
 * 小撇直接用 ' 即可
 
 字符上方加标识
-| 功能 | 代码    | 显示        |
-| ---- | ------- | ----------- |
-| 点   | \dot{}  | $\dot{a}$   |
-| 多点 | \ddot{} | $\ddot{a}$  |
-| 帽子 | \hat{}  | $\hat{a}$   |
-| 波浪 | \tilde  | $\tilde{a}$ |
-| 箭头 | \vec{}  | $\vec{x}$   |
+| 功能 | 代码        | 显示           |
+| ---- | ----------- | -------------- |
+| 点   | \dot{}      | $\dot{a}$      |
+| 多点 | \ddot{}     | $\ddot{a}$     |
+| 帽子 | \hat{}      | $\hat{a}$      |
+| 波浪 | \tilde      | $\tilde{a}$    |
+| 箭头 | \vec{}      | $\vec{x}$      |
+| 小圆 | \mathring{} | $\mathring{a}$ |
+| 横线 | \bar        | $\bar{a}$      |
 
 ### 2.1.2. 大运算符 范围运算符
 
@@ -330,6 +333,8 @@ p系列(中日韩)
 | 微分           | \partial{y} | $\partial{y}$             |
 | 求极限         | \lim        | $\lim_{x\rArr1}x^2$       |
 | 文字置于正下方 | underset{}  | $\underset{x\to 0}{\lim}$ |
+
+
 
 ### 2.1.4. 特殊格式字符
 

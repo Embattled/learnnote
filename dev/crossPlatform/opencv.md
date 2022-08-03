@@ -394,7 +394,70 @@ op 是一个枚举类型, 除了组合的形态学变化也把基础的变化加
 * MORPH_BLACKHAT 		: `close(src,element)−src`
 * MORPH_HITMISS 		: 只支持 CV_8UC1 binary images 
 
-### 4.2.3. 通用自定义 Filtering
+### 4.2.3. edge detection
+
+OpenCV实现了如下几种边缘检测算子:
+* Sobel		: Kernel 是 1 2 1
+* Scharr	: sober 的 kernel 改进, 为 3 10 3, 参数与 Sober 完全一致
+* Laplacian : 由二阶导数来计算梯度
+* Canny		: 细致的完整边缘检测算法
+  * 1. 平滑图像, 使用高斯滤波
+  * 2. 计算梯度和 edge , 使用 Sober
+  * 3. Non-maximum suppression, 移除非线条的Sober结果
+  * 4. 阈值
+
+```cpp
+void cv::Sobel 	(
+	 	InputArray  	src,
+		OutputArray  	dst,
+		int  	ddepth,
+		int  	dx,
+		int  	dy,
+		int  	ksize = 3,
+		double  	scale = 1,
+		double  	delta = 0,
+		int  	borderType = BORDER_DEFAULT 
+	)
+void cv::Scharr	(Same with above)
+void cv::Laplacian 	(
+	 	InputArray  	src,
+		OutputArray  	dst,
+		int  	ddepth,
+		int  	ksize = 1,
+		double  	scale = 1,
+		double  	delta = 0,
+		int  	borderType = BORDER_DEFAULT 
+	) 		
+// 完整的 Canny 
+void cv::Canny 	( 	
+		InputArray  	image,
+		OutputArray  	edges,
+		double  	threshold1,
+		double  	threshold2,
+		int  	apertureSize = 3,
+		bool  	L2gradient = false 
+	) 	
+// 使用经过其他途径计算的 x, y 方向梯度
+void cv::Canny 	( 	
+		InputArray  	dx,
+		InputArray  	dy,
+		OutputArray  	edges,
+		double  	threshold1,
+		double  	threshold2,
+		bool  	L2gradient = false 
+	) 	
+
+Python:
+	cv.Scharr(	src, ddepth, dx, dy[, dst[, scale[, delta[, borderType]]]]	) -> 	dst
+	cv.Sobel(	src, ddepth, dx, dy[, dst[, ksize[, scale[, delta[, borderType]]]]]	) -> 	dst
+	cv.Laplacian(	src, ddepth[, dst[, ksize[, scale[, delta[, borderType]]]]]	) -> 	dst
+
+
+	cv.Canny(	image, threshold1, threshold2[, edges[, apertureSize[, L2gradient]]]	) -> 	edges
+	cv.Canny(	dx, dy, threshold1, threshold2[, edges[, L2gradient]]	) -> 	edges
+```
+
+### 4.2.4. 通用自定义 Filtering
 
 ...
 
@@ -562,10 +625,54 @@ Python:
 # 5. highgui  High-level GUI
 
 独立于具体图像处理之外的 GUI 功能, 可以用来显示图像等调试功能
+* 用于快速尝试功能并可视化结果
+* 用于直接基于 OpenCV 开发完整的应用程序
+
+由于窗口环境属于比较特殊的环境, 因此是操作系统, 开发平台高度相关的, 大概有以下几种情况
+* OpenGL
+* Qt
+* WinRT
 
 `#include <opencv2/highgui.hpp>`
 
-## 5.1. imshow() 显示图片在窗口中
+## 5.1. 键盘响应
+
+* waitKey : Waits for a pressed key. 
+  * delay : Delay in milliseconds. 如果小于等于0 意为无限期等待
+  * 因为OS有最小线程切换时间, 所以该时间不会特别准确,  it will wait at least delay ms
+  * returns:
+    * the code of the pressed key
+    * `-1` if no key was pressed before the specified time had elapsed
+* waitKeyEx :
+  * Similar to `waitKey`, but returns `full key code`. 
+* pollKey : Polls for a pressed key. 
+  * check for a key press but not wait for it.
+  * The function pollKey polls for a key event without waiting.
+  * returns :
+    * the code of the pressed key
+    * -1 if no key was pressed since the last invocation. 
+
+键盘处理的两个函数是:
+* only methods in HighGUI that can fetch and handle GUI events
+* one of them needs to be called periodically for normal event processing
+  * unless HighGUI is used within an environment that takes care of event processing.
+* The function only works if there is at least one HighGUI window created and the window is active. 
+* If there are several HighGUI windows, any of them can be active.
+
+
+```cpp
+int cv::waitKey 	( 	int  	delay = 0	) 	
+int cv::waitKeyEx 	( 	int  	delay = 0	) 	
+int cv::pollKey 	( 		) 	
+Python:
+	cv.waitKey(	[, delay]	) -> 	retval
+	cv.waitKeyEx(	[, delay]	) -> 	retval
+	cv.pollKey(		) -> 	retval
+```
+
+## 5.2. 简易窗口
+
+### 5.2.1. imshow() 显示图片在窗口中
 
 ```cpp
 void cv::imshow 	( 	const String &  	winname,
@@ -585,6 +692,169 @@ Python:
 使用:
 * 该函数必须后接一个 `cv::waitKey or cv::pollKey` 来保证窗口可操作
 * `waitKey(0)` will display the window infinitely until any keypress
+
+## 5.3. windows 操作
+
+1. 创建窗口 `cv.namedWindow(winname, flags)`
+	* as a placeholder for images and trackbars
+	* windows are referred to by their names.
+	* the function does nothing when a window with the same name already exists.
+2. 移动窗口 `cv.moveWindow(winname, x, y)`
+	* 无任何特别, x y 是坐标
+3. 重命名窗口 `cv.setWindowTitle(winname, title)`
+	* Updates window title. 
+	* 并不会更改窗口的 name, 即各种操作的引用名字
+4. 修改窗口属性 `cv::setWindowProperty(winname, key, value)`
+	* 动态修改窗口的属性
+	* key : `cv::WindowPropertyFlags`
+	* value: `cv::WindowFlags` 同创建窗口时候的 flags 为同一枚举类型
+5. 修改窗口大小
+	* `cv.resizeWindow(winname, width, height)`
+	* `cv.resizeWindow(winname, size)`
+	* 只有窗口不是 `cv::WINDOW_AUTOSIZE` 才能调整
+	* 只能调整图像的区域, Toolbars 区域不受影响
+6. 手动关闭窗口 
+	* `cv::destroyWindow()`
+	* `cv::destroyAllWindows()`
+
+完整函数原型
+```cpp
+void cv::namedWindow 	(
+	const String &  	winname,
+	int  	flags = WINDOW_AUTOSIZE 
+	)
+// Winname	: Name of the window in the window caption that may be used as a window identifier. 
+// flags	: Flags of the window.  (cv::WindowFlags) 
+
+void cv::setWindowTitle 	( 	
+	const String &  	winname,
+	const String &  	title 
+	) 	
+
+	
+void cv::setWindowProperty 	( 	
+	const String &  	winname,
+	int  	prop_id,
+	double  	prop_value 
+	) 		
+// prop_id	: cv::WindowPropertyFlags
+// prop_value: New value of the window property.cv::WindowFlags
+
+
+Python:
+
+cv.namedWindow(	winname[, flags]	) -> 	None
+cv.setWindowTitle(	winname, title	) -> 	None
+cv.setWindowProperty(	winname, prop_id, prop_value	) -> 	None
+```
+### 5.3.1. cv::WindowFlags 创建窗口时候的 flag
+
+
+## 5.4. Trackbar 
+
+
+1. 创建  `cv::createTrackbar()`
+2. 修改属性:
+	* `cv::setTrackbarMax()`
+	* `cv::setTrackbarMin()`
+	* `cv::setTrackbarPos()`
+3. 获取值 ` getTrackbarPos()`
+
+
+函数原型
+```cpp
+int cv::createTrackbar 	( 	
+	// trackbar的名称
+	const String &  	trackbarname,
+	// 要添加到的窗口, 如果是 Qt 后端, 则可以为空
+	const String &  	winname,
+	// 用以存储滑条值的变量
+	int *  	value,
+	// 滑条的最大值, 滑条的最小值0且无法在初始时更改
+	int  	count,
+	// 函数指针, 用以每次滑块的值被更改时自动进行回调
+	// 函数原型必须是 void Foo(int,void*); 
+	// 第一个值是 value , 第二个值是 userdata
+	TrackbarCallback  	onChange = 0,
+	// 用以方便操作 trackBar 行为的一个用户自定义变量
+	// 使用该变量可以省去通过全局变量来调控回调函数的行为
+	// Python 下没有这个参数所以无法使用
+	void *  	userdata = 0 
+	) 	
+
+void cv::setTrackbarMin 	( 	const String &  	trackbarname,
+		const String &  	winname,
+		int  	minval 
+	)
+void cv::setTrackbarMax 	( 	const String &  	trackbarname,
+		const String &  	winname,
+		int  	maxval 
+	) 		
+void cv::setTrackbarPos 	( 	const String &  	trackbarname,
+		const String &  	winname,
+		int  	pos 
+	) 	
+int cv::getTrackbarPos 	( 	const String &  	trackbarname,
+		const String &  	winname 
+	) 		
+
+Python:
+	cv.setTrackbarMin(	trackbarname, winname, minval	) -> 	None
+	cv.setTrackbarMax(	trackbarname, winname, maxval	) -> 	None
+	cv.setTrackbarPos(	trackbarname, winname, pos	) -> 	None
+	cv.getTrackbarPos(	trackbarname, winname	) -> 	retval	
+
+```
+
+## 5.5. mouse 鼠标事件
+
+OpenCV GUI模块也提供了和鼠标的交互, 相比于 trackBar 等模块, 鼠标的管理函数更少, 但是对应的 flags 更复杂
+
+* getMouseWheelDelta()	: Gets the mouse-wheel motion delta. 鼠标滚轮
+* setMouseCallback()	: 设置鼠标的回调函数
+
+```cpp
+// flag The mouse callback flags parameter. 
+int cv::getMouseWheelDelta 	( 	int  	flags	) 	
+
+// 设置鼠标事件回调函数
+// 回调函数的原型则必须是 : 
+// void(* cv::MouseCallback) (int event, int x, int y, int flags, void *userdata)
+// 			event  : cv::MouseEventTypes constants
+// 			flags  : cv::MouseEventFlags constants
+void cv::setMouseCallback 	( 	
+		const String &  	winname,
+		MouseCallback  	onMouse,
+		void *  	userdata = 0 
+	) 	
+```
+
+鼠标事件 flags :
+* `enum cv::MouseEventTypes`
+  * EVENT_MOUSEMOVE 		: pointer has moved over the window. 
+  * 单击按下
+  * EVENT_LBUTTONDOWN 		: left mouse button is pressed. 
+  * EVENT_RBUTTONDOWN 		: right mouse button is pressed.
+  * EVENT_MBUTTONDOWN 		: middle mouse button is pressed. 
+  * 双击
+  * EVENT_LBUTTONDBLCLK 	: left mouse button is double clicked. 
+  * EVENT_RBUTTONDBLCLK 	: right mouse button is double clicked. 
+  * EVENT_MBUTTONDBLCLK 	: middle mouse button is double clicked.   
+  * 松开
+  * EVENT_LBUTTONUP 		: left mouse button is released. 
+  * EVENT_RBUTTONUP 		: right mouse button is released.
+  * EVENT_MBUTTONUP 		: middle mouse button is released. 
+  * 滚轮
+  * EVENT_MOUSEWHEEL 		: positive and negative values mean forward and backward scrolling
+  * EVENT_MOUSEHWHEEL 		: positive and negative values mean right and left scrolling
+* `enum cv::MouseEventFlags`: 代表鼠标操作时候的其他特殊 flags (多键组合)
+  * EVENT_FLAG_LBUTTON		: left mouse button is down
+  * EVENT_FLAG_RBUTTON		: right mouse button is down
+  * EVENT_FLAG_MBUTTON		: middle mouse button is down
+  * EVENT_FLAG_CTRLKEY 		: CTRL Key is pressed
+  * EVENT_FLAG_SHIFTKEY 	: SHIFT Key is pressed.
+  * EVENT_FLAG_ALTKEY 		: ALT Key is pressed
+
 
 # 6. videoio Video I/O
 

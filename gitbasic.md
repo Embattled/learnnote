@@ -229,16 +229,16 @@ $ git commit --amend
 2. `push` 命令用于推送所有 commit 到远程版本库
    * `git push <远程库名称> <分支名称>`
    * `-f  --force` 参数用于强制推送, 可以用于撤销已经 push 的 commit
-   * `-u --set-upstream`   set upstream for git pull/status
+   * `-u --set-upstream`   set upstream for git pull/status, 该命令在 `branch` 中也可以设置 
      * 一般用于执行第一次推送
      * `git push -u origin master` 命令来第一次推送  
      * `-u` 在将本地分支推送到远程的基础上,还将本地和远程的该分支关联了起来,在以后的推送或者拉去时可以简化命令
      * 在这之后的推送使用  `git push origin master`即可
      * 该配置在 branch 上有必要
 
-3. `clone` 用于克隆版本库
-   * `git clone git@github.com:Embattled/learnnote.git`  
+3. `clone <url>` 用于克隆版本库
    * `-b, --branch <branch>` 指定要克隆的分支
+   * `--recurse-submodules`  递归的克隆全部的 submodule, initialize and clone submodules within based on the provided pathspec.
 
 4. `fetch` 用于从远端拉取代码
    * Download objects and refs from another repository.
@@ -267,24 +267,33 @@ $ git commit --amend
    * `git rebase --continue | --abort | --skip | --edit-todo`
    * `git rebase -i` 交互式进行 rebash
 
-## 3.2. 使用Github
+## submodule 
+
+主要用于在项目庞大的时候进行模块文件抽离, 抽离出来的文件可以单独成为一个 git repo
+
+开发流程:
+* 不管主项目中的是否有更新, 只要子项目中修改过代码并提交过, 主项目就需要再提交一次
+* 1. 进入到子项目中对本次更新的代码进行一次提交操作, 并推送到远程
+* 2. 退到主项目中, 对主项目进行一次提交并推送
 
 
 
-本地Git仓库和GitHub仓库之间的传输是通过SSH加密的  
+* `git submodule` : 
+  * 配置 submodule 后:
+    * 会在项目根目录下新建可见 `.gitmodules` 文件用于管理子仓库
+    * 同时在不可见的 git 内部配置文件 `.git/config` 中添加了响应的配置
+  * `(空)`  : 打印当前仓库的 submodule 信息
+  * `add [options] <仓库地址> [<path>]`   : 给当前仓库添加 submodule
+    * `[<path>]` : 指定该 submodule 在当前 repo 的相对路径
+  * `status`  : 打印 submodule 的版本信息
+    * 对于主仓库来说, git submodule 是以 分支:版本 为基础管理的, 即 子仓库的内容会维持同一个分支的同一个版本不变
+    * 若需要更新子仓库的内容, 需要进入子仓库进行 `git switch`, 这个switch也需要在主仓库里进行一次 commit 
+    * Git认为移动submodule的指针和其他变化一样: 如果我们保存这个改动，就必须提交到仓库里
+  * `init` : Initialize the submodules recorded in the index, 将对应的 submodule URL 写入本地 .git/config
+  * `update`
+    * `git submodule update --init --recursive` : 懒人命令, 直接完成初始化和下载最新版本
+    * 更新模式 `[--checkout|--rebase|--merge]`
 
-* 创建SSH key
-  * 在用户主目录下看有没有`.ssh`目录,没有则输入命令创建
-  * `ssh-keygen -t rsa -C "youremail@example.com"`  
-  * 在`.ssh`目录中找到<kbd>id_ras.pub</kbd>,就是SSH公钥
-* 在github上将自己的SSH KEY公钥添加
-
-
-
-GitHub给出的地址不止一个，还可以用`https://github.com/Embattled/learnnote.git`这样的地址。实际上，Git支持多种协议，默认的`git://`使用`ssh`，但也可以使用https等其他协议。
-
-使用ssh的话，在github中保存公钥了后不用输入密码  
-使用http的话需要每次输入密码  
 
 # 4. Git的分支管理
 
@@ -331,8 +340,9 @@ GitHub给出的地址不止一个，还可以用`https://github.com/Embattled/le
      * 因为创建、合并和删除分支非常快，所以Git鼓励你使用分支完成某个任务，合并后再删掉分支，这和直接在master分支上工作效果是一样的，但过程更安全。
      * 使用 `git branch -d <分支名称>`可以删除一个分支
      * `-D` 命令用于强制删除一个还没有被 merge 的分支
-   * 链接远程分支
-     * 对于一个分支,也需要指定本地与远端的链接
+   * 链接远程分支 `--set-upstream-to`
+     * 就算是从远端克隆的repo, 也不会自动关联到远程对应的分支, 需要手动指定本地与远端的链接
+     * 链接的唯一好处就是简化之后的 pull 命令
      * `git branch --set-upstream-to dev origin/dev`  
 
 

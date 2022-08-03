@@ -33,6 +33,8 @@
     - [6.2.3. radius区域定义filter](#623-radius区域定义filter)
     - [6.2.4. 自定义Kernel](#624-自定义kernel)
   - [6.3. ImageTransform  <span id="transform"></span>](#63-imagetransform--)
+- [Plugin Reference](#plugin-reference)
+  - [](#)
 # 1. Pillow 
 
 Pillow is the friendly PIL fork
@@ -488,3 +490,9 @@ class QuadTransform(Transform):
 class MeshTransform(Transform):
   method = Image.MESH
 ```
+
+# Plugin Reference
+
+作为 Plugin? 的插件包  
+
+## 

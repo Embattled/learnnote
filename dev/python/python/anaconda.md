@@ -105,123 +105,7 @@ conda -n
 
 conda --envs
 conda -e
-```
 
-## 2.1. conda 格式
-
-### 2.1.1. conda package
-
-conda package 是一个压缩包 (.tar.bz2) 或者 .conda 文件  
-.conda 文件是 conda 4.7 新加入的, 相比压缩包更轻量化更快  
-
-包中包括:  
-* 系统及的库 system-level libraries
-* Python 或者其他模组 
-* 可执行程序以及其他组件
-* info/ 目录下的 metadata
-* 一组直接安装的 install 文件
-      .
-      ├── bin
-      │   └── pyflakes
-      ├── info
-      │   ├── LICENSE.txt
-      │   ├── files
-      │   ├── index.json
-      │   ├── paths.json
-      │   └── recipe
-      └── lib
-         └── python3.5
-* bin : 包相关的二进制文件
-* lib : 包相关的库文件
-* info: 包的 metadata
-
-### 2.1.2. conda 的目录结构
-
-* /pkgs  : 保存了已被解压的包, 可以直接被链接到一个 conda 环境  
-* /bin /include /lib/ share 都是 base 环境的内容
-* /envs  : 用于保存额外的环境 即(base)环境之外的环境, 子目录下的内容和上条相同
-
-## 2.2. conda channel
-
-channel 是一个包目录的 url , 用于检索conda 包  
-
-默认的channel 是 `https://repo.anaconda.com/pkgs/`  
-
-除此之外有名为 `Conda-forge` 的社区型 conda 索引库  
-
-
-```sh
-# 查看当前环境的 conda 所有配置信息
-conda config --show
-# 查看当前 channel
-conda config --show channels
-
-# 通过指定 channel 安装 scipy
-conda install scipy --channel conda-forge
-
-# 同时指定多个channel 优先级从左到右
-conda install scipy --channel conda-forge --channel bioconda
-
-# 使用 --override-channels 来指定只使用指定的 channel 安装  
-conda search scipy --channel conda-forge --override-channels
-```
-
-
-### 2.2.1. channel priority
-
-为了解决不同 channel 之间的冲突, 高优先级的 channel 会覆盖低优先级的  
-不管低优先级的 channel 中包的版本是否更加新  
-* 当默认通道中没有想要的包时, 可以安全的将新的通道放在最下层优先级  
-* 如果想要 conda 只安装最新的版本 通过命令修改 config 
-  * `conda config --set channel_priority false`
-  * 这样总会安装版本号更新的python
-* `conda config --set channel_priority flexible` 
-  * 灵活
-
-
-
-
-### 2.2.2. channel 管理
-
-增加新的 channel 应该明确优先级
-
-```sh
-# 放在顶部, 拥有最高优先级
-conda config --add channels new_channel
-conda config --prepend channels new_channel
-
-# 追加在 list 底部 最低优先级
-conda config --append channels new_channel
-
-# 删除一个旧的channel
-conda config --remove channels old_channel
-```
-
-##  2.3. conda 的环境管理 
-conda environment 是一个目录, 保存了对该环境安装了的 conda packages.  
-
-通过 `environment.yaml` 可以轻松的分享运行环境  
-
-`conda info --envs`  查看当前系统所拥有的环境  
-
-### 2.3.1. 创建
-```shell
-
-#创建虚拟环境 conda create --name <env_name> <package_names>
-#基于python3.8创建一个名字为python36的环境
-conda create --name python38 python=3.8
-
-# 加入多个包
-conda create -n python3 python=3.5 numpy pandas
-# 不指定python版本的话则会安装与 anaconda　版本相同的　python 版本
-
-# 复制一个环境
-conda create --name <new_env_name> --clone <copied_env_name>
-
-```
-
-### 2.3.2. 使用
-```shell
 #激活虚拟环境
 activate python36   # windows 平台
 conda activate python36 # linux/mac 平台
@@ -231,33 +115,67 @@ conda deactivate python36
 
 ```
 
-### 2.3.3. 管理
+## 2.1. conda 环境管理命令行命令
 
-```sh
-#查看所有已安装的虚拟环境
-conda info -e
-python36              *  D:\Programs\Anaconda3\envs\python36
-root                     D:\Programs\Anaconda3
+Conda 的管理 Command 数量比较少, 该章节和 conda 环境的使用命令 (activate 之类)的区分开了
 
 
-#删除虚拟环境
-conda remove -n python36 --all
-# 或者 
-conda env remove  -n python36
+### 2.1.1. create 首先是创建
+
+Create a new conda environment from a list of specified packages.  
+This command requires either the -n NAME or -p PREFIX option.  
+
+* 对于Python, 不指定python版本的话则会安装与 anaconda　版本相同的　python 版本
+```shell
+usage: conda create [-h] [--clone ENV] (-n ENVIRONMENT | -p PATH) [-c CHANNEL]
+                    [--use-local] [--override-channels]
+                    [--repodata-fn REPODATA_FNS] [--strict-channel-priority]
+                    [--no-channel-priority] [--no-deps | --only-deps]
+                    [--no-pin] [--copy] [-C] [-k] [--offline] [-d] [--json]
+                    [-q] [-v] [-y] [--download-only] [--show-channel-urls]
+                    [--file FILE] [--no-default-packages]
+                    [--experimental-solver {classic,libmamba,libmamba-draft}]
+                    [--dev]
+                    [package_spec [package_spec ...]]
+
+# (-n ENVIRONMENT | -p PATH)  是必须参数, 用于指定名字
+# 创建虚拟环境 conda create --name <env_name> <package_names>
+# package_spec Packages to install or update in the conda environment.
+conda create --name python38 python=3.8
+conda create -n python3 python=3.5 numpy pandas
+
+# 便捷创建 env 的方法
+# [--clone ENV] 复制一个环境
+conda create --name <new_env_name> --clone <copied_env_name>
+# [--file FILE] 从 requirement.txt 来创建, 可以传入多个
+conda create --name <new_env_name> --file=file1 --file=file2
+
+
+# -c, --channel            : Additional channel to search for packages.
+# -C, --use-index-cache    : Use cache of channel index files, even if it has expired. 直接使用未更新的 index 来安装
+
+
+# --copy       : 重要, 如果 vscode 的包检验失效可以用这个, Install all packages using copies instead of hard- or soft-linking.
 
 ```
 
-## 2.4. conda 的包管理
-
-conda 的包管理功能可 pip 是一样的，当然你选择 pip 来安装包也是没问题的。  
+### 2.1.2. info 情报确认
 
 ```shell
-# Check to see if the newly installed program is in this environment:
+usage: conda info [-h] [--json] [-v] [-q] [-a] [--base] [-e] [-s]
+                  [--unsafe-channels]
 
-# 搜索一个包 获取所有的版本的信息
-conda search scipy
+# -e, --envs         : 查看所有已安装的虚拟环境
+# -s, --system       : List environment variables.
+# --unsafe-channels  : Display list of channels with tokens exposed.
+
+
+# --json             : Report all output as json. Suitable for using conda programmatically.
+# -v, --verbose      : Use once for info, twice for debug, three times for trace.
+# -q, --quiet        : 没看懂, Do not display progress bar.
+
 ```
-### conda list 
+### 2.1.3. list 打印当前环境的包
 
 查看当前环境已安装的包
 ```shell
@@ -265,11 +183,22 @@ usage: conda list [-h] [-n ENVIRONMENT | -p PATH] [--json] [-v] [-q]
                   [--show-channel-urls] [-c] [-f] [--explicit] [--md5] [-e]
                   [-r] [--no-pip]
                   [regex]
+
+# -n, --name   : 指定要打印的环境Name of environment.
+# -p, --prefix : Full path to environment location (i.e. prefix).
+
+
+# -e, --export : Output requirement string only (output may be used by conda create --file).
+
+
+
+# regex      : 位置参数, List only packages matching this regular expression.
 ```
-* -e, --export : Output requirement string only (output may be used by conda create --file).
 
 
-### conda install
+
+
+### 2.1.4. install
 
 ```shell
 usage: conda install [-h] [--revision REVISION] [-n ENVIRONMENT | -p PATH]
@@ -305,6 +234,152 @@ conda remove matplotlib
 # 在安装了 conda-build 后 还可以直接通过源文件安装一个包
 conda build my_fun_package
 ```
+
+### 2.1.5. remove 删除包或者虚拟环境
+
+Remove a list of packages from a specified conda environment.
+* will also remove any package that depends on any of the specified packages as well 会一并删除所有依赖该库的包
+* add the '--force' option to skip this dependency checking and remove just the requested packages
+
+```shell
+usage: conda remove [-h] [-n ENVIRONMENT | -p PATH] [-c CHANNEL] [--use-local]
+                    [--override-channels] [--repodata-fn REPODATA_FNS] [--all]
+                    [--features] [--force-remove] [--no-pin]
+                    [--experimental-solver {classic,libmamba,libmamba-draft}]
+                    [-C] [-k] [--offline] [-d] [--json] [-q] [-v] [-y] [--dev]
+                    [package_name [package_name ...]]
+
+
+# --all        : 删除整个环境时用, Remove all packages, i.e., the entire environment.
+# --force-remove, --force  : Forces removal of a package without removing packages that depend on it. 小心使用
+                    
+```
+
+
+删除虚拟环境
+conda remove -n python36 --all
+conda env remove  -n python36
+
+### 2.1.6. clean 清理磁盘空间
+
+清理各种不需要的数据
+
+```shell
+usage: conda clean [-h] [-a] [-i] [-p] [-t] [-f]
+                   [-c [TEMPFILES [TEMPFILES ...]]] [-l] [-d] [--json] [-q]
+                   [-v] [-y]
+
+# -i, --index-cache     : Remove index cache.
+
+# -p, --packages        : Remove unused packages from writable package caches
+#                         WARNING: This does not check for packages installed using symlinks back to the package cache.
+
+# -f, --force-pkgs-dirs : Remove all writable package caches.
+#                       : This option is not included with the --all flag.               
+
+# -t, --tarballs        : Remove cached package tarballs.
+
+# -a, --all             : Remove index cache, lock files, unused cache packages, and tarballs
+```
+
+
+
+
+## 2.2. conda 结构
+
+### 2.2.1. conda package
+
+conda package 是一个压缩包 (.tar.bz2) 或者 .conda 文件  
+.conda 文件是 conda 4.7 新加入的, 相比压缩包更轻量化更快  
+
+包中包括:  
+* 系统及的库 system-level libraries
+* Python 或者其他模组 
+* 可执行程序以及其他组件
+* info/ 目录下的 metadata
+* 一组直接安装的 install 文件
+      .
+      ├── bin
+      │   └── pyflakes
+      ├── info
+      │   ├── LICENSE.txt
+      │   ├── files
+      │   ├── index.json
+      │   ├── paths.json
+      │   └── recipe
+      └── lib
+         └── python3.5
+* bin : 包相关的二进制文件
+* lib : 包相关的库文件
+* info: 包的 metadata
+
+### 2.2.2. conda 的目录结构
+
+* /pkgs  : 保存了已被解压的包, 可以直接被链接到一个 conda 环境  
+* /bin /include /lib/ share 都是 base 环境的内容
+* /envs  : 用于保存额外的环境 即(base)环境之外的环境, 子目录下的内容和上条相同
+
+## 2.3. conda channel
+
+channel 是一个包目录的 url , 用于检索conda 包  
+
+默认的channel 是 `https://repo.anaconda.com/pkgs/`  
+
+除此之外有名为 `Conda-forge` 的社区型 conda 索引库  
+
+
+```sh
+# 查看当前环境的 conda 所有配置信息
+conda config --show
+# 查看当前 channel
+conda config --show channels
+
+# 通过指定 channel 安装 scipy
+conda install scipy --channel conda-forge
+
+# 同时指定多个channel 优先级从左到右
+conda install scipy --channel conda-forge --channel bioconda
+
+# 使用 --override-channels 来指定只使用指定的 channel 安装  
+conda search scipy --channel conda-forge --override-channels
+```
+
+
+### 2.3.1. channel priority
+
+为了解决不同 channel 之间的冲突, 高优先级的 channel 会覆盖低优先级的  
+不管低优先级的 channel 中包的版本是否更加新  
+* 当默认通道中没有想要的包时, 可以安全的将新的通道放在最下层优先级  
+* 如果想要 conda 只安装最新的版本 通过命令修改 config 
+  * `conda config --set channel_priority false`
+  * 这样总会安装版本号更新的python
+* `conda config --set channel_priority flexible` 
+  * 灵活
+
+
+
+
+### 2.3.2. channel 管理
+
+增加新的 channel 应该明确优先级
+
+```sh
+# 放在顶部, 拥有最高优先级
+conda config --add channels new_channel
+conda config --prepend channels new_channel
+
+# 追加在 list 底部 最低优先级
+conda config --append channels new_channel
+
+# 删除一个旧的channel
+conda config --remove channels old_channel
+```
+
+##  2.4. conda 的环境管理 
+conda environment 是一个目录, 保存了对该环境安装了的 conda packages.  
+
+通过 `environment.yaml` 可以轻松的分享运行环境  
+
 
 # 3. Jupyter Notebook
 

@@ -1,7 +1,15 @@
 # 1. Generic Operating System Services
 
 * 和 runtime 中的 python 解释器模块不同, 这部分的模块更贴近操作系统方面
-* 在几乎所有的操作系统都能使用, 提供了与操作系统相关的所有操作的接口  
+* 在几乎所有的操作系统都能使用, 提供了与操作系统相关的所有操作的接口, 主要都是基于 C 接口实现的  
+
+杂项系统库:
+* os        各种基础操作啥都有
+
+专用目的库:
+* argparse  : 专门用来处理 python 命令行参数的
+* getpass   : 专门用来处理密码输入的
+* ctypes    :
 
 # 2. os
 
@@ -78,12 +86,12 @@ Unix. Windows:
   * 不是函数, 而是一个具体的字典对象. eg `environ['HOME']`
   * 该对象不仅可以用来查询, 修改该字典会自动写回环境变量到系统 (通过调用 ` os.putenv(key, value)¶` )
 
-## Process Management¶
+## 2.3. Process Management¶
 
 These functions may be used to create and manage processes. 可以用来通过Python解释器进程再创建各种子进程
 
 
-### os.system
+### 2.3.1. os.system
 
 是 python3 STL 的 subprocess 重点想要代替的基础函数
 
@@ -97,7 +105,7 @@ Execute the command (a string) in a subshell:
 
 `os.system(command)`
 
-# sys
+# 3. sys
 
 This module provides:
 * access to some variables used or maintained by the interpreter
@@ -106,14 +114,27 @@ This module provides:
 
 
 
-# 3. time
+# 4. time
 
 * 与系统时间相关的函数, 大部分都是直接调取操作系统内置的 同名C函数  
 * Python 中与时间操作的 module 还有 `datetime` 和 `calendar`
 
 并不是所有的函数都可以在所有平台使用, 因为大部分函数都是直接调用 C 函数库
 
-## 3.1. 相关定义
+datetime: 属于 Datatype 类型, 不在该文件中 
+
+
+Each operating system implements clocks and performance counters differently, and it is useful to know exactly which function is used and some properties of the clock like its resolution.   
+The `time.get_clock_info()` function gives access to all available information about each Python time function.  
+* `time.get_clock_info(name)`: 
+  * 'monotonic': time.monotonic()
+  * 'perf_counter': time.perf_counter()
+  * 'process_time': time.process_time()
+  * 'thread_time': time.thread_time()
+  * 'time': time.time()
+
+  
+## 4.1. 相关定义
 
 * epoch 时间是从 1970, 00:00:00 (UTC) 开始的, 根据平台不同可能会有不同的开始时间
 * 该模组中的函数都是 C 相关的, 因此对日期的处理只限于 32位描述, 即 1970~2038
@@ -125,24 +146,97 @@ This module provides:
 | seconds since the epoch   | struct_time in local time | localtime()       |
 | struct_time in UTC        | seconds since the epoch   | calendar.timegm() |
 | struct_time in local time | seconds since the epoch   | mktime()          |
+
 ```py
 # 获取该计算机平台的时间表示开始时间
 time.gmtime(0)
 
 ```
+## 4.2. 获取时间
 
-## 3.2. 获取时间
+`time.clock()` 的不足之处
+* 系统相关的
+* Windows下会包括程序睡眠期间经过的时间, Unix 不包括
+* 在 Windows 下有很高的精度, 但是 Unix 下精度很糟糕
 
-无参数函数
-1. time()    : 获取浮点数表示的从 epoch 开始经过的秒数
 
-## 3.3. 获取规格化字符串时间
+普通时钟:  seconds since the epoch
+* `time.time() → float`
+* `time.time_ns() → int`  version 3.7
 
-`time.strftime(format, t=None )`
-* 将一个元组或者 struct_time 转化成格式的字符串
-  * t 可以接受 gmtime() 或者 localtime() 的输入
-  * 没有 t 的话代表输出当前的时间
 
+
+
+单调时钟 : The clock is not affected by system clock updates.
+* 存在意义: 主要用于服务系统调度和超时检测, 直接使用系统时间会因为系统时间的更新导致程序出错
+* 单次调用没有任何实际意义, 只有两次调用的差值才有意义
+* `time.monotonic()->float` :  version 3.3
+  * 返回 秒 单位的浮点时间, 
+* `time.monotonic_ns()->int`:  version 3.7
+  * 返回 ns 单位的整数时间
+
+性能时钟 :  `system-wide`
+* 功能: 主要解决的 `time.clock()` 的几种缺点, 保证在不同系统下都是最高精度的时间测量器
+* 单次调用没有任何实际意义, 只有两次调用的差值才有意义
+* include time elapsed during sleep and is system-wide
+* `time.perf_counter() → float` 浮点返回值
+* `time.perf_counter_ns() → int` 整数返回值
+
+进程CPU时钟 : `process-wide by definition`
+* sum of the `system and user CPU time` of the current `process`
+* 注意该时间不是真实意义上的时间
+* always measures CPU time, does not include time elapsed during sleep.
+* has the best available resolution.
+* 单次调用没有任何实际意义, 只有两次调用的差值才有意义
+* `time.process_time() → float`
+* `time.process_time_ns() → int`
+
+
+线程CPU时钟:  thread-specific by definition
+* sum of the `system and user CPU time` of the current `thread`
+* always measures CPU time, does not include time elapsed during sleep.
+* 单次调用没有任何实际意义, 只有两次调用的差值才有意义
+* `time.thread_time() → float`
+* `time.thread_time_ns() → int`
+
+
+## 4.3. 时间格式转换
+
+转成秒数
+* `time.mktime(t)`
+  * 输入 :  `struct_time` or full 9-tuple (since the dst flag is needed) 
+    * `-1` as the dst flag if it is unknown
+  * return : a floating point number, for compatibility with `time()`
+
+转成 `struct_time`
+* `time.gmtime([secs])`
+  * 输入 :  a time expressed in seconds since the epoch
+  * 默认值: `time()`
+  * return : a `struct_time` in UTC in which the `dst flag is always zero`
+* `time.localtime([secs])`
+  * 输入和默认值都同上
+  * dst flag is set to 1 when DST applies to the given time
+* `time.strptime(string[, format])`
+  * 输入 : Parse a string representing a time according to a format.
+  * 根据指定的 format 将一个普通 string 转化成 struct_time
+  * return :  `struct_time`
+
+转成固定格式字符串
+* `time.asctime([t])` :
+  * 接受  : a tuple or `struct_time` as returned by `gmtime()` or `localtime()`
+  * 默认值: `localtime()` , 即当前时间
+  * return : 标准规格的时间字符串, 有固定长度 eg. `Sun Jun 20 23:21:05 1993`
+* `time.ctime([secs])`:
+  * 接受  : a time expressed in seconds since the epoch
+  * 默认值: `time()`, 相当于 `asctime(localtime(secs))`
+  * return : 标准规格的时间字符串, 同上
+
+  
+转成指定格式字符串
+* `time.strftime(format, t=None )`
+  * 接受 :  a tuple or `struct_time` as returned by `gmtime()` or `localtime()`
+  * 默认值: `localtime()` , 即当前时间
+  * return : 由 format 指定的字符串格式, 各种描述符如下
 | 描述符 | 意义                  |
 | ------ | --------------------- |
 | %S     | 秒数                  |
@@ -153,10 +247,40 @@ time.gmtime(0)
 | %m     | 月份                  |
 | %Y %y  | 四位数年份 两位数年份 |
 
-# 4. logging 日志模块
+
+## 4.4. 线程 CPU  (Unix限定)
+
+* `time.pthread_getcpuclockid(thread_id)` :  version 3.7
+  * 接受: thread_id , 必须是有效的 id, 否则会导致 段错误
+  * return : 该线程对应的 CPU-time 的 clk_id
+  * thread_id 可以通过 `threading.get_ident()` 来获得
+
+* `time.clock_getres(clk_id)` :  version 3.3
+  * 获取指定 clk_id 的 精度 (resolution)
 
 
-# 5. argparse
+* `time.clock_gettime(clk_id)->float` : version 3.3
+  * 获取指定 clk_id 的时间
+  * 返回值是浮点类型  
+* `time.clock_gettime_ns(clk_id)->int` : version 3.7
+  * 同上, 但是是整数返回值, 相对来说不会有精度损失
+* `time.clock_settime(clk_id, time: float)` : version 3.3
+  * float 类型设置指定 clk_id 的时间
+  * 当前版本 clk_id 只能是 `CLOCK_REALTIME` 
+* `time.clock_settime_ns(clk_id, time: int)` : version 3.7
+  * 同上, 但是是 int 表示 ns 来设置
+
+
+Clock ID Constants : used as parameters for `clock_getres()` and `clock_gettime()`
+
+## 4.5. 获取规格化字符串时间
+
+
+
+# 5. logging 日志模块
+
+
+# 6. argparse
 
 argparse组件可以很方便的写一个命令行界面, 可以很容易的定义程序的参数, 并从`sys.argv`中提取出来, 同时还会自动提供错误信息  
 
@@ -171,7 +295,7 @@ args = parser.parse_args() # 翻译传入的命令行参数
   * `Namespace` 就是定义在 argparse 包中的一个简单的类, 和字典类似, 但是 print()更加可读, 可以使用 `vars()` 方法进行转换成字典
   * `args.*` 用点号进行对应的参数访问
 
-## 5.1. class argparse.ArgumentParser
+## 6.1. class argparse.ArgumentParser
 
 整个库的核心类, 在 CLI 处理的一开始定义, 有很多参数   
 
@@ -203,7 +327,7 @@ class argparse.ArgumentParser(
 * 
 
 
-## 5.2. add_argument()
+## 6.2. add_argument()
 
 作为 ArgumentParser 的最关键的方法, 重要程度是相同的, 这里详细解释该方法的各个参数  
 
@@ -259,7 +383,7 @@ group.add_argument("-v", "--verbose", action="store_true")
 group.add_argument("-q", "--quiet", action="store_true")
 ```  
 
-### 5.2.1. Action class
+### 6.2.1. Action class
 
 Action classes implement the Action API
 * a callable which returns a callable which processes arguments from the command-line.
@@ -267,7 +391,7 @@ Action classes implement the Action API
 
 
 
-## 5.3. 高级 args
+## 6.3. 高级 args
 
 除了基础的直接对 parser 里添加参数外, 还有其他特殊的参数类别  
 
@@ -276,7 +400,7 @@ Action classes implement the Action API
 * ArgumentParser.add_subparsers
 * ArgumentParser.set_defaults
 
-### 5.3.1. Argument groups 参数分组
+### 6.3.1. Argument groups 参数分组
 
 ```py
 parser = argparse.ArgumentParser()
@@ -296,7 +420,7 @@ group.add_argument('--bar', action='store_false')
 
 
 
-### 5.3.2. mutual exclusion 矛盾参数
+### 6.3.2. mutual exclusion 矛盾参数
 
 * 可以将不同的参数归到一组里, 这个组的参数只能出现一种
 * 每次调用该参数会返回一个类似于`ArgumentParser` 的对象, 通过调用该对象的 add_argument来实现矛盾参数
@@ -312,7 +436,7 @@ group.add_argument('--foo', action='store_true')
 group.add_argument('--bar', action='store_false')
 ```
 
-### 5.3.3. subparsers 子解释器
+### 6.3.3. subparsers 子解释器
 
 ```py
 ArgumentParser.add_subparsers(
@@ -345,7 +469,7 @@ ArgumentParser.add_subparsers(
 
 
 ```
-### Parser defaults
+### 6.3.4. Parser defaults
 
 `ArgumentParser.set_defaults(**kwargs)` 
 
@@ -371,11 +495,11 @@ args=parser.parse_args()
 args.default_func()
 ```
 
-## 5.4. Parser defaults
+## 6.4. Parser defaults
 
 
 
-# 6. getpass  — Portable password input 
+# 7. getpass  — Portable password input 
 
 类似于 argparse , 只是该模组只针对密码界面    
 The getpass module provides two functions:
@@ -386,3 +510,10 @@ The getpass module provides two functions:
   * 获取当前进程的用户名
   * This function checks the environment variables `LOGNAME`, `USER`, `LNAME` and `USERNAME`, in order, and returns the value of the first one which is set to a `non-empty string`. 
   
+# ctypes — A foreign function library for Python
+
+foreign function library for Python, 外部函数库
+* 提供了与 C 语言兼容的数据类型
+* 允许调用 DLLs 或者其他 Shared libraries 的函数
+* 用于将库函数应用在纯 Python 中
+

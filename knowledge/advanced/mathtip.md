@@ -1,4 +1,96 @@
+# 数学基础
 
+字母加上小斜杠的字符一般被用来表示数域  
+
+* $\mathbb{Z}$ 整数域
+* $\mathbb{Q}$ 有理数
+* $\mathbb{R}$ 实数域
+* $\mathbb{C}$ 复数域
+
+
+## 复数域
+
+复数域补足了实数域的不完备的地方
+* 负数可以开根
+* 实数域需要引入特殊的无穷 $\infty$ 数字, 从数学上来说不完备, 复数域上无穷则是一个普通的数
+
+
+复变函数的定义:
+* $z=x+iy$ 称 x 是 real, y 是 imaginary 虚部
+* $f(z)=u+iv=u(x,y)+iv(x,y)\in \mathbb{C}$
+  * $x,y,u,v \in \mathbb{R}$
+
+复变函数的导数:
+* 标准导数定义:
+$$f'(z_o)=\lim_{z\rArr z_0}\frac{f(z)-f(z_0)}{z-z_0}$$
+* 若复变函数 $f(z)=u+iv$ 可导, 则 u,v 存在牵连关系
+  * 至少沿着 x,y (实轴和虚轴)的方向趋近得到的表达式相同
+  * 沿着实轴: 
+    * $z-z_0=\triangle x$
+    * $f'(z_o)=\lim_{\triangle x \rArr 0}\frac{\triangle u + i\triangle v}{\triangle x}==\frac{\partial u}{\partial x}+i\frac{\partial v}{\partial x}$
+  * 沿着虚轴, 同理:
+    * $z-z_0=i\triangle y$
+    * $f'(z_0)=\lim_{\triangle x \rArr 0}\frac{\triangle u + i\triangle v}{i\triangle y}=-i\frac{\partial u}{\partial y}+\frac{\partial v}{\partial y}$
+* 复变函数保留全套求导公式
+
+# 级数
+
+
+
+## 正交变换
+
+正交变换: 是信号变化的一系列统称
+* 傅立叶变换
+* 离散余弦变换
+* 小波变换
+* 多尺度几何分析（超小波）
+
+### Fourier Transform  
+
+### DCT 离散余弦变换  Discrete Cosine Transform
+
+是傅里叶变换的一个变种, 类似于离散傅里叶变换, 但是去除了虚数部分  
+* 相当于一个长度是它的两倍的对实偶函数进行的离散傅里叶变换  
+* DCT 有8种标准类型
+* 有两种相关变换  离散正弦变换, 改进的离散余弦变换
+* 用途: 对数字信号 (信号, 图像) 进行有损压缩, e.g. JPEG
+
+形式化定义: 线性的可逆函数 $F: R^n \rarr R^n$, 把 n 个实数变换到另外 n 个实数的操作  
+
+
+#### DCT-II 
+
+$$f_m=\sum^{n-1}_{k=0}x_kcos[\frac{\pi}{n}m(k+\frac{1}{2})]$$
+
+最常用的一种 DCT, 通常被直接称作 DCT    
+
+#### DCT-III  
+
+DCT-II 的逆变换, 通常称为 逆离散余弦变换 
+
+
+### Wavelet Transform 小波变换
+
+
+
+
+# 概率论
+
+
+
+## 分布
+
+
+### 泊松分布 poisson distribution
+
+是一种统计与概率学里常见到的离散机率分布 (discrete probability distribution)
+
+$$P(X=k)=\frac{\lambda^k}{k!}, k=0,1,...$$
+
+泊松分布的特征
+* 方差和数学期望均为 $\lambda$
+* $\lambda$ 是单位内随机事件的平局发生次数
+* 泊松分布适合描述单位时间内随机事件的发生次数
 
 
 # Hidden Markov Model HMM

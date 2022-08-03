@@ -317,8 +317,144 @@ find . -type f -name "*.jpg" -print | xargs tar -czvf images.tar.gz
 # 有一个文件包含了很多你希望下载的 URL
 cat url-list.txt | xargs wget -c
 ```
+# 3. Linux 目录和基本软件
 
-# 3. Linux 工作管理
+Linux 基金会的 FHS标准 制定了文件目录的标准  
+`（Filesystem Hierarchy Standard）`  
+
+规定了 Linux 系统中**所有**一级目录以及部分二级目录（/usr 和 /var）的用途  
+
+## 3.1.1. 根目录 
+
+```shell
+
+# 存放最基础的系统命令, 所有用户都可以执行,包括单用户模式  
+# 放置一些系统的必备执行档例如： cat、cp、chmod df、dmesg、gzip、kill、ls、mkdir、more、mount、rm、su、tar等
+/bin/
+
+# 保存与系统环境设置相关的命令
+# 主要放置一些系统管理的必备程式例如： cfdisk、dhcpcd、dump、e2fsck、fdisk、halt、ifconfig、ifup、 ifdown、init、insmod、lilo、lsmod、mke2fs、modprobe、quotacheck、reboot、rmmod、 runlevel、shutdown等
+/sbin/
+
+
+# 系统启动目录, 包括内核文件和启动引导程序 grub
+/boot/
+
+# /sys/class 是由kernel在运行时导出的,目的是通过文件系统暴露出硬件的层级关系
+/sys/class
+# 使用示例 查看网络接口的名称
+$ ls /sys/class/net
+
+
+# 配置文件 服务的启动脚本  采用默认安装方式的服务配置文件在此之中 
+/etc/
+
+# 主目录
+/home/
+
+# *系统* 调用的函数库保存位置 
+/lib/
+
+# 虽然系统准备了三个默认挂载目录 /media/、/mnt/、/misc/,但是到底在哪个目录中挂载什么设备可以由管理员自己决定
+# 挂载媒体设备, 如软盘和光盘
+/media/
+# 挂载目录, 如U盘,移动硬盘,*其他操作系统的分区*
+/mnt/
+# 挂载NFS服务的共享目录  
+/misc/
+
+# root用户的主目录,和用户的/home/123/类似
+/root/
+
+# 服务数据目录,保存服务启动后的数据
+/srv/
+
+```
+### 3.1.2. 软件目录 /usr
+
+注意不是 user, 全称为 `Unix Software Resource`  
+FHS 建议所有开发者,应把软件产品的数据`合理的放置在 /usr 目录下的各子目录中`  
+而不是为他们的产品创建单独的目录  
+类似 Windows 系统中` C:\Windows\ + C:\Program files\` 两个目录的综合体
+
+```shell
+# 存放系统命令, 除了单用户以外的所有用户可以执行
+# 主要放置一些应用软体工具的必备执行档例如： c++、g++、gcc、chdrv、diff、dig、du、eject、elm、free、gnome*、 gzip、htpasswd、kfm、ktop、last、less、locale、m4、make、man、mcopy、ncftp、 newaliases、nslookup passwd、quota、smb*、wget等
+/usr/bin/
+
+# 同样是根文件系统不需要的系统管理命令,只有root可以执行
+# 放置一些网路管理的必备程式例如： dhcpd、httpd、imap、in.*d、inetd、lpd、named、netconfig、nmbd、samba、sendmail、squid、swap、tcpd、tcpdump等
+/usr/sbin/
+
+# 应用程序调用的函数库位置
+/usr/lib/
+
+# 图形界面系统保存位置
+/usr/XllR6/ 
+
+#  手工安装的软件保存位置。我们一般建议源码包软件安装在这个位置
+/usr/local/
+
+# 应用程序的资源文件保存位置,如帮助文档、说明文档和字体目录
+/usr/share/
+
+# 我们手工下载的源码包和内核源码包都可以保存到这里
+# 不过笔者更习惯把手工下载的源码包保存到 /usr/local/src/ 目录中
+# 把内核源码保存到 /usr/src/linux/ 目录中
+/usr/src/
+
+# C/C++ 等编程语言头文件的放置目录
+/usr/include/
+
+```
+
+### 3.1.3. /var 目录 
+
+目录用于存储动态数据,例如缓存、日志文件、软件运行过程中产生的文件等  
+
+### 3.2. /dev/  设备文件  
+
+* /dev 下的文件是真实的设备 由UDEV在运行时创建
+* udev 是Linux kernel 2.6系列的设备管理器, 它主要的功能是管理/dev目录底下的设备节点
+
+
+### 3.2.1. /dev/null 丢弃
+
+只有一个用途, 就是丢弃各种输出流
+* 使用if来转储无用的数据, 在其中输出, 这样它就不会占用系统内存和处理能力
+* 甚至可以通过将无用的文件直接移动到 /dev/null/ 来删除它们
+* 根据需要, 将 stderr 流 或者 stdout 流重定向至这里, 可以减少 debug 的时间
+
+设备特点:
+* 这个文件的大小是0字节大小, 所有人都有读写权限, 没有执行权限
+* 由于它没有执行权限, 不是一个可执行文件, 所以不能使用管道符 | 来接 /dev/null
+* 它会吸收任何输入, 并且不返回任何内容,   
+* 如果你使用 cat 去读取这个文件, 那么它只会返回文件终点
+
+###  3.2.2. 存储
+
+/dev/sda 可能是您的主硬盘驱动器
+
+/dev/sdb 可能是您现在正在使用的笔记本驱动器的文件
+
+## 3.3. /etc/  Editable Text Configuration
+
+FHS规定用来放配置文件
+
+### 3.3.1. /etc/resolv.conf - resolver configuration file
+
+The file is designed to be human readable and contains a list of keywords with values that provide various types of resolver information.  
+
+* software  : resolver
+* default situation (this file does not exist):
+  *  only the name server on the local machine will be queried
+  *  and the search list contains the local domain name determined from the hostname.
+
+options :
+* nameserver  : Name server IP address
+* search      : Search list for host-name lookup
+
+# 4. Linux 工作管理
 
 工作管理指的是在单个登录终端（也就是登录的 Shell 界面）同时管理多个工作的行为.  
 把命令放入后台,然后把命令恢复到前台,或者让命令恢复到后台执行,这些管理操作就是工作管理。  
@@ -331,7 +467,7 @@ cat url-list.txt | xargs wget -c
    1. 比如 vi 命令只能放入后台暂停,而不能执行,因为 vi 命令需要前台输入信息；
    2. top 命令也不能放入后台执行,而只能放入后台暂停,因为 top 命令需要和前台交互。
 
-## 3.1. 进程前后台操作
+## 4.1. 进程前后台操作
 
 恢复前台  fg
 * `fg %[工作号]`  
@@ -354,7 +490,7 @@ cat url-list.txt | xargs wget -c
 `&` 表示此命令会立即终端后台工作 如果没有 `&` 则执行后此命令会在终端前台执行  
 
 
-## 3.2. jobs 工作查看命令
+## 4.2. jobs 工作查看命令
 
 jobs 命令可以用来查看**当前终端**放入后台的工作
 
@@ -378,7 +514,7 @@ jobs 命令可以用来查看**当前终端**放入后台的工作
 
 
   
-## 3.3. 定时执行
+## 4.3. 定时执行
 
 * at    定时执行任务
 * atrm  提供相应的工作 ID, 删除某个工作
@@ -411,11 +547,11 @@ at 命令选项及含义
 | -f 脚本文件   | 指定所要提交的脚本文件                                  |
 
 
-## 3.4. crond服务 定时循环执行
+## 4.4. crond服务 定时循环执行
 
 
 
-# 4. Linux 的进程管理
+# 5. Linux 的进程管理
 
 在 Linux 系统中,每个进程都有一个唯一的进程号（PID）  
 启动一个进程主要有 2 种途径
@@ -425,7 +561,7 @@ at 命令选项及含义
 对进程来说,每一个从终端开始运行的进程都会依附于这个终端,这个终端就称为这些进程的控制终端,当控制终端被关闭时,相应的进程都会自动关闭。
 
 
-## 4.1. 手工启动
+## 5.1. 手工启动
 指的是由用户输入命令直接启动一个进程, 可以细分为前台启动和后台启动 2 种方式
 * 当用户输入一个命令并运行,就已经启动了一个进程,而且是一个前台的进程
   * 假如启动一个比较耗时的进程,可以把该进程挂起(放入后台并暂停运行)
@@ -433,7 +569,7 @@ at 命令选项及含义
   * 该进程非常耗时,且用户也不急着需要其运行结果的时候
   * 输入命令并运行之后,Shell 会提供给我们一个数字,此数字就是该进程的进程号
 
-## 4.2. daemon进程 守护进程
+## 5.2. daemon进程 守护进程
 
 1. 守护进程（Daemon Process）,也就是通常说的 Daemon 进程（精灵进程）,是 Linux 中的后台服务进程。
 2. 是一个生存期较长的进程,通常独立于控制终端并且周期性地执行某种任务或等待处理某些发生的事件。
@@ -444,7 +580,7 @@ at 命令选项及含义
 2. 没有控制终端（ TTY 为 ？）
 3. 终端进程组 ID 为 -1 （ TPGID 表示终端进程组 ID）
 
-## 4.3. ps 命令打印全部进程
+## 5.3. ps 命令打印全部进程
 
 在不同的 Linux 发行版上,ps 命令的语法各不相同  
 为此,Linux 采取了一个折中的方法,即融合各种不同的风格,兼顾那些已经习惯了其它系统上使用 ps  命令的用户。  
@@ -515,7 +651,7 @@ Linux的终端控制
   * tty1~tty6 是本地的字符界面终端,tty7 是图形终端
 * 虚拟终端 , 一般是远程链接的终端 , 第一个链接占用 pts/0 第二个用 pts/1, 以此类推
 
-## 4.4. top 动态持续监听进程
+## 5.4. top 动态持续监听进程
 
 ```shell
 # 命令格式
@@ -571,7 +707,7 @@ $ top [选项]
 | TIME+   | 该进程共占用的 CPU 时间。              |
 | COMMAND | 进程的命令名。                         |
 
-## 4.5. pstree  查看进程树
+## 5.5. pstree  查看进程树
 
 pstree 命令是以树形结构显示程序和进程之间的关系  
 
@@ -591,11 +727,11 @@ pstree 命令是以树形结构显示程序和进程之间的关系
 如果想知道某个用户都启动了哪些进程,使用 pstree 命令可以很容易实现,以 mysql 用户为例  
 `# pstree mysql`  
 
-##  4.6. lsof 列出进程正在调用或者打开的文件
+##  5.6. lsof 列出进程正在调用或者打开的文件
 `list opened files`的缩写   
 
 
-# 5. Linux 的服务管理
+# 6. Linux 的服务管理
 
 Linux 服务管理两种方式service和systemctl 
 
@@ -603,7 +739,7 @@ systemd是Linux系统**最新的初始化系统**(init),作用是提高系统的
 
 systemd对应的进程管理命令就是 `systemctl`
 
-## 5.1. service  
+## 6.1. service  
 
 service命令其实是去`/etc/init.d`目录下,去执行相关程序, 已经被淘汰
 
@@ -616,9 +752,9 @@ service redis start
 update-rc.d redis defaults
 ```
 
-## 5.2. systemctl
+## 6.2. systemctl
 
-### 5.2.1. 概念
+### 6.2.1. 概念
 
 systemctl命令兼容了service  
 
@@ -640,7 +776,7 @@ systemd 默认读取 `/etc/systemd/system `下的配置文件,该目录下的文
 代表四种`Unit`  
 
 
-### 5.2.2. 命令综述
+### 6.2.2. 命令综述
 
 `systemctl –-version`  查看版本  
 
@@ -677,7 +813,7 @@ systemctl 提供了子命令可以查看系统上的 unit,命令格式为:
 | mask      | 注销 unit,注销后你就无法启动这个 unit 了。                                |
 | unmask    | 取消对 unit 的注销。                                                      |
 
-### 5.2.3. status 命令
+### 6.2.3. status 命令
 
 执行 `systemctl status [unit]`   
 
@@ -693,7 +829,7 @@ systemctl 提供了子命令可以查看系统上的 unit,命令格式为:
   * active (waiting)：正在执行当中,不过还再等待其他的事件才能继续处理。 
 * 第四行的 Docs 提供了在线文档的地址。  
 
-### 5.2.4. 操作环境管理
+### 6.2.4. 操作环境管理
 通过指定 `--type=target` 就可以用 `systemctl list-units` 命令查看系统中默认有多少种 target
 
 | 操作环境          | 功能                                                                                                                                 |
@@ -717,20 +853,20 @@ systemctl 提供了子命令可以查看系统上的 unit,命令格式为:
 我们还可以在不重新启动的情况下切换不同的 target,比如从图形界面切换到纯文本的模式：
 `systemctl isolate multi-user.target`
 
-## 5.3. Unit的编写与设置
+## 6.3. Unit的编写与设置
 
-### 5.3.1. Unit的基本概念
+### 6.3.1. Unit的基本概念
 一般都会有  
 Unit小节: 描述,启动时间与条件等等  
 
-### 5.3.2. .service
+### 6.3.2. .service
 
 .service文件定义了一个服务,分为[Unit],[Service],[Install]三个小节
 
 `[Unit]` 段: 启动顺序与依赖关系   
 `[Service] `段: 启动行为,如何启动,启动类型  
 `[Install]` 段: 定义如何安装这个配置文件,即怎样做到开机启动  
-### 5.3.3. .mounnt
+### 6.3.3. .mounnt
 
 .mount文件定义了一个挂载点,[Mount]节点里配置了What(名称),Where(位置),Type(类型)三个数据项
 
@@ -742,15 +878,15 @@ Type=hugetlbfs
 等于执行以下命令  
 `mount -t hugetlbfs /dev/hugepages hugetlbfs`  
 
-### 5.3.4. .target
+### 6.3.4. .target
 
 .target定义了一些基础的组件,供.service文件调用
 
-### 5.3.5. .wants文件
+### 6.3.5. .wants文件
 
 `.wants`文件定义了要执行的文件集合,每次执行,`.wants`文件夹里面的文件都会执行  
 
-### 5.3.6. 编写开机启动rc.local
+### 6.3.6. 编写开机启动rc.local
 
 查看`/lib/systemd/system/rc-local.server`,默认会缺少`Install`段,显然这样配置是无效的  
 
@@ -784,10 +920,9 @@ exit 0
 $ ln -s /lib/systemd/system/rc.local.service /etc/systemd/system/
 ```
 
-# 6. Linux 的文件和目录管理
+# 7. Linux 的文件和磁盘
 
-
-## 6.1. 软硬链接文件 ln 命令
+## 7.1. 软硬链接文件 ln 命令
 
 
 **ext4 文件系统**
@@ -841,11 +976,7 @@ ln /root/cangls /tmp
 In -s /root/bols /tmp
 ```
 
-
-
-
-
-## 6.2. Linux 的文件系统
+## 7.2. Linux 的文件系统
 
 查看各种文件的情况, 大小等
 * ls 文件查看, 文件夹也会被当成文件, 因此无法衡量文件夹大小
@@ -858,7 +989,7 @@ In -s /root/bols /tmp
 | ----------- | ------------ |
 | -h          | 人类易读格式 |
 
-### 6.2.1. ls 文件情况查看
+### 7.2.1. ls 文件情况查看
 
 List information about the FILEs. 默认查看当前位置  
 
@@ -870,7 +1001,7 @@ List information about the FILEs. 默认查看当前位置
 | -l     | 长格式打印     |
 | -s     | 打印文件的大小 |
 
-### 6.2.2. du 目录情况查看
+### 7.2.2. du 目录情况查看
 
 `du [OPTION]... [FILE]...`  
 该命令默认会递归输出所有子文件  
@@ -882,7 +1013,7 @@ List information about the FILEs. 默认查看当前位置
 | -d     | 指定递归打印深度, -d 0 等同于 -s         |
 
 
-### 6.2.3. df 磁盘情况查看
+### 7.2.3. df 磁盘情况查看
 
 * df 用于显示系统中各文件系统的硬盘使用情况
 * 包括文件系统所在的硬盘分区的总容量, 已使用的容量, 剩余容量等
@@ -896,7 +1027,24 @@ List information about the FILEs. 默认查看当前位置
 | -T   | 显示该分区的文件系统名称；                                      |
 | -i   | 不用硬盘容量显示, 而是以含有 inode 的数量来显示。               |
 
-# 7. Linux 的用户管理
+
+### mount 挂载
+
+Linux 下所有硬件设备都必须挂载后才能使用, 区别是硬盘分区挂载被写入了系统启动脚本, 而其他设备(例如U盘等)需要手动挂载
+
+* `mount [-l|-h|-V]`    情报打印
+  * `l`     : 同时打印挂载设备的卷标
+
+
+* `mount -a [-fFnrsvw] [-t fstype] [-O optlist]`  自动挂载
+  * 重新读取 `/etc/fstab` 检查文件中有无疏漏被挂载的设备文件
+
+
+* `mount [-fnrsvw] [-t fstype] [-o options] device dir`   标准挂载
+  * `-t`    : 想要挂载的硬件的系统类型, 可以自动检测
+  * 
+
+# 8. Linux 的用户管理
 
 Linux 是多用户多任务操作系统, 换句话说, Linux 系统支持多个用户在同一时间内登陆, 不同用户可以执行不同的任务, 并且互不影响。  
 * 用户都有唯一的用户名和密码。在登录系统时, 只有正确输入用户名和密码, 才能进入系统和自己的主目录
@@ -905,11 +1053,11 @@ Linux 是多用户多任务操作系统, 换句话说, Linux 系统支持多个�
 
 Linux 系统中, 每个用户的 ID 细分为 2 种, 分别是用户 ID（User ID, 简称 UID）和组 ID Group ID, 简称 GID
 
-## 7.1. 相关文件
+## 8.1. /etc 里的用户配置文件
+
+### 8.1.1. /etc/passwd
 
 Linux 系统将所有用户的名称与 ID 的对应关系都存储在 `/etc/passwd`  
-
-### 7.1.1. /etc/passwd
 
 是系统用户配置文件, 存储了系统中所有用户的基本信息, 并且所有用户都可以对此文件执行读操作  
 
@@ -917,8 +1065,8 @@ Linux 系统将所有用户的名称与 ID 的对应关系都存储在 `/etc/pas
 系统用户无法用来登录系统, 但也不能删除, 因为一旦删除, 依赖这些用户运行的服务或程序就不能正常执行, 会导致系统问题。  
 
 
-信息格式, 每行用户信息都以 "：" 作为分隔符, 划分为 7 个字段:   
-`用户名：密码：UID（用户ID）：GID（初始组ID）：描述性信息：主目录：默认Shell`   
+信息格式, 每行用户信息都以 ":" 作为分隔符, 划分为 7 个字段:   
+`用户名:密码:UID（用户ID）:GID（初始组ID）:描述性信息:主目录:默认Shell`   
 * 用户名 就是一串代表用户身份的字符串 和 UID GID 进行匹配
 * 密码   "x" 表示此用户设有密码, 但不是真正的密码, 真正的密码保存在 `/etc/shadow`
 
@@ -950,7 +1098,7 @@ Shell 就是 Linux 的命令解释器, 是用户和 Linux 内核之间沟通的�
     * 禁止登陆 : lamp:x:502:502::/home/lamp:**/sbin/nologin**
     * 登录之后就只能修改自己的密码: lamp:x:502:502::/home/lamp:**/usr/bin/passwd**
 
-### 7.1.2. /etc/shadow
+### 8.1.2. /etc/shadow
 
 由于/etc/passwd 允许所有用户读取, 易导致用户密码泄露  
 因此 Linux 系统将用户的密码信息从 /etc/passwd 文件中分离出来, 并单独放到了此文件中  
@@ -959,7 +1107,7 @@ Shell 就是 Linux 的命令解释器, 是用户和 Linux 内核之间沟通的�
 * 用于存储 Linux 系统中用户的密码信息
 
 内容格式:  
-`用户名：加密密码：最后一次修改时间：最小修改时间间隔：密码有效期：密码需要变更前的警告天数：密码过期后的宽限时间：账号失效时间：保留字段`  
+`用户名:加密密码:最后一次修改时间:最小修改时间间隔:密码有效期:密码需要变更前的警告天数:密码过期后的宽限时间:账号失效时间:保留字段`  
 
 
 * 加密密码  : 加密后的密码。目前 Linux 的密码采用的是 SHA512 散列加密算法
@@ -978,19 +1126,46 @@ Shell 就是 Linux 的命令解释器, 是用户和 Linux 内核之间沟通的�
    2. 或者通过挂载根目录, 修改 /etc/shadow, 将账户的 root 密码清空的方法, 此方式可使用 root 无法密码即可登陆
 
 
-### 7.1.3. /etc/group
+### 8.1.3. /etc/group
 
-### 7.1.4. /etc/skel
+组说明文件里的字段较短, 只有四个, 依次是 `组名:密码:GID:该用户组中的用户列表`
+* 组名, 即GID对应的该组的名称, 唯一
+* 组密码, 组也是需要密码的 `x` 代表该组有密码, 真正的密码同用户密码文件 `/etc/shadow` 类似, 存放在 `etc/gshadow` 中
+  * 组密码主要用于很精细化的组管理员, 属于系统管理员的下级
+  * 用于超级管理员 root 可能比较忙碌的时候, 通过群组管理员来实现添加别的用户到自己该组里
+  * 目前已经完全不使用了
+* 组ID (GID), 与 `/etc/passwd` 中的第四个字段对应
+* 组中用户列表, 该字段只会记录该组的附加用户, 要查询某一个用户的初始组之能通过 `/etc/passwd` 查询组 GUI然后再对比该文件
 
-在创建一个新用户后, 你会发现, 该用户主目录并不是空目录  
-而是有 .bash_profile、.bashrc 等文件  
-这些文件都是从 /etc/skel 目录中自动复制过来的。  
-因此, 更改 /etc/skel 目录下的内容就可以改变新建用户默认主目录中的配置文件信息  
+
+`/etc/gshadow` 的格式是 `组名:加密密码:组管理员:组附加用户列表`
+* 类似于用户的密码文件
 
 
-## 7.2. 命令
+### 8.1.4. 默认配置信息
 
-### 7.2.1. useradd
+* `/etc/skel/` 默认用户配置信息目录
+  * 对于新用户后, 主目录中会自动创建一些 bash 配置文件, 包括: 
+  * `.bash_rc` `.profile` `bash_logout` 等 
+  * 这些文件都是从 `/etc/skel` 目录中自动复制过来的
+  * 即, 通过`/etc/skel` 目录下的内容可以改变新建用户默认主目录中的配置文件信息
+
+* `/etc/login.defs` : 默认用户密码属性
+  * 指定用户的默认设置
+  * 例如 UID 和 GID 的范围
+  * 用户的过期时间等
+
+## 8.2. 用户命令
+
+### 8.2.1. 用户信息查询
+
+* `users [FILE]` : 通过查询 FILE 的信息确定当前登录的用户名, 默认是 `/var/run/utmp` (即当前登录的用户信息会写在该文件里)
+* `groups [USERNAME]` : 查询某一个用户所属的全部组名, 默认是当前用户
+
+
+### 8.2.2. useradd 新建用户
+
+
 
 使用 useradd 命令新建用户 `useradd [选项] 用户名`  
 useradd 命令创建用户的过程, 其实就是修改了与用户相关的几个文件或目录  
@@ -1005,7 +1180,7 @@ useradd 命令创建用户的过程, 其实就是修改了与用户相关的几�
 5. 默认创建用户的主目录和邮箱
 6. 将 /etc/skel 目录中的配置文件复制到新用户的主目录中
 
-### 7.2.2. passwd 配置用户密码
+### 8.2.3. passwd 配置用户密码
 
 直接使用 `passwd`修改当前用户的密码  
 `passwd [选项] 用户名`: 高级功能大部分只有 root 用户可以用
@@ -1019,7 +1194,7 @@ useradd 命令创建用户的过程, 其实就是修改了与用户相关的几�
 - -i 天数 : shadow文件中各行密码的第 7 字段,设置密码失效日期
 
 
-## 7.3. 文件权限
+## 8.3. 文件权限
 
 每个文件都有自己的拥有者 ID 和群组 ID, 当显示文件属性时, 系统会根据 `/etc/passwd` 和 `/etc/group` 文件中的内容, 分别找到 UID 和 GID 对应的用户名和群组名, 然后显示出来  
 对任意一个文件（Linux下一切皆文件, 包括目录、CPU内存等设备） 使用 `ls -l` 可以查看文件的类型和权限
@@ -1035,17 +1210,15 @@ useradd 命令创建用户的过程, 其实就是修改了与用户相关的几�
 * `/var、/usr、/bin、/opt` 等常见文件夹及子目录, 几乎所有用户都能访问其中的文件和内容, 执行可执行程序, 但只有root用户和属主有写入的权限
 * 
 
-## 7.4. 软件安装
+## 8.4. 软件安装
 
 大部分软件默认安装路径是 `/usr/bin` 或 `/usr/local/bin`  
 普通用户没有目录的写权限, 于是提示无权限导致安装失败  
 
 
+# 9. 查找与匹配
 
-
-# 8. 查找与匹配
-
-## 8.1. 通配符
+## 9.1. 通配符
 要注意通配符与正则表达式的区别  
 简单的理解为通配符只有 `*,?,[],{}` 这4种, 而正则表达式复杂多了
 
@@ -1059,7 +1232,7 @@ useradd 命令创建用户的过程, 其实就是修改了与用户相关的几�
 | [!c1-c2]或[^c1-c2]    | 匹配不在c1-c2的任意字符                     | a[!0-9]b 如acb adb                                                                 |
 | {string1,string2,...} | 匹配 sring1 或 string2 (或更多)其一字符串   | a{abc,xyz,123}b 列出aabcb,axyzb,a123b                                              |
 
-## 8.2. find
+## 9.2. find
 
 find 命令功能非常强大,通常用来在 `特定的目录下` 搜索 `符合条件的文件`
 * `find [路径] -name "*.py"`  查找指定路径下扩展名是 .py 的文件,包括子目录
@@ -1077,7 +1250,7 @@ find 命令功能非常强大,通常用来在 `特定的目录下` 搜索 `符�
   * `{}` 代表 find 出来的结果
   * `grep -l log {}` : 子命令, 该命令的意思是查找文件是否含有 `log` 字符
 
-## 8.3. 字符查找 grep
+## 9.3. 字符查找 grep
 
  `grep `(global search regular expression(RE) and print out the line,全面搜索正则表达式并把行打印出来)  
 
@@ -1090,7 +1263,7 @@ find 命令功能非常强大,通常用来在 `特定的目录下` 搜索 `符�
 
 
 
-## 8.4. 正则表达式
+## 9.4. 正则表达式
 
 针对文件内容的文本过滤工具里,大都用到正则表达式,如vi,grep,awk,sed等  
 其他的一些编程语言,如C++（c regex,c++ regex,boost regex）,java,python等都***有自己的正则表达式库***.
@@ -1132,7 +1305,7 @@ find 命令功能非常强大,通常用来在 `特定的目录下` 搜索 `符�
 
 
 
-# 9. Shell基础  
+# 10. Shell基础  
 
 * shell 是脚本操作Linux的脚本语言
 * 是 Linux 运维工程师 OPS 的必备技能
@@ -1151,21 +1324,21 @@ shell 既是脚本编程语言, 也是一个连接用户和内核的软件, 作�
   * 大多情况下 bash 和 sh 行为一致, 但是仍有例外的区别
 
 
-## 9.1. shell 程序
+## 10.1. shell 程序
 
 学会精致的管理自己的 shell 程序可以大大提高工作效率
 
-### 9.1.1. 查看操作系统已安装的 shell
+### 10.1.1. 查看操作系统已安装的 shell
 
 shell 本身仅仅是一个程序, 因此有一些目录可以简单的查看系统里已安装的所有的 shell 程序
 
-1. `/echo $SHELL` 打印当前的默认 shell 程序, 即环境变量
+1. `echo $SHELL` 打印当前的默认 shell 程序, 即环境变量
 2. `/etc/shells` 是一个专有文本文件, 专门用于记录当前系统可用的 shell, 可以使用 cat 命令查看 
 
 * `/bin` 和 `/usr/bin` 是一般命令行的启动路径, shell 会放在这里
 * 在 流行的 linux 系统中, `/bin/sh` 一般已经是 `/bin/bash` 的符号链接
 
-### 9.1.2. 更改默认的 shell 程序
+### 10.1.2. 更改默认的 shell 程序
 
 `chsh` - change login shell
 * `chsh [options] [LOGIN]` 
@@ -1175,7 +1348,7 @@ shell 本身仅仅是一个程序, 因此有一些目录可以简单的查看系
   * `-R --root <CHROOT_DIR>` 将更改应用在参数的目录, 并使用参数目录下的配置文件
  
 
-### 9.1.3. shell 命令提示符
+### 10.1.3. shell 命令提示符
 
 登入进 linux 系统后会伴随着 shell 程序的启动
 * 看见命令提示符就意味着可以输入命令了
@@ -1218,7 +1391,7 @@ shell 对命令提示符的管理也是通过环境变量来操作的
 | `\[` | 控制码序列的开头                                                      |
 | `\]` | 控制码序列的结尾                                                      |
 
-### 9.1.4. shell 启动方式 4种
+### 10.1.4. shell 启动方式 4种
 
 根据 是否登录 和 是否交互 的组合可以区分出 4 种shell 的运行方式  
 
@@ -1238,7 +1411,7 @@ shell 对命令提示符的管理也是通过环境变量来操作的
 5. 桌面环境进入终端时, 为 交互式非登录
 
 
-### 9.1.5. shell 配置文件
+### 10.1.5. shell 配置文件
 
 Bash Shell 在启动时总要配置其运行环境
 * 初始化环境变量
@@ -1253,8 +1426,7 @@ Bash Shell 在启动时总要配置其运行环境
 
 非登录式 Shell 的加载流程
 1. 直接主动执行 `~/.bashrc`
-  * 会嵌套加载 `/etc/bashrc`
-2. `/etc/bashrc`
+2. 会嵌套加载 `/etc/bashrc`
   * 为每一个运行bash shell的用户执行此文件
   * 当bash shell被打开时,该文件被读取
   * 有些linux版本中的/etc目录下已经没有了该
@@ -1288,7 +1460,7 @@ Bash Shell 在启动时总要配置其运行环境
 
 
 
-### 9.1.6. 环境变量
+### 10.1.6. 环境变量
 
 * 配置linux中的系统环境
 * 所谓环境就是系统在启动的时候根据各种配置文件自动载入的变量
@@ -1329,7 +1501,7 @@ PATH 的载入
    * 此时可以加入 `PATH=$PATH:$HOME/addon`
    * 甚至是对命令提示符的修改 `PS1="[c.biancheng.net]\$ "`
 
-### 9.1.7. Shell 内建命令
+### 10.1.7. Shell 内建命令
 
 所谓 Shell 内建命令, 就是由 Bash 作为软件自身提供的命令, 而不是文件系统中的某个可执行文件
 
@@ -1341,7 +1513,7 @@ PATH 的载入
 
 [完整内建命令表](http://c.biancheng.net/view/1136.html)
 
-## 9.2. source 命令 
+## 10.2. source 命令 
 
 source命令也称为“点命令”,也就是一个点符号（.）,是bash的内部命令。  
 功能：
@@ -1360,7 +1532,7 @@ source命令也称为“点命令”,也就是一个点符号（.）,是bash的�
 
 
 
-## 9.3. Ubuntu开机自动脚本
+## 10.3. Ubuntu开机自动脚本
 
 * Ubuntu18.04以后的版本 默认是没有 /etc/rc.local 这个文件的,需要自己创建  
 * Ubuntu执行开机任务的流程
@@ -1392,7 +1564,7 @@ GuessMainPID=no
 
 
 
-## 9.4. shell 脚本编程
+## 10.4. shell 脚本编程
 
 
 * 脚本第一行需要写 `#!/bin/sh`, shell脚本是用 `#` 来作为注释,但是对 `#!/bin/sh`不是
@@ -1405,7 +1577,7 @@ GuessMainPID=no
 
 * 也可以将脚本文件作为参数传给 bash 命令 `bash code.sh`
 
-### 9.4.1. shell 变量
+### 10.4.1. shell 变量
 
 * 变量是任何一种编程语言都必不可少的组成部分
 * 脚本语言在定义变量时通常不需要指明类型
@@ -1435,7 +1607,7 @@ readonly myUrl
 unset variable_name
 ```
 
-#### 9.4.1.1. 变量的作用域
+#### 10.4.1.1. 变量的作用域
 
 Shell 变量的作用域可以分为三种: 
 1. 只能在函数内部使用, 这叫做局部变量（local variable）
@@ -1463,7 +1635,7 @@ export a # 在定义变量 a 以后再将它导出为环境变量
 export a=22 # 在定义的同时导出为环境变量
 
 ```
-#### 9.4.1.2. 命令替换 
+#### 10.4.1.2. 命令替换 
 
 将命令的输出结果赋值给某个变量
 
@@ -1492,7 +1664,7 @@ echo "$LSL"  #使用引号包围
 
 ```
 
-#### 9.4.1.3. 特殊变量
+#### 10.4.1.3. 特殊变量
 
 特殊变量种类不是很多
 
@@ -1526,7 +1698,7 @@ echo "$LSL"  #使用引号包围
   * Shell 函数中的 return 关键字用来表示函数的退出状态
 
 
-#### 9.4.1.4. shell 字符串
+#### 10.4.1.4. shell 字符串
 
 三种引号的区别
 * 由单引号' '包围的字符串
@@ -1592,7 +1764,7 @@ echo ${url%%/*}  #结果为 http:
 
 
 ```
-#### 9.4.1.5. shell 数组
+#### 10.4.1.5. shell 数组
 
 * 数组的定义使用括号 `( )`
 * 获取数组中的元素要使用下标 `[ ]`
@@ -1632,7 +1804,7 @@ echo ${#nums[10]}
 
 ```
 
-### 9.4.2. shell 的计算
+### 10.4.2. shell 的计算
 
 相比于变量的定义:  所有变量的定义都是字符串形式存储, 无论有没有引号  
 在需要计算的时候需要有特殊的语句来执行 : 数值计算 / 逻辑判断  
@@ -1657,11 +1829,11 @@ c=((a+b))
 
 ```
 
-### 9.4.3. shell 程序逻辑
+### 10.4.3. shell 程序逻辑
 
 shell 也有通用程序的多种选择/循环分支  
 
-#### 9.4.3.1. 选择语句 if 
+#### 10.4.3.1. 选择语句 if 
 
 * if else elif 语句
   * fi 用于结构闭合
@@ -1691,7 +1863,7 @@ if  condition;  then
 fi
 
 ```
-#### 9.4.3.2. 选择语句 case
+#### 10.4.3.2. 选择语句 case
 
 shell 也有对应的 switch 语句
 * 关键字 `case in` 进入选择结构
@@ -1727,7 +1899,7 @@ case expression in
         statementn
 esac
 ```
-#### 9.4.3.3. for 循环
+#### 10.4.3.3. for 循环
 
 * do done 是关键字, done 用来结束语句结构
 * 支持两种风格
@@ -1766,7 +1938,7 @@ done
 echo "The sum is: $sum"
 ```
 
-### 9.4.4. shell 函数
+### 10.4.4. shell 函数
 
 shell 的函数定义没有太大区别
 * function 是关键字, 但是可以省略
@@ -1793,7 +1965,7 @@ name
 name param1 param2 param3
 ```
 
-# 10. SELinux   Security Enhanced Linux
+# 11. SELinux   Security Enhanced Linux
 
 由美国国家安全局 NSA 联合其他安全机构开发的, 用于增强传统Linux 系统的安全性, 解决例如 root 权限过高等问题
 * SELinux 在2000年以 GPL 形式开源
@@ -1813,7 +1985,7 @@ name param1 param2 param3
 * 即使应用了 SELinux, Linux 原本的 rwx 权限也在生效, 需要同时满足才能被执行 (DAC优先生效)
 
 
-## 10.1. SELinux 的构成
+## 11.1. SELinux 的构成
 
 1. 主体 (Subject): 需要访问资源的进程
     * DAC 模式 : 用户->命令-> 进程 , 进程的权限=用户的权限
@@ -1827,7 +1999,7 @@ name param1 param2 param3
     * 根据策略中的规则来检查每次访问时, 进程和资源的安全上下文是否`匹配`
     * 具体控制 SELinux 策略的时候, 大部分都是修改 进程/资源的 上下文, 使其对应的访问匹配/不匹配, 很少去在规则层面更改
 
-## 10.2. SELinux 启用
+## 11.2. SELinux 启用
 
 SELinux 目前虽然 SELinux 被整合到了内核中, 但是管理工具需要手动安装
 
@@ -1846,7 +2018,7 @@ SELinux 的配置命令
 * `sestatus`   : 查看较为详细的 SELinux 的状态, 包括 config 文件中 SELinux 的配置设定
 * `setenforce <0/1>` : 在 permissive `0`, 和 enforce `1` 状态中切换, 不能用该命令关闭 SELinux
 
-## 10.3. 上下文
+## 11.3. 上下文
 
 通过 `Z` 选项来执行上下文相关的显示
 
@@ -1868,141 +2040,3 @@ SELinux 的配置命令
 * `-t` 类型 type
 
 
-# 11. Linux文件目录解释
-
-Linux 基金会的 FHS标准 制定了文件目录的标准  
-`（Filesystem Hierarchy Standard）`  
-
-规定了 Linux 系统中**所有**一级目录以及部分二级目录（/usr 和 /var）的用途  
-
-## 11.1. 基本目录
-
-### 11.1.1. 根目录 /
-
-```shell
-
-# 存放系统命令,所有用户都可以执行,包括单用户模式  
-# 放置一些系统的必备执行档例如： cat、cp、chmod df、dmesg、gzip、kill、ls、mkdir、more、mount、rm、su、tar等
-/bin/
-
-# 保存与系统环境设置相关的命令
-# 主要放置一些系统管理的必备程式例如： cfdisk、dhcpcd、dump、e2fsck、fdisk、halt、ifconfig、ifup、 ifdown、init、insmod、lilo、lsmod、mke2fs、modprobe、quotacheck、reboot、rmmod、 runlevel、shutdown等
-/sbin/
-
-
-# 系统启动目录, 包括内核文件和启动引导程序 grub
-/boot/
-
-# /sys/class 是由kernel在运行时导出的,目的是通过文件系统暴露出硬件的层级关系
-/sys/class
-# 使用示例 查看网络接口的名称
-$ ls /sys/class/net
-
-
-# 配置文件 服务的启动脚本  采用默认安装方式的服务配置文件在此之中 
-/etc/
-
-# 主目录
-/home/
-
-# *系统* 调用的函数库保存位置 
-/lib/
-
-# 虽然系统准备了三个默认挂载目录 /media/、/mnt/、/misc/,但是到底在哪个目录中挂载什么设备可以由管理员自己决定
-# 挂载媒体设备, 如软盘和光盘
-/media/
-# 挂载目录, 如U盘,移动硬盘,*其他操作系统的分区*
-/mnt/
-# 挂载NFS服务的共享目录  
-/misc/
-
-# root用户的主目录,和用户的/home/123/类似
-/root/
-
-# 服务数据目录,保存服务启动后的数据
-/srv/
-
-```
-### 11.1.2. 软件目录 /usr
-
-注意不是 user, 全称为 `Unix Software Resource`  
-FHS 建议所有开发者,应把软件产品的数据`合理的放置在 /usr 目录下的各子目录中`  
-而不是为他们的产品创建单独的目录  
-类似 Windows 系统中` C:\Windows\ + C:\Program files\` 两个目录的综合体
-
-```shell
-# 存放系统命令, 除了单用户以外的所有用户可以执行
-# 主要放置一些应用软体工具的必备执行档例如： c++、g++、gcc、chdrv、diff、dig、du、eject、elm、free、gnome*、 gzip、htpasswd、kfm、ktop、last、less、locale、m4、make、man、mcopy、ncftp、 newaliases、nslookup passwd、quota、smb*、wget等
-/usr/bin/
-
-# 同样是根文件系统不需要的系统管理命令,只有root可以执行
-# 放置一些网路管理的必备程式例如： dhcpd、httpd、imap、in.*d、inetd、lpd、named、netconfig、nmbd、samba、sendmail、squid、swap、tcpd、tcpdump等
-/usr/sbin/
-
-# 应用程序调用的函数库位置
-/usr/lib/
-
-# 图形界面系统保存位置
-/usr/XllR6/ 
-
-#  手工安装的软件保存位置。我们一般建议源码包软件安装在这个位置
-/usr/local/
-
-# 应用程序的资源文件保存位置,如帮助文档、说明文档和字体目录
-/usr/share/
-
-# 我们手工下载的源码包和内核源码包都可以保存到这里
-# 不过笔者更习惯把手工下载的源码包保存到 /usr/local/src/ 目录中
-# 把内核源码保存到 /usr/src/linux/ 目录中
-/usr/src/
-
-# C/C++ 等编程语言头文件的放置目录
-/usr/include/
-
-```
-
-### 11.1.3. /var 目录 
-
-目录用于存储动态数据,例如缓存、日志文件、软件运行过程中产生的文件等  
-
-## 11.2. /dev/  设备文件  
-
-* /dev 下的文件是真实的设备 由UDEV在运行时创建
-* udev 是Linux kernel 2.6系列的设备管理器, 它主要的功能是管理/dev目录底下的设备节点
-
-
-### 11.2.1. /dev/null 丢弃
-
-只有一个用途, 就是丢弃各种输出流
-* 使用if来转储无用的数据, 在其中输出, 这样它就不会占用系统内存和处理能力
-* 甚至可以通过将无用的文件直接移动到 /dev/null/ 来删除它们
-* 根据需要, 将 stderr 流 或者 stdout 流重定向至这里, 可以减少 debug 的时间
-
-设备特点:
-* 这个文件的大小是0字节大小, 所有人都有读写权限, 没有执行权限
-* 由于它没有执行权限, 不是一个可执行文件, 所以不能使用管道符 | 来接 /dev/null
-* 它会吸收任何输入, 并且不返回任何内容,   
-* 如果你使用 cat 去读取这个文件, 那么它只会返回文件终点
-
-###  11.2.2. 存储
-
-/dev/sda 可能是您的主硬盘驱动器
-
-/dev/sdb 可能是您现在正在使用的笔记本驱动器的文件
-
-## 11.3. /etc/  Editable Text Configuration
-
-FHS规定用来放配置文件
-
-### 11.3.1. /etc/resolv.conf - resolver configuration file
-
-The file is designed to be human readable and contains a list of keywords with values that provide various types of resolver information.  
-
-* software  : resolver
-* default situation (this file does not exist):
-  *  only the name server on the local machine will be queried
-  *  and the search list contains the local domain name determined from the hostname.
-
-options :
-* nameserver  : Name server IP address
-* search      : Search list for host-name lookup
