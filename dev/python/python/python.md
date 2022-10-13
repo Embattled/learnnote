@@ -130,6 +130,8 @@
     - [12.2.1. venv](#1221-venv)
     - [12.2.2. virtualenv](#1222-virtualenv)
     - [12.2.3. virtualenvwrapper](#1223-virtualenvwrapper)
+- [python 解释器](#python-解释器)
+  - [python Environment variables](#python-environment-variables)
 
 # 1. Python 的背景
 
@@ -2605,3 +2607,12 @@ pip install django==2.0
 - cdvirtualenv          : 导航到当前激活的虚拟环境的目录中, 比如说这样您就能够浏览它的 site-packages
 - cdsitepackages        : 和上面的类似, 但是是直接进入到 site-packages 目录中
 - lssitepackages        : 显示 site-packages 目录中的内容
+
+
+# python 解释器
+
+此节用于学习 python CLI 以及解释器的各种环境配置
+
+## python Environment variables
+
+会对 python 解释器起作用的环境变量  

@@ -1,6 +1,12 @@
 # 1. Pytorch
 
+Pytorch 基础操作 
+
 ## 1.1. install 
+
+官方有很方便使用的 command 自动生成交互  
+https://pytorch.org/get-started/locally/
+
 
 可通过 conda 或者 pip 方便安装
 

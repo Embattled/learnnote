@@ -1,28 +1,37 @@
 # 1. scikit-image
 
 A collection of algorithms for image processing.  
-scikit-的图像处理相关库.  
+
+scikit-的图像处理相关库, 内容比较简单实用. 绝大多数降噪和 
 
 Submodules:
-* skimage
-    * color
-    * data
-    * draw
-    * exposure
-    * feature
-    * filters
-    * future
-    * graph
-    * io
-    * measure
-    * metrics
-    * morphology
-    * registration
-    * restoration
-    * segmentation
-    * transform
-    * util
-    * viewer
+* color
+* data
+* draw
+* exposure
+* feature       : 各种图像特征提取器
+* filters       :  各种滤波实现
+* future
+* graph
+* io
+* measure
+* metrics       : 各种图像的评价指标
+* morphology
+* registration
+* restoration   : 图像修复算法实现, 比起单纯的 filter 来说更加注重对图像的修复
+* segmentation
+* transform
+* util
+* viewer
+
+## 全局参数
+
+因为都是面向图像的处理, 所属于不同子包的函数有相同的参数, 置于此处
+
+
+| 参数           | 意义                                                                                    |
+| -------------- | --------------------------------------------------------------------------------------- |
+| `channel_axis` | 需要手动输入来表示颜色 channel 是哪一个 axis, 0 or 2, 默认会把图片当作 grayscale 来处理 |
 
 # 2. io
 
@@ -244,3 +253,59 @@ hog_image   : (M, N) ndarray, optional
 
 * clip  : bool , 用于防止添加噪声后的数据范围越界
 * seed  : int, 随机化的种子, 用于数据再现
+
+# restoration 图片复原
+
+图像修复算法实现, 比起单纯的 filter 来说更加注重对图像的修复, 例如反卷积, 具体的降噪算法等
+`skimage.restoration.*`
+
+## Tools 
+
+基于小波域的高斯噪声标准差测量
+* `estimate_sigma(image, average_sigmas=False, multichannel=False, *, channel_axis=None)`
+  * average_sigmas : bool, 如果 True 的话则会平均所有通道的 sigma, False 的话则会返回 List 表示每个通道各自的 sigma
+  * channel_axis
+
+
+## 降噪方法
+
+小波域阈值降噪
+* `denoise_wavelet(image, sigma=None, wavelet='db1', mode='soft', wavelet_levels=None, convert2ycbcr=False, method='BayesShrink', rescale_sigma=True, *, channel_axis=None)`
+  * sigma : 用于指定小波域 shrinkage 的具体阈值, 默认值 None 代表自动测定. sigma 代表噪声的标准差  
+  * wavelet : 小波变换的种类, 主流的有 `{'db2', 'haar', 'sym9'}`, 完整的可以参照 pywt.wavelist
+  * mode : 硬阈值还是软阈值, 在 AWGN 的情况下 soft 可以找到图像的最佳近似值
+  * wavelet_levels : The number of wavelet decomposition levels. 默认值是 maximum possible decomposition levels - 3
+  * convert2ycbcr : bool, 是否在 YCbCr 进行降噪, 能够取得比 RGB 更好的效果
+  * method: `{BayesShrink, VisuShrink}` , 默认是前者, 会对每一个 wavelet subband 计算一个阈值. VisuShrink 则是使用一个通用阈值  
+  * rescale_sigma : True, 如果图像在内部被缩放, 则用户提供的 sigma 也会被缩放  
+
+
+
+# filter 图片滤波  
+
+
+
+# metrics  图片评价指标
+
+图片评价指标  `skimage.metrics.*`
+
+* PSNR Peak Signal Noise Ratio
+  * `peak_signal_noise_ratio(image_true, image_test, *, data_range=None)`
+  * data_range : 数值最小和最大之间的差值, 即 2^bitwidth-1, 默认会根据数据的 dtype 来确定
+
+* MSE Mean Squared Error
+  * `mean_squared_error(image0, image1)`
+  * 简单的计算
+
+* SSIM Structural Similarity
+  * `structural_similarity(im1, im2, *, win_size=None, gradient=False, data_range=None, channel_axis=None, multichannel=False, gaussian_weights=False, full=False, **kwargs)`
+  * win_size : sliding window 的边长, 必须是奇数. 如果 gaussian_weights=True, 则该参数被无视, 并且具体的 win_size 会根据 sigma 来确定
+  * data_range : 同上, 2^bitwidth-1
+  * gaussian_weights : 如果是 True, 那么 patch 将会加权的计算 mean 和 variance
+  * gradient : 是否返回 im2 的 gradient
+  * full : 是否返回全图的 SSIM, 一般参考意义不大
+  * 其他的参数
+    * use_sample_covariance : 是否在计算 cov 的时候添加 1 的自由度, 即 除以 N-1
+    * K1 : SSIM 的常数
+    * K2 : SSIM 的常数
+    * sigma : gaussian_weight 的方差

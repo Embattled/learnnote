@@ -116,11 +116,11 @@ TeX Live includes executables for TeX, LaTeX2e, ConTeXt, Metafont, MetaPost, Bib
 2. 大约7000mb空间, 一个小时时间
 
 配置环境变量
-
+```sh
 PATH=/usr/local/texlive/2020/bin/i386-linux:$PATH; export PATH
 MANPATH=/usr/local/texlive/2020/texmf-dist/doc/man:$MANPATH; export MANPATH
 INFOPATH=/usr/local/texlive/2020/texmf-dist/doc/info:$INFOPATH; export INFOPATH
-
+```
 ### 1.2.2. tlmgr  TexLive的管理程序
 
 管理安装后的系统: 
@@ -285,10 +285,13 @@ p系列(中日韩)
 | 不等于       | \ne                  | $\ne$      |
 | 约等于       | \approx              | $\approx$  |
 | 波浪号, 相关 | \sim                 | $\sim$     |
+| 原型         | \propto              | $\propto$  |
 | 全等         | \equiv               | $\equiv$   |
 | 属于         | \in                  | $\in$      |
 | 存在         | \exists \exist       | $\exists$  |
 | 不存在       | \nexist \nexists     | $\nexists$ |
+| 全部         | \forall              | $\forall$  |
+逼近, 箭头|\to|$\to$
 
 ## 2.1. 基础数学commands
 
@@ -318,12 +321,14 @@ p系列(中日韩)
 ### 2.1.2. 大运算符 范围运算符
 
 范围运算符号, 基本上表示范围的算是都是直接用上下标方法来输入
-| 名称     | 代码        | 显示               |
-| -------- | ----------- | ------------------ |
-| 求积分   | \int        | $\int_{a}^{b}x^2$  |
-| 多重积分 | \多个i + nt | $\iiint$           |
-| 求和     | \sum        | $\sum_{n=1}^Na_n$  |
-| 求积     | \prod       | $\prod_{n=1}^Na_n$ |
+| 名称         | 代码        | 显示               |
+| ------------ | ----------- | ------------------ |
+| 求积分       | \int        | $\int_{a}^{b}x^2$  |
+| 多重积分     | \多个i + nt | $\iiint$           |
+| 曲线积分     | \oint       | $\oint$            |
+| 多重曲线积分 | \oiint      | $\oiint$           |
+| 求和         | \sum        | $\sum_{n=1}^Na_n$  |
+| 求积         | \prod       | $\prod_{n=1}^Na_n$ |
 
 
 ### 2.1.3. 特殊运算
@@ -332,7 +337,7 @@ p系列(中日韩)
 | 导数           | \nabla{f}   | $\nabla{f}$               |
 | 微分           | \partial{y} | $\partial{y}$             |
 | 求极限         | \lim        | $\lim_{x\rArr1}x^2$       |
-| 文字置于正下方 | underset{}  | $\underset{x\to 0}{\lim}$ |
+| 文字置于正下方 | underset{under}{upper}  | $\underset{x\to 0}{\lim}$ |
 
 
 
@@ -384,12 +389,27 @@ p系列(中日韩)
 1. align
 2. equation   : 最基础
 3. eqnarray
+4. gather
 
 ### 2.3.1. equation
 
 * equation 是最一般的公式环境, 表示一个公式, 默认表示一个单行的公式
 * 可以通过内嵌其他环境进行拓展, 例如对齐环境
-  
+$$\begin{equation*}
+	\begin{split}
+	\cos 2x &= \cos^2 x - \sin^2 x\\
+	\end{split}
+\end{equation*}
+$$
+
+$$
+\begin{equation*}
+	D(x) = \begin{cases}
+            0, &\text{如果} x \in \mathbb{R} \setminus \mathbb{Q} \\
+            1, an	
+         \end{cases}
+         %\text是为了在数学公式中处理中文
+\end{equation*}$$
 ```tex
 \begin{equation}
 	\begin{split}
@@ -414,7 +434,7 @@ p系列(中日韩)
 * 每一行都是独立的公式, 都会独立的编号
 * `&` 分割出来的单元为单位进行对齐, 成为组, 每个组都可以指定特定排版, 相当于表格的列
 
-```
+```tex
 \begin{align*}
     f(x)  &= (x+a)(x+b)         \\
           &= x^2 + (a+b)x + ab
@@ -511,6 +531,7 @@ https://ftp.yz.yamagata-u.ac.jp/pub/CTAN/macros/latex/contrib/comment/comment.pd
 * 以此为基准来控制各种长度的表如下:
 * 该表中的命令为 Mathematical expression
 * 对应的命令 command 语句为  `\setlength{ \textwidth }{ 数值 }`
+
 | 模块           | 命令            | 功能                                                                                 |
 | -------------- | --------------- | ------------------------------------------------------------------------------------ |
 | 文本           | \textheight     | Height of main texts without header and footer                                       |

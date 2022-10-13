@@ -1,4 +1,9 @@
-# 1. Tmux
+# 1. 终端复用器
+
+tmux, screen, byobu, nohup
+
+
+# 2. Tmux
 
 * 一个终端复用器 terminal multiplexer  
 * 类似的还有 GNU Screen, Tmux与之功能类似, 但是普遍认为 Tmux 更强大
@@ -15,7 +20,7 @@
 * windows     : attach 到一个 session, 产生一个 节目
 * pane        : 由一个 windows 分割而来
 
-## 1.1. 基本用法
+## 2.1. 基本用法
 
 * 基本操作
   * 使用 `tmux` 即可进入 Tmux 窗口 `Ctrl+d` 或者输入 `exit` 推出 Tmux
@@ -23,8 +28,8 @@
 * 查看当前所有会话
   * `tmux ls` 和 `Ctrl+b s`可以查看当前所有的 tmux 会话
 
-## 1.2. 会话 session 
-### 1.2.1. 会话 session 管理
+## 2.2. 会话 session 
+### 2.2.1. 会话 session 管理
 
 * 输入 tmux 后启动的窗口是编号 0, 第二个窗口是编号 1
 * 这些窗口对应的会话就是 0, 1 会话
@@ -46,7 +51,7 @@
    * `tmux kill-session -a -t <id or name>` 结束除了指定会话以外的所有会话  
     
 
-### 1.2.2. 会话分离与接入
+### 2.2.2. 会话分离与接入
 
 1. `detach` 用于分离当前会话 (detach-client)
    * 输入后会立刻退出当前 tmux 窗口, 但是会话仍会在后台保持
@@ -61,11 +66,15 @@
    * `tmux switch -t <id or name>` 直接切换到另一个会话
 
 
-## 1.3. 窗格 (pane)
+## 2.3. 窗口管理 (windows)
+
+
+
+## 2.4. 窗格 (pane)
 
 使用窗格(pane)功能即可在终端中同时运行多个命令  
 
-### pane 管理
+### 2.4.1. pane 管理
 
 1. `splitw` 窗格划分 (split-windows)
    * `split-window [-bdfhIvP] [-c start-directory] [-e environment] [-l size | -p percentage] [-t target-pane] [shell-command] [-F format]`
@@ -81,11 +90,7 @@
   * `select-pane [-DdeLlMmRU] [-T title] [-t target-pane]`
   * `tmux swap-pane -UDLR`
   
-## 1.4. 窗口操作
-
-tmux 允许新建多个窗口  
-
-## 1.5. 快捷键总结
+## 2.5. 快捷键总结
 
 总结 Ctrl+b 模式的快捷键  
 
@@ -108,7 +113,7 @@ tmux 允许新建多个窗口
 * `{ }` : 当前窗格与上/下一个窗格交换位置 
 
 
-# 2. Windows Terminal
+# 3. Windows Terminal
 
 wt.exe  
 
@@ -117,7 +122,7 @@ wt.exe
 * Alt   + Enter     : 全屏显示
 * Ctrl  + ,         : 打开 setting.json
 
-## 2.1. 窗口分割操作
+## 3.1. 窗口分割操作
 
 基于当前光标的窗口进行分割 (新建)
 * shift + Alt + `-` 水平

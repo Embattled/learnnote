@@ -1162,7 +1162,6 @@ Shell 就是 Linux 的命令解释器, 是用户和 Linux 内核之间沟通的�
 * `users [FILE]` : 通过查询 FILE 的信息确定当前登录的用户名, 默认是 `/var/run/utmp` (即当前登录的用户信息会写在该文件里)
 * `groups [USERNAME]` : 查询某一个用户所属的全部组名, 默认是当前用户
 
-
 ### 8.2.2. useradd 新建用户
 
 

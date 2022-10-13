@@ -1,8 +1,11 @@
 - [1. 数据处理pandas包](#1-数据处理pandas包)
 - [2. IO 输入输出](#2-io-输入输出)
-  - [2.1. read_csv](#21-read_csv)
-  - [others](#others)
-  - [2.2. csv写入](#22-csv写入)
+  - [Flat file](#flat-file)
+    - [2.1. read_csv](#21-read_csv)
+  - [Excel](#excel)
+    - [读取](#读取)
+  - [2.2. others](#22-others)
+  - [2.3. csv写入](#23-csv写入)
 - [3. Series](#3-series)
   - [3.1. creation](#31-creation)
   - [3.2. 操纵数据](#32-操纵数据)
@@ -74,7 +77,7 @@ pandas 中的主要数据结构被实现为以下两类：
 2. DataFrame，您可以将它想象成一个关系型数据表格，其中包含多个行和已命名的列。
 3. DataFrame 中包含一个或多个 Series，每个 Series 均有一个名称。
 
-
+这里的笔记目录完全参照 pandas 的官网 API reference
 
 # 2. IO 输入输出
 
@@ -82,7 +85,15 @@ pandas 中的主要数据结构被实现为以下两类：
   * Pandas 包中提供的读写函数都是非常高层次的函数
   * 支持了多种格式
 
-## 2.1. read_csv
+按照文件的分类
+
+## Flat file
+
+平铺数据的文件, 类似于 txt
+
+
+
+### 2.1. read_csv
 
 * `read_csv(filepath_or_buffer[, sep, …])`
 * read_csv 是最基础的读取函数, 拥有巨多的参数
@@ -111,7 +122,17 @@ pandas 中的主要数据结构被实现为以下两类：
    * quotechar:
    * doublequote:
 
-## others
+## Excel 
+
+微软标准Excel文件读取
+
+### 读取
+
+`pandas.read_excel(**args 参数太多了)`
+* 
+
+
+## 2.2. others
 最常用的部分
 1. `read_table(filepath_or_buffer[, sep, …])`
       Read general delimited file into DataFrame.
@@ -142,7 +163,7 @@ cars=pd.read_csv("cars.csv",sep=';',index_col='Car',names=name)
 
 
 ```
-## 2.2. csv写入
+## 2.3. csv写入
 
   
 ```py
@@ -207,7 +228,6 @@ population.apply(lambda val: val > 1000000)
 
 pandas最核心的数据类型, 由任意个 Series 和其名称组成   
 可以理解为 spreadsheet 或者 SQL 表  
-
 
 ## 4.1. 创建DF Constructor
 

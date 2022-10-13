@@ -47,6 +47,10 @@ Opencv4, Main Modules: 除此之外还有 other
 14. `stitching`.     Images stitching
 15. `gapi`.          Graph API* 
 
+
+Extra modules: 拓展模组
+* `ximgproc`. 		Extended Image Processing
+
 ## 1.2. opencv C++
 
 ### 1.2.1. API Concepts 
@@ -102,11 +106,14 @@ cmake -DCMAKE_INSTALL_PREFIX=$HOME/.local
   * 代码易读
   * 实际的执行计算在后台仍然是C++实现的
 
+安装:
+* `pip install opencv-python` 
+* `pip install opencv-contrib-python`
+
 依赖库:
 * Numpy. OpenCV-Python makes use of Numpy. And OpenCV-Python requires only Numpy.
 * All the OpenCV array structures are converted to and from Numpy arrays. 
 * This also makes it easier to integrate with other libraries that use Numpy. such as `SciPy` and `Matplotlib`
-
 
 
 opencv-python 的 API 都定义在了 cv2 包中, 为了保证代码的可执行性  
@@ -119,8 +126,9 @@ opencv-python 的 API 都定义在了 cv2 包中, 为了保证代码的可执行
 定义了 OpenCV 中最核心的类 (图像), 以及一些对于 array 的数学上的操作 
 * 有些图像处理的功能可能没有定义在图像部分, 而是在 array 对象的更原始的层面里实现了
 
+## Basic structures OpenCV 的基础数据结构
 
-## 2.1. mat  core/mat.hpp
+### 2.1. mat  core/mat.hpp
 
 同 numpy 一样, opencv并没有特地的图片类, 而是用矩阵来表示 -> `cv::Mat`  
 
@@ -154,6 +162,20 @@ Python:
   * alpha , beta 分别是 src1 src2 的透明度通道
   * gamma 是最后的标量
   * 由此可见对于 RGBA 图像, 需要先将 alpha 通道独立出来
+
+### mixChannels 通道重排列
+
+`mixChannels()`  将 src 指定的通道拷贝到 dst 指定的通道里 
+* 非常 tools 的函数
+* 很多其他函数就是基于该函数实现的 partial cases of `cv::mixChannels`.
+  * `cv::split`
+  * `cv::merge`
+  * `cv::extractChannel`
+  * `cv::insertChannel`
+  * some forms of `cv::cvtColor`  
+
+* `fromTo` : 一个一维数列, 按着拷贝顺序存储通道index, `s1,d1,s2,d2...`
+
 
 # 3. imgcodecs  Image file reading and writing 
 
@@ -271,6 +293,11 @@ Python:
 * code	: 转换模式
 * dstCn	: dst图像的通道数. 一般置零用来自动判定
 
+注意:
+* 该函数是支持输入图像是小数格式的 (0,1) , 在默写转换模式下甚至推荐使用小数格式
+  * 对于 Luv 转换 e.g. COLOR_BGR2Luv , 是应该使用标准化来将图像放到 (0,1) 中的
+* OpenCV 只支持32 bit 小数, 即单精度, 因此对于 numpy 来说不要使用 float64
+
 
 ### 4.1.2. ColorConversionCodes
 
@@ -311,7 +338,6 @@ Python:
 平滑图片, 即 smoothing, 常被用来:
 * reduce noise
 
-
 * `cv.blur()`				: 均值滤波
 * `cv.GaussianBlur()`		: 高斯滤波
 * `cv.medianBlur()`			: 中值滤波
@@ -323,6 +349,13 @@ Python:
   * Sigma values: CV里两个域核应该都是高斯函数, 推荐范围是 (10~150)
   * d : Large filters (d > 5) are very slow, so it is recommended to use d=5 for real-time applications, and perhaps d=9 for offline applications that need heavy noise filtering.
 
+
+* `cv::boxFilter()` : 均值盒滤波
+  * call `blur(src, dst, ksize, anchor, borderType)` 
+  * is equivalent to `boxFilter(src, dst, src.type(), ksize, anchor, true, borderType)`.
+  * 其中的参数 `bool normalize` 用于指定滤波核是否经过归一化, 如果是 true 的话就等同于 blur
+  * 如果 normalize 是 false 的话, 相当于计算了各个位置上的 窗口核, 主要用于计算其他 Filter 的中间量
+  * 因此该函数主要用于辅助别的函数实现
 
 ### 4.2.2. Morphological Transformation 形态学变化
 
@@ -749,6 +782,18 @@ cv.setWindowProperty(	winname, prop_id, prop_value	) -> 	None
 ```
 ### 5.3.1. cv::WindowFlags 创建窗口时候的 flag
 
+Flags for cv::namedWindow  枚举类型
+
+| 代码                | 功能                                             |
+| ------------------- | ------------------------------------------------ |
+| WINDOW_NORMAL       | 用户可以自己调整窗口大小                         |
+| WINDOW_AUTOSIZE     | 用户不能控制窗口大小, 根据图片的大小自动调整窗口 |
+| WINDOW_OPENGL       | OpenGL 后端的窗口                                |
+| WINDOW_FULLSCREEN   | 全屏幕窗口                                       |
+| WINDOW_FREERATIO    | 自由比例                                         |
+| WINDOW_KEEPRATIO    | 固定比例                                         |
+| WINDOW_GUI_EXPANDED | status bar and tool bar                          |
+
 
 ## 5.4. Trackbar 
 
@@ -1129,3 +1174,49 @@ Python:
 * flags			: 补全算法选择
   * `cv::INPAINT_NS`
   * `cv::INPAINT_TELEA`
+
+# 10. contrib : ximgoproc  Extended Image Processing
+
+contrib 包, 拓展的图像处理  
+
+
+## 10.1. Filter
+
+
+### 10.1.1. Guided Filter
+
+```cpp
+void cv::ximgproc::guidedFilter 	( 	
+		InputArray  	guide,		// guided image
+		InputArray  	src,		// filtering img
+		OutputArray  	dst,
+		int  	radius,				// filter 半径
+		double  	eps,			// guided filter 的超参数
+		int  	dDepth = -1 
+	) 		
+Python:
+	cv.ximgproc.guidedFilter(	guide, src, radius, eps[, dst[, dDepth]]	) -> 	dst
+
+Ptr<GuidedFilter> cv::ximgproc::createGuidedFilter 	( 	
+		InputArray  	guide,		// guided image
+		int  	radius,				// 半径
+		double  	eps 			// epsilon
+	) 		
+Python:
+	cv.ximgproc.createGuidedFilter(	guide, radius, eps	) -> 	retval
+
+virtual void cv::ximgproc::GuidedFilter::filter 	( 	
+		InputArray  	src,
+		OutputArray  	dst,
+		int  	dDepth = -1 
+	) 		
+	pure virtual
+Python:
+	cv.ximgproc.GuidedFilter.filter(	src[, dst[, dDepth]]	) -> 	dst
+```
+
+对 Guided Filter 的实现, 包括了一个函数实现和类实现  
+* `void cv::ximgproc::guidedFilter` : 快速单行应用 Filter, 如果有多张图片要用到同样的 guided img, 使用类的形式更快
+* `Ptr<GuidedFilter> cv::ximgproc::createGuidedFilter` : Factory method, 类的工厂构造函数  
+* `cv::ximgproc::GuidedFilter::filter` : 类方法
+

@@ -91,7 +91,8 @@ Pillow is the friendly PIL fork
 * `PIL.Image.open(fp, mode='r', formats=None)` 打开一个给定的图像文件
   * fp : 指定文件路径  filename (string), pathlib.Path object or a file object.
   * mode : 对该函数来说只能给定 'r', 搞不懂为啥还要独立出来, 表示读取
-  * formats : list or tuple, 指定用指定的格式打开文件, None 的话就是尝试所有格式
+  * formats : list or tuple, 指定用指定的格式打开文件, None 的话就是尝试所有格式. 
+    * 通过使用 `python3 -m PIL` 或者 `PIL.features.pilinfo()` 来查看支持的所有格式  
   * 返回一个 Image object
 * 异常
   * FileNotFoundError : 文件未找到

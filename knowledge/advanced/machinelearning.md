@@ -1,3 +1,50 @@
+- [1. Data Science Solutions](#1-data-science-solutions)
+  - [1.1. Workflow](#11-workflow)
+  - [1.2. 面试QA](#12-面试qa)
+- [2. Machine Learning 机器学习基础](#2-machine-learning-机器学习基础)
+  - [2.1. 学习算法](#21-学习算法)
+  - [2.2. 拟合](#22-拟合)
+- [3. 特征工程 - 抽出问题的特征向量](#3-特征工程---抽出问题的特征向量)
+  - [3.1. 通用特征处理](#31-通用特征处理)
+    - [3.1.1. 特征归一化](#311-特征归一化)
+    - [3.1.2. 类别型特征(数据)](#312-类别型特征数据)
+    - [3.1.3. 组合特征与降维处理](#313-组合特征与降维处理)
+  - [3.2. 文本表示模型](#32-文本表示模型)
+    - [3.2.1. TF-IDF 单词权重计算](#321-tf-idf-单词权重计算)
+    - [3.2.2. Bag of Words 词袋模型](#322-bag-of-words-词袋模型)
+    - [3.2.3. N-gram](#323-n-gram)
+    - [3.2.4. Word2Vec 谷歌2013提出的词嵌入模型](#324-word2vec-谷歌2013提出的词嵌入模型)
+  - [3.3. 图像数据增强 过拟合防止](#33-图像数据增强-过拟合防止)
+- [4. 模型评估 - 多种指标用于评估模型的性能](#4-模型评估---多种指标用于评估模型的性能)
+  - [4.1. 准确率 Accuracy](#41-准确率-accuracy)
+  - [4.2. 精确率 Precision 和 召回率 Recall 和 F1 score](#42-精确率-precision-和-召回率-recall-和-f1-score)
+  - [4.3. RMSE 指标](#43-rmse-指标)
+  - [4.4. ROC曲线 Receiver Operating Characteristic Curve](#44-roc曲线-receiver-operating-characteristic-curve)
+  - [4.5. 余弦距离](#45-余弦距离)
+  - [4.6. A/B 测试](#46-ab-测试)
+  - [4.7. 模型评估的抽样方法](#47-模型评估的抽样方法)
+- [5. 降维](#5-降维)
+  - [5.1. PCA Principal Components Analysis](#51-pca-principal-components-analysis)
+    - [5.1.1. 最大方差理论](#511-最大方差理论)
+    - [5.1.2. 最小平方误差理论](#512-最小平方误差理论)
+  - [5.2. LDA Linear Discriminant Analysis](#52-lda-linear-discriminant-analysis)
+- [6. 监督学习基础算法 Supervised Learning](#6-监督学习基础算法-supervised-learning)
+  - [6.1. Support Vector Machines](#61-support-vector-machines)
+- [7. 非监督学习基础算法 Unsupervised Learning](#7-非监督学习基础算法-unsupervised-learning)
+  - [7.1. 聚类算法](#71-聚类算法)
+    - [7.1.1. K-means](#711-k-means)
+    - [7.1.2. x-means](#712-x-means)
+    - [7.1.3. Gap Statistic](#713-gap-statistic)
+    - [7.1.4. ISODATA 迭代自组织数据分析法](#714-isodata-迭代自组织数据分析法)
+    - [7.1.5. Self-Organizing Map SOM 自组织映射神经网络](#715-self-organizing-map-som-自组织映射神经网络)
+- [8. 优化算法](#8-优化算法)
+  - [8.1. 监督学习的损失函数](#81-监督学习的损失函数)
+  - [8.2. 机器学习算法优化基础](#82-机器学习算法优化基础)
+    - [8.2.1. 凸优化](#821-凸优化)
+    - [8.2.2. 非凸优化](#822-非凸优化)
+    - [8.2.3. 直接法求解最优解](#823-直接法求解最优解)
+- [RANSAC Random Sample Consensus](#ransac-random-sample-consensus)
+
 # 1. Data Science Solutions 
 
 数据科学中实现一个解决方案的大致流程  
@@ -518,7 +565,7 @@ K-means ++
 * 改进了初始值的生成方法:
 * 第一个簇中心通过随机方法
 * 选取第 n+1 个中心点时, 距离当前 n 个聚类中心越远的点会有更高的概率被选为聚类中心
-### x-means
+### 7.1.2. x-means
 
 一种基于 K-means 的改进算法:
 * 完善了
@@ -533,7 +580,7 @@ K-means ++
 
 
 
-### 7.1.2. Gap Statistic
+### 7.1.3. Gap Statistic
 
 自动化确定 K 值的基于蒙特卡洛模拟的方法:
 * 记 Dk 为 k 簇 时候的损失函数
@@ -543,7 +590,7 @@ K-means ++
 * 定义 Gam Statistic $Gap(k)=E(logD_k)-logD_k$
 * 当取得最佳 k 的时候, Gap(k) 也应取得最小
 
-### 7.1.3. ISODATA 迭代自组织数据分析法
+### 7.1.4. ISODATA 迭代自组织数据分析法
 
 基于 k-means, 加入了对簇个数的自动化增删
 * 如果某个类别的样本数过少, 则删去该簇
@@ -556,7 +603,7 @@ K-means ++
 * 聚类中心的最小聚氯 Dmin : 如果两个簇中心点过近, 则会合并
 
 
-### 7.1.4. Self-Organizing Map SOM 自组织映射神经网络
+### 7.1.5. Self-Organizing Map SOM 自组织映射神经网络
 
 ...
 
@@ -660,3 +707,22 @@ K-means ++
 - 岭回归问题 (Ridge Regression)
   * 岭回归问题是对最小二乘法的一个补充, 损失了无偏性, 但是得到了高数值稳定性
   * 目标函数 $L(\theta)=||X\theta -y||_2^2+\lambda||\theta||_2^2$
+
+
+# RANSAC Random Sample Consensus
+
+于 1981 年由 Fischler 和 Bolles 最早提出  
+
+根据一组包含异常数据的样本数据集, 计算出数据的数学模型参数, 从而反过来得到有效样本数据的算法, 该算法假设  
+* 数据集中有 inliers 和 outliers, 即存在噪声
+* 根据数据集中的一小组 inliers 是可以计算出匹配所有 inliers 的模型的正确参数的  
+
+基本思想: 样本集 P
+1. 考虑一个最小抽样集 S, |S|=n , 从 P 中随机抽取 n 个样本初始化模型 M
+2. 余集(P-S) 中, 与初始化模型 M 的误差小于一定阈值 t 的样本 与 S 一起构成了 S* , 此时假设认为 S* 中的点都是 inliers
+3. 若 |S*|> 一定的数量, 则认为该模型合理, 利用 S* 重新计算新的模型 M*, 再重新抽取 S, 重复该过程
+4. 若重复一定次数都未找到 Consensus Set, 则算法失败, 否则根据所找到的样本数最多的 S* 作为结论的 inliers
+
+
+* 优点: 鲁棒的估计模型参数
+* 缺点: 不存在迭代上限, 不保证得到正确结果, 需要正确选择超参数, 只能得到一个模型, 如果数据存在两个合理模型, 则无法找到    

@@ -5,6 +5,7 @@
 
 杂项系统库:
 * os        各种基础操作啥都有
+  * os.path 作为 os 库中作用比较几种的子集, 放在饿了 path 专门的文档中  
 
 专用目的库:
 * argparse  : 专门用来处理 python 命令行参数的
@@ -105,14 +106,6 @@ Execute the command (a string) in a subshell:
 
 `os.system(command)`
 
-# 3. sys
-
-This module provides:
-* access to some variables used or maintained by the interpreter
-* functions that interact strongly with the interpreter
-* It is always available
-
-
 
 # 4. time
 
@@ -163,8 +156,6 @@ time.gmtime(0)
 普通时钟:  seconds since the epoch
 * `time.time() → float`
 * `time.time_ns() → int`  version 3.7
-
-
 
 
 单调时钟 : The clock is not affected by system clock updates.
@@ -516,4 +507,54 @@ foreign function library for Python, 外部函数库
 * 提供了与 C 语言兼容的数据类型
 * 允许调用 DLLs 或者其他 Shared libraries 的函数
 * 用于将库函数应用在纯 Python 中
+
+
+## 使用指南
+
+1. 建立动态库示例
+2. 获取动态库函数
+
+### 获取动态库实例
+
+
+动态库默认实例, You load libraries by accessing them as attributes of these objects
+* cdll      : standard cdecl calling convention
+* windll    : stdcall calling convention
+* oledll    : stdcall calling convention, and assumes the functions return a Windows `HRESULT` error code.
+  * The error code is used to automatically raise an `OSError` exception when the function call fails.
+* 可以按照访问成员的方式来访问动态库
+```py
+from ctypes import *
+print(windll.kernel32)  
+print(cdll.msvcrt)      
+libc = cdll.msvcrt    
+```
+
+* 对于 Windows, Python 实现会自动给末尾添加 `.dll` 后缀, 因此只要输入动态库名称即可
+* 对于 Linux, 则需要精确的输入具体的动态库名称, e.g. `libc.so.6`, 因此不适用于 成员元素 的方式来获取动态库
+  * 通过 成员函数 的方式来访问 `.LoadLibrary(动态库名称)`
+  * 通过动态库类的构造函数来重新定义实例
+
+```py
+cdll.LoadLibrary("libc.so.6")  
+# <CDLL 'libc.so.6', handle ... at ...>
+libc = CDLL("libc.so.6")       
+libc
+# <CDLL 'libc.so.6', handle ... at ...>  
+```
+
+### 获取动态库函数  
+
+
+### 调用动态库函数  
+
+## 文档
+
+### 动态库查找
+
+`ctypes.util.find_library(name)`:
+* `name` : 动态库的名称, 不需要带任何前缀 `lib` 和后缀 `.so` 以及版本 `.6` 
+* return : pathname, 如果在当前平台找不到该库则返回 `None`
+* 用和 C 编译器相同的方法去查找并定位一个 动态库
+* can help to determine the library to load.
 

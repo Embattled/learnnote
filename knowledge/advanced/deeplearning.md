@@ -18,35 +18,46 @@
     - [2.5.2. VGG 训练](#252-vgg-训练)
     - [2.5.3. ResNet 训练 ImageNet](#253-resnet-训练-imagenet)
     - [2.5.4. CRNN](#254-crnn)
-- [4. Data Augmentation](#4-data-augmentation)
-  - [4.1. Reference](#41-reference)
-  - [4.2. Traditional](#42-traditional)
-  - [4.3. Geometric / Spatial](#43-geometric--spatial)
-  - [4.4. 融合 augmentation 参数和网络参数](#44-融合-augmentation-参数和网络参数)
-- [5. Dataset](#5-dataset)
-  - [5.1. Text spot](#51-text-spot)
-    - [5.1.1. Scene Text](#511-scene-text)
-    - [5.1.2. Handwritten Text](#512-handwritten-text)
-- [6. 网络结构 与模型](#6-网络结构-与模型)
-  - [6.1. Backbone网络](#61-backbone网络)
-    - [6.1.1. Alexnet](#611-alexnet)
-    - [6.1.2. VGGNet](#612-vggnet)
-    - [6.1.3. GoogLeNet](#613-googlenet)
-    - [6.1.4. ResNet](#614-resnet)
-    - [6.1.5. MobileNet 轻量化网络](#615-mobilenet-轻量化网络)
-      - [6.1.5.1. MobileNetV1](#6151-mobilenetv1)
-      - [6.1.5.2. MobileNetV2](#6152-mobilenetv2)
-  - [6.2. Detection 系列网络](#62-detection-系列网络)
-    - [6.2.1. R-CNN](#621-r-cnn)
-    - [6.2.2. SPP-Net](#622-spp-net)
-    - [6.2.3. Fast-RCNN](#623-fast-rcnn)
-    - [6.2.4. FasterRCNN RPN](#624-fasterrcnn-rpn)
-  - [6.3. 语义分割 Semantic Segmentation](#63-语义分割-semantic-segmentation)
-    - [6.3.1. FCN - Fully Convolutional Networks](#631-fcn---fully-convolutional-networks)
-  - [6.4. FPN - Feature Pyramid Networks](#64-fpn---feature-pyramid-networks)
-- [7. 序列建模 - 循环和递归网络](#7-序列建模---循环和递归网络)
-  - [7.1. 常见的序列网络即应用](#71-常见的序列网络即应用)
-- [8. Attention](#8-attention)
+- [3. Data Augmentation](#3-data-augmentation)
+  - [3.1. Reference](#31-reference)
+  - [3.2. Traditional](#32-traditional)
+  - [3.3. Geometric / Spatial](#33-geometric--spatial)
+  - [3.4. 融合 augmentation 参数和网络参数](#34-融合-augmentation-参数和网络参数)
+- [4. 网络结构 与模型](#4-网络结构-与模型)
+  - [4.1. Backbone网络](#41-backbone网络)
+    - [4.1.1. Alexnet](#411-alexnet)
+    - [4.1.2. VGGNet](#412-vggnet)
+    - [4.1.3. GoogLeNet](#413-googlenet)
+    - [4.1.4. ResNet](#414-resnet)
+    - [4.1.5. MobileNet 轻量化网络](#415-mobilenet-轻量化网络)
+      - [4.1.5.1. MobileNetV1](#4151-mobilenetv1)
+      - [4.1.5.2. MobileNetV2](#4152-mobilenetv2)
+  - [4.2. Detection 系列网络](#42-detection-系列网络)
+    - [4.2.1. R-CNN](#421-r-cnn)
+    - [4.2.2. SPP-Net](#422-spp-net)
+    - [4.2.3. Fast-RCNN](#423-fast-rcnn)
+    - [4.2.4. FasterRCNN RPN](#424-fasterrcnn-rpn)
+  - [4.3. 语义分割 Semantic Segmentation](#43-语义分割-semantic-segmentation)
+    - [4.3.1. FCN - Fully Convolutional Networks](#431-fcn---fully-convolutional-networks)
+  - [4.4. FPN - Feature Pyramid Networks](#44-fpn---feature-pyramid-networks)
+- [5. 序列建模 - 循环和递归网络 RNN](#5-序列建模---循环和递归网络-rnn)
+  - [5.1. Recurrent Neural Networks (RNN)](#51-recurrent-neural-networks-rnn)
+  - [5.2. Long Short-Term Memory LSTM](#52-long-short-term-memory-lstm)
+- [6. Attention](#6-attention)
+- [7. Multi Object Tracking (MOT)](#7-multi-object-tracking-mot)
+- [8. Transfer Learning](#8-transfer-learning)
+  - [8.1. Domain Adaptation (DA)](#81-domain-adaptation-da)
+  - [8.2. Domain Generalization](#82-domain-generalization)
+- [9. View Synthesis](#9-view-synthesis)
+  - [9.1. Neural Rendering  的各种渲染方法](#91-neural-rendering--的各种渲染方法)
+    - [9.1.1. Volume 体数据  体渲染](#911-volume-体数据--体渲染)
+  - [9.2. NeRF Neural Radiance Fields](#92-nerf-neural-radiance-fields)
+    - [9.2.1. Vanilla NeRF](#921-vanilla-nerf)
+  - [Neural 3D shape representations](#neural-3d-shape-representations)
+- [10. Dataset](#10-dataset)
+  - [10.1. Text spot](#101-text-spot)
+    - [10.1.1. Scene Text](#1011-scene-text)
+    - [10.1.2. Handwritten Text](#1012-handwritten-text)
 
 
 # 1. Deep Learning 概念
@@ -328,46 +339,27 @@ $b_{x,y}^k=a_{x,y}^k/(k+\alpha\sum_{i=max(0,x-n/2)}^{min(W,x+n/2)}\sum_{j=max(0,
 * 
 
 
-# 4. Data Augmentation
+# 3. Data Augmentation
 
 Data augmentation is a low cost way.
 
-## 4.1. Reference
+## 3.1. Reference
 
 1. Jaderberg, M., Simonyan, K., Vedaldi, A., & Zisserman, A. (2014). Synthetic Data and Artificial Neural Networks for Natural Scene Text Recognition. Computer Vision and Pattern Recognition. http://arxiv.org/abs/1406.2227
 2. Luo, C., Zhu, Y., Jin, L., & Wang, Y. (2020). Learn to augment: Joint data augmentation and network optimization for text recognition. Proceedings of the IEEE Computer Society Conference on Computer Vision and Pattern Recognition, 13743–13752. https://doi.org/10.1109/CVPR42600.2020.01376
 
-## 4.2. Traditional 
+## 3.2. Traditional 
 
 Traditional augmentation methods such as rotation, scaling and perspective transformation,
 
-## 4.3. Geometric / Spatial
+## 3.3. Geometric / Spatial
 
-## 4.4. 融合 augmentation 参数和网络参数
+## 3.4. 融合 augmentation 参数和网络参数
 
 
-# 5. Dataset
 
-## 5.1. Text spot
 
-3755 classes (Ievel-l set of GB2312-80) 
-
-### 5.1.1. Scene Text
-
-* IIIT 5K-Words  (IIIT5K) contains 3000 cropped word images for testing.
-* Street View Text (SVT) consists of 647 word images for testing. Many images are severely corrupted by noise and blur.
-* Street View Text Perspective (SVT-P) contains 645
-cropped images for testing. Most of them are perspective distorted.
-* ICDAR 2003 (IC03) contains 867 cropped images after discarding images that contained non-alphanumeric characters or had fewer than three characters.
-* ICDAR 2013 (IC13) inherits most of its samples from IC03. It contains 1015 cropped images.
-* ICDAR 2015 (IC15) is obtained by cropping the words using the ground truth word bounding boxes and includes more than 200 irregular text images.
-
-### 5.1.2. Handwritten Text
-
-* IAM contains more than 13,000 lines and 115,000 words written by 657 different writers.
-* RIMES contains more than 60,000 words written in French by over 1000 authors. 4.3.
-
-# 6. 网络结构 与模型
+# 4. 网络结构 与模型
 
 * 简单粗暴的方法来提高精度就是加深网络以及加宽网络, 缺点有
   * 容易过拟合
@@ -377,7 +369,7 @@ cropped images for testing. Most of them are perspective distorted.
 * 基础的方法是增加网络的稀疏性, 尽可能减少全连接层
 
 
-## 6.1. Backbone网络 
+## 4.1. Backbone网络 
 
 * AlexNet
   * 推广了 ReLU 和 Dropout
@@ -392,7 +384,7 @@ cropped images for testing. Most of them are perspective distorted.
 0. (1998)Gradient-based learning applied to document recognition
 1. 
 
-### 6.1.1. Alexnet
+### 4.1.1. Alexnet
 
 * ReLU 激活函数被应用在了所有卷积层和FC层的后面
 
@@ -481,7 +473,7 @@ class AlexNet(nn.Module):
         x = self.classifier(x)
         return x
 ```
-### 6.1.2. VGGNet
+### 4.1.2. VGGNet
 
 * 网络模型
   * 输入大小为 224*224 
@@ -499,7 +491,7 @@ class AlexNet(nn.Module):
   * 再加上随机水平翻转和色彩偏移
 
 
-### 6.1.3. GoogLeNet
+### 4.1.3. GoogLeNet
 
 GoogLeNet的发展共有四个版本  
 
@@ -535,7 +527,7 @@ Inception V3:
 * 高维特征信息包含的更多, 更容易加快训练
 
 
-### 6.1.4. ResNet
+### 4.1.4. ResNet
 
 * Residual Network
 * 灵感来源于: 如果使用恒等映射层, 那么网络的加深起码不会带来训练误差的上升
@@ -556,12 +548,12 @@ Inception V3:
 
 
 
-### 6.1.5. MobileNet 轻量化网络
+### 4.1.5. MobileNet 轻量化网络
 
 * MobileNet 提出了同时注重速度和模型大小的网络结构, 更贴合实际应用
 
 
-#### 6.1.5.1. MobileNetV1
+#### 4.1.5.1. MobileNetV1
 
 * 提出了两个超参数用来管理网络结构 : width multiplier, resolution multiplier
 
@@ -587,7 +579,7 @@ depthwise conv 可以看作 Group Conv 的极端, 即分组数 g = 输入通道�
 * 可以戏剧性的降低模型的运算和大小, 解除了 `输出通道数N` 和 `卷积核大小` 的乘法关系
 * 只牺牲了很小的精确率
 
-#### 6.1.5.2. MobileNetV2
+#### 4.1.5.2. MobileNetV2
 
 * 通过结合 ResNet的 shoutcut连接, 实现了V2, 核心是 inverted residual block
 * residual block (ResNet) v.s. inverted residual block (MobileNetV2)
@@ -822,7 +814,7 @@ class MobileNetV2(nn.Module):
 ```
 
 
-## 6.2. Detection 系列网络
+## 4.2. Detection 系列网络
 
 Detection 相比 Recognition 是更复杂的任务:
 1. Detection 的过程中往往也就顺带进行了分类识别
@@ -848,7 +840,7 @@ Detection 相比 Recognition 是更复杂的任务:
 3. (2014)Spatial Pyramid Pooling in Deep Convolutional Networks for Visual Recognition
 4. (2017)Faster R-CNN: Towards Real-Time Object Detection with Region Proposal Networks
 
-### 6.2.1. R-CNN
+### 4.2.1. R-CNN
 
 R-CNN算法可以分为四步:
 1. 候选区域选择, 即 Region Proposal
@@ -862,7 +854,7 @@ R-CNN算法可以分为四步:
 * CNN需要固定尺寸输入, 因此对候选区域的拉伸或截取会丢失信息
 * 候选区域存在重叠, 因此计算浪费
 
-### 6.2.2. SPP-Net
+### 4.2.2. SPP-Net
 
 由其他作者对RCNN的一个实质性的改进  
 1. 取消了 crop/warp 的图像归一化过程, 解决了图像变形导致的信息丢失
@@ -875,7 +867,7 @@ R-CNN算法可以分为四步:
 3. 在整个过程中，Proposal Region仍然很耗时。
 
 
-### 6.2.3. Fast-RCNN
+### 4.2.3. Fast-RCNN
 
 主要贡献在于对RCNN进行加速, 受SPP-Net启发而来  
 1. 借鉴了SPP-Net的思路, 提出了简化版的 ROI池化层 (注意并非金字塔), 加入了候选框映射功能, 使得网络可以反向传播, 解决了SPP的整体网络训练问题  
@@ -883,7 +875,7 @@ R-CNN算法可以分为四步:
 3. SVD加速全连接层的训练
 4. 
 
-### 6.2.4. FasterRCNN RPN
+### 4.2.4. FasterRCNN RPN
 
 Faster RCNN 基本实现了端到端的实时检测  
 
@@ -903,7 +895,7 @@ RPN网络过程
 
 
 
-## 6.3. 语义分割 Semantic Segmentation
+## 4.3. 语义分割 Semantic Segmentation
 
 图像分割: 让网络做像素级别的预测, 直接得出label map  
 
@@ -911,7 +903,7 @@ RPN网络过程
 
 
 
-### 6.3.1. FCN - Fully Convolutional Networks
+### 4.3.1. FCN - Fully Convolutional Networks
 
 深度学习应用在图像分割的代表成就
 * FCN 接受任意尺寸的输入图像
@@ -928,7 +920,7 @@ RPN网络过程
 * Feature map 经过该卷积层, 还是得到二维的 Feature map, 因此对输入图片的 size 没有了限制
 * 例: 全连接层 4096->4096->1000, 对应的卷积核 (4096,1,1)-> (4096,1,1)-> (1000,1,1)
 
-## 6.4. FPN - Feature Pyramid Networks
+## 4.4. FPN - Feature Pyramid Networks
 
 论文: Feature pyramid networks for object detection  
 一种获得多缩放特征( Multi-scale Feature )的方法, 独立于 Backbone 网络.  
@@ -952,25 +944,12 @@ RPN网络过程
   * 在merge后的特征图加一个3X3的卷积层, 用于消除升采样带来的误差
   * 最终获得了 P2~P5 的特征图
 
-# 7. 序列建模 - 循环和递归网络
+# 5. 序列建模 - 循环和递归网络 RNN
 
 * 普通的神经网络以及CNN, 都是假设元素之间是相互独立的, 输入与输出也是独立的
   * CNN 专门用于处理网格化数据
 * 循环神经网络的特点: 拥有记忆能力, 输入依赖于当前的输出和记忆
   * 处理序列数据
-
-定义:
-* Xt 表t时刻的输入
-* Ot 表t时刻的输出: $o_t=softmax(VS_t)$
-  * $V$ 即记忆的权重矩阵, 表示根据当前的记忆来决定输出
-  * 很多任务并不需要中间的输出, 只关注最后的输出
-* St 表t时刻的记忆: $S_t=f(U*X_t+W*S_{t-1})$  
-  * $f()$是激活函数
-  * 可以把St当作一个隐状态
-* 网络中的所有细胞共享参数 $UVW$
-
-
-## 7.1. 常见的序列网络即应用
 
 网络结构:
 * Recurrent neural networks (RNN)
@@ -983,10 +962,32 @@ RPN网络过程
 * Transduction problem
   * Machine translation
 
+##  5.1. Recurrent Neural Networks (RNN)
 
+定义一个单节点的 RNN 网络 $U,V,W$, 给定输入序列 $x_t$ 表t时刻的输入
+* 有t时刻的记忆(状态序列): $s_t=f(Ux_t+Ws_{t-1})$  
+  * $f()$是激活函数
+  * 可以把st当作一个隐状态
+* 有 t 时刻的网络输出 $o_t=f(Vs_t)$
+  * $V$ 即记忆的权重矩阵, 表示根据当前的记忆来决定输出
+  * 很多任务并不需要中间的输出, 只关注最后的输出
+* 网络中的所有细胞共享参数 $UVW$
 
+## 5.2. Long Short-Term Memory LSTM
 
-# 8. Attention
+对比朴素 RNN :
+* 将传统 RNN 的状态 s 序列定义成短期记忆
+* 添加了另外一条状态序列 c, 称为 长期记忆
+
+对于状态序列 c 的更新:
+* 定义 遗忘长期参数 : $f1=sigmoid(w_1[s_{t-1},x_t]^T+b_1)$, 获得 遗忘系数
+* 定义 新增短期记忆 : $f2=sigmoid(w_2[s_{t-1},x_t]^T+b_2)*tanh(\hat{w_2}[s_{t-1},x_t]^T+\hat{b_2})$
+* 定义 新的长期记忆状态 $c_t=f1\times c_{t-1}+f_2$
+
+长期记忆状态序列 c 会参与短期记忆 s 的更新
+* 定义短期记忆 $s_t=sigmoid(w_3[s_{t-1},x_t]^T+b_3)*tanh(\hat{w_3}c_t+\hat{b_3})$
+
+# 6. Attention
 
 Recurrent模型通常会根据符号的输入顺序来分解计算, 根据t-1时刻的状态和t时刻的输入来决定t时刻的输出和新状态。这从原理上使得并行变得不可能, 同时导致内存开销极大.  
 一些基于Block的并行化方法同时输入并计算各个位置上的特征, 但导致学习远距离关联变得很难.  
@@ -1037,3 +1038,168 @@ Self-Attention:
   * relying entirely on self-attention to compute representations.
   * without using sequence-aligned RNN or convolution.
 
+
+# 7. Multi Object Tracking (MOT)
+
+当前的 MOT 手法可以分成 2 个大类 
+1. Batch Tracking
+  * 使用当前帧的前后序列信息
+  * 精度高
+  * 因为使用了未来帧的信息因此不能应用在实时项目中, 只能 offline
+2. Online Tracking
+  * 使用当前帧 + 过去帧
+  * 当前的精度比起 Batch Tracking 仍有不足
+  * 实时追踪理论上可行, 19年时间点上仍然困难
+
+总体上, 主流的 MOT 算法可以分成 4 个步骤
+1. Detection stage      : 标准物体检测 (检出)
+2. Feature extraction / Motion prediction stage   : 提取各个对象的用于追踪的特征图 / 或者直接预测对象的下一时间点的位置
+3. Affinity stage       : 通过特征图或者预测信息, 比较下一时间点的物体检测得到的位置信息, 计算距离分数
+4. Association stage    : 距离较小的对象认为是同一个物体, 实现追踪
+
+
+MOT 常用的数据库:
+* MOT Challenge datasets
+* KITTI datasets : 人と車の両方の追跡用
+* UA-DETRAC tracking benchmark : 交通用の監視カメラで撮影した車の見下ろし画像
+* TUD datasets    : 人物追踪用的数据库
+* PETS2009 datasets : 人の追跡用
+
+MOT 的评价方法:
+* 同样分 Accuracy, Precision ->  MOTA MOTP
+* IDF1 (Identification F1)
+
+# 8. Transfer Learning
+
+
+## 8.1. Domain Adaptation (DA)
+
+域适应: 指同一个模型在两个相似任务的下实现尽可能相同的效果, 是迁移学习的一种, 也是当前迁移学习的主要研究方向
+* 两个任务有可能具有细微的差异 (光照, 姿态, 图像质量), 同一个模型直接使用会有很大的效果差异
+* Domain Adaptation 是为了减少两个域在特征空间的差异, 使得模型学到更普适的特征
+
+目前的 DA 可以主要分为两种
+* One-step DA
+  * 假设源域和目标域是相关的, 只是域的分布上有差异, 通过调整域间分布来实现域适应
+* Multi-step DA
+  * 假设源域和目标域是无关的 (更符合现实)
+  * 通过在源域和目标域建立一些桥梁 (中间域), 多步实现域适应
+
+根据数据类型分为 同构/异构
+* 同构: 数据空间相同的数据. e.g. 不同类别但是分辨率相同的图片
+  * 监督域自适应
+  * 半监督域自适应
+  * 无监督域自适应  (主流研究方向) 
+* 异构: 数据空间不同的数据. e.g. 文字和图片之间
+
+手法的方向:
+* 特征的适应 (主流方向): 把源域和目标域的特征提取到统一的特征空间中, 让不同特征之间的距离足够近
+* 实例的适应 (小技巧)  : 提取出源域中与目标域更相似的一部分数据, 给予该部分数据更大的权重
+* 参数的适应 (小技巧)  : 直接修改模型的参数使得模型适应新的任务
+
+
+
+## 8.2. Domain Generalization
+
+对比 域适应 (Domain Adaptation) 更加泛化的域适应的研究方向  
+
+
+# 9. View Synthesis
+
+视角合成任务, 通过输入对一系列对物体不同角度的图像, 来生成新的角度下的图像
+* 对于一个训练好的模型
+* 通常输入的数据是一系列图像, 并且带有对应的角度数据, e.g. 空间坐标 (x,y,z) 视角 (theta, phi)
+* 输出是
+  * the volume density 
+  * and view-dependent emitted radiance at that spatial location, 可以直接理解成新视角下的图像
+
+
+
+通常的手法使用一个中间的 3D 场景表征来作为中介, 并以此生成高质量的虚拟视角, 根据该中间表征的形式, 可分为:
+* 显式 Explicit representation : 例如 Mesh, Point Cloud, Voxel, Volume 等等, 对场景进行显式建模, 但是这些显式类型一般都是离散的, 有精度问题
+* 隐式 Implicit representation : 用一个函数来描述几何场景, 一般是一个不可解释的 MLP 模型, 输入 3D 空间坐标, 输出对应的几何信息, 是一种连续的表示 (Neural Fields, 神经场)   
+
+
+Neural Fields  神经场:
+* 场 Fields   : 是一个物理概念, 对所有 (连续)时间 或 空间 定义的量, 如电磁场, 重力场, 对 场的讨论一定是建立在目标是连续概念的前提上
+* 神经场表示用神经网络来 全部或者部分参数化的场
+* 在视觉领域, 场即空间, 视觉任务的神经场即 以 `空间或者其他维度 时间, 相机角度等` 作为输入, 通过一个神经网络, 获取目标的一个标量 (颜色, 深度 等) 的过程   
+
+## 9.1. Neural Rendering  的各种渲染方法
+
+即中间层的显式表达方法 Mesh, Point Cloud, Voxel, Volume 等
+
+### 9.1.1. Volume 体数据  体渲染
+
+从体数据渲染得到想要的 2D 图片  
+
+体数据是一种数据存储格式, 例如 医疗中的 CT 和 MRI, 地址信息, 气象信息
+* 是通过 : 追踪光线进入场景并对光线长度进行某种积分来生成图像或者视频   Ray Casting Ray Marching Ray Tracing
+* 这种数据需要额外的渲染过程才能显示成 2D 图像并被人类理解  
+* 对比于传统的 Mesh, Point 等方法, 更加适合模拟光照, 烟雾, 火焰等非刚体, 在图形学中也有应用   
+* 体渲染是一种可微渲染  
+
+
+
+## 9.2. NeRF Neural Radiance Fields
+
+2019年开始兴起, 在 2020 年 ECCV 中得到 Best Paper Candidate  
+
+NeRF 是一种隐式的 3D 中间表示, 但是却使用了 Voluem 的规则, 即一个 隐式的 Volume, 实现了 神经场 Neural Field 与图形学组件 Volume Rendering 的有效结合  
+* 本身的方法非常简洁, 且有效, 说明是合理的
+* 对于启发 计算机视觉和图形学的交叉领域 有很大的功劳
+
+
+### 9.2.1. Vanilla NeRF
+
+将一个 scene 表示成一个 5D vector-valued function.
+* 输入 3D location X=(x,y,z) 和 viewing direction d=(theta, phi)
+* 输出 emitted color $c=(r,g,b)$ 和 volume density $\sigma$
+* volume density sigma(x) 可以解释为一个 ray 在空间中的无限微小点 X 终止的微分概率  
+
+
+基于 NeRF 的 Volume Rendering
+* 对于一个 camera ray  $r(t)=o+td$  t 是 camera ray 的远近距离 t_n t_f
+* camera ray 得到的颜色 C(r)可以写作  
+$$C(r)=\int_{t_n}^{t_f}T(t)\sigma(r(t))c(r(t),d)dt$$
+* $T(t)=exp(-\int_{t_n}^t\sigma(r(s))ds)$
+  * 该公式代表了一个 accumulated transmittance, 
+  * 对于一个距离 t 从 t_n 到 t, 光线最终没有被遮蔽的概率  
+* 从一个 NeRF 模型中渲染出一个 view 需要
+  * estimating this integral C(r) for a camera ray traced through each pixel of the desired virtual camera.
+  * 从虚拟摄像头中, 对穿越每一个像素的 camera cay 计算 C(r)
+
+
+NeRF 本身的问题, 有如下:
+* 速度慢  : 对于每个输出像素分别进行前向预测, 因此计算量很大  
+* 只能应用于静态场景
+* 泛化性差
+* 需要大量的视角  : 需要数百张不同视角的图片来训练  
+
+## Neural 3D shape representations
+
+在 NeRF 提出之前的主流方案, 对于一个连续的 3D shape
+* map xyz coordinates to signed distance functions or occupancy fields
+* 这种方案最早的时候需要 GT 3D geomerty, 因此在研究中经常使用 synthetic 3d shape
+* 后来有直接输出每个坐标对应的 feature vector 和 RGB function, 在通过复杂的 rendering function 得到2D img 再计算 Loss
+
+# 10. Dataset
+
+## 10.1. Text spot
+
+3755 classes (Ievel-l set of GB2312-80) 
+
+### 10.1.1. Scene Text
+
+* IIIT 5K-Words  (IIIT5K) contains 3000 cropped word images for testing.
+* Street View Text (SVT) consists of 647 word images for testing. Many images are severely corrupted by noise and blur.
+* Street View Text Perspective (SVT-P) contains 645
+cropped images for testing. Most of them are perspective distorted.
+* ICDAR 2003 (IC03) contains 867 cropped images after discarding images that contained non-alphanumeric characters or had fewer than three characters.
+* ICDAR 2013 (IC13) inherits most of its samples from IC03. It contains 1015 cropped images.
+* ICDAR 2015 (IC15) is obtained by cropping the words using the ground truth word bounding boxes and includes more than 200 irregular text images.
+
+### 10.1.2. Handwritten Text
+
+* IAM contains more than 13,000 lines and 115,000 words written by 657 different writers.
+* RIMES contains more than 60,000 words written in French by over 1000 authors. 4.3.

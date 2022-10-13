@@ -1,43 +1,156 @@
 - [1. matplotlib包 图表制作](#1-matplotlib包-图表制作)
+  - [1.1. matplotlib 的类](#11-matplotlib-的类)
+    - [1.1.1. Figure](#111-figure)
+    - [1.1.2. Axes](#112-axes)
+    - [1.1.3. Axis](#113-axis)
+    - [1.1.4. Artist](#114-artist)
+  - [1.2. Customizing Matplotlib](#12-customizing-matplotlib)
+  - [泛用性参数](#泛用性参数)
+    - [fontdict](#fontdict)
 - [2. matplotlib.pyplot](#2-matplotlibpyplot)
-  - [2.1. 基本操作](#21-基本操作)
-    - [2.1.1. matplotlib.pyplot.show](#211-matplotlibpyplotshow)
-    - [2.1.2. matplotlib.pyplot.subplots 子图](#212-matplotlibpyplotsubplots-子图)
-    - [2.1.3. 坐标轴设置 axes](#213-坐标轴设置-axes)
-    - [2.1.4. 标签标题设置 label](#214-标签标题设置-label)
-  - [2.2. Annotations](#22-annotations)
-  - [2.3. 折线图 plot](#23-折线图-plot)
-    - [2.3.1. 画图基本](#231-画图基本)
-    - [2.3.2. 折线图线的颜色及样式 标识 参数](#232-折线图线的颜色及样式-标识-参数)
-  - [2.4. 饼图 pie](#24-饼图-pie)
-  - [2.5. bar  条形图](#25-bar--条形图)
-  - [2.6. 直方图 Histograms  matplotlib.pyplot.hist](#26-直方图-histograms--matplotlibpyplothist)
-    - [2.6.1. 单数据图](#261-单数据图)
-    - [2.6.2. 多数据图](#262-多数据图)
-  - [2.7. 箱线图  plt.boxplot](#27-箱线图--pltboxplot)
-  - [2.8. 散点图 Scatterplots](#28-散点图-scatterplots)
-    - [2.8.1. 使用numpy 来分析散点数据](#281-使用numpy-来分析散点数据)
-  - [2.9. 图的设置](#29-图的设置)
-    - [2.9.1. 为折线图的线添加注解](#291-为折线图的线添加注解)
-  - [2.10. Text properties](#210-text-properties)
+  - [2.1. plt 基本通用操作](#21-plt-基本通用操作)
+    - [2.1.1. show](#211-show)
+    - [2.1.2. savefig](#212-savefig)
+  - [2.2. 图像创建与全局定义](#22-图像创建与全局定义)
+    - [2.2.1. pyplot.figure](#221-pyplotfigure)
+- [3. matplotlib.figure Figure](#3-matplotlibfigure-figure)
+- [4. matplotlib.axes Axes](#4-matplotlibaxes-axes)
+  - [4.1. Plotting](#41-plotting)
+    - [4.1.1. Basic 基础图](#411-basic-基础图)
+      - [4.1.1.1. plot 万物基础-折线图](#4111-plot-万物基础-折线图)
+    - [4.1.2. Spectral](#412-spectral)
+    - [4.1.3. 2D arrays 二维数据](#413-2d-arrays-二维数据)
+    - [4.1.4. Text and annotations 文字和标注](#414-text-and-annotations-文字和标注)
+  - [4.2. Axis / limits](#42-axis--limits)
+    - [4.2.1. Axis limits and direction](#421-axis-limits-and-direction)
+      - [Axes limit](#axes-limit)
+      - [Axes direction](#axes-direction)
+    - [4.2.2. Axis labels, title, and legend](#422-axis-labels-title-and-legend)
+      - [Axes title](#axes-title)
+      - [Axis labels 坐标轴 label](#axis-labels-坐标轴-label)
+      - [4.2.2.1. legend 图例说明](#4221-legend-图例说明)
+    - [4.2.3. Axis scales](#423-axis-scales)
+    - [4.2.4. Autoscaling and margins](#424-autoscaling-and-margins)
+    - [4.2.5. Aspect ratio](#425-aspect-ratio)
+    - [4.2.6. Ticks and tick labels](#426-ticks-and-tick-labels)
+  - [4.3. 以前的内容](#43-以前的内容)
+    - [4.3.1. 坐标轴设置 axes](#431-坐标轴设置-axes)
+    - [4.3.2. 标签标题设置 label](#432-标签标题设置-label)
+  - [4.4. Annotations](#44-annotations)
+  - [4.5. 折线图 plot](#45-折线图-plot)
+    - [4.5.1. 画图基本](#451-画图基本)
+    - [4.5.2. 折线图线的颜色及样式 标识 参数](#452-折线图线的颜色及样式-标识-参数)
+  - [4.6. 饼图 pie](#46-饼图-pie)
+  - [4.7. bar  条形图](#47-bar--条形图)
+  - [4.8. 直方图 Histograms  matplotlib.pyplot.hist](#48-直方图-histograms--matplotlibpyplothist)
+    - [4.8.1. 单数据图](#481-单数据图)
+    - [4.8.2. 多数据图](#482-多数据图)
+  - [4.9. 箱线图  plt.boxplot](#49-箱线图--pltboxplot)
+  - [4.10. 散点图 Scatterplots](#410-散点图-scatterplots)
+    - [4.10.1. 使用numpy 来分析散点数据](#4101-使用numpy-来分析散点数据)
+  - [4.11. 图的设置](#411-图的设置)
+    - [4.11.1. 为折线图的线添加注解](#4111-为折线图的线添加注解)
+  - [4.12. Text properties](#412-text-properties)
 
 
 # 1. matplotlib包 图表制作
-Plot show graphically what you've defined numerically
+
+Plot show graphically what you've defined numerically  
+
+用类似 Matlab 的方法制作各种图标, 是数据可视化, 数据分析的基础包
+
+
+## 1.1. matplotlib 的类
+
+plt 包是面向对象思想的库  
+整个 plt 的使用流程中, 基本上都是在对具体的某个图片对象进行操作和修改  
+![类](https://matplotlib.org/stable/_images/anatomy.png)
+
+整个库最常使用的类从顶层到底层如下: 
+
+### 1.1.1. Figure
+
+Figure 是整个图片, Figure 中:
+* 保持了对 子Axes的追踪
+* 图片的各种 Artists (包括titles, figure legends, colorbars, etc)
+* 子图的对象
+
+
+注意: 大部分的实际使用的函数都是同时创建 figure 和 axes, 但是实际上 axes 是 figure 的一部分, 可以先创建 figure 再往里面添加 axes
+* `fig = plt.figure()  # an empty figure with no Axes`
+* `fig, ax = plt.subplots()  # a figure with a single Axes`
+* `fig, axs = plt.subplots(2, 2)  # a figure with a 2x2 grid of Axes`
+
+### 1.1.2. Axes
+
+Axes 是 Figure 的一个 Artist , 用于控制整个图片的区域, 是所有轴的集合管理对象
+* axes 虽然结构上是 Figure 的一部分, 但是却是整个 plt 的核心画图接口 e.g. `ax.plot()`
+  * 大部分的画图函数都是作为 axes 的方法被定义的
+  * 根据图片的维度个数, 包括了 n 个子 Axis 对象
+  * 也包括了对应的 title, x-label, y-label 等  
+* Figure 之所以最大, 是因为它还管理了图片的分辨率, 图片的尺寸, 背景的颜色等相对来说 trivial 的属性
+
+
+### 1.1.3. Axis
+
+名词解释
+* tick : the marks on the Axis, 轴的刻度
+* ticklabels : strings labeling the ticks, 刻度的标签
+
+Axis 则是 Axes 的一部分 :
+* provide ticks and tick labels to provide scales for the data in the Axes
+* 用于正确的确定刻度和刻度标签的位置
+
+
+### 1.1.4. Artist
+
+是整个 matplotlib 库的最基础的类, 祖先类
+
+属于 matplotlib 的专用称呼, 即在 Figure 中所有可见的元素都是 Artist  (even Figure, Axes, and Axis objects)
+
+* 除此之外, includes Text objects, Line2D objects, collections objects, Patch objects, etc.
+* 在最后的渲染中, 所有的 Artist 被画在了画布(canvas)上 
+* 大部分细则的 Artist 都是绑定在 Axes 上的, 无法做到多个 Axes 之间共享
+
+## 1.2. Customizing Matplotlib
+
+Customizing Matplotlib with style sheets and rcParams
+
+
+## 泛用性参数
+
+### fontdict
+
+fontdict : `dict` A dictionary controlling the appearance of the title text, the default fontdict is
+
+```py
+{'fontsize': rcParams['axes.titlesize'],
+ 'fontweight': rcParams['axes.titleweight'],
+ 'color': rcParams['axes.titlecolor'],
+ 'verticalalignment': 'baseline',
+ 'horizontalalignment': loc}
+
+```
 
 # 2. matplotlib.pyplot
 
-该包是 matplotlib 最核心的包, 也是一般使用者会使用的最多的包
-
+该包是 matplotlib 最核心的包, 也就是整个画图包提供给普通用户的接口
 * `import matplotlib.pyplot as plt`  
-* 图的数据输入接受 numpy.array, 因此和 pandas 一起使用的时候需要用 `.values`
+* 其他的包的对象都可以通过该类自动生成, 因此在实际使用中不需要导入其他的包, 但是在学习的时候仍然需要参照其他包的文档
+* 图的数据输入接受 numpy.array, 因此和 pandas 一起使用的时候需要先转换类型  
 
 
-## 2.1. 基本操作
+matplotlib.pyplot is a state-based interface to matplotlib.
+
+## 2.1. plt 基本通用操作
 
 与图的类型无关, 是所有图通用的相关设置与操作  
 
-### 2.1.1. matplotlib.pyplot.show
+* plt.show()      :图像GUI显示
+* plt.savefig()   :保存图片
+
+
+### 2.1.1. show
 
 `matplotlib.pyplot.show(*, block=None)`  
 
@@ -46,47 +159,279 @@ Plot show graphically what you've defined numerically
   * 在非交互模式下, 例如远程Terminal, block 默认为 True, 只有在图像关闭后函数才返回
   * 在交互模式下, block 默认为 True, 立即返回
 
-
-### 2.1.2. matplotlib.pyplot.subplots 子图
-
-`matplotlib.pyplot.subplot(*args, **kwargs)`  
-
-* 分割图形 , 画多个图  
-* 返回值会自动得到用于设置参数的 `axes.Axes` 对象
+### 2.1.2. savefig
 
 ```py
-# 第一个参数 *argsint, (int, int, index), or SubplotSpec, default: (1, 1, 1)
-# 221代表分成2行2列后选择第一个子图
-
-# 该函数在调用的时候会自动将下一个画图函数应用到子图中
-# 调用完成后直接画就行
-
-ax1 = plt.subplot(221)
-plt.plot(...)
-ax2 = plt.subplot(222)
-plt.plot(...)
-ax3 = plt.subplot(223)
-plt.plot(...)
-ax4 = plt.subplot(224)
-plt.plot(...)
-# 优雅的写法
-ax1 = plt.subplot(2,2,1)
+savefig(fname, *, dpi='figure', format=None, metadata=None,
+        bbox_inches=None, pad_inches=0.1,
+        facecolor='auto', edgecolor='auto',
+        backend=None, **kwargs
+       )
+``` 
+* `fname`     : str or path-like or binary file-like
+* `format`    : str, 决定输出格式, 注意 plt 中如果 format 指定的话, 则完全不会影响 fname, 如果 format 是默认值, 则会从 fname 自动推导图片格式, 默认 Png
+* `dpi`       : float or 'figure', 每 inch 是多少分辨率
+* `bbox_inches`: str or `Bbox`, 如果是字符串 `tight`, 则会画出图片边界框
+* `pad_inches`: 在 bbox_inches 指定为 `tight` 的时候, 指定图片周围的留白宽度
 
 
 
+## 2.2. 图像创建与全局定义 
 
-# using the variable ax for single a Axes
-fig, ax = plt.subplots()
+图像创建的本质就是创建 Figure 对象以及为其添加 Axes 对象
 
-# using the variable axs for multiple Axes
-fig, axs = plt.subplots(2, 2)
+使用 matplotlib 创建图形有两种使用 style:
+1. 使用面向对象方法, 显式的创建 Figure 对象和 Axes 对象, 然后在其上调用方法, 比较麻烦, 但是清晰
+2. 直接使用 pyplot 包的懒人函数创建各种图形, 可以非常快, 但是资源不能复用, 这部分的函数单独写在一段里  
 
-# using tuple unpacking for multiple Axes
-fig, (ax1, ax2) = plt.subplot(1, 2)
-fig, ((ax1, ax2), (ax3, ax4)) = plt.subplot(2, 2)
+创建图形并获取图片对象Figure和 `axes.Axes`对象
+```py
+fig = plt.figure()  # an empty figure with no Axes
+fig, ax = plt.subplots()  # a figure with a single Axes
+fig, axs = plt.subplots(2, 2)  # a figure with a 2x2 grid of Axes
 ```
 
-### 2.1.3. 坐标轴设置 axes
+### 2.2.1. pyplot.figure
+
+```py
+matplotlib.pyplot.figure(
+    num=None, figsize=None, dpi=None, 
+    facecolor=None, edgecolor=None, frameon=True, 
+    FigureClass=<class 'matplotlib.figure.Figure'>, 
+    clear=False, **kwargs)
+```
+
+创建一个新的图 `Figure` 对象, 或者激活一个已经存在的图, 不会直接创建任何 Axes
+
+* `num`       : int or str or `Figure`
+  * 作为图在 matplotlib 内部内存的标识器, 分为数字版本 `Figure.number` 和字符串版本
+  * 如果是 None, 则会自动从 1 编号
+  * 如果是数字或者字符串, 则相应的创建并赋予标号
+  * 如果该标识的图片已经存在, 则 this figure is made active and returned
+* `figsize`   :(float, float), (default: [6.4, 4.8])
+* `facecolor` : color, 默认为白色
+* `edgecolor` : color, 边框颜色
+
+
+# 3. matplotlib.figure Figure
+
+Figure 在 matplotlib 中是最高级的类, `Top level Artist`, 保存了对所有图片中元素的链接  
+
+
+
+
+# 4. matplotlib.axes Axes
+
+参考官方文档 `matplotlib.axes` 
+
+是具体的画数据的类, 是控制画图的核心
+
+继承上来看 `artist.Artist -> axes._base._AxesBase -> axes._axes.Axes`
+
+通常来说, 一个二维图的 axes 里有 2个 axis  
+
+
+## 4.1. Plotting
+
+各种以 Axes 对象方法来操作画图的函数, 包括了matplotlib.pyplot 的各种画图函数的真实画图接口方法
+
+* 这些函数的返回值都是各种 `具体图的对象`, 例如 plot 会返回 `matplotlib.lines.Line2D` 的对象
+* 一般来说不需要直接操作图的属性, 转而用方法的 `**kwargs` 参数即可
+* 不同图的类也不同, 意味着不同种类的图可操作的属性也不同 , 因为太多了所以各种图的函数的 `**kwargs` 就暂且省去不看了
+
+
+
+
+
+### 4.1.1. Basic 基础图
+
+最基础的图, 也是最常用的包括
+
+| 类方法   | 图类型                                                           |
+| -------- | ---------------------------------------------------------------- |
+| plot     | 折线图, Plot y versus x as lines and/or markers.                 |
+| errorbar | Plot y versus x as lines and/or markers with attached errorbars. |
+| bar      | 条形图                                                           |
+| pie      | 饼图                                                             |
+
+#### 4.1.1.1. plot 万物基础-折线图 
+
+`Axes.plot(*args, scalex=True, scaley=True, data=None, **kwargs)`
+* 最主要的数据是通过无限参数 args 来输入的, 具体的使用方法如下
+* `plot([x], y, [fmt], *, data=None, **kwargs)`
+* `plot([x], y, [fmt], [x2], y2, [fmt2], ..., **kwargs)`
+* `fmt` : 是一个便捷参数, 用于省去通过类方法或者属性来修改图的样子的过程, 直接通过一个字符串来定义图的样式
+
+使用例
+```py
+plot(x, y)        # plot x and y using default line style and color
+plot(x, y, 'bo')  # plot x and y using blue circle markers
+plot(y)           # plot y using x as index array 0..N-1
+plot(y, 'r+')     # ditto, but with red plusses
+```
+
+
+`data = None` 传入类字典的数据来便捷的指定数据
+* 比起直接传入 x , y 的数据, 转而传入 data 的dict对象的对应 keys
+* `plot('xlabel', 'ylabel', data=obj)` 
+
+画出多个图
+* 由于 matplotlib 是基于状态的库 所以直接依次多次调用 plot 即可在同一张图片上画多个折现
+* 可以直接将 x, 或者 y 变成多维, 来直接传入多个曲线, 这里注意, matplotlib 的坐标轴维度(属性)在前, 数据index在后
+  * 若单条数据有 N 个点, 共计 m 条数据, 则 y 的维度应该是 (N,m) 而不是 (m,N), 这与一些数据分析的维度顺序相反
+  *  If both x and y are 2D, they must have the same shape.
+  *  If only one of them is 2D with shape (N, m) the other must have length N and will be used for every data set m.
+* 也可以使用 `*args` 的特性, 依次传入多个图的 `x,y,fmt` 即可
+
+```py
+# 多次调用
+plot(x1, y1, 'bo')
+plot(x2, y2, 'go')
+
+# 高维 x or y
+x = [1, 2, 3]
+y = np.array([[1, 2], [3, 4], [5, 6]])
+plot(x, y)
+
+# 无限参数
+plot(x1, y1, 'g^', x2, y2, 'g-')
+```
+
+
+### 4.1.2. Spectral
+
+### 4.1.3. 2D arrays 二维数据
+
+### 4.1.4. Text and annotations 文字和标注
+
+
+## 4.2. Axis / limits
+
+坐标轴, limits  
+
+用来操作数据轴的一些函数, 如同 matplotlib 的类的包容图, 一个 axes 对象管理了两个 axis 对象
+
+虽然一般情况下不需要直接进行 axis 对象的操作, 但是获取对象的方式是存在的
+```py
+# The use of this function is discouraged. You should instead directly access the attribute
+
+Axes.get_xaxis  # [Discouraged] Return the XAxis instance.
+Axes.get_yaxis  # [Discouraged] Return the YAxis instance.
+
+ax.xaxis
+ax.yaxis
+```
+
+### 4.2.1. Axis limits and direction
+
+
+#### Axes limit
+
+#### Axes direction
+调整坐标轴的方向, 通过这个接口可以反转坐标轴的增加方向, 正常方向是 x 轴向右增加, y 轴向上增加
+
+* `Axes.invert_xaxis()`   调转 x-axis
+* `Axes.invert_yaxis()`
+* `Axes.xaxis_inverted()`  返回目前的调转状态
+* `Axes.yaxis_inverted()`
+
+
+
+### 4.2.2. Axis labels, title, and legend
+
+对于一个图来说不可或缺的说明内容
+
+#### Axes title 
+
+一个图不能没有标题, 这里指定的是 axes 的 title, 理论上如果一个 figure 里只有一个子图的话和 figure 里的指定并没有区别, 应该主要用于有多个子图的情况
+
+这里一个 axes 事实上可以指定最多3个 title
+
+* `Axes.set_title(label, fontdict=None, loc=None, pad=None, *, y=None, **kwargs)`          Set a title for the Axes.
+  * loc : `{'center', 'left', 'right'}` 默认 center
+  * y : Vertical Axes location for the title (1.0 is the top), 如果是默认值 None 的话则代表自动推测 (自动推测防止覆盖到坐标轴的位置)
+  * pad : The offset of the title from the top of the Axes, in points. float, default `6.0`
+  * return : matplotlib 自己的文本对象  `matplotlib.text`
+
+* `Axes.get_title(loc='center')`          Get an Axes title. 参数用于指定要获取哪一个 title
+  * loc : `{'center', 'left', 'right'}`, str, default: 'center'
+ 
+
+#### Axis labels 坐标轴 label
+
+用于后手指定 x,y 的坐标轴
+
+* `Axes.set_xlabel(xlabel, fontdict=None, labelpad=None, *, loc=None, **kwargs)`   Set the label for the x-axis.
+* `Axes.set_ylabel(ylabel, fontdict=None, labelpad=None, *, loc=None, **kwargs)`   Set the label for the y-axis.
+  * labelpad 用于指定某种间距, 不太清楚, 传入 `float` 
+  * loc  用于指定坐标轴的 label 位于坐标轴的位置, 可以传入  `{'left', 'center', 'right'}`
+
+* `Axes.get_xlabel()`   Get the xlabel text string.
+* `Axes.get_ylabel()`   Get the ylabel text string.
+
+#### 4.2.2.1. legend 图例说明
+
+起码在拥有多条折线的图例, 各个线的图例是不可或缺的   
+
+`Axes.legend(*args, **kwargs)    Place a legend on the Axes.`
+* `handles` sequence of Artist, optional
+* `label` slist of str, optional
+* return : legend 对象, `matplotlib.legend`
+* 还有其他对于 legend box 的各种样式/位置指定参数, 可以直接去参照 `matplotlib.legend` 的文档, 或者日后要用的时候在参照该函数的文档
+
+创建一个易读的 legend 的方法如下
+* 1. Automatic detection of elements to be shown in the legend
+  * 这需要为每一个折线指定好 label
+  * 可以在创建一个折线的时候指定 `ax.plot([1, 2, 3], label='Inline label')`
+  * 可以在创建折现后, 通过折线的对象来设置 `line = ax.plot([1, 2, 3])   line.set_label('Label via method')`
+* 2. 直接将折线对象和对应的 legend 传入即可
+  * 这需要在创建折线的时候保留折线对象
+  * 向函数依次传入对应的 折线list 和 legend list
+  * 该函数可以保留一部分折线没有 legend, 即只选定想要有 legend 的折线
+* 3. 12的结合方法
+  * 创建折线的时候指定 label, 并保存对象
+  * 向函数传入关键字参数 `handles=[line1,line2]`
+* 4. 不安全的懒人方法
+  * 直接向 legend 函数传入按照次序的 legend list
+  * 会按照折线的创建顺序依次把 legend list 的名称赋予折线
+  * matplotlib 官方不推荐这种用法
+
+
+具体反应在代码上如下
+```py
+# 方法1 , 设置好 label 后直接调用 legend() 即可
+legend()
+
+# 方法2 , 
+legend(handles, labels)
+
+# 方法3
+legend(handles=handles)
+
+# 方法4
+legend(labels)
+```
+
+* `Axes.get_legend()`   返回当前 axes 的 legend 对象
+* `Axes.get_legend_handles_labels(legend_handler_map=None)` 返回当前 axes 的 legend 对象的 handles 和 labels
+
+```py
+# ax.legend() is equivalent to
+h, l = ax.get_legend_handles_labels()
+ax.legend(h, l)
+```
+
+### 4.2.3. Axis scales
+
+### 4.2.4. Autoscaling and margins
+
+### 4.2.5. Aspect ratio
+
+### 4.2.6. Ticks and tick labels
+
+## 4.3. 以前的内容
+
+### 4.3.1. 坐标轴设置 axes
 
 * axes 是一个图的坐标轴对象的引用
 * 如果获取了一个 axes 变量 , 然后就可以通过这个变量来对图标的坐标轴进行设置
@@ -111,7 +456,8 @@ ax.set(ylim=(4000 , 6000))
 ax.set_facecolor(color='tab:gray')
 ```
 
-### 2.1.4. 标签标题设置 label
+
+### 4.3.2. 标签标题设置 label
 
 * 不需要调用对象, 直接使用 plt 包的函数
 * 坐标轴标签
@@ -146,7 +492,9 @@ label = plt.xticks()
 # Passing an empty list removes all xticks.
 plt.xticks([])
 ```
-## 2.2. Annotations
+
+
+## 4.4. Annotations
 
 为图片添加注释
 * `matplotlib.pyplot.annotate(text, xy, *ara, **kwargs)`  
@@ -180,9 +528,9 @@ arrowpros 箭头格式设置:
     * ? 	Any key to matplotlib.patches.FancyArrowPatch
 
 
-## 2.3. 折线图 plot
+## 4.5. 折线图 plot
 
-### 2.3.1. 画图基本
+### 4.5.1. 画图基本
 ```py
 
 # plt.plot( x轴, y轴)
@@ -193,7 +541,7 @@ plt.plot(range(5,13),hurr_table[["2015"]].values)
 plt.show()
 
 ```
-### 2.3.2. 折线图线的颜色及样式 标识 参数 
+### 4.5.2. 折线图线的颜色及样式 标识 参数 
 
 对于网格和折线都可以对其进行样式设置
 ```py
@@ -236,7 +584,7 @@ plt.plot(range(1,13),aritravel[["1958"]].values, ls='-',color='r',marker='s')
 plt.plot(range(1,13),aritravel[["1960"]].values, ls='--',color='b',marker='o')
 ```
 
-## 2.4. 饼图 pie
+## 4.6. 饼图 pie
 
 
 `matplotlib.pyplot.pie(values, colors=colors, labels=labels,explode=explode, autopct='%1.1f%%', shadow=True)` 
@@ -252,7 +600,7 @@ plt.plot(range(1,13),aritravel[["1960"]].values, ls='--',color='b',marker='o')
 
 
 
-## 2.5. bar  条形图
+## 4.7. bar  条形图
 创建一个条形图 x坐标和其对应的值是必须的  
 
 ```py
@@ -282,9 +630,9 @@ matplotlib.pyplot.bar(x,height)
 
 
 
-## 2.6. 直方图 Histograms  matplotlib.pyplot.hist
+## 4.8. 直方图 Histograms  matplotlib.pyplot.hist
 
-### 2.6.1. 单数据图
+### 4.8.1. 单数据图
 * 直方图是一种统计报告图，形式上也是一个个的长条形，  
 * 但是直方图用长条形的面积表示频数，所以长条形的高度表示频数/组距，宽度表示组距，其长度和宽度均有意义。  
 * 当宽度相同时，一般就用长条形长度表示频数。  
@@ -324,7 +672,7 @@ plt.hist(flights['arr_delay'], color = 'blue', edgecolor = 'black',bins = int(18
 
   * The type of histogram to draw. 'bar' is a traditional bar-type histogram.
   * 
-### 2.6.2. 多数据图  
+### 4.8.2. 多数据图  
 
 
 
@@ -364,7 +712,7 @@ side-by-side 缺点
 * still hard to compare distributions between airlines.
 
 
-## 2.7. 箱线图  plt.boxplot
+## 4.9. 箱线图  plt.boxplot
 
 * 箱线图能够明确的展示离群点的信息，同时能够让我们了解数据是否对称，数据如何分组、数据的峰度.  
 
@@ -405,7 +753,7 @@ plt.show()
   * Sets the width of each box either with a scalar or a sequence. 
   * The default is 0.5, or 0.15*(distance between extreme positions), if that is smaller.
 
-## 2.8. 散点图 Scatterplots
+## 4.10. 散点图 Scatterplots
 
 Scatterplots show clusters of data rather than trends (as with line graphs) or discrete values (as with bar charts).  
 The purpose of a scatterplot is to help you see data patterns.  
@@ -421,7 +769,7 @@ plt.scatter(x, y, s=[100], marker='x', c='r')
 
 ```
 
-### 2.8.1. 使用numpy 来分析散点数据 
+### 4.10.1. 使用numpy 来分析散点数据 
 
 
 ```py
@@ -437,10 +785,10 @@ plb.plot(x, p(x), 'k-')
 ```
 
 
-## 2.9. 图的设置
+## 4.11. 图的设置
 
 
-###  2.9.1. 为折线图的线添加注解 
+###  4.11.1. 为折线图的线添加注解 
 
 ```py
 # 两条折线
@@ -458,7 +806,7 @@ plt.legend(['1958', '1960'], loc=2,facecolor ="None")
 
 
 
-## 2.10. Text properties
+## 4.12. Text properties
 
 对于一切字符实例,都可以指定其属性  (e.g., title(), xlabel() and text()).
 The matplotlib.text.Text instances have a variety of properties which can be configured via keyword arguments to the text commands   

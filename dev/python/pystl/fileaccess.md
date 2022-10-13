@@ -12,7 +12,6 @@
 *  实现了 `os.PathLike` 的对象可以通过 os 下的 `os.fspath()` 转换成 str or bytes
 
 
-
 # 2. os.path
 
 `os.path` 是一整个模块名, 从 `os` 模组中被分离出来
@@ -45,15 +44,16 @@ The pathlib module offers high-level path objects.
 ## 2.3. 提取及转换函数
 
 一分为二函数  
-* os.path.basename(path)  返回 path 路径中的最后一个成分
+* `os.path.basename(path)`  返回 path 路径中的最后一个成分
   * 如果 path 是文件路径, 就是文件名
   * 如果 path 是目录, 就是叶子文件夹名
-* os.path.dirname(path) 	返回 path 路径中的 减去 basename(path)
-* os.path.split(path)     将路径分解成 head 和 tail 两部分, 分别相当于上面的函数
+* `os.path.dirname(path)` 	返回 path 路径中的 减去 basename(path)
+  * 通过 `os.path.realpath(__file__)` 来提取脚本所在目录
+* `os.path.split(path)`     将路径分解成 head 和 tail 两部分, 分别相当于上面的函数
   * join(head, tail) returns a path to the same location as path
 
-* os.path.realpath(path) 	返回 path 的真实路径。
-* os.path.abspath(path)   返回相对路径 path 的绝对路径版本
+* `os.path.realpath(path)` 	返回 path 的真实路径。
+* `os.path.abspath(path)`   返回相对路径 path 的绝对路径版本
   * 相当于 `os.path.normpath(os.path.join(os.getcwd(), path))`
   * 直接执行 `os.path.abspath('.')` 获取当前路径
 
@@ -79,15 +79,35 @@ The pathlib module offers high-level path objects.
 * 相比于os.path, pathlib 将路径进行了对象化, 并提供了遍历文件夹相关的操作
 
 
+pathlib 实现了 Unix 和 Windows 两种不同格式的路径类, 类的具体继承定义如下, 明确各个类的负责的功能对于使用帮助很大  
+1. PurePath   : 定义了一个路径类的各种成员, 作为该包的基类, 用于明确 Path 类的成员变量构成
+2. 1 PurePosixPath : 定义了 Unix 路径的规格
+3. 2 PureWindowsPath : 同理, Windows 路径
+4. Path(PurePath)  : 添加了具体的OS访问方法, 是主要接口  
+5. 1 PosixPath(Path,PurePosixPath) : 具体的 Unix 路径类
+6. 2 WindowsPath(Path,PureWindowsPath) : 具体的 Windows 路径类
+
+在定义一个具体的路径对象时, 直接使用 Path()即可, 会根据系统标识号自动选择对应的对象  
+要想操作不同系列的路径, 即 Unix 操作 Windows 路径, 不能够定义 WindowsPath 类, 因为其中实现了 OS 接口, 但是可以定义 PureWindowsPath, 因为其中只有路径的字符操作没有 OS 操作  
+
+
 ## 3.1. pathlib.PurePath
 
 pathlib模块中的基类, 将路径看作普通的字符串
 * 将多个指定的字符串拼接成适用于当前操作系统的路径格式
 * 判断两个路径是否相等
+* 该模块的意义是 没有OS接口方法
 
 PurePath作为该模块的基类, 提供了最基础的构造方法和实例属性
-1. 创建路径时, 直接创建 PurePath 对象即可, 解释器会自动根据操作系统返回 PurePosixPath或者 PureWindowsPath
+1. 要创建Pure路径时, 直接创建 PurePath 对象即可, 解释器会自动根据操作系统返回 PurePosixPath或者 PureWindowsPath
 2. 创建好后可以通过 str() 转换成字符串
+
+要注意, Unix 和 Windows 里：
+* 路径对于大小写的敏感是不同的, Unix 是大小写敏感的, windows 不是, 这一点在 PurePath 里也是实现了的
+* 子路径的符号是不同的, 在 Python 里可以统一的使用斜杠/ , 在输出的时候会自动转换成对应操作系统的分隔符  
+
+The best way to construct a path is to join the parts of the path using the special operator `/`.
+
 
 ### 3.1.1. 创建路径
 
@@ -102,7 +122,19 @@ path = PurePath('http:','c.biancheng.net','python')
 print(path)
 ```
 
-### 3.1.2. 提取路径成分
+### 3.1.2. PurePath 的运算符重载  / 
+
+PurePath 类实现了 / 运算符, 直接使用斜杠可以快速的为 Path 添加子路径  
+
+```py
+
+a = PurePath('test')
+a / "cd"
+>>> PurePath('/test/cd')
+
+```
+
+### 3.1.3. 提取路径成分
 
 全部都是`PurePath.` 的成员变量, 直接用即可
 
@@ -112,12 +144,12 @@ print(path)
 | drive    | 返回路径字符串中的驱动器盘符。                                             |
 | root     | 返回路径字符串中的根路径。                                                 |
 | anchor   | 返回路径字符串中的盘符和根路径。                                           |
-| parents  | 返回当前路径的全部父路径。                                                 |
+| parents  | 特殊 object, 当前路径的全部父路径, len(parents) 相当于目录个数             |
 | parent   | 返回当前路径的上一级路径，相当于 `parents[0]` 的返回值。                   |
-| name     | 返回当前路径中的文件名。                                                   |
+| name     | 返回当前路径中的文件名, 相当于剔除 parent                                  |
 | suffixes | 返回当前路径中的文件所有后缀名。                                           |
 | suffix   | 返回当前路径中的文件后缀名。相当于 suffixes 属性返回的列表的最后一个元素。 |
-| stem     | 返回当前路径中的主文件名。                                                 |
+| stem     | 返回当前路径中的主文件名, 剔除掉 suffix 的 name                            |
 
 ```py
 
@@ -125,105 +157,150 @@ path1 = Path('.') / 'folder1' / 'text1.txt'
 print([path1, path1.name, path1.stem, path1.suffix, path1.parent, path1.parent.parent, path1.anchor])
 # [PosixPath('folder1/text1.txt'), 'text1.txt', 'text1', '.txt', PosixPath('folder1'), PosixPath('.'), '']
 ```
-## 3.2. pathlib.Path
+## 3.2. pathlib.Path - Concrete paths
 
 * Path类是PurePath的子类, 因此继承的方法不多赘述
 * Path类的路径必须是真实有效的
 
-提供的方法 :
+提供的方法 : 各种 OS 路径访问  
 * 判断路径是否真实存在
 * 判断该路径对应的是文件还是文件夹
 * 如果是文件，还支持对文件进行读写等操作
 
-The best way to construct a path is to join the parts of the path using the special operator `/`.
+很多都是从 os. 包中进行再封装的函数  
+
+### 3.2.1. 创建路径
+
+类构造函数创建
+* `pathlib.Path(*pathsegments)`
+  * `path1 = Path('.') / 'folder1' / 'text1.txt'`
+  * 会根据操作系统自动创建对应的 Path, 因此一般不需要用到下面的函数
+  * `pathlib.PosixPath(*pathsegments)`
+  * `class pathlib.WindowsPath(*pathsegments)`
 
 
-### 3.2.1. 定义路径
+便捷类方法创建
+* 创建当前路径的 Path
+  * `Path.cwd()`
+  * `Path('.')`
+* 创建用户主目录 Path
+  * `Path.home()`
 
-You can use `Path.cwd()` or `Path('.') `to refer to your currently working directory.
-```py
-from pathlib import Path
+路径的解释与转换
+* 解释 用户主目录符号 `~`
+  * `Path('~').expanduser()  ->  PosixPath('/home/longubuntu') `
+  * 注意, 带有 `~` 的 path 必须在通过该解释函数后才能正确使用
+* 转化成绝对路径
+  * `Path.resolve(strict=False)`
+  * 解释路径中的所有 `.`  `..` 等
+  * `strict=True` 相当于同时执行了 Path.exists(), 属于是一个懒人参数
+* 转化(追踪) link
+  * `Path.readlink()` 追踪一个link 的 path, 即返回 path of target file 
 
-print("Getting 'text1.txt'")
-path1 = Path('.') / 'folder1' / 'text1.txt'
-print(path1)
 
-```
+### 3.2.2. 获取文件信息
 
-### 3.2.2. .iterdir() 获取文件列表
+简单函数 省略 Path.*
 
-Using `.iterdir()` you can get all the files in a folder.   
-By list comprehension, you can convert this into a list object.  
+| 名称                          | 功能                                                                                    |
+| ----------------------------- | --------------------------------------------------------------------------------------- |
+| owner()                       | Return the name of the user owning the file                                             |
+| group()                       | Return name of the group owning the file                                                |
+| stat(*, follow_symlinks=True) | 返回一个 `os.stat_result` 对象, 具体查看该对象的成员, 传入 False 则查看 link 本身的信息 |
+| lstat()                       | 懒人函数, 相当于 stat(follow_symlinks=False)                                            |
+
+
+### 3.2.3. 更改文件信息
+
+
+`Path.chmod(mode, *, follow_symlinks=True)`
+* Change the file mode and permissions, like `os.chmod()`
+* e.g. `p.chmod(0o444)`
+* `Path.lchmod(mode)`  懒人函数, 相当于 `chmod(mode, follow_symlinks=False)`
+
+`Path.rename(target)`
+* 重命名/移动一个 文件(夹)
+* 如果 target 已经存在
+  * Unix : 会静默覆盖目标文件
+  * Windows : 会报错
+
+`Path.replace(target)`
+* 重命名/移动一个 文件(夹)
+* rename 的确保覆盖版本, 目标除了 file 以外, 还可以是 empty folder
+
+
+### 3.2.4. 文件(夹) 创建与访问
+
+文件夹 增删
+* `Path.mkdir(mode=0o777, parents=False, exist_ok=False)`
+  * Path 的创建文件夹, 比较方便
+`Path.rmdir()`
+  * 删除一个文件夹, 该文件夹必须为空  
+
+`Path.open(mode='r', buffering=- 1, encoding=None, errors=None, newline=None)`
+* 返回一个 opened file
+* 相当于 `open(Path)`
+
+
+文件读写函数, 直接省去 .open() 的过程
+* `Path.read_bytes()` 文件内容以 byte 读取, 返回 `b'` 二进制内容
+* `Path.read_text(encoding=None, errors=None)` : 文件内容以 txt 读取
+
+
+
+
+### link 的创建与修改
+
+链接的创建以及 Follow
+* `Path.readlink()` 追踪一个link 的 path, 即返回 path of target file 
+* `Path.symlink_to(target, target_is_directory=False)`
+
+### 3.2.5. is_* 系列判断函数
+
+该部分统一返回 bool, 省略 Path.*
+
+总是返回 False 的特殊情况
+* 不存在的路径
+* broken symlink
+* Permission error 无访问权限之类的
+
+
+| 函数              | 功能                                               |
+| ----------------- | -------------------------------------------------- |
+| exists()          | 路径是否存在, 如果不存在则以下所有函数都是 False   |
+| is_dir()          | 文件夹, 或者 symbolic link pointing to a directory |
+| is_file()         | 文件,  symbolic link pointing to a regular file    |
+| is_mount()        | Unix 专属函数, 不太懂                              |
+| is_symlink()      | True if the path points to a symbolic link         |
+| is_socket()       | True if the path points to a Unix socket           |
+| is_fifo()         | True if the path points to a FIFO                  |
+| is_block_device() | True if the path points to a block device          |
+| is_char_device()  | True if the path points to a character device      |
+
+
+### 3.2.6. 检索文件夹
+
+
+* `.iterdir()` 获取一层文件列表, 注意该函数返回的是一个迭代器, 需要手动转化成list * 
 
 ```py
 path2 = Path('.') / 'folder1'
 path_list = list(path2.iterdir())
-print(f'List of files: {path_list}')
-'''
-List of files: [PosixPath('folder1/text1.txt'), PosixPath('folder1/text2.txt'), PosixPath('folder1/text3.txt')]
-'''
-
 print(f'Number of files: {len(path_list)}')
-
 ```
 
-### 3.2.3. Path 的有用方法
+* `Path.glob(pattern)`  文件 pattern 检索  : 返回的也是迭代器
+  * 使用 `*` 通配符来匹配所有文件名   `glob(*.py)`
+  * 使用 `**` 来递归的检索所有子文件夹 `glob(**/*.py)`
+* `Path.rglob(pattern)` 递归的 pattern 检索
+  * 懒人函数
+  * 相当于默认在 pattern 前面添加了 `**/`
 
-```py
+### 3.2.7. 与 OS. 的互换性
 
-# Path.exists()
-# Checks if a path exists or not. Returns boolean value.
-file_path = Path('.') / 'folder1' / 'text2.txt'
-print(file_path.exists())
+由于很多函数都是 os. 的封装, 文档中列出了与 os 的函数对照表
 
-
-# Path.glob()   Globs and yields all file paths matching a specific pattern. 
-#  mark (?), which stands for one character.
-print("\nGetting all files with .csv extension.")
-dir_path = Path('.') / 'folder1'
-file_paths = dir_path.glob("*.csv")
-print(list(file_paths))
-
-# Path.rglob()
-# This is like Path.glob method but matches the file pattern recursively.
-print("\nGetting all .txt files starts with 'other' in all directories.")
-dir_path = Path('.')
-file_paths = dir_path.rglob("other?.txt")
-print(list(file_paths))
-
-# Path.mkdir()
-# Creates a new directory at this given path. 
-dir_path = Path('.') / 'folder_new' / 'folder_new_1'
-# parents:(boolean) If parents is True, 
-#         any missing parents of this path are created as needed. 
-#          Otherwise, if the parent is absent, FileNotFoundError is raised.
-dir_path.mkdir(parents=True)
-# exist_ok: (boolean) 
-#       If False, FileExistsError is raised if the target directory already exists. 
-#       If True, FileExistsError is ignored.
-
- 
-# Path.rename(target)   This will raise FileNotFoundError if the file is not found
-dir_path = Path('.') / 'folder_new' / 'folder_new_1'
-dir_path.rename(dir_path.parent / 'folder_n1')
-
-
-# Replaces a file or directory to the given target. Returns the new path instance. 
-dir_path = Path('.') / 'folder_new' / 'folder_n1'
-dir_path2 = Path('.') / 'folder1'  
-dir_path.replace(dir_path.parent / dir_path2)
-
-
-
-# Path.rmdir()
-# Removes a path pointing to a file or directory. The directory must be empty, otherwise, OSError is raised.
-```
-## 3.3. PosixPath WindowsPath
-
-* PurePosixPath PureWindowsPath 继承自PurePath
-* PosixPath WindowsPath 各自继承Pure*和Path类
-作为实例化的类, 一般不需要手动定义, 解释器会自动根据系统将Path和PurePath实例化成对应的类
-
+https://docs.python.org/3/library/pathlib.html?highlight=pathlib#correspondence-to-tools-in-the-os-module 
 
 
 # 4. shutil - High-level file operations
@@ -299,7 +376,7 @@ glob 模组提供查找对应 pattern 的路径的功能， 该模组顺从 Unix
 * 直接转义 pathname 中的所有特殊符号 `*?[]`
 * 对于想查找可能包含特殊符号的文件, 但又不知道怎么写转义符的时候很有用
 
-## tmpfile
+## 5.3. tmpfile
 
 只负责临时文件的全部, 分为 
 * low-level : which require manual cleanup. 需要手动删除使用完毕的 temp 文件
@@ -311,13 +388,13 @@ glob 模组提供查找对应 pattern 的路径的功能， 该模组顺从 Unix
   * TemporaryDirectory
   * SpooledTemporaryFile
 
-### 部件命令
+### 5.3.1. 部件命令
 
 创建随机文件名
 * gettempprefix()   : Return the filename prefix used to create temporary files
 * gettempprefixb()  : return value is in bytes.
 
-### 基础命令
+### 5.3.2. 基础命令
 
 * mkstemp : Creates a temporary file in the most secure manner possible.
 * mkdtemp : Creates a temporary directory in the most secure manner possible.

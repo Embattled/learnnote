@@ -7,7 +7,7 @@ Scipy是一个用于数学、科学、工程领域的常用软件包，可以处
 | ----------------- | ------------------ |
 | scipy.cluster     | 向量计算/Kmeans    |
 | scipy.constants   | 物理和数学常量     |
-| scipy.fftpack     | 傅立叶变换         |
+| scipy.fft          | 傅立叶变换         |
 | scipy.integrate   | 积分程序           |
 | scipy.interpolate | 插值               |
 | scipy.io          | 数据输入输出       |
@@ -21,10 +21,90 @@ Scipy是一个用于数学、科学、工程领域的常用软件包，可以处
 | scipy.special     | 一些特殊的数学函数 |
 | scipy.stats       | 统计               |
 
+# Fourier Transforms ( scipy.fft )
 
-## 1.1. scipy.stats  统计包
+因为是计算机的数值计算库, 所以天然是离散的  
+定义了很多 离散傅里叶变换 discrete Fourier transform (DFT) 的实现  
+
+The DFT has become a mainstay of numerical computing in part because of a very fast algorithm for computing it, called the Fast Fourier Transform (FFT)
+
+同为正交变换的离散正余弦变换也在该库中, 还有 Hankel Transforms  
+
+
+## Fast FFourier Transforms 快速傅里叶
+
+函数命名规则 `(i)(r/h)fft(n)`
+* i : 是否是逆变换
+* r/h: 数列的形式,  r 复数数列, h Hermitian complex array.
+* n : 针对几维数据的变换  支持 2,n
+
+函数通用输入参数:
+* `x` array_like  : 输入的数列, 支持 complex
+* `n/s=None` int/list : 数值要进行变换的长度, 即输出的结果数列的 shape, 对于多维FFT, len(s)=x.ndim, 而根据 n/s 具体的数值会对输入数列进行裁剪或者 0 padding
+* `axis=-1`   : 要进行 FFT 的维度, 影响最终输出的 ndim, 默认是针对全部数据的 FFT, 对于 fftn, 也会受 s 参数的影响
+* 
+
+## Discrete Sin and Discrete Cosine Transforms (DST DCT)
+
+## Fast Hankel Transforms
+
+## Helper functions 辅助函数
+
+# Interpolation (scipy.interpolate)
+
+scipy 的线性插值包, 大概可以分为:
+* 单变量插值
+* 多变量插值
+* 1-D Splines
+* 2-D Splines
+* Additional tools
+
+同系列的包管理方法一样, 各种功能具有 类 和 单函数两种实现  
+
+## Multivariate interpolation
+
+### 网格数据
+
+`scipy.interpolate.griddata(points, values, xi, method='linear', fill_value=nan, rescale=False)`
+* 无限制 任意维度网格插值
+* Interpolate unstructured D-D data.
+* points : 原始数据点的坐标, 令 数据的维度是 D, 点的个数是 n
+  * points 接受 2-D ndarray 输入, 维度为 (n,D), 代表 n 个点的坐标
+  * 接受 tuple 输入, len(points) = D, 每个元素是每个维度的坐标1-D np.array
+* values : Data values. shape (n,). 每个点的数据值
+* xi : 要被插值的点的坐标, 令 插值点的个数为 m
+  * 接受的两种输入格式同 points 一致
+* method : Method of 插值
+  * nearest
+  * linear
+  * cubic 
+
+
+
+# Multidimensional image processing ( scipy.ndimage ) 
+
+Scipy 也有图像处理的相关函数, 对比 scikit-image 里较为基础, 但也足够强大  
+
+# Signal Processing (scipy.signal)
+
+SciPy 中专门用于处理信号的包
+* 包括了一些 filter
+* 一些 filter design tools
+* 一些 B-spline interpolation algorithms for 1- and 2-D data
+
+## Filtering
+
+Filtering : a generic name for any system that modifies an input signal in some way.
+
+在 SciPy 中, signal 也是 Numpy array  
+
+
+## B-splines
+
+
+# 2. Statistics ( scipy.stats ) 
  
-### 1.1.1. 偏度（skewness） 和 峰度（peakedness；kurtosis）又称峰态系数
+### 2.0.1. 偏度（skewness） 和 峰度（peakedness；kurtosis）又称峰态系数
 * 偏度（skewness）
   * 是统计数据分布偏斜方向和程度的度量，是统计数据分布非对称程度的数字特征。  
   * 偏度定义中包括正态分布（偏度=0），右偏分布（也叫正偏分布，其偏度>0），左偏分布（也叫负偏分布，其偏度<0）
@@ -62,7 +142,7 @@ print(f'p-value {pvalue}')
 ```
 
 
-###  1.1.2. T-Test
+###  2.0.2. T-Test
 
 ```py
 
@@ -79,7 +159,7 @@ print(f"p-value {pvalue}")
 
 ```
 
-### 1.1.3. ANOVA
+### 2.0.3. ANOVA
 
 ```py
 from scipy.stats import f_oneway
@@ -98,7 +178,7 @@ print(f"p-value {pvalue}")
 
 ```
 
-### 1.1.4. from  chi-square statistic
+### 2.0.4. from  chi-square statistic
 
 scipy.stats import chi2_contingency
 
@@ -123,7 +203,7 @@ print(f'Chi-square {chi2}   p-value {p}')
 
 ```
 
-### 1.1.5. pearson
+### 2.0.5. pearson
 a = player_table["Height(inches)"]
 b = player_table["Weight(lbs)"]
 #print(a)
@@ -132,3 +212,5 @@ r_coef, r_p = pearsonr(a, b)
 
 print(f'Pearson r: {r_coef}')
 print(f'Spearman r: {rho_coef}')
+
+# 3. Multidimensional image processing ( scipy.ndimage )
