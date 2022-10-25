@@ -107,7 +107,7 @@ Execute the command (a string) in a subshell:
 `os.system(command)`
 
 
-# 4. time
+# 3. time
 
 * 与系统时间相关的函数, 大部分都是直接调取操作系统内置的 同名C函数  
 * Python 中与时间操作的 module 还有 `datetime` 和 `calendar`
@@ -127,7 +127,7 @@ The `time.get_clock_info()` function gives access to all available information a
   * 'time': time.time()
 
   
-## 4.1. 相关定义
+## 3.1. 相关定义
 
 * epoch 时间是从 1970, 00:00:00 (UTC) 开始的, 根据平台不同可能会有不同的开始时间
 * 该模组中的函数都是 C 相关的, 因此对日期的处理只限于 32位描述, 即 1970~2038
@@ -145,7 +145,7 @@ The `time.get_clock_info()` function gives access to all available information a
 time.gmtime(0)
 
 ```
-## 4.2. 获取时间
+## 3.2. 获取时间
 
 `time.clock()` 的不足之处
 * 系统相关的
@@ -191,7 +191,7 @@ time.gmtime(0)
 * `time.thread_time_ns() → int`
 
 
-## 4.3. 时间格式转换
+## 3.3. 时间格式转换
 
 转成秒数
 * `time.mktime(t)`
@@ -239,7 +239,7 @@ time.gmtime(0)
 | %Y %y  | 四位数年份 两位数年份 |
 
 
-## 4.4. 线程 CPU  (Unix限定)
+## 3.4. 线程 CPU  (Unix限定)
 
 * `time.pthread_getcpuclockid(thread_id)` :  version 3.7
   * 接受: thread_id , 必须是有效的 id, 否则会导致 段错误
@@ -264,14 +264,14 @@ time.gmtime(0)
 
 Clock ID Constants : used as parameters for `clock_getres()` and `clock_gettime()`
 
-## 4.5. 获取规格化字符串时间
+## 3.5. 获取规格化字符串时间
 
 
 
-# 5. logging 日志模块
+# 4. logging 日志模块
 
 
-# 6. argparse
+# 5. argparse
 
 argparse组件可以很方便的写一个命令行界面, 可以很容易的定义程序的参数, 并从`sys.argv`中提取出来, 同时还会自动提供错误信息  
 
@@ -286,7 +286,7 @@ args = parser.parse_args() # 翻译传入的命令行参数
   * `Namespace` 就是定义在 argparse 包中的一个简单的类, 和字典类似, 但是 print()更加可读, 可以使用 `vars()` 方法进行转换成字典
   * `args.*` 用点号进行对应的参数访问
 
-## 6.1. class argparse.ArgumentParser
+## 5.1. class argparse.ArgumentParser
 
 整个库的核心类, 在 CLI 处理的一开始定义, 有很多参数   
 
@@ -318,7 +318,7 @@ class argparse.ArgumentParser(
 * 
 
 
-## 6.2. add_argument()
+## 5.2. add_argument()
 
 作为 ArgumentParser 的最关键的方法, 重要程度是相同的, 这里详细解释该方法的各个参数  
 
@@ -374,7 +374,7 @@ group.add_argument("-v", "--verbose", action="store_true")
 group.add_argument("-q", "--quiet", action="store_true")
 ```  
 
-### 6.2.1. Action class
+### 5.2.1. Action class
 
 Action classes implement the Action API
 * a callable which returns a callable which processes arguments from the command-line.
@@ -382,7 +382,7 @@ Action classes implement the Action API
 
 
 
-## 6.3. 高级 args
+## 5.3. 高级 args
 
 除了基础的直接对 parser 里添加参数外, 还有其他特殊的参数类别  
 
@@ -391,7 +391,13 @@ Action classes implement the Action API
 * ArgumentParser.add_subparsers
 * ArgumentParser.set_defaults
 
-### 6.3.1. Argument groups 参数分组
+### 5.3.1. Argument groups 参数分组
+
+* 可以将不同的参数归到一组里,
+* 这个组在参数调用的时候没有任何卵用
+* 但是可以在程序帮助信息打印的时候更加清晰明确
+  * `title` 和 `descripition` 参数用于清晰打印
+  * 如果二者都为空, 那么在组之间只会有空行
 
 ```py
 parser = argparse.ArgumentParser()
@@ -403,15 +409,11 @@ group.add_argument('--bar', action='store_false')
 # 添加至这个组的参数在打印参数说明的时候会单独分隔开, 方便区分
 ```
 
-* 可以将不同的参数归到一组里,
-* 这个组在参数调用的时候没有任何卵用
-* 但是可以在程序帮助信息打印的时候更加清晰明确
-  * `title` 和 `descripition` 参数用于清晰打印
-  * 如果二者都为空, 那么在组之间只会有空行
 
 
 
-### 6.3.2. mutual exclusion 矛盾参数
+
+### 5.3.2. mutual exclusion 矛盾参数
 
 * 可以将不同的参数归到一组里, 这个组的参数只能出现一种
 * 每次调用该参数会返回一个类似于`ArgumentParser` 的对象, 通过调用该对象的 add_argument来实现矛盾参数
@@ -427,7 +429,7 @@ group.add_argument('--foo', action='store_true')
 group.add_argument('--bar', action='store_false')
 ```
 
-### 6.3.3. subparsers 子解释器
+### 5.3.3. subparsers 子解释器
 
 ```py
 ArgumentParser.add_subparsers(
@@ -460,7 +462,7 @@ ArgumentParser.add_subparsers(
 
 
 ```
-### 6.3.4. Parser defaults
+### 5.3.4. Parser defaults
 
 `ArgumentParser.set_defaults(**kwargs)` 
 
@@ -486,11 +488,11 @@ args=parser.parse_args()
 args.default_func()
 ```
 
-## 6.4. Parser defaults
+## 5.4. Parser defaults
 
 
 
-# 7. getpass  — Portable password input 
+# 6. getpass  — Portable password input 
 
 类似于 argparse , 只是该模组只针对密码界面    
 The getpass module provides two functions:
@@ -501,7 +503,7 @@ The getpass module provides two functions:
   * 获取当前进程的用户名
   * This function checks the environment variables `LOGNAME`, `USER`, `LNAME` and `USERNAME`, in order, and returns the value of the first one which is set to a `non-empty string`. 
   
-# ctypes — A foreign function library for Python
+# 7. ctypes — A foreign function library for Python
 
 foreign function library for Python, 外部函数库
 * 提供了与 C 语言兼容的数据类型
@@ -509,12 +511,12 @@ foreign function library for Python, 外部函数库
 * 用于将库函数应用在纯 Python 中
 
 
-## 使用指南
+## 7.1. 使用指南
 
 1. 建立动态库示例
 2. 获取动态库函数
 
-### 获取动态库实例
+### 7.1.1. 获取动态库实例
 
 
 动态库默认实例, You load libraries by accessing them as attributes of these objects
@@ -543,14 +545,14 @@ libc
 # <CDLL 'libc.so.6', handle ... at ...>  
 ```
 
-### 获取动态库函数  
+### 7.1.2. 获取动态库函数  
 
 
-### 调用动态库函数  
+### 7.1.3. 调用动态库函数  
 
-## 文档
+## 7.2. 文档
 
-### 动态库查找
+### 7.2.1. 动态库查找
 
 `ctypes.util.find_library(name)`:
 * `name` : 动态库的名称, 不需要带任何前缀 `lib` 和后缀 `.so` 以及版本 `.6` 

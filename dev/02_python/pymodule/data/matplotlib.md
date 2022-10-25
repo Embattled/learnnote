@@ -5,30 +5,36 @@
     - [1.1.3. Axis](#113-axis)
     - [1.1.4. Artist](#114-artist)
   - [1.2. Customizing Matplotlib](#12-customizing-matplotlib)
-  - [泛用性参数](#泛用性参数)
-    - [fontdict](#fontdict)
+  - [1.3. 泛用性参数](#13-泛用性参数)
+    - [1.3.1. fontdict](#131-fontdict)
 - [2. matplotlib.pyplot](#2-matplotlibpyplot)
   - [2.1. plt 基本通用操作](#21-plt-基本通用操作)
     - [2.1.1. show](#211-show)
     - [2.1.2. savefig](#212-savefig)
   - [2.2. 图像创建与全局定义](#22-图像创建与全局定义)
     - [2.2.1. pyplot.figure](#221-pyplotfigure)
+    - [2.2.2. pyplot.subplots](#222-pyplotsubplots)
 - [3. matplotlib.figure Figure](#3-matplotlibfigure-figure)
 - [4. matplotlib.axes Axes](#4-matplotlibaxes-axes)
   - [4.1. Plotting](#41-plotting)
     - [4.1.1. Basic 基础图](#411-basic-基础图)
       - [4.1.1.1. plot 万物基础-折线图](#4111-plot-万物基础-折线图)
-    - [4.1.2. Spectral](#412-spectral)
-    - [4.1.3. 2D arrays 二维数据](#413-2d-arrays-二维数据)
-    - [4.1.4. Text and annotations 文字和标注](#414-text-and-annotations-文字和标注)
+      - [4.1.1.2. lines](#4112-lines)
+    - [4.1.2. Spans 跨度线](#412-spans-跨度线)
+    - [4.1.3. Spectral](#413-spectral)
+    - [Statistics 统计图](#statistics-统计图)
+    - [Binned 分箱图](#binned-分箱图)
+      - [histogram 标准直方图](#histogram-标准直方图)
+    - [4.1.4. 2D arrays 二维数据](#414-2d-arrays-二维数据)
+    - [4.1.5. Text and annotations 文字和标注](#415-text-and-annotations-文字和标注)
   - [4.2. Axis / limits](#42-axis--limits)
     - [4.2.1. Axis limits and direction](#421-axis-limits-and-direction)
-      - [Axes limit](#axes-limit)
-      - [Axes direction](#axes-direction)
+      - [4.2.1.1. Axes limit](#4211-axes-limit)
+      - [4.2.1.2. Axes direction](#4212-axes-direction)
     - [4.2.2. Axis labels, title, and legend](#422-axis-labels-title-and-legend)
-      - [Axes title](#axes-title)
-      - [Axis labels 坐标轴 label](#axis-labels-坐标轴-label)
-      - [4.2.2.1. legend 图例说明](#4221-legend-图例说明)
+      - [4.2.2.1. Axes title](#4221-axes-title)
+      - [4.2.2.2. Axis labels 坐标轴 label](#4222-axis-labels-坐标轴-label)
+      - [4.2.2.3. legend 图例说明](#4223-legend-图例说明)
     - [4.2.3. Axis scales](#423-axis-scales)
     - [4.2.4. Autoscaling and margins](#424-autoscaling-and-margins)
     - [4.2.5. Aspect ratio](#425-aspect-ratio)
@@ -67,6 +73,8 @@ plt 包是面向对象思想的库
 ![类](https://matplotlib.org/stable/_images/anatomy.png)
 
 整个库最常使用的类从顶层到底层如下: 
+
+![继承关系](https://matplotlib.org/stable/_images/inheritance-7345c0ddb5186802e9fa7f2fb57416ac6be9621b.png)
 
 ### 1.1.1. Figure
 
@@ -117,9 +125,9 @@ Axis 则是 Axes 的一部分 :
 Customizing Matplotlib with style sheets and rcParams
 
 
-## 泛用性参数
+## 1.3. 泛用性参数
 
-### fontdict
+### 1.3.1. fontdict
 
 fontdict : `dict` A dictionary controlling the appearance of the title text, the default fontdict is
 
@@ -140,6 +148,7 @@ fontdict : `dict` A dictionary controlling the appearance of the title text, the
 * 图的数据输入接受 numpy.array, 因此和 pandas 一起使用的时候需要先转换类型  
 
 
+该包是一个基于状态的包, 很多对象都是隐式的保存在内存中的
 matplotlib.pyplot is a state-based interface to matplotlib.
 
 ## 2.1. plt 基本通用操作
@@ -184,7 +193,7 @@ savefig(fname, *, dpi='figure', format=None, metadata=None,
 1. 使用面向对象方法, 显式的创建 Figure 对象和 Axes 对象, 然后在其上调用方法, 比较麻烦, 但是清晰
 2. 直接使用 pyplot 包的懒人函数创建各种图形, 可以非常快, 但是资源不能复用, 这部分的函数单独写在一段里  
 
-创建图形并获取图片对象Figure和 `axes.Axes`对象
+创建并获取图片对象`Figure`和 `axes.Axes`对象
 ```py
 fig = plt.figure()  # an empty figure with no Axes
 fig, ax = plt.subplots()  # a figure with a single Axes
@@ -207,10 +216,57 @@ matplotlib.pyplot.figure(
   * 作为图在 matplotlib 内部内存的标识器, 分为数字版本 `Figure.number` 和字符串版本
   * 如果是 None, 则会自动从 1 编号
   * 如果是数字或者字符串, 则相应的创建并赋予标号
-  * 如果该标识的图片已经存在, 则 this figure is made active and returned
-* `figsize`   :(float, float), (default: [6.4, 4.8])
-* `facecolor` : color, 默认为白色
-* `edgecolor` : color, 边框颜色
+  * 如果该标识的图片已经存在, 则 this figure is made active and returned. 通过 clear 参数可以覆盖的重新创建
+* `figsize`   :(float, float), (default: [6.4, 4.8]) Width, height in inches.
+* `dpi`       : float, default 100.0 . The resolution of the figure in dots-per-inch.
+* `facecolor` : color, 默认为白色. The background color.
+* `edgecolor` : color, 边框颜色. The border color.
+* `frameon`   : bool, default: True. If False, suppress drawing the figure frame.
+* `FigureClass`: subclass of Figure. If set, an instance of this subclass will be created, rather than a plain Figure.
+* `clear`     : bool, default: False. If True and the figure already exists, then it is cleared.
+* `layout`    : `{'constrained', 'tight', LayoutEngine, None}`, default: None. 需要参照 Figure 类的文档
+* `**kwargs`  : 其他关键字参数传递给 Figure 类的构造函数
+* Returns: `Figure`
+
+
+### 2.2.2. pyplot.subplots
+
+```py
+matplotlib.pyplot.subplots(
+  nrows=1, ncols=1, *, 
+  sharex=False, sharey=False, 
+  squeeze=True, 
+  width_ratios=None, height_ratios=None, 
+  subplot_kw=None, gridspec_kw=None, 
+  **fig_kw)
+```
+Create a figure and a set of subplots.
+* `nrows`, `ncols`  :int, default: 1 .Number of rows/columns of the subplot grid.
+* `sharex`, `sharey` : bool or `{'none', 'all', 'row', 'col'}`, default: False.
+  * Controls sharing of properties among x (sharex) or y (sharey) axes:
+  * `True` or `all` 会在所有子图中共享 x/y 轴
+  * `False` or `none` 会让各个子图的坐标轴互相独立
+  * `row` : 子图的每行里会共享 x/y 轴
+  * `col` : 子图的每列会共享 x/y 轴
+  * 如果开启了坐标轴共享的话:
+    * When subplots have a shared x-axis along a column, only the x tick labels of the bottom subplot are created.
+    * When subplots have a shared y-axis along a row, only the y tick labels of the first column subplot are created.
+    * To later turn other subplots' ticklabels on, use tick_params.
+    * When subplots have a shared axis that has units, calling set_units will update each axis with the new units.
+* `squeeze` :bool, default: True. 正常来说返回的 Axes 应该是个2维矩阵, 但是 squeeze 为 True 的话会压缩掉shape为 1 的维度
+  * if only one subplot is constructed (nrows=ncols=1), the resulting single Axes object is returned as a scalar
+  * for Nx1 or 1xM subplots, the returned object is a 1D numpy object array of Axes objects.
+* `width_ratios` `height_ratios` : array-like of length ncols, optional. 
+  * 是一个从 `gridspec_kw` 提取的便捷参数
+  * 用于指定图之间的相互比例, 通过比例来调整子图的大小
+  * Each column gets a relative width of `width_ratios[i] / sum(width_ratios) `
+  * Each row gets a relative height of `height_ratios[i] / sum(height_ratios)`
+* `subplot_kw` : 用于传递给 `add_subplot` 的关键字参数字典
+* `gridspec_kw`: 用于传递给 `GridSpec` constructor 的关键字参数字典
+* `**fig_kw`   : 其余的关键字参数都是传递给 `pyplot.figure` 的
+* return:
+  * fig : `Figure`
+  * ax  : `Axes` or array of Axes  
 
 
 # 3. matplotlib.figure Figure
@@ -297,12 +353,92 @@ plot(x, y)
 plot(x1, y1, 'g^', x2, y2, 'g-')
 ```
 
+#### 4.1.1.2. lines
 
-### 4.1.2. Spectral
+画横线/竖线
+* 这里线的长度是根据坐标轴的数值来指定的, 且为必须参数
+* 如果想方便快捷的画跨越整个图的直线, 直接使用 `ax*line` 
+* 该函数也可以转换成类似于 `ax*line` 的使用方法  
+  * `By using ``transform=vax.get_xaxis_transform()`` the y coordinates are scaled`
+  * ` such that 0 maps to the bottom of the axes and 1 to the top.`
+* 该函数一次可以画多条线 : 返回 `LineCollection` 对象
 
-### 4.1.3. 2D arrays 二维数据
+```py
+Axes.vlines(x, ymin, ymax, colors=None, linestyles='solid', label='', *, data=None, **kwargs)
+Axes.hlines(y, xmin, xmax, colors=None, linestyles='solid', label='', *, data=None, **kwargs)
 
-### 4.1.4. Text and annotations 文字和标注
+Returns:
+    LineCollection
+
+vax.vlines([1, 2], 0, 1, transform=vax.get_xaxis_transform(), colors='r')
+
+```
+
+### 4.1.2. Spans 跨度线
+
+主要用来做一些标记, 该分类提供了一些在图中画水平线/垂直线的函数, 功能上似乎和 basic 中的 vlines 没什么区别, 但是这里线的长度是相对于整个图, 与数据内容无关, 且该函数一次只能画一条线/一个多边形  
+
+* line 函数本质上与 plot 相同都是向图中添加 `Line2D` 对象 和一个 transform
+* span 函数则是向图中添加 `Polygon`
+* 因此查阅各个函数的 kwargs 内容即参照以上的对象即可
+
+画单线的函数
+* Axes.axhline   Add a horizontal line across the Axes.
+* Axes.axvline   Add a vertical line across the Axes.
+* Axes.axline    Add an infinitely long straight line.
+  * 指定两点画一条线
+  * 或者指定一点 + `slope` 来画一条线
+  * xy 代表一个点, 为 `(float,float)` 的格式
+
+```py
+Axes.axhline(y=0, xmin=0, xmax=1, **kwargs)
+Axes.axvline(x=0, ymin=0, ymax=1, **kwargs)
+Axes.axline(xy1, xy2=None, *, slope=None, **kwargs)
+
+Returns:
+    Line2D
+```
+
+
+画范围的函数
+* Axes.axhspan   Add a horizontal span (rectangle) across the Axes.
+* Axes.axvspan   Add a vertical span (rectangle) across the Axes.
+
+```py
+Axes.axhspan(ymin, ymax, xmin=0, xmax=1, **kwargs)
+Axes.axvspan(xmin, xmax, ymin=0, ymax=1, **kwargs)
+
+Returns:
+    Polygon
+        # Vertical span (rectangle) from (xmin, ymin) to (xmax, ymax).
+
+
+```
+
+
+### 4.1.3. Spectral
+
+### Statistics 统计图
+
+### Binned 分箱图
+
+最经典的直方图定义在这里  
+
+
+#### histogram 标准直方图
+
+```py
+Axes.hist(x, bins=None, range=None, density=False, weights=None, 
+    cumulative=False, bottom=None, histtype='bar', align='mid', 
+    orientation='vertical', 
+    rwidth=None, log=False, color=None, 
+    label=None, stacked=False, *, data=None, **kwargs)
+
+```
+
+### 4.1.4. 2D arrays 二维数据
+
+### 4.1.5. Text and annotations 文字和标注
 
 
 ## 4.2. Axis / limits
@@ -325,9 +461,9 @@ ax.yaxis
 ### 4.2.1. Axis limits and direction
 
 
-#### Axes limit
+#### 4.2.1.1. Axes limit
 
-#### Axes direction
+#### 4.2.1.2. Axes direction
 调整坐标轴的方向, 通过这个接口可以反转坐标轴的增加方向, 正常方向是 x 轴向右增加, y 轴向上增加
 
 * `Axes.invert_xaxis()`   调转 x-axis
@@ -341,7 +477,7 @@ ax.yaxis
 
 对于一个图来说不可或缺的说明内容
 
-#### Axes title 
+#### 4.2.2.1. Axes title 
 
 一个图不能没有标题, 这里指定的是 axes 的 title, 理论上如果一个 figure 里只有一个子图的话和 figure 里的指定并没有区别, 应该主要用于有多个子图的情况
 
@@ -357,7 +493,7 @@ ax.yaxis
   * loc : `{'center', 'left', 'right'}`, str, default: 'center'
  
 
-#### Axis labels 坐标轴 label
+#### 4.2.2.2. Axis labels 坐标轴 label
 
 用于后手指定 x,y 的坐标轴
 
@@ -369,7 +505,7 @@ ax.yaxis
 * `Axes.get_xlabel()`   Get the xlabel text string.
 * `Axes.get_ylabel()`   Get the ylabel text string.
 
-#### 4.2.2.1. legend 图例说明
+#### 4.2.2.3. legend 图例说明
 
 起码在拥有多条折线的图例, 各个线的图例是不可或缺的   
 
