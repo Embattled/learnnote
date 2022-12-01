@@ -22,11 +22,12 @@
       - [4.1.1.2. lines](#4112-lines)
     - [4.1.2. Spans 跨度线](#412-spans-跨度线)
     - [4.1.3. Spectral](#413-spectral)
-    - [Statistics 统计图](#statistics-统计图)
-    - [Binned 分箱图](#binned-分箱图)
-      - [histogram 标准直方图](#histogram-标准直方图)
-    - [4.1.4. 2D arrays 二维数据](#414-2d-arrays-二维数据)
-    - [4.1.5. Text and annotations 文字和标注](#415-text-and-annotations-文字和标注)
+    - [4.1.4. Statistics 统计图](#414-statistics-统计图)
+    - [4.1.5. Binned 分箱图](#415-binned-分箱图)
+      - [4.1.5.1. histogram 标准直方图](#4151-histogram-标准直方图)
+      - [4.1.5.2. staris 阶梯图](#4152-staris-阶梯图)
+    - [4.1.6. 2D arrays 二维数据](#416-2d-arrays-二维数据)
+    - [4.1.7. Text and annotations 文字和标注](#417-text-and-annotations-文字和标注)
   - [4.2. Axis / limits](#42-axis--limits)
     - [4.2.1. Axis limits and direction](#421-axis-limits-and-direction)
       - [4.2.1.1. Axes limit](#4211-axes-limit)
@@ -418,14 +419,14 @@ Returns:
 
 ### 4.1.3. Spectral
 
-### Statistics 统计图
+### 4.1.4. Statistics 统计图
 
-### Binned 分箱图
+### 4.1.5. Binned 分箱图
 
 最经典的直方图定义在这里  
 
 
-#### histogram 标准直方图
+#### 4.1.5.1. histogram 标准直方图
 
 ```py
 Axes.hist(x, bins=None, range=None, density=False, weights=None, 
@@ -436,9 +437,31 @@ Axes.hist(x, bins=None, range=None, density=False, weights=None,
 
 ```
 
-### 4.1.4. 2D arrays 二维数据
+以 numpy 的 histogram 函数作为基础, 配合 matplotplot 库的 BarContainer 或 Ploygon 模块来实现的直方图, 绝大多数参数的意思都继承了 numpy 的 histogram 函数
+* 注意, 该函数更倾向是一个统合的便捷函数, 如果数据已经经过 numpy.histogram 进行统计, 则可以使用 `bar` 或者 `stairs` 来画图
+* 或者使用使用特殊的参数来将直方图统计的结果直接输入 `Axes.hist` 即 `plt.hist(bins[:-1], bins, weights=counts)`
 
-### 4.1.5. Text and annotations 文字和标注
+
+#### 4.1.5.2. staris 阶梯图
+
+作为直方图的一部分, 将每个 y值数据 画成从 x 轴出发的长方形  
+A stepwise constant function as a line with bounding edges or a filled plot.
+
+`Axes.stairs(values, edges=None, *, orientation='vertical', baseline=0, fill=False, data=None, **kwargs)`
+* `values` : array-like, The step heights.
+* `edges`  : array-like, The edge positions, with `len(edges) == len(vals) + 1`, between which the curve takes on vals values.
+* `orientation` : `{'vertical', 'horizontal'}`, default: 'vertical'. 决定了数据的长方体画的方向。
+* `baseline` : float, array-like or None, default: 0. 直方图的底部基线数值.
+* `fill`   : bool, default: False. 每太看懂, Whether the area under the step curve should be filled.
+* `data`   : indexable object, optional. 经典字典型数据输入, If given, all parameters also accept a string `s`, which is interpreted as `data[s]`
+* `**kwargs` :StepPatch properties
+
+返回值:
+* Returns: `matplotlib.patches.StepPatch` 
+
+### 4.1.6. 2D arrays 二维数据
+
+### 4.1.7. Text and annotations 文字和标注
 
 
 ## 4.2. Axis / limits
@@ -460,8 +483,16 @@ ax.yaxis
 
 ### 4.2.1. Axis limits and direction
 
+操纵坐标轴的 limits
 
 #### 4.2.1.1. Axes limit
+
+* `Axes.set_xlim` : Set the x-axis view limits.
+* `Axes.get_xlim` : Return the x-axis view limits.
+* `Axes.set_ylim` : Set the y-axis view limits.
+* `Axes.get_ylim` : Return the y-axis view limits.
+
+
 
 #### 4.2.1.2. Axes direction
 调整坐标轴的方向, 通过这个接口可以反转坐标轴的增加方向, 正常方向是 x 轴向右增加, y 轴向上增加

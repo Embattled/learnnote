@@ -23,7 +23,7 @@
     - [4.2.1. Changing array shape 形态转换](#421-changing-array-shape-形态转换)
     - [4.2.2. Transpose-like operations 转置操作](#422-transpose-like-operations-转置操作)
     - [4.2.3. Changing number of dimensions 维度个数操作](#423-changing-number-of-dimensions-维度个数操作)
-      - [4.2.3.1. expand_dims 升维](#4231-expand_dims-升维)
+      - [4.2.3.1. expand\_dims 升维](#4231-expand_dims-升维)
       - [4.2.3.2. squeeze 压缩维度](#4232-squeeze-压缩维度)
     - [4.2.4. Joining arrays 拼接](#424-joining-arrays-拼接)
     - [4.2.5. Splitting arrays 拆分](#425-splitting-arrays-拆分)
@@ -32,43 +32,50 @@
       - [4.2.7.1. append](#4271-append)
       - [4.2.7.2. resize 强行更改 shape](#4272-resize-强行更改-shape)
     - [4.2.8. Rearranging elements 重新排列元素](#428-rearranging-elements-重新排列元素)
-  - [4.3. numpy Input and Output  Numpy 数据的 IO](#43-numpy-input-and-output--numpy-数据的-io)
-    - [4.3.1. Text Files](#431-text-files)
-  - [4.4. Linear algebra 线性代数计算](#44-linear-algebra-线性代数计算)
-    - [4.4.1. Matrix and vector products 向量矩阵乘法](#441-matrix-and-vector-products-向量矩阵乘法)
-      - [4.4.1.1. 矩阵乘法](#4411-矩阵乘法)
-    - [4.4.2. Solving equations and inverting matrices 计算矩阵方程或者逆](#442-solving-equations-and-inverting-matrices-计算矩阵方程或者逆)
-  - [4.5. Logic functions 逻辑计算](#45-logic-functions-逻辑计算)
-    - [4.5.1. Truth value testing](#451-truth-value-testing)
-  - [4.6. Masked array operations](#46-masked-array-operations)
-  - [4.7. Mathematical function 数学操作](#47-mathematical-function-数学操作)
-    - [4.7.1. Trigonometric functions 三角函数](#471-trigonometric-functions-三角函数)
-    - [4.7.2. Hyperbolic functions 双曲线函数](#472-hyperbolic-functions-双曲线函数)
-    - [4.7.3. Rounding 最近值](#473-rounding-最近值)
-    - [4.7.4. Sums, products, differences 求和求积求差](#474-sums-products-differences-求和求积求差)
-    - [4.7.5. Exponents and logarithms 指数](#475-exponents-and-logarithms-指数)
-    - [4.7.6. Rational routines 最大公因数 最小公倍数](#476-rational-routines-最大公因数-最小公倍数)
-    - [4.7.7. Extrema Finding 极值寻找](#477-extrema-finding-极值寻找)
-    - [4.7.8. 杂项](#478-杂项)
-      - [4.7.8.1. convolve 卷积](#4781-convolve-卷积)
-      - [4.7.8.2. clip 裁剪](#4782-clip-裁剪)
-      - [4.7.8.3. interp 简易线性插值](#4783-interp-简易线性插值)
-  - [4.8. Sorting, Searching, Counting 排序 搜索 计数](#48-sorting-searching-counting-排序-搜索-计数)
-    - [4.8.1. Sorting 排序](#481-sorting-排序)
-      - [4.8.1.1. 基础排序](#4811-基础排序)
-      - [4.8.1.2. 部分有序](#4812-部分有序)
-    - [4.8.2. Searching 元素查找](#482-searching-元素查找)
-      - [4.8.2.1. 最大值选择](#4821-最大值选择)
-      - [4.8.2.2. 逻辑选择值 where](#4822-逻辑选择值-where)
-      - [4.8.2.3. 非零选择](#4823-非零选择)
-  - [4.9. Statistics 统计](#49-statistics-统计)
-    - [4.9.1. Averages and variances 平均和方差](#491-averages-and-variances-平均和方差)
-    - [4.9.2. Histograms](#492-histograms)
-      - [4.9.2.1. histogram 一维数据直方图](#4921-histogram-一维数据直方图)
-      - [4.9.2.2. histogram2d 二维直方图](#4922-histogram2d-二维直方图)
-      - [4.9.2.3. bincount 原子统计](#4923-bincount-原子统计)
-  - [4.10. Set 集合](#410-set-集合)
-    - [4.10.1. unique](#4101-unique)
+  - [4.3. Discrete Fourier Transform (numpy.fft)](#43-discrete-fourier-transform-numpyfft)
+    - [4.3.1. Standard FFTs 标准傅里叶变换](#431-standard-ffts-标准傅里叶变换)
+    - [4.3.2. Real FFTs 复数傅里叶变换](#432-real-ffts-复数傅里叶变换)
+    - [4.3.3. Hermitian FFTs](#433-hermitian-ffts)
+    - [Helper routines 辅助功能](#helper-routines-辅助功能)
+  - [4.4. linalg](#44-linalg)
+    - [4.4.1. SVD 奇异值分解](#441-svd-奇异值分解)
+  - [4.5. numpy Input and Output  Numpy 数据的 IO](#45-numpy-input-and-output--numpy-数据的-io)
+    - [4.5.1. Text Files](#451-text-files)
+  - [4.6. Linear algebra 线性代数计算](#46-linear-algebra-线性代数计算)
+    - [4.6.1. Matrix and vector products 向量矩阵乘法](#461-matrix-and-vector-products-向量矩阵乘法)
+      - [4.6.1.1. 矩阵乘法](#4611-矩阵乘法)
+    - [4.6.2. Solving equations and inverting matrices 计算矩阵方程或者逆](#462-solving-equations-and-inverting-matrices-计算矩阵方程或者逆)
+  - [4.7. Logic functions 逻辑计算](#47-logic-functions-逻辑计算)
+    - [4.7.1. Truth value testing](#471-truth-value-testing)
+  - [4.8. Masked array operations](#48-masked-array-operations)
+  - [4.9. Mathematical function 数学操作](#49-mathematical-function-数学操作)
+    - [4.9.1. Trigonometric functions 三角函数](#491-trigonometric-functions-三角函数)
+    - [4.9.2. Hyperbolic functions 双曲线函数](#492-hyperbolic-functions-双曲线函数)
+    - [4.9.3. Rounding 最近值](#493-rounding-最近值)
+    - [4.9.4. Sums, products, differences 求和求积求差](#494-sums-products-differences-求和求积求差)
+    - [4.9.5. Exponents and logarithms 指数](#495-exponents-and-logarithms-指数)
+    - [4.9.6. Rational routines 最大公因数 最小公倍数](#496-rational-routines-最大公因数-最小公倍数)
+    - [4.9.7. Extrema Finding 极值寻找](#497-extrema-finding-极值寻找)
+    - [4.9.8. 杂项](#498-杂项)
+      - [4.9.8.1. convolve 卷积](#4981-convolve-卷积)
+      - [4.9.8.2. clip 裁剪](#4982-clip-裁剪)
+      - [4.9.8.3. interp 简易线性插值](#4983-interp-简易线性插值)
+  - [4.10. Sorting, Searching, Counting 排序 搜索 计数](#410-sorting-searching-counting-排序-搜索-计数)
+    - [4.10.1. Sorting 排序](#4101-sorting-排序)
+      - [4.10.1.1. 基础排序](#41011-基础排序)
+      - [4.10.1.2. 部分有序](#41012-部分有序)
+    - [4.10.2. Searching 元素查找](#4102-searching-元素查找)
+      - [4.10.2.1. 最大值选择](#41021-最大值选择)
+      - [4.10.2.2. 逻辑选择值 where](#41022-逻辑选择值-where)
+      - [4.10.2.3. 非零选择](#41023-非零选择)
+  - [4.11. Statistics 统计](#411-statistics-统计)
+    - [4.11.1. Averages and variances 平均和方差](#4111-averages-and-variances-平均和方差)
+    - [4.11.2. Histograms](#4112-histograms)
+      - [4.11.2.1. histogram 一维数据直方图](#41121-histogram-一维数据直方图)
+      - [4.11.2.2. histogram2d 二维直方图](#41122-histogram2d-二维直方图)
+      - [4.11.2.3. bincount 原子统计](#41123-bincount-原子统计)
+  - [4.12. Set 集合](#412-set-集合)
+    - [4.12.1. unique](#4121-unique)
 - [5. numpy.random](#5-numpyrandom)
   - [5.1. Generator](#51-generator)
   - [5.2. Random Generation Function](#52-random-generation-function)
@@ -82,11 +89,9 @@
     - [7.1.2. numpy binary files](#712-numpy-binary-files)
     - [7.1.3. text file](#713-text-file)
 - [8. config](#8-config)
-  - [8.1. np.set_printoptions](#81-npset_printoptions)
+  - [8.1. np.set\_printoptions](#81-npset_printoptions)
     - [8.1.1. numpy.shape](#811-numpyshape)
     - [8.1.2. numpy.dot()  矩阵点乘](#812-numpydot--矩阵点乘)
-  - [8.2. linalg](#82-linalg)
-    - [8.2.1. SVD 奇异值分解](#821-svd-奇异值分解)
 
 * python数值包 最基础的列表处理包 被其他许多包所依赖  
 * python stl 中的 math 有许多同名函数, 但不支持向量输入, 因此机器学习中更多的使用 numpy
@@ -527,7 +532,88 @@ flip 以及 懒人 flip : Reverse the order of elements in an array along the gi
   * 反转左右, 列, 要求输入数据必须是 2维以上, axis=1
 
 
-## 4.3. numpy Input and Output  Numpy 数据的 IO
+## 4.3. Discrete Fourier Transform (numpy.fft)
+
+The SciPy module `scipy.fft` is a more comprehensive superset of numpy.fft, which includes only a basic set of routines.
+* numpy 的傅里叶变换包只提供了一些基础的 routines 
+* 在满足使用场景的情况下, 使用 numpy 的包可以不用导入 scipy
+
+numpy fft 的细则:
+* 类型提升
+  * 为了保证精度, numpy.fft 会自动对输入数据进行数据精度提升, `float32 -> float64` 以及 `complex64 -> complex128`
+  * 对于不提升精度的 FFT 实现, 需要参考 `scipy.fftpack`
+* Normalization : 傅里叶变化的标准化选项
+  * 所有的 numpy.fft 实现都有 `norm` 选项代表 标准化 选项, 有三种
+  * `backward`
+  * `ortho`
+  * `forward`
+* 
+
+
+### 4.3.1. Standard FFTs 标准傅里叶变换
+
+### 4.3.2. Real FFTs 复数傅里叶变换
+
+### 4.3.3. Hermitian FFTs 
+
+
+### Helper routines 辅助功能
+
+* `np.fft.fftshift(x, axes=None)`: 便于 fft 结果的可视化
+  * 标准 np.fft 运算的结果, 0频率的部分位于结果数列 `x[0]`, 然而一般为了可视化, 更加倾向于将 0 频率的部分移到数组中间
+  * `axes=None`,  int or shape tuple, optional, 很重要, 需要同 fft 应用时候的 axis 参数一致
+  * 注意, 最终 shift 的结果上, `y[0]` 是 Nyquist component only if `len(x)` is even.
+
+* `np.fft.ifftshift(x, axes=None)` : fftshift 的逆运算
+  * identical for even-length x
+  * differ by one sample for odd-length x
+
+
+## 4.4. linalg 
+
+### 4.4.1. SVD 奇异值分解
+
+Singular Value Decomposition  
+* M = U * s * Vh  
+* U  : Contains all the information about the rows (observations)  
+* Vh: Contains all the information about the columns (features)  
+* s   : Records the SVD process  
+
+奇异值可以用来压缩数据  
+
+```py
+# 对原始数据进行SVD分解
+A = np.array([[1,3,4], [2,3,5], [1,2,3], [5,4,6]])
+U, s, Vh = np.linalg.svd(A, full_matrices=False)
+
+# 删除了不重要的一行/列数据, 再不影响最终维度的情况下,仍能得到原本的矩阵
+Us = np.dot(U[:,:2], np.diag(s[:2]))
+UsVh = np.dot(Us, Vh[:2,:])
+'''
+[[1.  2.8 4.1]
+ [2.  3.2 4.8]
+ [1.  2.  3. ]
+ [5.  3.9 6. ]]
+ '''
+# 若是删除了两行,则不能保证还原数据
+Us = np.dot(U[:,:1], np.diag(s[:1]))
+UsVh = np.dot(Us, Vh[:1,:])
+'''
+[[2.1 2.5 3.7]
+ [2.6 3.1 4.6]
+ [1.6 1.8 2.8]
+ [3.7 4.3 6.5]]
+'''
+
+# 一般通过统计 s 中的数值占比
+s_percentage = (s/sum(s)*100).round(2)
+
+
+
+```
+As a general rule, you should consider solutions maintaining from 70 to 99 percent of the original information.  
+
+## 4.5. numpy Input and Output  Numpy 数据的 IO
 
 numpy 对于各种类型的输出支持的很好, 要注意对于 pandas 的 DataFrame 支持写在了别的段里  
 
@@ -537,7 +623,7 @@ numpy 对于各种类型的输出支持的很好, 要注意对于 pandas 的 Dat
   * 可能在别的地方有完整的文档, 保留为 [TODO]
 
 
-### 4.3.1. Text Files
+### 4.5.1. Text Files
 
 保存 save :
 * `numpy.savetxt(fname, X, fmt='%.18e', delimiter=' ', newline='\n', header='', footer='', comments='# ', encoding=None)`
@@ -556,7 +642,7 @@ numpy 对于各种类型的输出支持的很好, 要注意对于 pandas 的 Dat
 
 
 
-## 4.4. Linear algebra 线性代数计算 
+## 4.6. Linear algebra 线性代数计算 
 
 包含了 numpy 的各种线性代数计算函数, 其中一些函数定义在子包 `numpy.linalg` 中  
 * numpy 的线性代数函数基于各种 BLAS 和 LAPACK 库来实现, 提供了高速的各种线性代数计算
@@ -565,10 +651,10 @@ numpy 对于各种类型的输出支持的很好, 要注意对于 pandas 的 Dat
   * pros scipy 的库更加全面, 有一些 numpy 中没有的计算函数, 对于重合的函数, scipy 也有一些额外的参数
   * cons numpy 的有些函数对于 array 的 broadcasting 的效果更好
 
-### 4.4.1. Matrix and vector products 向量矩阵乘法
+### 4.6.1. Matrix and vector products 向量矩阵乘法
 
 
-#### 4.4.1.1. 矩阵乘法
+#### 4.6.1.1. 矩阵乘法
 * `numpy.dot(a, b, out=None)`  矩阵点乘, 可以理解为尽可能执行矩阵乘法, 对于高维是有一定拓展性的, 但是不适用于 Tensor
   * 因为是函数, 所以不存在手动加 T 之类的, 只根据 a,b 的维度来决定操作
   * a,b 都是 1D, 执行 向量内积
@@ -610,7 +696,7 @@ np.matmul(a, c).shape :(9, 5, 7, 3)
 
 
 
-### 4.4.2. Solving equations and inverting matrices 计算矩阵方程或者逆
+### 4.6.2. Solving equations and inverting matrices 计算矩阵方程或者逆
 
 * `numpy.linalg.inv(a)`  计算一个矩阵的逆
   * 具体在代码上表现为 `dot(a, ainv) = dot(ainv, a) = eye(a.shape[0])`  
@@ -618,43 +704,43 @@ np.matmul(a, c).shape :(9, 5, 7, 3)
   * 返回值 ainv 也满足 shape `(...,M,M)`
 
 
-## 4.5. Logic functions 逻辑计算
+## 4.7. Logic functions 逻辑计算
 
 包括 ndarray 之间的逻辑运算以及自身元素的检查逻辑
 
-### 4.5.1. Truth value testing
+### 4.7.1. Truth value testing
 
 只有两个函数
 * `numpy.all(a, axis=None, out=None, keepdims=<no value>, *, where=<no value>)` 是否全部为 True
 * `numpy.any(a, axis=None, out=None, keepdims=<no value>, *, where=<no value>)` 是否有 True
 
-## 4.6. Masked array operations 
+## 4.8. Masked array operations 
 
 同 Logic 操作非常相似, 主要是通过各种逻辑判断来生成 mask 数据  
 
 
 
-## 4.7. Mathematical function 数学操作
+## 4.9. Mathematical function 数学操作
 
 绝大多数常用的数学基础函数都属于该分类
 
-### 4.7.1. Trigonometric functions 三角函数
+### 4.9.1. Trigonometric functions 三角函数
 
-### 4.7.2. Hyperbolic functions 双曲线函数
+### 4.9.2. Hyperbolic functions 双曲线函数
 
 
 
-### 4.7.3. Rounding 最近值
+### 4.9.3. Rounding 最近值
 
-### 4.7.4. Sums, products, differences 求和求积求差
+### 4.9.4. Sums, products, differences 求和求积求差
 
 * sum()
 * cumsum(a) 累加求和
 
-### 4.7.5. Exponents and logarithms 指数
-### 4.7.6. Rational routines 最大公因数 最小公倍数
+### 4.9.5. Exponents and logarithms 指数
+### 4.9.6. Rational routines 最大公因数 最小公倍数
 
-### 4.7.7. Extrema Finding 极值寻找
+### 4.9.7. Extrema Finding 极值寻找
 
 应该是用的比较多的一类方法, 总的上来说就 min 和 max, 但是根据使用场景的不同分出了四种
 
@@ -688,7 +774,7 @@ np.matmul(a, c).shape :(9, 5, 7, 3)
   * 同 amax 完全一致, 但是对于 NaN 会无视
   * 如果某一个比较的 slices 都是 NaN , 则会报警告, 并返回 NaN
 
-### 4.7.8. 杂项
+### 4.9.8. 杂项
 
 有时候需要的很特殊的功能, 没办法分类, 目前学习的有
 
@@ -696,11 +782,13 @@ np.matmul(a, c).shape :(9, 5, 7, 3)
 * clip
 * interp
 
-#### 4.7.8.1. convolve 卷积
+#### 4.9.8.1. convolve 卷积
 
 Returns the discrete, linear convolution of two one-dimensional sequences.
 * 常用在信号处理中
 * 一维卷积
+* 可以用来非常快的计算一维数据的移动平均 
+  * `np.convolve(data, np.ones(平均区间长)/平均区间长)`
 
 `numpy.convolve(a, v, mode='full')`  
 * a, v 是两个一维array , 需要 a 比 v 长, 否则会在计算前交换顺序
@@ -716,7 +804,7 @@ Returns the discrete, linear convolution of two one-dimensional sequences.
     * 只计算 a 和 v 完全 overlap 的卷积
     * 得到   max(M, N) - min(M, N) + 1. 个值
 
-#### 4.7.8.2. clip 裁剪
+#### 4.9.8.2. clip 裁剪
 
 `numpy.clip(a, a_min, a_max, out=None, **kwargs)`
 * 裁剪一个 array, 比用最大最小值实现要快, 且代码更清晰
@@ -725,7 +813,7 @@ Returns the discrete, linear convolution of two one-dimensional sequences.
   * 注意 a_min a_max 是没有大小比较验证的, 需要用户自己保证
 
 
-#### 4.7.8.3. interp 简易线性插值
+#### 4.9.8.3. interp 简易线性插值
 
 `numpy.interp(x, xp, fp, left=None, right=None, period=None)`  
 One-dimensional linear interpolation for monotonically increasing sample points.
@@ -737,14 +825,14 @@ One-dimensional linear interpolation for monotonically increasing sample points.
 * period : A period for the x-coordinates, xp 的周期, 一般用来计算角度, 即360 度为一圈, 720度会被正确的放在 0 度的位置
 
 
-## 4.8. Sorting, Searching, Counting 排序 搜索 计数
+## 4.10. Sorting, Searching, Counting 排序 搜索 计数
 
 这里的 counting 都是很简单的函数, 更详细的统计在 statistics 模块
 
 
-### 4.8.1. Sorting 排序
+### 4.10.1. Sorting 排序
 
-#### 4.8.1.1. 基础排序
+#### 4.10.1.1. 基础排序
 
 * `msort(a)` : Return a copy of an array sorted along the first axis.
 
@@ -765,12 +853,12 @@ One-dimensional linear interpolation for monotonically increasing sample points.
   * 用于通过 结构体字段的名称或者名称list来指定排序比较的顺序
 
 
-#### 4.8.1.2. 部分有序
+#### 4.10.1.2. 部分有序
 
 * partition(a, kth[, axis, kind, order])    :  Return a partitioned copy of an array.
 * argpartition(a, kth[, axis, kind, order]) : 
 
-### 4.8.2. Searching 元素查找
+### 4.10.2. Searching 元素查找
 
 大概可以分成
 * 极值查找
@@ -784,7 +872,7 @@ One-dimensional linear interpolation for monotonically increasing sample points.
   * nonzero
   * flatnonzero
 
-#### 4.8.2.1. 最大值选择
+#### 4.10.2.1. 最大值选择
 
 * `argmax(a[, axis, out, keepdims])`
   * Returns the indices of the maximum values along an axis.
@@ -794,7 +882,7 @@ One-dimensional linear interpolation for monotonically increasing sample points.
 
 
 
-#### 4.8.2.2. 逻辑选择值 where
+#### 4.10.2.2. 逻辑选择值 where
 
 `numpy.extract(condition, arr)`
 * 根据 condition 选择元素, 等同于 
@@ -812,7 +900,7 @@ One-dimensional linear interpolation for monotonically increasing sample points.
 
 
 
-#### 4.8.2.3. 非零选择
+#### 4.10.2.3. 非零选择
 
 * `nonzero(a)`        : Return the indices of the elements that are non-zero.
   * 返回 a tuple of arrays
@@ -827,11 +915,11 @@ One-dimensional linear interpolation for monotonically increasing sample points.
   * 功能上几乎等同于 `np.transpose(np.nonzero(a))`  but produces a result of the correct shape for a 0-D array.
 
 
-## 4.9. Statistics 统计
+## 4.11. Statistics 统计
 
 更加完整的统计函数定义在了这里
 
-### 4.9.1. Averages and variances 平均和方差
+### 4.11.1. Averages and variances 平均和方差
 
 较为通用的统计函数, 根据对于 NaN 的处理分为标准版和 `nan*` 版  (average 除外没有 nan 版本) 
 
@@ -858,7 +946,7 @@ One-dimensional linear interpolation for monotonically increasing sample points.
   * 标准差
 
 
-### 4.9.2. Histograms
+### 4.11.2. Histograms
 
 
 直方图统计, 在 Statistic 分类的函数中属于一个大类, 不止一个函数  
@@ -866,7 +954,7 @@ One-dimensional linear interpolation for monotonically increasing sample points.
 * numpy.histogram    : 普通一维直方图统计, 
 
 
-#### 4.9.2.1. histogram 一维数据直方图
+#### 4.11.2.1. histogram 一维数据直方图
 ```py
 numpy.histogram(a, bins=10, range=None, normed=None, weights=None, density=None)
 ```
@@ -900,7 +988,7 @@ numpy.histogram(a, bins=10, range=None, normed=None, weights=None, density=None)
 * bin_edges : 因为 bins 可能是整数或者别的省略的输入方法, 该返回值用于标识完整的区间序列
   * 注意 len(bin_edges) = len(hist)+1 
 
-#### 4.9.2.2. histogram2d 二维直方图
+#### 4.11.2.2. histogram2d 二维直方图
 
 Compute the bi-dimensional histogram of two data samples.   
 并不是单纯的二维数据直方图统计, 而是一种双方向上的统计.  
@@ -927,16 +1015,16 @@ numpy.histogram2d(x, y, bins=10, range=None, normed=None, weights=None, density=
   * yedges ndarray, shape(ny+1,)
 
 
-#### 4.9.2.3. bincount 原子统计
+#### 4.11.2.3. bincount 原子统计
 
 直方图的简化版本
 
 
 
 
-## 4.10. Set 集合
+## 4.12. Set 集合
 
-### 4.10.1. unique
+### 4.12.1. unique
 
 寻找一组数据中的唯一元素, 可以用来统计元素的种类数  
 除了返回独立的元素种类, 还可以返回
@@ -1148,46 +1236,3 @@ print(np.shape(U), np.shape(s), np.shape(Vh))
 
 
 
-## 8.2. linalg 
-
-### 8.2.1. SVD 奇异值分解
-
-Singular Value Decomposition  
-* M = U * s * Vh  
-* U  : Contains all the information about the rows (observations)  
-* Vh: Contains all the information about the columns (features)  
-* s   : Records the SVD process  
-
-奇异值可以用来压缩数据  
-
-```py
-# 对原始数据进行SVD分解
-A = np.array([[1,3,4], [2,3,5], [1,2,3], [5,4,6]])
-U, s, Vh = np.linalg.svd(A, full_matrices=False)
-
-# 删除了不重要的一行/列数据, 再不影响最终维度的情况下,仍能得到原本的矩阵
-Us = np.dot(U[:,:2], np.diag(s[:2]))
-UsVh = np.dot(Us, Vh[:2,:])
-'''
-[[1.  2.8 4.1]
- [2.  3.2 4.8]
- [1.  2.  3. ]
- [5.  3.9 6. ]]
- '''
-# 若是删除了两行,则不能保证还原数据
-Us = np.dot(U[:,:1], np.diag(s[:1]))
-UsVh = np.dot(Us, Vh[:1,:])
-'''
-[[2.1 2.5 3.7]
- [2.6 3.1 4.6]
- [1.6 1.8 2.8]
- [3.7 4.3 6.5]]
-'''
-
-# 一般通过统计 s 中的数值占比
-s_percentage = (s/sum(s)*100).round(2)
-
-
-
-```
-As a general rule, you should consider solutions maintaining from 70 to 99 percent of the original information.  

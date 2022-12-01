@@ -1,38 +1,40 @@
 - [1. 数据处理pandas包](#1-数据处理pandas包)
 - [2. IO 输入输出](#2-io-输入输出)
-  - [Flat file](#flat-file)
-    - [2.1. read_csv](#21-read_csv)
-  - [Excel](#excel)
-    - [读取](#读取)
-  - [2.2. others](#22-others)
-  - [2.3. csv写入](#23-csv写入)
+  - [2.1. Flat file](#21-flat-file)
+    - [2.1.1. read\_csv](#211-read_csv)
+  - [2.2. Excel](#22-excel)
+    - [2.2.1. 读取](#221-读取)
+    - [DataFrame.to\_excel()   -  类方法](#dataframeto_excel------类方法)
+  - [2.3. others](#23-others)
+  - [2.4. csv写入](#24-csv写入)
 - [3. Series](#3-series)
   - [3.1. creation](#31-creation)
   - [3.2. 操纵数据](#32-操纵数据)
   - [3.3. index](#33-index)
 - [4. DataFrame](#4-dataframe)
-  - [4.1. 创建DF Constructor](#41-创建df-constructor)
-  - [4.2. 访问数据 Indexing, iteration](#42-访问数据-indexing-iteration)
-    - [4.2.1. 添加修改内容](#421-添加修改内容)
-    - [4.2.2. DF切片](#422-df切片)
-  - [4.3. Attributes and underlying data](#43-attributes-and-underlying-data)
-    - [4.3.1. DF.info](#431-dfinfo)
-    - [4.3.2. index](#432-index)
-  - [4.4. 选择 Reindexing / selection / label manipulation](#44-选择-reindexing--selection--label-manipulation)
-    - [4.4.1. label 操作](#441-label-操作)
-      - [4.4.1.1. 根据重复内容删除行](#4411-根据重复内容删除行)
-    - [4.4.2. reindexing](#442-reindexing)
-      - [4.4.2.1. .reindex ()](#4421-reindex-)
-  - [4.5. 计算与描述 Computations / descriptive stats](#45-计算与描述-computations--descriptive-stats)
-  - [4.6. 分组以及应用函数变换 Function application, GroupBy & window](#46-分组以及应用函数变换-function-application-groupby--window)
-    - [4.6.1. groupby](#461-groupby)
-  - [4.7. Plotting](#47-plotting)
-  - [4.8. 合并 Combining / comparing / joining / merging](#48-合并-combining--comparing--joining--merging)
-  - [4.9. 缺失值处理 Missing data handling](#49-缺失值处理-missing-data-handling)
-  - [4.10. 排序 sort_values sort_index](#410-排序-sort_values-sort_index)
-  - [4.11. .loc 按标签提取 laber](#411-loc-按标签提取-laber)
-      - [4.11.0.1. 使用下标切片](#41101-使用下标切片)
-      - [4.11.0.2.](#41102)
+  - [4.1. Constructor  - DataFrame 构造函数](#41-constructor----dataframe-构造函数)
+  - [4.2. Attributes and underlying data - DataFrame 的各种属性](#42-attributes-and-underlying-data---dataframe-的各种属性)
+    - [4.2.1. DF.info](#421-dfinfo)
+    - [4.2.2. index](#422-index)
+  - [4.3. 以下都是旧内容](#43-以下都是旧内容)
+  - [4.4. 访问数据 Indexing, iteration](#44-访问数据-indexing-iteration)
+    - [4.4.1. 添加修改内容](#441-添加修改内容)
+    - [4.4.2. DF切片](#442-df切片)
+  - [4.5. 选择 Reindexing / selection / label manipulation](#45-选择-reindexing--selection--label-manipulation)
+    - [4.5.1. label 操作](#451-label-操作)
+      - [4.5.1.1. 根据重复内容删除行](#4511-根据重复内容删除行)
+    - [4.5.2. reindexing](#452-reindexing)
+      - [4.5.2.1. .reindex ()](#4521-reindex-)
+  - [4.6. 计算与描述 Computations / descriptive stats](#46-计算与描述-computations--descriptive-stats)
+  - [4.7. 分组以及应用函数变换 Function application, GroupBy \& window](#47-分组以及应用函数变换-function-application-groupby--window)
+    - [4.7.1. groupby](#471-groupby)
+  - [4.8. Plotting](#48-plotting)
+  - [4.9. 合并 Combining / comparing / joining / merging](#49-合并-combining--comparing--joining--merging)
+  - [4.10. 缺失值处理 Missing data handling](#410-缺失值处理-missing-data-handling)
+  - [4.11. 排序 sort\_values sort\_index](#411-排序-sort_values-sort_index)
+  - [4.12. .loc 按标签提取 laber](#412-loc-按标签提取-laber)
+      - [4.12.0.1. 使用下标切片](#41201-使用下标切片)
+      - [4.12.0.2.](#41202)
 - [5. pandas.Categorical](#5-pandascategorical)
   - [5.1. 创建 categorical](#51-创建-categorical)
 - [6. pandas.Timestamp](#6-pandastimestamp)
@@ -48,12 +50,14 @@
   - [7.1. 统计数据](#71-统计数据)
     - [7.1.1. 基础寻值](#711-基础寻值)
     - [7.1.2. 基于数值统计](#712-基于数值统计)
-      - [7.1.2.1. Series.value_counts()](#7121-seriesvalue_counts)
+      - [7.1.2.1. Series.value\_counts()](#7121-seriesvalue_counts)
       - [7.1.2.2. .sum()](#7122-sum)
       - [7.1.2.3. cut与qcut](#7123-cut与qcut)
       - [7.1.2.4. crosstab](#7124-crosstab)
     - [7.1.3. 基于统计学的数值](#713-基于统计学的数值)
       - [7.1.3.1. Variance 方差](#7131-variance-方差)
+
+
 # 1. 数据处理pandas包
 
 pandas 是一种列存数据分析 API。它是用于处理和分析输入数据的强大工具，很多机器学习框架都支持将 pandas 数据结构作为输入。   
@@ -87,13 +91,13 @@ pandas 中的主要数据结构被实现为以下两类：
 
 按照文件的分类
 
-## Flat file
+## 2.1. Flat file
 
 平铺数据的文件, 类似于 txt
 
 
 
-### 2.1. read_csv
+### 2.1.1. read_csv
 
 * `read_csv(filepath_or_buffer[, sep, …])`
 * read_csv 是最基础的读取函数, 拥有巨多的参数
@@ -122,17 +126,28 @@ pandas 中的主要数据结构被实现为以下两类：
    * quotechar:
    * doublequote:
 
-## Excel 
+## 2.2. Excel 
 
-微软标准Excel文件读取
+微软标准Excel文件读取输出
 
-### 读取
+### 2.2.1. 读取
 
 `pandas.read_excel(**args 参数太多了)`
+
+
+### DataFrame.to_excel()   -  类方法
+
+`DataFrame.to_excel(excel_writer, **args 超多参数)`
+* `excel_writer` : path-like, file-like, or `ExcelWriter` object, File path or existing ExcelWriter.
 * 
 
+示例:
+```py
 
-## 2.2. others
+
+```
+
+## 2.3. others
 最常用的部分
 1. `read_table(filepath_or_buffer[, sep, …])`
       Read general delimited file into DataFrame.
@@ -163,7 +178,7 @@ cars=pd.read_csv("cars.csv",sep=';',index_col='Car',names=name)
 
 
 ```
-## 2.3. csv写入
+## 2.4. csv写入
 
   
 ```py
@@ -229,27 +244,61 @@ population.apply(lambda val: val > 1000000)
 pandas最核心的数据类型, 由任意个 Series 和其名称组成   
 可以理解为 spreadsheet 或者 SQL 表  
 
-## 4.1. 创建DF Constructor
 
-DataFrame accepts many different kinds of input:
-* Dict of 1D ndarrays, lists, dicts, or Series
-* 2-D numpy.ndarray
-* Structured or record ndarray
-* A Series
-* Another DataFrame
+## 4.1. Constructor  - DataFrame 构造函数  
 
-创建:
+Two-dimensional, size-mutable, potentially heterogeneous tabular data.  
+* 可以包括 labeled axes (rows and columns)
+* 各种数学操作也可以沿着横轴或者纵轴计算
+* 可以被想成是一个 dict-like container for Series objects. 
+
+`class pandas.DataFrame(data=None, index=None, columns=None, dtype=None, copy=None)`  
+* `data` : ndarray (structured or homogeneous), Iterable, dict, or DataFrame
+  * 构造函数支持多种输入  
+  * Dict of 1D ndarrays, lists, dicts, or Series
+  * 2-D numpy.ndarray
+  * Structured or record ndarray
+  * A Series
+  * Another DataFrame
+* `index` : Index or array-like
+  * 用于结果帧的索引
+  * 默认会创建一个 `RangeIndex`
+* `columns` : Index or array-like
+  * 列名, 用于指定每一列的 labels
+  * 默认会用 `RangeIndex(0, 1, 2, …, n)`. 
+  * If data contains column labels, will perform column selection instead.
+  * 如果 data 数据本身已经有 labels , 那么输入 `columns` 参数将会进行 列选择
+* `dtype` : dtype, default None
+  * Data type to force. Only a single dtype is allowed. If None, infer.
+* `copy` : bool or None, default None
+  * For dict data, the default of None behaves like `copy=True`
+  * For `DataFrame` or `2d ndarray` input, the default of None behaves like `copy=False`
+  * If data is a `dict` containing one or more `Series` (possibly of different dtypes), `copy=False` will ensure that these inputs are not copied.
+
+
 1. 通过字典创建 
-   1. dict: `df=pd.DataFrame( d
-   2. ict() )`
-   3. 通过 dict of Series  : `df=pd.DataFrame( 同样是字典dict(),value=Series  )`
+   1. dict: `df=pd.DataFrame( dict() )`
+   1. 通过 dict of Series  : `df=pd.DataFrame( 同样是字典dict(),value=Series  )`
       * 需要通过 字典的方式给 Series 赋予列名称
-   4. dict of ndarrays/lists: 
+   2. dict of ndarrays/lists: 
       * `d = {"one": [1.0, 2.0, 3.0, 4.0], "two": [4.0, 3.0, 2.0, 1.0]}`
       * `pd.DataFrame(d)`
 
+示例
 ```py
-# 从Series创建, 需要赋予每个Series列名称
+# 1. 从字典创建  dict
+data = {"Name"  : ["Eli", "Abe", "Ito", "Mia", "Moe", "Leo", "Mia", "Ann"],
+        "Age"   : [19, 20, 21, 20, 20, 20, 20, 19],
+        "Gender": ["M","M","M","F","F","M", "F","F"]
+}
+# 字典转为 DF
+df = pd.DataFrame(data)
+
+# 直接创建
+pd.DataFrame({'Bob': ['I liked it.', 'It was awful.'], 'Sue': ['Pretty good.', 'Bland.']})
+
+
+# 2. 从Series创建, 需要赋予每个Series列名称
 # 如果 Series 在长度上不一致，系统会用特殊的 NA/NaN 值填充缺失的值
 city_names = pd.Series(['San Francisco', 'San Jose', 'Sacramento'])
 population = pd.Series([852469, 1015785, 485199])
@@ -257,20 +306,18 @@ population = pd.Series([852469, 1015785, 485199])
 pd.DataFrame({ 'City name': city_names, 'Population': population })
 
 
-# 复习一下python的字典
-data = {"Name"  : ["Eli", "Abe", "Ito", "Mia", "Moe", "Leo", "Mia", "Ann"],
-        "Age"   : [19, 20, 21, 20, 20, 20, 20, 19],
-        "Gender": ["M","M","M","F","F","M", "F","F"]
-}
-#字典转为 DF
-df = pd.DataFrame(data)
-# 直接创建
-pd.DataFrame({'Bob': ['I liked it.', 'It was awful.'], 'Sue': ['Pretty good.', 'Bland.']})
-
+# 3. 从 numpy ndarray 创建
 # 创建随机内容 , 指定 索引和列标签
 df = pd.DataFrame(np.random.randn(8, 4),
     index=['a','b','c','d','e','f','g','h'], 
     columns = ['A', 'B', 'C', 'D'])
+
+# 创建拥有 列标签的 ndarray
+ata = np.array([(1, 2, 3), (4, 5, 6), (7, 8, 9)],
+                dtype=[("a", "i4"), ("b", "i4"), ("c", "i4")])
+# 选取特定的列来创建 DataFrame
+df3 = pd.DataFrame(data, columns=['c', 'a'])
+
 
 # 手动填入数据方法, 参数依次为:
    # value的值
@@ -279,7 +326,53 @@ df = pd.DataFrame(np.random.randn(8, 4),
 dfl = pd.DataFrame(np.random.randn(5, 4),columns=list('ABCD'),index=pd.date_range('20130101', periods=5))
 
 ```
-## 4.2. 访问数据 Indexing, iteration
+
+## 4.2. Attributes and underlying data - DataFrame 的各种属性
+
+
+最基础的, DataFrame 相关的属性
+* `DataFrame.index`    The index (row labels) of the DataFrame.
+* `DataFrame.columns`  The column labels of the DataFrame.
+* `DataFrame.dtypes`   返回数据的类型, 因为每一列的数据类型可能不同, 所以会分别返回每一列的数据类型
+* `DataFrame.axes`     依次返回 行的 labels 和列的 labels 
+
+* 数据维度类 
+  * `DataFrame.size`            返回一个整数, 代表元素总数
+  * `DataFrame.shape`           返回一个元组, 代表 DataFrame 的 shape 
+  * `DataFrame.ndim`            返回整数, 代表维度个数, 对于 Pandas 库来说只有两种可能, 如果是 DataFrame 则是2, 如果是 Series 则是1 
+
+* 数据表示
+  * `DataFrame.value`           将任意 DataFrame 转为 numpy 表示的类型返回
+
+
+### 4.2.1. DF.info
+
+打印信息在屏幕上, 无返回值  
+* Print a concise summary of a DataFrame.
+* including the index dtype and columns, non-null values and memory usage.
+
+```py
+DataFrame.info(verbose=None, buf=None, max_cols=None, memory_usage=None, show_counts=None, null_counts=None)
+
+```
+### 4.2.2. index
+
+使用`DataFrame.index`可以获取一个类数组的索引列表,依据数据的不同有多种形式    
+
+`Int64Index([1997, 1998, 1996, 1995, 1994, 1993], dtype='int64')`  
+`<class 'pandas.core.indexes.numeric.Int64Index'>`  
+
+`RangeIndex(start=0, stop=23, step=1)`  
+`<class 'pandas.core.indexes.range.RangeIndex'>`   
+
+
+更改DF的索引, 将会替换原本索引,并且通过values获取数据时该列数据将不再出现  
+df = df.set_index("Country")
+
+
+## 4.3. 以下都是旧内容
+
+## 4.4. 访问数据 Indexing, iteration
 
 
 ```py
@@ -305,7 +398,7 @@ cities['City name'][1]
 # <class 'str'>
 # San Jose
 ```
-### 4.2.1. 添加修改内容
+### 4.4.1. 添加修改内容
 
 对于df类型, 直接使用标签即可添加修改内容
 ```py
@@ -342,7 +435,7 @@ for i in birthday:
 tanjoubi['年齢']=age
 ```
 
-### 4.2.2. DF切片
+### 4.4.2. DF切片
 
 * DataFrame是个结构化数据　`<class 'pandas.core.frame.DataFrame'>`  
 * 在输出 `DataFrame`的时候会输出表头 , 再输出内容   `print(car_year)`  
@@ -352,46 +445,10 @@ tanjoubi['年齢']=age
 `homes_table[:10]`  
 
 
-## 4.3. Attributes and underlying data
 
-最基础的, DF 相关的属性
-* `DataFrame.index`    The index (row labels) of the DataFrame.
-* `DataFrame.columns`  The column labels of the DataFrame.
-* 数据维度类 
-  * `DF.size`            返回一个整数, 代表元组总数
-  * `DF.shape`           返回一个元组, 代表 DF 的维度
-  * `DF.ndim`            返回整数, 代表维度个数
-* 数据表示
-  * `DF.value`           将任意 DF 转为 numpy 表示的类型返回
+## 4.5. 选择 Reindexing / selection / label manipulation
 
-
-### 4.3.1. DF.info
-
-打印信息在屏幕上, 无返回值  
-* Print a concise summary of a DataFrame.
-* including the index dtype and columns, non-null values and memory usage.
-
-```py
-DataFrame.info(verbose=None, buf=None, max_cols=None, memory_usage=None, show_counts=None, null_counts=None)
-
-```
-### 4.3.2. index
-
-使用`DataFrame.index`可以获取一个类数组的索引列表,依据数据的不同有多种形式    
-
-`Int64Index([1997, 1998, 1996, 1995, 1994, 1993], dtype='int64')`  
-`<class 'pandas.core.indexes.numeric.Int64Index'>`  
-
-`RangeIndex(start=0, stop=23, step=1)`  
-`<class 'pandas.core.indexes.range.RangeIndex'>`   
-
-
-更改DF的索引, 将会替换原本索引,并且通过values获取数据时该列数据将不再出现  
-df = df.set_index("Country")
-
-## 4.4. 选择 Reindexing / selection / label manipulation
-
-### 4.4.1. label 操作
+### 4.5.1. label 操作
 
 * drop  : Drop specified labels from rows or columns.
 * 
@@ -400,7 +457,7 @@ df = df.set_index("Country")
 data=data.drop(data.loc[data['State']=="CA"].index)
 ```
 
-#### 4.4.1.1. 根据重复内容删除行
+#### 4.5.1.1. 根据重复内容删除行
 
 
 ```py
@@ -428,9 +485,9 @@ print(df.drop_duplicates())
       * If True, the resulting axis will be `labeled 0, 1, …, n - 1. `
       * New in version 1.0.0.
 
-### 4.4.2. reindexing
+### 4.5.2. reindexing
 
-#### 4.4.2.1. .reindex ()
+#### 4.5.2.1. .reindex ()
 
 pandas有一个类似 .loc的方法, 为 reindex() , 会检查内容的有无并返回对应的数值  
 缺点是代码长, 不简洁 ,必须要指定 `index` 和 `columns`参数  
@@ -440,7 +497,7 @@ print("\nChecking rows ['f','g','h','i'] and column ['D','E']")
 print(df.reindex(index=['f','g','h','i'],columns=['D','E']))
 ```
 
-## 4.5. 计算与描述 Computations / descriptive stats
+## 4.6. 计算与描述 Computations / descriptive stats
 
 可以使用多种方法来对 DF 数据进行全局描述
 * 
@@ -452,10 +509,10 @@ print(df.reindex(index=['f','g','h','i'],columns=['D','E']))
 df.describe()
 
 ```
-## 4.6. 分组以及应用函数变换 Function application, GroupBy & window
+## 4.7. 分组以及应用函数变换 Function application, GroupBy & window
 
 
-### 4.6.1. groupby
+### 4.7.1. groupby
 
 * 最为常用的分析工具
 * 使用 groupby来分类数据 , 并使用 describe() 来生成一个默认模板的数据分析结果
@@ -478,7 +535,7 @@ gen_gr_desc_countmean = gender_group_desc.loc[:,(slice(None),['count','mean'])]
 
 ```
 
-## 4.7. Plotting
+## 4.8. Plotting
 
 
 
@@ -488,7 +545,7 @@ df.hist('housing_median_age')
 ```
 
 
-## 4.8. 合并 Combining / comparing / joining / merging
+## 4.9. 合并 Combining / comparing / joining / merging
 
 包含了基本的多DF连接处理, 类似于数据库 table
 * append
@@ -520,7 +577,7 @@ df.join(other, lsuffix='_caller', rsuffix='_other')
 df.set_index('key').join(other.set_index('key'))
 ```
 
-## 4.9. 缺失值处理 Missing data handling
+## 4.10. 缺失值处理 Missing data handling
 
 
 ```py
@@ -540,7 +597,7 @@ homes_table =homes_table.reset_index()
 ```
 
 
-## 4.10. 排序 sort_values sort_index
+## 4.11. 排序 sort_values sort_index
 
 ```py
 
@@ -549,7 +606,7 @@ DataFrame.sort_index(ascending = False)
 DataFrame.sort_values(by='mean_rating',)
 
 ```
-## 4.11. .loc 按标签提取 laber 
+## 4.12. .loc 按标签提取 laber 
 
 
 `.loc ` 是一个很严格的类型, 如果输入的切片是整数而且不能转化成原本DF的Index,会报类型错误  
@@ -568,7 +625,7 @@ dfl.loc['20130102':'20130104']
 ```
 
 
-#### 4.11.0.1. 使用下标切片
+#### 4.12.0.1. 使用下标切片
 ```
 按具体数值来切片  
 df1 = pd.DataFrame(np.random.randn(6, 4),index=list('abcdef'),columns=list('ABCD'))
@@ -603,7 +660,7 @@ f -1.281247 -0.727707 -0.121306
 ```
 
 
-#### 4.11.0.2. 
+#### 4.12.0.2. 
 按照具体值来切
 ```py
 

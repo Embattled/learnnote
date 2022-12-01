@@ -306,7 +306,7 @@ class argparse.ArgumentParser(
 该类除了 `add_argument()` 的其他方法在 `Other utilities` 部分进行说明
 
 说明用
-* prog    : The name of the program `(default: os.path.basename(sys.argv[0]))`
+* prog    : The name of the program `(default: os.path.basename(sys.argv[0]))`, 及在调用该程序的时候终端里应该输入的程序名称, 通过这个参数可以修改默认的程序名称
 
 全局配置参数
 * argument_default  : The global default value for arguments (default: None)

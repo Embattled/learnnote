@@ -1,8 +1,47 @@
+- [1. File and Directory Access](#1-file-and-directory-access)
+  - [1.1. path-like object](#11-path-like-object)
+- [2. os.path](#2-ospath)
+  - [2.1. is 判断函数](#21-is-判断函数)
+  - [2.2. 部分提取提取](#22-部分提取提取)
+  - [2.3. 路径检测以及转换](#23-路径检测以及转换)
+  - [2.4. 路径操作](#24-路径操作)
+  - [2.5. 路径文件信息提取 os.path.get\*](#25-路径文件信息提取-ospathget)
+- [3. pathlib — Object-oriented filesystem paths](#3-pathlib--object-oriented-filesystem-paths)
+  - [3.1. pathlib.PurePath](#31-pathlibpurepath)
+    - [3.1.1. 创建路径](#311-创建路径)
+    - [3.1.2. PurePath 的运算符重载  /](#312-purepath-的运算符重载--)
+    - [3.1.3. 提取路径成分](#313-提取路径成分)
+  - [3.2. pathlib.Path - Concrete paths](#32-pathlibpath---concrete-paths)
+    - [3.2.1. 创建路径](#321-创建路径)
+    - [3.2.2. 获取文件信息](#322-获取文件信息)
+    - [3.2.3. 更改文件信息](#323-更改文件信息)
+    - [3.2.4. 文件(夹) 创建与访问](#324-文件夹-创建与访问)
+    - [3.2.5. link 的创建与修改](#325-link-的创建与修改)
+    - [3.2.6. is\_\* 系列判断函数](#326-is_-系列判断函数)
+    - [3.2.7. 检索文件夹](#327-检索文件夹)
+    - [3.2.8. 与 OS. 的互换性](#328-与-os-的互换性)
+- [4. shutil - High-level file operations](#4-shutil---high-level-file-operations)
+- [5. 简单功能模组](#5-简单功能模组)
+  - [5.1. fnmatch - Unix filename pattern matching](#51-fnmatch---unix-filename-pattern-matching)
+  - [5.2. glob - Unix style pathname pattern expansion](#52-glob---unix-style-pathname-pattern-expansion)
+  - [5.3. tmpfile](#53-tmpfile)
+    - [5.3.1. 部件命令](#531-部件命令)
+    - [5.3.2. 基础命令](#532-基础命令)
+
 # 1. File and Directory Access
 
 用于处理磁盘上的文件以及目录
 
-* pathlib — Object-oriented filesystem paths
+* os.path - 是 pathlib 的基石, 最最基础的路径操作  
+* pathlib - Object-oriented filesystem paths  属于对象化比较清晰的路径管理库
+* shutil — High-level file operations 还在阅读
+
+* 简单功能模组
+  * filecmp   : 面向路径的字符串比较
+  * fnmatch   : 通配符匹配路径
+  * glob      : 同样的是查找路径. 比 fnmatch 高级, 但是该功能也集成在了 pathlib 里, 比起直接调用这个库更好用
+  * tempfile  : 方便的创建临时文件, 随机生成一个文件夹名
+
 
 ## 1.1. path-like object
 
@@ -23,39 +62,77 @@
 The pathlib module offers high-level path objects.  
 * 但是 os.path 用的非常多  
 * 内容非常简单
+* 尽量记住和 pathlib 中对应的函数方法
+
+
+`os.path.supports_unicode_filenames`
+* True if arbitrary Unicode strings can be used as file names (within limitations imposed by the file system).
+* 检测该系统是否允许任意字符作为文件名, wsl 测试下为 False
+
 
 ## 2.1. is 判断函数
 
-* os.path.isdir(path) 	判断路径是否为目录。
-* os.path.isfile(path) 	判断路径是否为文件。
-* os.path.isabs(path)   判断是否是一个绝对路径
+* `os.path.isdir(path)` 	判断路径是否为目录。
+* `os.path.isfile(path)` 	判断路径是否为文件。
+* `os.path.isabs(path)`   判断是否是一个绝对路径
   * linux 下即 `/` 开头
   * windows下即 盘符: 加反斜杠开头
+* `os.path.islink` 判断输入是否是一个 symbolic link
+* `os.path.ismount(path)`  判断一个路径是否是一个挂载点
+  * 即 挂载点路径 `path` 和基于该挂载点路径的内容 `path/..` 是否是在同一个设备上
 
-## 2.2. 路径检测
 
-* os.path.exists(path)
-  * 判断该路径是否存在
-  * 如果是 破坏掉的 link , 则返回 False
-* os.path.lexists(path)
-  * 对于 破坏掉的 link 也返回 True
-  * 只检测是否存在该文件
+## 2.2. 部分提取提取
 
-## 2.3. 提取及转换函数
+类似于 pathlib 里面的部件提取
 
-一分为二函数  
 * `os.path.basename(path)`  返回 path 路径中的最后一个成分
   * 如果 path 是文件路径, 就是文件名
   * 如果 path 是目录, 就是叶子文件夹名
-* `os.path.dirname(path)` 	返回 path 路径中的 减去 basename(path)
-  * 通过 `os.path.realpath(__file__)` 来提取脚本所在目录
+
+* `os.path.dirname(path)` 	返回 path 路径中的 减去 `basename(path)`
+  * 通过输入 `os.path.realpath(__file__)` 来直接提取代码所在的脚本的目录
+
 * `os.path.split(path)`     将路径分解成 head 和 tail 两部分, 分别相当于上面的函数
   * join(head, tail) returns a path to the same location as path
 
+
+## 2.3. 路径检测以及转换
+
+* `os.path.exists(path)`
+  * 判断该路径是否存在
+  * 如果是 破坏掉的 link , 则返回 False
+* `os.path.lexists(path)`
+  * 对于 破坏掉的 link 也返回 True
+  * 只检测是否存在该文件
+
+
+* `os.path.expanduser(path)`: 转换路径中的 `~` 和 `~user`
+  * 要求 path 的第一个字符必须是 `~`, 这也符合 linux 中的使用方法
+  * 会根据 linux 或 windows 的系统流程查找对应的 Home 目录并进行替换
+
+* `os.path.expandvars(path)` : 转换路径中的环境变量, 即 `$环境变量名  ${环境变量名}`
+  * 如果环境变量不存在, 则不会进行替换
+  * 对于 windows 系统, 还额外支持一种环境变量格式 `%环境变量名%`
+
+* `os.path.normpath(path)` 标准化一个路径
+  * 删除多余的 `/`
+  * 删除最末尾的 `/`
+  * 删除位于中间的 `..` 并进行逻辑重定位
+  * 如果路径中间包含 Link 则有可能出错, 因为这是一个字符串操作函数
+
+* `os.path.normcase(path)` : 大小写标准化
+  * 在 windows 下因为路径不区分大小写, 该函数将路径中的 part 全部转为小写
+  * Linux 下不做任何操作
+
+
 * `os.path.realpath(path)` 	返回 path 的真实路径。
+
 * `os.path.abspath(path)`   返回相对路径 path 的绝对路径版本
   * 相当于 `os.path.normpath(os.path.join(os.getcwd(), path))`
   * 直接执行 `os.path.abspath('.')` 获取当前路径
+
+
 
 ## 2.4. 路径操作
 
@@ -64,10 +141,32 @@ The pathlib module offers high-level path objects.
   * 每个参数作为一个文件名目录
   * 最后一个参数后面不接 `/`
   * 如果某个元素是绝对路径, 那么该元素之前的输入会被抛弃 (windows下是 `c:` 之类的)
-* os.path.normpath(path) 标准化一个路径
-  * 删除多余的 `/`
-  * 删除最末尾的 `/`
-  * 删除位于中间的 `..` 并进行逻辑重定位
+
+* `os.path.commonpath(paths)` : 接受一个path数组, 返回里面的路径的最大共同路径, 
+  * raise ValueError : 报错
+    * 如果输入中同时包含了相对路径和绝对路径
+    * 如果路径位于不同的drives上 (windows)
+    * 有路径为空
+  * 该函数会返回一个有效的路径
+
+* `os.path.commonprefix(list)` : 返回输入里面的最大共同前缀, 同 commonpath 类似, 但是更倾向于字符串的处理
+  * 该函数返回的不一定是有效路径
+  * 逐字符处理
+
+## 2.5. 路径文件信息提取 os.path.get*
+
+os.path.get* 系列函数, 用于提取 path 指定的路径的各种文件信息
+* 注意, 文件不存在或者没有访问权限 的话这些函数会 raise OSError
+* 以 `seconds since the epoch` 格式返回
+
+函数列表
+* `os.path.getatime(path)` : 获取最后一次访问该文件的时间, 
+* `os.path.getmtime(path)` : 获取最后一次更改时间
+* `os.path.getctime(path)` : 获取文件创建时间 (如果可能的话) , 该函数的表现是OS依存的
+  * Unix: is the time of the last metadata chang
+  * Windows:  is the creation time for path
+* `os.path.getsize(path)`  : 获取文件大小 in bytes
+
 
 
 # 3. pathlib — Object-oriented filesystem paths
@@ -249,13 +348,13 @@ print([path1, path1.name, path1.stem, path1.suffix, path1.parent, path1.parent.p
 
 
 
-### link 的创建与修改
+### 3.2.5. link 的创建与修改
 
 链接的创建以及 Follow
 * `Path.readlink()` 追踪一个link 的 path, 即返回 path of target file 
 * `Path.symlink_to(target, target_is_directory=False)`
 
-### 3.2.5. is_* 系列判断函数
+### 3.2.6. is_* 系列判断函数
 
 该部分统一返回 bool, 省略 Path.*
 
@@ -278,7 +377,7 @@ print([path1, path1.name, path1.stem, path1.suffix, path1.parent, path1.parent.p
 | is_char_device()  | True if the path points to a character device      |
 
 
-### 3.2.6. 检索文件夹
+### 3.2.7. 检索文件夹
 
 
 * `.iterdir()` 获取一层文件列表, 注意该函数返回的是一个迭代器, 需要手动转化成list * 
@@ -296,7 +395,7 @@ print(f'Number of files: {len(path_list)}')
   * 懒人函数
   * 相当于默认在 pattern 前面添加了 `**/`
 
-### 3.2.7. 与 OS. 的互换性
+### 3.2.8. 与 OS. 的互换性
 
 由于很多函数都是 os. 的封装, 文档中列出了与 os 的函数对照表
 
@@ -308,11 +407,6 @@ https://docs.python.org/3/library/pathlib.html?highlight=pathlib#correspondence-
 
 # 5. 简单功能模组
 
-* filecmp   : 面向路径的字符串比较
-* fnmatch   : 通配符匹配路径
-* glob      : 同样的是查找路径. 比 fnmatch 高级
-
-* tempfile  : 方便的创建临时文件
 
 ## 5.1. fnmatch - Unix filename pattern matching
 

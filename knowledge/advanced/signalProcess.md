@@ -1,4 +1,6 @@
 - [1. Signal Process](#1-signal-process)
+      - [6.1.2.1. 均方根 Root Mean Square (RMS)](#6121-均方根-root-mean-square-rms)
+  - [Signal-to-noise ratio SNR 信噪比 S/N](#signal-to-noise-ratio-snr-信噪比-sn)
 - [2. Noise](#2-noise)
   - [2.1. Noise Classification](#21-noise-classification)
     - [2.1.1. 热噪声 Thermal Noise](#211-热噪声-thermal-noise)
@@ -66,7 +68,6 @@
   - [6.1. Random Processes 随机过程](#61-random-processes-随机过程)
     - [6.1.1. 随机过程的概率模型](#611-随机过程的概率模型)
     - [6.1.2. Power Spectral Density (PSD)](#612-power-spectral-density-psd)
-      - [6.1.2.1. 均方根 Root Mean Square (RMS)](#6121-均方根-root-mean-square-rms)
       - [6.1.2.2. 谱线 - 对信号的测量](#6122-谱线---对信号的测量)
       - [6.1.2.3. 信号的能量分类](#6123-信号的能量分类)
       - [6.1.2.4. 谱密度 能量谱密度](#6124-谱密度-能量谱密度)
@@ -86,6 +87,64 @@
 # 1. Signal Process
 
 信号处理杂记, 由于波形信号和图像信号的共同点相当多, 该笔记里不分类 
+
+香农极限   Shannon–Hartley theorem  
+
+## 1.1. 均方根 Root Mean Square (RMS)
+
+均方根是描述 AC 波的有效电压或者电流的一种最普遍的表达方式  
+
+$$RMS=\sqrt{\frac{\sum^N_{i=1}x^2[i]}{N}}$$
+
+物理由来:
+* 在 DC 直流电路中, 对于电压或者电流可以很简单的定义
+* 对于 AC 交流电路中, 对于物理量的描述就复杂得多, 其中 RMS 就是最朴素的一种
+* 对于 AC 的波形函数进行 RMS 计算
+  * 1.计算波形函数的平方值
+  * 2.计算波形函数平方后的函数的时间平均值
+  * 3.开根
+* 在 AC 交流电路的表示中, RMS 值通常称为有效值或者 DC 等价值, 在日常生活中的交流电压就是用 RMS 来表示的
+* 理论中的有效值一般都是用积分直接积出来的
+
+## 1.2. Signal-to-noise ratio SNR 信噪比 S/N
+
+Signal-to-noise ratio (SNR or S/N) is a measure used in science and engineering that compares the level of a desired signal to the level of background noise.
+* often expressed in `decibels`.
+* A ratio higher than 1:1 (greater than `0 dB`) indicates more signal than noise.
+* 高于 0 分贝则说明信号强度大于噪声强度  
+
+通信信道的几个指标 SNR, bandwidth, channel capacity 由 香农-哈特利定理(香农极限)连接
+
+SNR 的定义是基于信号的 强度 (Power)的, 基础公式 $SNR=\frac{P_{signal}}{P_{noise}}$ 这里的 P 指的是平均强度
+
+一般的, 信号可以是一个固定值 s , 也可以是一个混杂着噪声随机变量 N 的随机变量 S, 因此利用随机变量期待值的定义可以写成
+$$SNR = \frac{s^2}{E[N^2]}=\frac{E[S^2]}{E[N^2]}$$
+
+然而, 噪声更多的都是均值为 0 的随机变量, 那么 SNR 的定义分母就是 $\sigma_N^2$, 即噪声的方差
+
+
+对于电信号, SNR 也可以用 RMS 来评价  
+$$SNR= (\frac{A_{signal}}{A_{noise}})^2$$
+
+
+SNR 的分贝表示: 由于信号的动态范围往往非常大, 因此信号的强度, 信噪比也都可以用分贝来进行表示
+* $P_{signal,dB} = 10\text{log}_{10}(P_{signal})$
+* $P_{noise,dB} = 10\text{log}_{10}(P_{noise})$
+* $SNR_{dB}=10\text{log}_{10}(SNR)=10\text{log}_{10}(\frac{P_{signal}}{P_{signal}})=P_{signal,dB}-P_{noise,dB}$
+
+再次进行强调, SNR 评价的是Power, 对于伏特或者安培应用场景, 必须对信号量进行平方来获取 `与功率成正比的量`
+
+$$SNR_{dB}=10\text{log}_{10}(\frac{A_{signal}}{A_{noise}})^2=20\text{log}_{10}(\frac{A_{signal}}{A_{noise}})=2(A_{signal,dB}-A_{noise,dB})$$
+
+## 1.3. 香农极限 Shannon–Hartley theorem
+
+指的是在信道上进行无差错传输的`理论`最大传输速率, 是香农定理在有限带宽的信道上的理论.
+* 即, 当信息传输速率未达到香农极限时, 理论上存在 零容错率的编码方法  
+
+$$C = B \text{log}_2(1+\frac{S}{N})$$
+* C 是信道容量 channel capacity,  /bps 单位比特速率
+* B 是带宽, 单位 Hz
+* S/N 的信噪比, 这里使用的是单纯的比值, 而不是分贝后的数值
 
 
 # 2. Noise
@@ -1213,23 +1272,9 @@ $$P(k)=\lim_{N\rightarrow \infin}\frac{|F(k)|^2}{N} (rad^2/hz)$$
 
 即图像的二维离散傅里叶变换除以对应的图片 shape
 
-#### 6.1.2.1. 均方根 Root Mean Square (RMS)
 
-均方根是描述 AC 波的有效电压或者电流的一种最普遍的表达方式  
 
-$$RMS=\sqrt{\frac{\sum^N_{i=1}x^2[i]}{N}}$$
-
-物理由来:
-* 在 DC 直流电路中, 对于电压或者电流可以很简单的定义
-* 对于 AC 交流电路中, 对于物理量的描述就复杂得多, 其中 RMS 就是最朴素的一种
-* 对于 AC 的波形函数进行 RMS 计算
-  * 1.计算波形函数的平方值
-  * 2.计算波形函数平方后的函数的时间平均值
-  * 3.开根
-* 在 AC 交流电路的表示中, RMS 值通常称为有效值或者 DC 等价值, 在日常生活中的交流电压就是用 RMS 来表示的
-* 理论中的有效值一般都是用积分直接积出来的
-
-#### 6.1.2.2. 谱线 - 对信号的测量
+#### 6.1.2.1. 谱线 - 对信号的测量
 
 对于一个固定带宽的信号 e.g. 6000HZ, 所谓以某一个分辨率进行的测量即:
 * 对谱进行数字化得到的离散数据点
@@ -1241,7 +1286,7 @@ $$RMS=\sqrt{\frac{\sum^N_{i=1}x^2[i]}{N}}$$
 * 对于一个固定信号, 谱线的振幅实际上是谱线的函数, 谱线越多, 每个谱线的振幅越低   
 
 
-#### 6.1.2.3. 信号的能量分类
+#### 6.1.2.2. 信号的能量分类
 
 首先定义两种不同的信号概念, 概念上这两种信号都是建立在无穷大时间的积分上的, 对于一个信号 $f(t)$, 首先根据 电阻的模拟理解, 可以写出该信号的能量 $E$    
 
@@ -1264,7 +1309,7 @@ $$P=\lim_{T\rightarrow \infin}\int^{T/2}_{-T/2}\frac{1}{T}f_T^2(t)dt=\lim_{T\rig
   * 将定义域是做一个周期, 进行周期延拓, 可以得到结论是功率信号
   * 将定义域以外的时间轴定义为 0, 可以得到结论是 能量信号.    
 
-#### 6.1.2.4. 谱密度 能量谱密度
+#### 6.1.2.3. 谱密度 能量谱密度
 
 如果是能量信号 $f(t)$, 因为不存在功率, 所以也就不存在功率谱密度, 但是可以对能量进行计算
 * 通过傅里叶变换, 一样可以分理处不同频域分量所对应的能量 得到 $F(\omega)$
@@ -1273,7 +1318,7 @@ $$P=\lim_{T\rightarrow \infin}\int^{T/2}_{-T/2}\frac{1}{T}f_T^2(t)dt=\lim_{T\rig
 * 此时 $F(\omega)$ 就可以直接定义成能量谱, 即能量与功率的关系   
 
 
-#### 6.1.2.5. 自功率谱  Self Power Spectrum 
+#### 6.1.2.4. 自功率谱  Self Power Spectrum 
 
 同样也是物理领域的名词  
 
@@ -1300,7 +1345,7 @@ $$P=\lim_{T\rightarrow \infin}\int^{T/2}_{-T/2}\frac{1}{T}f_T^2(t)dt=\lim_{T\rig
 
 
 
-#### 6.1.2.6. 功率谱密度的计算
+#### 6.1.2.5. 功率谱密度的计算
 
 
 对于一个功率有限的确定信号 $f(t)$, 即功率信号, 从中截取 $|t|\le \frac{T}{2}$ 的一段, 写成一个截尾函数 $f_T(t)$, 即:

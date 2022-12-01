@@ -21,7 +21,7 @@ Scipy是一个用于数学、科学、工程领域的常用软件包，可以处
 | scipy.special     | 一些特殊的数学函数 |
 | scipy.stats       | 统计               |
 
-# Fourier Transforms ( scipy.fft )
+# 2. Fourier Transforms ( scipy.fft )
 
 因为是计算机的数值计算库, 所以天然是离散的  
 定义了很多 离散傅里叶变换 discrete Fourier transform (DFT) 的实现  
@@ -31,7 +31,7 @@ The DFT has become a mainstay of numerical computing in part because of a very f
 同为正交变换的离散正余弦变换也在该库中, 还有 Hankel Transforms  
 
 
-## Fast FFourier Transforms 快速傅里叶
+## 2.1. Fast FFourier Transforms 快速傅里叶
 
 函数命名规则 `(i)(r/h)fft(n)`
 * i : 是否是逆变换
@@ -44,13 +44,13 @@ The DFT has become a mainstay of numerical computing in part because of a very f
 * `axis=-1`   : 要进行 FFT 的维度, 影响最终输出的 ndim, 默认是针对全部数据的 FFT, 对于 fftn, 也会受 s 参数的影响
 * 
 
-## Discrete Sin and Discrete Cosine Transforms (DST DCT)
+## 2.2. Discrete Sin and Discrete Cosine Transforms (DST DCT)
 
-## Fast Hankel Transforms
+## 2.3. Fast Hankel Transforms
 
-## Helper functions 辅助函数
+## 2.4. Helper functions 辅助函数
 
-# Interpolation (scipy.interpolate)
+# 3. Interpolation (scipy.interpolate)
 
 scipy 的线性插值包, 大概可以分为:
 * 单变量插值
@@ -61,9 +61,10 @@ scipy 的线性插值包, 大概可以分为:
 
 同系列的包管理方法一样, 各种功能具有 类 和 单函数两种实现  
 
-## Multivariate interpolation
 
-### 网格数据
+## 3.1. Multivariate interpolation 
+
+### 3.1.1. 网格数据 (griddata)
 
 `scipy.interpolate.griddata(points, values, xi, method='linear', fill_value=nan, rescale=False)`
 * 无限制 任意维度网格插值
@@ -79,32 +80,51 @@ scipy 的线性插值包, 大概可以分为:
   * linear
   * cubic 
 
+### 3.1.2. Regular Grid
 
 
-# Multidimensional image processing ( scipy.ndimage ) 
+## 3.2. Spline interpolation
+
+样条插值, 是区别于多项式插值的另一个插值算法家族, Spline interpolation 于2018年成为正式的计算机科学技术名词  
+* 与多项式插值不同, 产生的结果是一个分段函数 (分段多项式函数 piecewise polynomial), 降低了结果函数的整体性, 但是有效避免了 龙格现象(Runge Phenomenon)
+* 同时对于每段插值, 即使 degree 阶很小, 也能活得很好的效果
+* 样条在 计算机辅助设计和 计算机图形学 领域中被广泛应用  
+
+
+原文描述
+* a spline is a special function defined piecewise by polynomials
+* instead of fitting a single, high-degree polynomial to all of the values at once, spline interpolation fits low-degree polynomials to small subsets of the values
+
+
+Spline interpolation 的基础步骤
+1. 计算曲线的样条表示
+2. 评估样条曲线在所需要的点的效果
+
+
+# 4. Multidimensional image processing ( scipy.ndimage ) 
 
 Scipy 也有图像处理的相关函数, 对比 scikit-image 里较为基础, 但也足够强大  
 
-# Signal Processing (scipy.signal)
+# 5. Signal Processing (scipy.signal)
 
 SciPy 中专门用于处理信号的包
 * 包括了一些 filter
 * 一些 filter design tools
 * 一些 B-spline interpolation algorithms for 1- and 2-D data
 
-## Filtering
+## 5.1. Filtering
 
 Filtering : a generic name for any system that modifies an input signal in some way.
 
 在 SciPy 中, signal 也是 Numpy array  
 
 
-## B-splines
+## 5.2. B-splines
 
 
-# 2. Statistics ( scipy.stats ) 
+# 6. Statistics ( scipy.stats ) 
  
-### 2.0.1. 偏度（skewness） 和 峰度（peakedness；kurtosis）又称峰态系数
+### 6.0.1. 偏度（skewness） 和 峰度（peakedness；kurtosis）又称峰态系数
 * 偏度（skewness）
   * 是统计数据分布偏斜方向和程度的度量，是统计数据分布非对称程度的数字特征。  
   * 偏度定义中包括正态分布（偏度=0），右偏分布（也叫正偏分布，其偏度>0），左偏分布（也叫负偏分布，其偏度<0）
@@ -142,7 +162,7 @@ print(f'p-value {pvalue}')
 ```
 
 
-###  2.0.2. T-Test
+###  6.0.2. T-Test
 
 ```py
 
@@ -159,7 +179,7 @@ print(f"p-value {pvalue}")
 
 ```
 
-### 2.0.3. ANOVA
+### 6.0.3. ANOVA
 
 ```py
 from scipy.stats import f_oneway
@@ -178,7 +198,7 @@ print(f"p-value {pvalue}")
 
 ```
 
-### 2.0.4. from  chi-square statistic
+### 6.0.4. from  chi-square statistic
 
 scipy.stats import chi2_contingency
 
@@ -203,7 +223,7 @@ print(f'Chi-square {chi2}   p-value {p}')
 
 ```
 
-### 2.0.5. pearson
+### 6.0.5. pearson
 a = player_table["Height(inches)"]
 b = player_table["Weight(lbs)"]
 #print(a)
@@ -213,4 +233,4 @@ r_coef, r_p = pearsonr(a, b)
 print(f'Pearson r: {r_coef}')
 print(f'Spearman r: {rho_coef}')
 
-# 3. Multidimensional image processing ( scipy.ndimage )
+# 7. Multidimensional image processing ( scipy.ndimage )

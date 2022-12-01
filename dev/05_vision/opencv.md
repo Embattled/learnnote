@@ -294,8 +294,9 @@ Python:
 * dstCn	: dst图像的通道数. 一般置零用来自动判定
 
 注意:
-* 该函数是支持输入图像是小数格式的 (0,1) , 在默写转换模式下甚至推荐使用小数格式
+* 该函数是(部分)支持输入图像是小数格式的 (0,1) , 在默写转换模式下甚至推荐使用小数格式
   * 对于 Luv 转换 e.g. COLOR_BGR2Luv , 是应该使用标准化来将图像放到 (0,1) 中的
+  * 对于 Demosaic 转换, 即 Bayer 的转换只支持整数类型 `Assertion failed) depth == CV_8U || depth == CV_16U in function 'demosaicing'`
 * OpenCV 只支持32 bit 小数, 即单精度, 因此对于 numpy 来说不要使用 float64
 
 

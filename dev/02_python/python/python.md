@@ -71,7 +71,7 @@
       - [5.4.2.4. 对齐方法](#5424-对齐方法)
       - [5.4.2.5. 清除对齐方法](#5425-清除对齐方法)
       - [5.4.2.6. 识别转换方法 **str.extract()**](#5426-识别转换方法-strextract)
-      - [5.4.2.7. str.get_dummies()](#5427-strget_dummies)
+      - [5.4.2.7. str.get\_dummies()](#5427-strget_dummies)
   - [5.5. Iterator](#55-iterator)
     - [5.5.1. Generator Types](#551-generator-types)
 - [6. Python 流程控制](#6-python-流程控制)
@@ -125,13 +125,13 @@
 - [12. Python 的包 环境管理](#12-python-的包-环境管理)
   - [12.1. Python的包管理](#121-python的包管理)
     - [12.1.1. distutils 和 setuptools](#1211-distutils-和-setuptools)
-    - [12.1.2. pip](#1212-pip)
   - [12.2. 环境管理](#122-环境管理)
     - [12.2.1. venv](#1221-venv)
     - [12.2.2. virtualenv](#1222-virtualenv)
     - [12.2.3. virtualenvwrapper](#1223-virtualenvwrapper)
 - [python 解释器](#python-解释器)
   - [python Environment variables](#python-environment-variables)
+  - [](#)
 
 # 1. Python 的背景
 
@@ -1801,8 +1801,10 @@ print(str_max.__doc__)
   - 但是返回数列会导致, 函数在运行中占用的内存会随着返回的 list 的长度而增大
   - 如果要控制内存占用, 最好不要用 List, 来保存中间结果, 而是通过 iterable 对象来迭代
 
-  -
-
+- 使用方法
+  - 把 yield 替换掉 return 即可
+  - 下次再调用该函数的时候会从上次 yield 的地方继续运行
+$\rightarrow$
 ```py
 def gen():  # defines a generator function
     yield 123
@@ -2440,9 +2442,11 @@ re.search('(bar)+', 'foo barbarbar baz')
 
 [官方推荐文档]<https://packaging.python.org/guides/tool-recommendations/>  
 
+
 ## 12.1. Python的包管理
 
 包管理工具有很多
+* [pip](./pip.md)
 
 ### 12.1.1. distutils 和 setuptools
 
@@ -2470,24 +2474,6 @@ setup(
 然后在工作目录下运行  `python setup.py sdist`  则会打包好  `fooBar-1.0.zip`  
 安装者则需要解压压缩包  然后运行  `python setup.py install`  就可以使用包了
 
-### 12.1.2. pip
-
-pip是目前最流行的Python包管理工具, 它被当作easy_install的替代品, 但是仍有大量的功能建立在setuptools之上。  
-
-- Python 2.7.9及后续版本：默认安装, 命令为pip
-- Python 3.4及后续版本：默认安装, 命令为pip3
-
-pip的使用非常简单, 并支持从任意能够通过 VCS 或浏览器访问到的地址安装 Python 包  
-
-- 安装:  pip install SomePackage
-  - 加上 `==` 来指定安装版本 `pip install scipy==0.15.1`
-- 卸载:  pip uninstall SomePackage
-
-- pip list 查看已安装包的列表
-- pip freeze 另一种查看方法
-  - `pip freeze > requirements.txt` 将输出存入文件 可以使别人安装相同版本的相同包变得容易
-  - `pip install -r requirements.txt`
-  - `pip install -u ModuleName` 下载一个已经安装包的更新版本  
 
 ## 12.2. 环境管理
 
@@ -2616,3 +2602,12 @@ pip install django==2.0
 ## python Environment variables
 
 会对 python 解释器起作用的环境变量  
+
+
+## 
+
+好像一般的包都不能够通过终端直接访问
+
+`python -m pip --version`
+
+查看一个包的版本  

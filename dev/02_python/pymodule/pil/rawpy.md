@@ -1,0 +1,4 @@
+# rawpy
+
+rawpy is an easy-to-use Python wrapper for the `LibRaw` library. It also contains some extra functionality for finding and repairing hot/dead pixels.
+
