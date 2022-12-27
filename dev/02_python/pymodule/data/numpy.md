@@ -44,6 +44,7 @@
   - [4.6. Linear algebra 线性代数计算](#46-linear-algebra-线性代数计算)
     - [4.6.1. Matrix and vector products 向量矩阵乘法](#461-matrix-and-vector-products-向量矩阵乘法)
       - [4.6.1.1. 矩阵乘法](#4611-矩阵乘法)
+      - [einsum](#einsum)
     - [4.6.2. Solving equations and inverting matrices 计算矩阵方程或者逆](#462-solving-equations-and-inverting-matrices-计算矩阵方程或者逆)
   - [4.7. Logic functions 逻辑计算](#47-logic-functions-逻辑计算)
     - [4.7.1. Truth value testing](#471-truth-value-testing)
@@ -661,7 +662,7 @@ numpy 对于各种类型的输出支持的很好, 要注意对于 pandas 的 Dat
   * a,b 都是 2D, 执行矩阵乘法, 即 `numpy.matmul` 或者 `@` 运算符
   * a,b 有一个标量, 执行普通元素乘法
   * a,b 有一个 ND, 和一个1D, 对于 a,b 的最后一维执行 sum product (对应元素求积再相加), 矩阵向量乘
-  * a,b 是 ND和MD, 执行 sum product over the last axis of a and the second-to-last axis of b , 相当于各取 a,b 的最后两维作为矩阵执行矩阵乘法, 
+  * a,b 是 ND和MD, 执行 sum product over the last axis of a and the second-to-last axis of b. 
     * 最终得到结果为 (N+M-2) 维, 即其余维进行全排列, 这对于某些场景来说可能不适用
     * `dot(a, b)[i,j,k,m] = sum(a[i,j,:] * b[k,:,m])`
 
@@ -694,7 +695,18 @@ np.matmul(a, c).shape :(9, 5, 7, 3)
   * 该函数比较基础, 只接受 a,b 都是向量
   * 生成外积矩阵, 矩阵形状为 (a.len, b.len)
 
+#### einsum  
 
+评估操作数的爱因斯坦求和约定
+Evaluates the Einstein summation convention on the operands.
+
+爱因斯坦求和约定, 可以用一个简单的方式表示许多常见的 多维线性数据运算.  
+在 numpy 中
+* 隐式implicit模式下, 直接计算对应的值
+* 显式explicit模式下, provides further flexibility to compute other array operations that might not be considered classical Einstein summation operations.
+
+
+`numpy.einsum(subscripts, *operands, out=None, dtype=None, order='K', casting='safe', optimize=False)`
 
 ### 4.6.2. Solving equations and inverting matrices 计算矩阵方程或者逆
 
@@ -890,7 +902,6 @@ One-dimensional linear interpolation for monotonically increasing sample points.
   * 如果 condition is an array of boolean 则等同于`arr[condition]`
 * 完全的与 `numpy.place` 功能相反的函数
 * 返回 : 所提取的元素组成的 1-D array
-
 
 
 `numpy.where(condition, [x, y, ]/)`

@@ -5,7 +5,7 @@
 
 杂项系统库:
 * os        各种基础操作啥都有
-  * os.path 作为 os 库中作用比较几种的子集, 放在饿了 path 专门的文档中  
+  * os.path 作为 os 库中作用比较几种的子集, 放在了 path 专门的文档中  
 
 专用目的库:
 * argparse  : 专门用来处理 python 命令行参数的
@@ -17,10 +17,13 @@
 * os — Miscellaneous operating system interfaces, 包含了各种操作系统相关的方法, 是一个杂模组
 * 里面很多函数都是限定操作系统的
 * 非常大的库
+* 经常与 sys 库搞混
+* 该库更加贴近于不与 python 相关的 os 的功能
 
 
 * 一些非常常用的功能被移动到了python内部函数:
   * 如果想使用文件IO, 查看内部函数 `open()`即可, 它是 `os.fdopen()` 的alias
+* 一些目的比较明确的库, 被 python 封装成了其他专用的 STL 包
   * 管理运行时 paths, 使用模组 `os.path`
   * 文件读取的相关内容在 `fileinput` 中
   * 临时文件          `tempfile`
@@ -45,6 +48,7 @@ os.makedirs(name, mode=0o777, exist_ok=False)
   - top     : 搜索的根目录
   - topdown : 是否自顶向下搜索
   - floowlink:是否进入目录中的软连接进行搜索, 可能会导致无限递归
+
 ```py
 import os
 from os.path import join, getsize
@@ -59,7 +63,7 @@ for root, dirs, files in os.walk('/home/eugene/workspace/learnnote/cvml'):
 
 These functions and data items provide information and operate on the current process and user.  
 
-可以提取一些调用该python 程序的进程信息和用户信息
+可以提取一些调用该 python 程序的进程信息和用户信息
 
 
 ### 2.2.1. 各种 get
@@ -81,13 +85,13 @@ Unix. Windows:
 * `os.getlogin()`   : Return the name of the user logged in on the controlling terminal of the process.
   * 不被官方推荐使用, 应该用 `getpass.getuser()` 代替
 
-### 2.2.2. 环境变量
+### 2.2.2. 环境变量管理
 
 * `os.environ` A mapping object where keys and values are strings that represent the process environment.
   * 不是函数, 而是一个具体的字典对象. eg `environ['HOME']`
   * 该对象不仅可以用来查询, 修改该字典会自动写回环境变量到系统 (通过调用 ` os.putenv(key, value)¶` )
 
-## 2.3. Process Management¶
+## 2.3. Process Management
 
 These functions may be used to create and manage processes. 可以用来通过Python解释器进程再创建各种子进程
 

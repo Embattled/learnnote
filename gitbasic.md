@@ -1,4 +1,4 @@
-# 1. Git config
+# 1. Git 的配置 Setup and Config
 
 **一些基础的Linux命令**
 * `mkdir learngit` 创建一个文件夹  
@@ -7,34 +7,65 @@
 * `ls -ah` ls用来输出当前文件夹的所有文件及文件夹  -ah用来输出包括被隐藏的全部
 
 
-
-git配置文件有三个位置:
-1. `/etc/gitconfig` 系统配置文件,            对应 `git config --system`
-2. `~/.gitconfig` 用户全局配置文件,          对应 `git config --global`
-3. 项目目录中`.git/config` 仅该项目配置文件,  对应 `git config --local`
+## 1.1. git信息命令
 
 
-## 1.1. 自报家门
 
-Git是分布式版本控制系统，所以，每个机器都必须自报家门：你的名字和Email地址  
-安装程序完成后需要在命令行输入
+## 1.2. git-config 命令
+
+属于 git 的一个命令行配置命令, 通过CLI的方式直接对 git 配置文件进行一些修改, 语法特别多, 直接对配置文件通过编辑器修改也是可行的  
+
+git配置文件有多个位置:
+* 系统层级的配置文件,对应 `git config --system`, `$(prefix)/etc/gitconfig ` `/etc/gitconfig` 
+* 用户全局配置文件, 对应 `git config --global` 
+  * `$XDG_CONFIG_HOME/git/config ` 环境变量 `XDG_CONFIG_HOME` 如果没有被定义或者为空, 则会使用默认值 `$HOME/.config/`, 即   `$HOME/.config/git/config`
+  * `~/.gitconfig`
+  * 用户的配置文件是有两个路径的, 即以上两个都会被载入, 但前者优先级更高
+* 项目配置 `$GIT_DIR/config `,  对应 `git config --local`, 默认 `$GIF_DIR` 的值是 `.git/`, 即配置文件为 `.git/config`
+* 与 local 类似, 但是在工作树功能启动的时候会不同  `git config --worktree`
+  * This is optional and is only searched when `extensions.worktreeConfig` is present in `$GIT_DIR/config`.
+
+
+修改项的值以及在配置文件中的格式, 例如 `user.name` 的修改, 在配置文件中具体的格式为, 要注意直接修改时候的格式
+```.gitconfig
+[user]
+      name = name
 ```
+
+
+非修改性命令:
+* 打印所有修改后的值 `-l --list`
+
+
+### 1.2.1. core 核心功能
+
+#### 1.2.1.1. 更换默认编辑器
+
+`git config --global core.editor` <编辑器, 例如 vim>
+
+#### 1.2.1.2. 定义Git全局的 .gitignore 文件
+
+创建针对所有库的全局的 .gitignore 文件, 可以放在任意位置。然后在使用以下命令配置Git:  
+`git config --global core.excludesfile ~/.gitignore`
+
+### 1.2.2. 自报家门
+
+Git是分布式版本控制系统, 所以, 每个机器都必须自报家门：你的名字和Email地址  
+安装程序完成后需要在命令行输入
+```sh
 git config --global user.name "Your Name"
 git config --global user.email "email.example.com"
 
 git config -l  # 测试编辑好的机器信息
 ```
 
-注意`git config`命令的`--global` 参数，用了这个参数，表示该用户在这台机器上所有的Git仓库都会使用这个配置，当然也可以对某个仓库指定不同的用户名和Email地址
+注意`git config`命令的`--global` 参数, 用了这个参数, 表示该用户在这台机器上所有的Git仓库都会使用这个配置, 当然也可以对某个仓库指定不同的用户名和Email地址
 
-## 1.2. 定义Git全局的 .gitignore 文件
 
-创建针对所有库的全局的 .gitignore 文件，可以放在任意位置。然后在使用以下命令配置Git:  
-`git config --global core.excludesfile ~/.gitignore`
 
-## 1.3. 更换默认编辑器
+### 1.2.3. pull
 
-`git config --global core.editor` <编辑器, 例如 vim>
+
 
 # 2. 离线操作
 
@@ -138,7 +169,7 @@ git config -l  # 测试编辑好的机器信息
    * `git commit -c <commit>` 懒人代码, 直接复制参数 commit 的 log msg
    * `git commit -C <commit>` 复制参数 commit 的 log msg 并进入编辑界面
    * ` git commit -m "wrote a readme file"`  
-   * 如果commit注释写错了，只是想改一下注释，只需要：
+   * 如果commit注释写错了, 只是想改一下注释, 只需要：
    * `git commit --amend` 用于提交后发现忘记了暂存某些需要的修改, 或者更改最后一次提交的信息
      * 相当于 `git reset --soft HEAD^` 再重新提交 `git commit -c ORIG_HEAD`
      * 使用示例
@@ -267,7 +298,7 @@ $ git commit --amend
    * `git rebase --continue | --abort | --skip | --edit-todo`
    * `git rebase -i` 交互式进行 rebash
 
-## submodule 
+## 3.2. submodule 
 
 主要用于在项目庞大的时候进行模块文件抽离, 抽离出来的文件可以单独成为一个 git repo
 
@@ -288,7 +319,7 @@ $ git commit --amend
   * `status`  : 打印 submodule 的版本信息
     * 对于主仓库来说, git submodule 是以 分支:版本 为基础管理的, 即 子仓库的内容会维持同一个分支的同一个版本不变
     * 若需要更新子仓库的内容, 需要进入子仓库进行 `git switch`, 这个switch也需要在主仓库里进行一次 commit 
-    * Git认为移动submodule的指针和其他变化一样: 如果我们保存这个改动，就必须提交到仓库里
+    * Git认为移动submodule的指针和其他变化一样: 如果我们保存这个改动, 就必须提交到仓库里
   * `init` : Initialize the submodules recorded in the index, 将对应的 submodule URL 写入本地 .git/config
   * `update`
     * `git submodule update --init --recursive` : 懒人命令, 直接完成初始化和下载最新版本
@@ -337,7 +368,7 @@ $ git commit --amend
      * 大写的 字母 用于覆盖目标名称原本的分支
    * 删除 `-d -D`
      * ` git branch [<options>] [-r] (-d | -D) <branch-name>...`
-     * 因为创建、合并和删除分支非常快，所以Git鼓励你使用分支完成某个任务，合并后再删掉分支，这和直接在master分支上工作效果是一样的，但过程更安全。
+     * 因为创建、合并和删除分支非常快, 所以Git鼓励你使用分支完成某个任务, 合并后再删掉分支, 这和直接在master分支上工作效果是一样的, 但过程更安全。
      * 使用 `git branch -d <分支名称>`可以删除一个分支
      * `-D` 命令用于强制删除一个还没有被 merge 的分支
    * 链接远程分支 `--set-upstream-to`
@@ -366,11 +397,11 @@ $ git commit --amend
 
 
 
-当Git无法执行`快速合并`，只能试图把各自的修改合并起来，但这种合并就可能会有冲突  
+当Git无法执行`快速合并`, 只能试图把各自的修改合并起来, 但这种合并就可能会有冲突  
 必须手动解决冲突后再提交
 
 使用`git status`可以告诉我们冲突的文件
-Git用<kbd><<<<<<<</kbd>，<kbd>=======</kbd>，<kbd>>>>>>>></kbd>标记出不同分支的内容
+Git用<kbd><<<<<<<</kbd>, <kbd>=======</kbd>, <kbd>>>>>>>></kbd>标记出不同分支的内容
 
 
 ## 4.4. 分支管理策略
@@ -412,7 +443,185 @@ tag是git版本库的一个标记, 指向某个 commit
 
 3. `git branch <branchName> <tagName>`: 依照 tag 对应的 commit 来建立分支
 
-# git-lfs Large File Storage (LFS)
+# 6. Sharing and Updating Projects
+
+共享项目以及协同作业
+    fetch
+    pull
+    push
+    remote
+    submodule
+    subtree (貌似非官方)
+
+## 6.1. submodule 子模块
+
+submodule: 子模块 Mounting one repository inside another
+* 将一个版本库作为子库引入到另一个版本库中
+  * 子库 submodule 有自己的历史
+  * 嵌入子库的库成为 superproject
+* 如果要克隆完整仓库, 
+  * 直接默认的 clone 父仓库的时候, 所有子仓库都只有一个空文件夹  
+  * 需要额外的步骤对子库进行 `init` 和 `update`
+  * `git submodule init`
+  * `git submodule update --recursive`
+* 通过 `.gitmodules` 来进行文件记录和 submodule 的版本信息
+* 如果要删除一个 submodule, 步骤比较繁琐, 没有专用的命令
+  * 需要删除对应子模块的文件夹
+  * 从 `.gitmodules` 中删除对应的项
+  * 提交以上两个改动
+* 子父仓库的代码没有双向关联
+  * 不能在 父版本库中 修改子版本库的代码, 即子库的代码是单向传递给父库的 (某些时候可能是需要该特性的)
+  * 子仓库的代码的修改不会自动反映到父仓库里, 需要手动同步
+
+相关概念
+* `.gitmodules` `$GIT_DIR/config` 文件用于描述 子模块
+* `git submodule` 命令
+* `git <command> --recurse-submodules`  在进行仓库操作的时候, 可以递归操作所有子模块来简化操作
+
+命令构成:
+```sh
+git submodule [--quiet] [--cached]
+git submodule [--quiet] add [<options>] [--] <repository> [<path>]
+git submodule [--quiet] status [--cached] [--recursive] [--] [<path>…​]
+git submodule [--quiet] init [--] [<path>…​]
+git submodule [--quiet] deinit [-f|--force] (--all|[--] <path>…​)
+git submodule [--quiet] update [<options>] [--] [<path>…​]
+git submodule [--quiet] set-branch [<options>] [--] <path>
+git submodule [--quiet] set-url [--] <path> <newurl>
+git submodule [--quiet] summary [<options>] [--] [<path>…​]
+git submodule [--quiet] foreach [--recursive] <command>
+git submodule [--quiet] sync [--recursive] [--] [<path>…​]
+git submodule [--quiet] absorbgitdirs [--] [<path>…​]
+
+# 通用参数
+-q, --quiet  : 安静执行, Only print error messages.
+```
+
+
+
+### 6.1.1. add 添加子库
+
+`git submodule add git@地址 my_sub_module` 将地址对应的远程仓库作为子库, 保存到当前版本库的对应目录下, 通过 git status 查看父库的状态有:  
+* 对应的 创建/修改 `.gitmodules` 文件
+* 新的子库的文件夹  
+
+查看子库的信息 `.gitmodules` 则有  
+```.gitmodules
+[submodule "子库名称"]
+    path = 父库目录下子库的相对路径
+    url  = 子库的远程url
+```
+### 6.1.2. status 查看子库的信息
+
+`status [--cached] [--recursive] [--] [<path>…​] `  
+
+打印所有子库的名字以及版本信息  
+
+### 6.1.3. init 初始化子库
+
+`init [--] [<path>…​] `  
+
+将所有子库的目录初始化为 git 版本控制目录, 该命令也不会正式下载子库的代码, 具体的下载在 `update` 命令中, 该步骤可以通过 `update --init` 直接省略掉
+
+### 6.1.4. update 子库更新核心命令
+
+```sh
+update [--init] [--remote] [-N|--no-fetch] [--[no-]recommend-shallow]
+      [-f|--force] [--checkout|--rebase|--merge] [--reference <repository>]
+      [--depth <depth>] [--recursive] 
+      [--jobs <n>] [--[no-]single-branch] [--filter <filter spec>] 
+      [--] [<path>…​] 
+```
+
+更新所有子模块, 包括
+* 克隆缺失的子模块
+* 获取子模块的新提交
+* 更新子模块的工作树 working tree
+
+该命令的无参默认动作可以通过配置文件中的 `submodule.<name>.update` 来指定, 否则执行真正软件层的默认操作  
+
+
+参数说明
+* `[--init]` : 自动初始化子模块
+* `--checkout|--rebase|--merge]` 执行具体的怎么样的 update
+  * checkout : 默认操作
+
+
+### 6.1.5. foreach 遍历所有子库
+
+## 6.2. subtree 
+
+从1.5.2版本开始, 官方新增Git Subtree并推荐使用这个功能来替代Git Submodule管理仓库共用(子仓库, 子项目)  
+但是官方文档里没有 subtree 的介绍, 不知为何  
+
+git submodule/subtree 允许其他的仓库指定以一个commit嵌入仓库的子目录
+* git subtree 作为 git submodule 的替代命令, 拥有更加强大的功能且据说被官方推荐
+* 但是在 git 官方文档里查不到任何 git subtree 的说明
+* google 上也没有 git subtree 的官方说明网站, 只有仓库里的[说明文件](https://github.com/git/git/blob/master/contrib/subtree/git-subtree.txt)
+
+
+![不同点](https://imgconvert.csdnimg.cn/aHR0cDovL2FodW50c3VuLmdpdGVlLmlvL2Jsb2dpbWFnZWJlZC9pbWcvZ2l0L2xlc3NvbjEwLzI5LnBuZw?x-oss-process=image/format,png)
+subtree 的不同:
+* 不增加 `.gitmodule`, 可以直接一条命令删除子库
+* 子项目对其他成员透明, 可以不用知道 subtree 的存在
+  * 可以在父库中修改子库的内容, 甚至可以把修改的子库内容推送到远程子库中
+* 本质就是把子项目目录作为一个普通的文件目录, 对于父级的主项目来说是完全透明的, 原来是怎么操作现在依旧是那么操作
+  * 在远程中 (github)
+  * submodules 的子库目录是一个链接, 点进去会跳转到别的仓库页面
+  * subtree 的子库就是文件, 没有链接
+* 主子仓库的分支同步, 切换主项目分支的时候, 子仓库也会同步切换
+* 缺点:
+  * 无法直接单独查看子仓库的修改记录, 因为子仓库的修改包含在父仓库的记录中了
+  * 子仓库的分支管理较为麻烦
+  * 单独的一整套指令, 且复杂度较高, 需要学习
+
+```sh
+[verse]
+'git subtree' [<options>] -P <prefix> add <local-commit>
+'git subtree' [<options>] -P <prefix> add <repository> <remote-ref>
+'git subtree' [<options>] -P <prefix> merge <local-commit> [<repository>]
+'git subtree' [<options>] -P <prefix> split [<local-commit>]
+
+[verse]
+'git subtree' [<options>] -P <prefix> pull <repository> <remote-ref>
+'git subtree' [<options>] -P <prefix> push <repository> <refspec>
+```
+
+### 6.2.1. add 添加子库
+
+由于 subtree 的工作原理是基于分支的, 因此这里添加子库的方法还需要用到一些基础命令  
+1. 单纯添加子库的地址到 remote :    `git remote add subtree-origin git@子库链接` 
+   * 该步骤其实是可选的
+   * 将链接添加到库的 remote 中会方便接下来的操作, 如果不添加的话则在下面的命令中使用完整链接
+2. 将remote地址链接成子库   : `git subtree add -P submodule subtree-origin master --squash`
+   * 该命令表示链接的对象是 remote 链接中的 `subtree-origin` 的 master 分支
+   * 由于链接以及变成子库的对象是一个具体的分支, 因此可以把一个远程库的不同分支当作不同的子库同时放进一个父项目中
+   * `-P <prefix>` 表示具体到本地目录的目录名, 如果不指定应该就是 子库原本的仓库名
+   * `--squash` 是一个常用的参数, 表示合并/压缩, 表示会把远程子库上的历史提交合并成一次提交, 再拉去到本地, 这样子库的历史分支就看不到了
+     * 如果不加的话, 会拷贝子库的所有历史提交, 造成 git log 污染
+     * 对于一个子库的使用, 需要在整个使用中保持 `--squash` 值的相同, 即要么永远不用, 要么永远用
+     * `远程子库上的历史提交合并成一次提交` 会导致在之后不加 squash 的拉取中由于找不到公共父节点导致拉取失败
+
+### 6.2.2. pull 拉取更新
+
+### 6.2.3. push 
+
+### 6.2.4. split
+
+subtree 的强大功能, 抽离子库: 开发的过程中发现某些功能可以剥离出来当作公用的子库的时候, 在保留该新子库的所有历史 log 的情况下, 生成一个新的库    
+`git subtree split --prefix=<prefix> [OPTIONS] [<commit>]`
+
+假设某个文件夹 module1 可以作为一个新的子库独立出去
+1. 剥离该目录 `git subtree split -P module1 -b childb`, -b 表示创建了一个新的分支 childb 用于单独保存该分支的文件夹
+2. 在别的地方创建正式的子库目录 `mkdir module1` `git init`
+3. 从父库剥离除去的子库文件分支中, 拷贝代码到子库新的独立的位置 `git pull 父库路径 childb(剥离分支名称)`
+4. 在新的仓库创建远程关联, 推送等
+   * `cd module1`
+   * `git remote add origin git@module1`
+   * `git push -u origin +master`
+
+
+# 7. git-lfs Large File Storage (LFS)
 
 replaces large files such as audio samples, videos, datasets, and graphics with `text pointers` inside Git.
 

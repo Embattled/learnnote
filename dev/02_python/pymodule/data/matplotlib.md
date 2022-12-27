@@ -15,6 +15,9 @@
     - [2.2.1. pyplot.figure](#221-pyplotfigure)
     - [2.2.2. pyplot.subplots](#222-pyplotsubplots)
 - [3. matplotlib.figure Figure](#3-matplotlibfigure-figure)
+  - [3.1. 添加子图 Axes](#31-添加子图-axes)
+    - [3.1.1. fig.add\_axes](#311-figadd_axes)
+    - [3.1.2. figure.add\_subplot](#312-figureadd_subplot)
 - [4. matplotlib.axes Axes](#4-matplotlibaxes-axes)
   - [4.1. Plotting](#41-plotting)
     - [4.1.1. Basic 基础图](#411-basic-基础图)
@@ -27,17 +30,21 @@
       - [4.1.5.1. histogram 标准直方图](#4151-histogram-标准直方图)
       - [4.1.5.2. staris 阶梯图](#4152-staris-阶梯图)
     - [4.1.6. 2D arrays 二维数据](#416-2d-arrays-二维数据)
+      - [4.1.6.1. Axes.imshow 图像显示](#4161-axesimshow-图像显示)
     - [4.1.7. Text and annotations 文字和标注](#417-text-and-annotations-文字和标注)
   - [4.2. Axis / limits](#42-axis--limits)
     - [4.2.1. Axis limits and direction](#421-axis-limits-and-direction)
       - [4.2.1.1. Axes limit](#4211-axes-limit)
       - [4.2.1.2. Axes direction](#4212-axes-direction)
+    - [Axes bound](#axes-bound)
     - [4.2.2. Axis labels, title, and legend](#422-axis-labels-title-and-legend)
       - [4.2.2.1. Axes title](#4221-axes-title)
       - [4.2.2.2. Axis labels 坐标轴 label](#4222-axis-labels-坐标轴-label)
       - [4.2.2.3. legend 图例说明](#4223-legend-图例说明)
     - [4.2.3. Axis scales](#423-axis-scales)
-    - [4.2.4. Autoscaling and margins](#424-autoscaling-and-margins)
+    - [4.2.4. Autoscling and margins](#424-autoscling-and-margins)
+      - [4.2.4.1. Autoscaling](#4241-autoscaling)
+      - [4.2.4.2. margins](#4242-margins)
     - [4.2.5. Aspect ratio](#425-aspect-ratio)
     - [4.2.6. Ticks and tick labels](#426-ticks-and-tick-labels)
   - [4.3. 以前的内容](#43-以前的内容)
@@ -149,8 +156,9 @@ fontdict : `dict` A dictionary controlling the appearance of the title text, the
 * 图的数据输入接受 numpy.array, 因此和 pandas 一起使用的时候需要先转换类型  
 
 
-该包是一个基于状态的包, 很多对象都是隐式的保存在内存中的
+该包是一个基于状态的包, 很多对象都是隐式的保存在内存中的, 某种程度上说方便也方便, 但是不利于功能的函数化
 matplotlib.pyplot is a state-based interface to matplotlib.
+
 
 ## 2.1. plt 基本通用操作
 
@@ -192,14 +200,22 @@ savefig(fname, *, dpi='figure', format=None, metadata=None,
 
 使用 matplotlib 创建图形有两种使用 style:
 1. 使用面向对象方法, 显式的创建 Figure 对象和 Axes 对象, 然后在其上调用方法, 比较麻烦, 但是清晰
-2. 直接使用 pyplot 包的懒人函数创建各种图形, 可以非常快, 但是资源不能复用, 这部分的函数单独写在一段里  
-
 创建并获取图片对象`Figure`和 `axes.Axes`对象
 ```py
 fig = plt.figure()  # an empty figure with no Axes
+ax = fig.add_subplot(1, 2, 1)
+# some plot function
+ax = fig.add_subplot(1, 2, 2)
+# some plot function
+
+# 一口气创建所有的 axes 对象  
 fig, ax = plt.subplots()  # a figure with a single Axes
 fig, axs = plt.subplots(2, 2)  # a figure with a 2x2 grid of Axes
+
 ```
+
+
+2. 直接使用 pyplot 包的懒人函数创建各种图形, 可以非常快, 但是资源不能复用, 这部分的函数需要单独写在一段里  
 
 ### 2.2.1. pyplot.figure
 
@@ -262,9 +278,9 @@ Create a figure and a set of subplots.
   * 用于指定图之间的相互比例, 通过比例来调整子图的大小
   * Each column gets a relative width of `width_ratios[i] / sum(width_ratios) `
   * Each row gets a relative height of `height_ratios[i] / sum(height_ratios)`
-* `subplot_kw` : 用于传递给 `add_subplot` 的关键字参数字典
+* `subplot_kw` : 用于传递给 `figure.add_subplot()` 的关键字参数字典
 * `gridspec_kw`: 用于传递给 `GridSpec` constructor 的关键字参数字典
-* `**fig_kw`   : 其余的关键字参数都是传递给 `pyplot.figure` 的
+* `**fig_kw`   : 其余的关键字参数都是传递给 `pyplot.figure()` 的
 * return:
   * fig : `Figure`
   * ax  : `Axes` or array of Axes  
@@ -274,7 +290,46 @@ Create a figure and a set of subplots.
 
 Figure 在 matplotlib 中是最高级的类, `Top level Artist`, 保存了对所有图片中元素的链接  
 
+* `matplotlib.pyplot.figure()`
+* `class matplotlib.figure.Figure()`
 
+
+## 3.1. 添加子图 Axes
+
+### 3.1.1. fig.add_axes
+
+Add an Axes to the figure.
+函数原型 `add_axes(*args, **kwargs)`  
+```py
+add_axes(rect, projection=None, polar=False, **kwargs)
+add_axes(ax)
+```
+参数意思:  
+* rect : tuple (left, bottom, width, height).  
+  * 用于指定新 Axes 在figure中的位置, 所有参数都用 0~1 小数来表示在 figure 中的相对位置/宽度
+  *  
+
+
+### 3.1.2. figure.add_subplot
+
+Add an Axes to the figure as part of a subplot arrangement.
+
+函数原型为: `add_subplot(*args, **kwargs)`, 意为该函数有多种调用方法
+```py
+add_subplot(nrows, ncols, index, **kwargs)
+add_subplot(pos, **kwargs)
+add_subplot(ax)
+add_subplot()
+```
+
+参数意思:
+* `*args` : 多种类参数, `int, (int, int, index), or SubplotSpec, default: (1, 1, 1)`
+  * The position of the subplot described by one of
+  * (int, int, index), 前两个参数指定具体的网格 nrows, ncols, 第三个 index 用于指定该新添加的 Axes 的位置, index 可以是单个数字意为从左到右的Index, 也可以是一个 2-tuple.  
+  * pos : 一个 3-digit integer, 用于最简便的替换(int, int, index), 因此该方法无法对应子图个数大于9的情况
+  * `SubplotSpec` : 一个子图实例, 即在别处已经创建好的 Axes 直接传入图中.
+* return :  `axes.SubplotBase`, or another subclass of `Axes`
+* `kwargs` : 传递给 class `Axes` 构造函数的参数
 
 
 # 4. matplotlib.axes Axes
@@ -461,6 +516,19 @@ A stepwise constant function as a line with bounding edges or a filled plot.
 
 ### 4.1.6. 2D arrays 二维数据
 
+直接将2为数据画成图的函数
+
+#### 4.1.6.1. Axes.imshow 图像显示
+
+Display data as an image, i.e., on a 2D regular raster.  
+
+该函数的参数原型非常复杂  
+`Axes.imshow(X, cmap=None, norm=None, *, aspect=None, interpolation=None, alpha=None, vmin=None, vmax=None, origin=None, extent=None, interpolation_stage=None, filternorm=True, filterrad=4.0, resample=None, url=None, data=None, **kwargs)`
+
+* X : array-like or PIL image. 支持直接传入 PIL.image 对象.
+  * 支持 (M,N) 2-D 数据, 并可以通过 colormap(`cmap`) 和 normalization(`norm`) 参数来彩色化
+  * 支持 (M,N,3) 和 (M,N,4) 图像的直接显示, 数据支持 8bit 和 0~1 小数 
+
 ### 4.1.7. Text and annotations 文字和标注
 
 
@@ -487,9 +555,15 @@ ax.yaxis
 
 #### 4.2.1.1. Axes limit
 
+xlim ylim 的值, 即在图上显示的坐标区间, 会对数据进行阶段, 即传入了 plot 但是不会显示在图上
+
 * `Axes.set_xlim` : Set the x-axis view limits.
-* `Axes.get_xlim` : Return the x-axis view limits.
+  * `(left=None, right=None, *, emit=True, auto=False, xmin=None, xmax=None)`
+  * left, right. float,  lim in data coordinates.
+  * left and right xlims may also be passed as the tuple `(left, right)` as the first positional argument.
 * `Axes.set_ylim` : Set the y-axis view limits.
+  * `(bottom=None, top=None, *, emit=True, auto=False, ymin=None, ymax=None)`
+* `Axes.get_xlim` : Return the x-axis view limits.
 * `Axes.get_ylim` : Return the y-axis view limits.
 
 
@@ -501,6 +575,9 @@ ax.yaxis
 * `Axes.invert_yaxis()`
 * `Axes.xaxis_inverted()`  返回目前的调转状态
 * `Axes.yaxis_inverted()`
+
+### Axes bound
+
 
 
 
@@ -590,11 +667,136 @@ ax.legend(h, l)
 
 ### 4.2.3. Axis scales
 
-### 4.2.4. Autoscaling and margins
+设置坐标轴 axis 的 `scale`, 例如坐标轴的坐标是指数增长之类的  
+
+设置函数: `(value, **kwargs)` 
+* Axes.set_xscale  : Set the xaxis' scale.
+* Axes.set_yscale  : Set the yaxis' scale.
+* value `{"linear", "log", "symlog", "logit", ...}` or ScaleBase 
+
+获取函数 : 无参数, 返回 axis scale as str
+* Axes.get_xscale  : Return the xaxis' scale (as a str).
+* Axes.get_yscale  : Return the yaxis' scale (as a str).
+
+### 4.2.4. Autoscling and margins
+
+xlim ylim 的值, 即在图上显示的坐标区间, 自动调整的功能能被称作 Autoscaling  
+
+margin 则是 :  所输入的 Data 的范围再左右扩充, 即一定程度上的留白, 默认的 lim 是 5%.
+
+`Axes.use_sticky_edges` Axes类的一个属性 : When autoscaling, whether to obey all Artist.sticky_edges.
+* 默认值为 True
+* Setting this to False ensures that the specified margins will be applied, even if the plot includes an image
+
+#### 4.2.4.1. Autoscaling
+
+* `Axes.autoscale(enable=True, axis='both', tight=None)`
+  * Autoscale the axis view to the data (toggle).
+  * enable: True, False, None. 分别起到 打开, 关闭, 保持 autoscale 机能的作用
+  * axis  : {'both','x','y'}, 指定要操作的 autoscale 的坐标轴
+  * tight : bool or None, 如果参数为 True, 则会设置 margins 为 0.
+    * 不管该参数的具体的值, 都会调用一次 autoscale_view 并将该参数值传递过去
+  * `autoscale()` 快速调用来启动 autoscale, 一般用于在设置了 xlim ylim 以后重新启动
+
+* `Axes.autoscale_view(tight=None, scalex=True, scaley=True)`
+  * Autoscale the view limits using the data limits.
+  * 可以理解为具体执行画图 autoscale 的接口函数
+  * 如果 xlim ylim 被设置, 那么该函数调用了也不会起作用
+  * `tight` : 
+    * True, 根据当前的 margin 的值, 来 autoscale 一次坐标轴的 lim
+    * False, 会参照 `axes.autolimit_mode` 的值, 如果后者是 `round_numbers`, 那么会通过 axis major locator 进一步扩充 axis limit, 否则仍然等同于 True
+    * None, 维持上次调用的值, 初次调用相当于 False, 结合 `axes.autolimit_mode` 的默认值, 最终的表现相当于执行 True
+  * 如果数据被更新了, 则调用 `Axes.relim()` 来重新计算 limit
+* `Axes.relim(visible_only=False)`
+  * Recompute the data limits based on current artists.
+  * `visible_only` : bool, default: False, Whether to exclude invisible artists.
+
+
+
+
+状态获取函数 get :
+* `Axes.get_autoscale_on()` : 如果两个轴都打开了 autoscale ,返回 True, 否则返回 False
+* `Axes.get_autoscalex_on()`: 返回 xaxis 的状态
+* `Axes.get_autoscaley_on()`: 返回 yaxis 的状态
+
+设置函数 set :
+* `Axes.set_autoscale_on(b)` : 同时设置两个轴
+* `Axes.set_autoscaley_on(b)` 
+* `Axes.set_autoscalex_on(b)` 
+
+
+
+#### 4.2.4.2. margins 
+
+
+注意: 一些特殊的 plot, 例如 created with Axes.imshow 的假色彩图像, 会不受 margins 的影响
+* 由于 Sticky edges , 特性的存在, 图片 plot 的边缘会粘着坐标轴
+* 因此 正值的 margin 不会起作用, 即不管怎么样都不会有 margin , 但是 负值的 margin 仍然生效
+  * 对于这种特殊情况可以使用 `Axes.use_sticky_edges = False` 来关闭该特性, 使图片类Plot可以正常添加 margin
+ 
+
+* `Axes.margins(*margins, x=None, y=None, tight=True)`
+  * 无参数调用, 获取坐标轴的 margins, 默认的 margins 是 0.05 即左右各有5% 的留白
+  * 通过位置参数或者关键字参数来设置, 只能选择一种设置方法.
+  * All input parameters must be floats within the range [0, 1].
+  * `*margins` : float, optional.
+    *  single positional argument is provided, it specifies both margins of the x-axis and y-axis limits.
+    *  two positional arguments are provided, they will be interpreted as xmargin, ymargin.
+    *  该方法不能单独修改一个坐标轴的 margin 同时维持另一个坐标轴的 margin 不变, 如果有这种需求, 使用 kw 参数
+  * `x, y` : float, optional. 关键字参数.
+  * `tight` : bool or None, default: True.
+    * 传递给 `Axes.autoscale_view()` 的参数
+* `Axes.set_xmargin(m)`
+* `Axes.set_ymargin(m)`
+  * 单独设置某个坐标轴的 margin, m 参数的意思与上面相同, 都是 `[-0.5,+00]`范围的小数
+
+
 
 ### 4.2.5. Aspect ratio
 
+设置 Axes 的比例  
+
+* adjustable : how the Axes adjusts to achieve the required aspect ratio.
+  * `Axes.set_adjustable(adjustable, share=False)`
+    * adjustable : `{'box', 'datalim'}`
+    * 如果是 `box`, 则改变具体的 figure 上的表示, 对数据进行拉伸, 如果是 `datalim`, 则会修改数据的 limit
+    * share: bool, default False. If True, apply the settings to all shared Axes.
+  * `Axes.get_adjustable()` 
+    * 返回当前的 adjustable 设置
+
+* aspect :  ratio of the axes scaling. 
+  * `Axes.set_aspect(aspect, adjustable=None, anchor=None, share=False)`
+    * aspect : `{'auto', 'equal'} or float`
+      * `auto` 会填充整个 rectangle
+      * `equal` : 相当于 1, 即 x, y 有相同的比例
+      * `float` : height/width
+    * `adjustable`: `None or {'box', 'datalim'}`, optional
+    * `anchor` : `None or str or (float, float)`, optional
+      * 如果设置了非 auto 的 aspect, 那么对于 axes 的留白空间, 如何进行定位
+      * 可以设置居中或者 四个角落 或者贴着四个边缘居中
+      * 具体的输入参照 `axes.set_anchor` 函数
+    * `share`: bool, default: False . If True, apply the settings to all shared Axes.
+
+  * `Axes.get_aspect()` : Return the aspect ratio of the axes scaling.
+    * This is either "auto" or a float giving the ratio of y/x-scale.
+
+
+* box_aspect : ratio of height to width. 主要是在 figure 中的比例, 与 data 是无关的.
+  * 设置该属性设置函数会将`adjustable` 属性为 `datalim`
+  * `Axes.set_box_aspect(aspect=None)` :设置 axes 的比例
+    * aspect : `float or None`,  height/width. 
+    * 传入 None, 会关闭 fixed box aspect, 使得 height 和 weight 会各自独立进行选择 
+  * `Axes.get_box_aspect()` : 返回当前的比例, 默认都是 None
+
+* `Axes.apply_aspect(position=None)` : 根据当前的 aspect 设置来重新计算(adjust) axes
+  * Depending on `get_adjustable` this will modify
+    *  the Axes box (position), 根据 `get_anchor` 来确定最终的效果
+    *  view limits.
+
+
 ### 4.2.6. Ticks and tick labels
+
+坐标刻度管理  
 
 ## 4.3. 以前的内容
 
