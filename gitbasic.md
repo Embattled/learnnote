@@ -66,6 +66,42 @@ git config -l  # 测试编辑好的机器信息
 ### 1.2.3. pull
 
 
+# Getting and Creating Projects
+
+开始一个项目的操作
+
+## init 初始化
+
+初始化一个空的仓库, 或者重新初始化一个已经存在的仓库
+* 在既存的仓库里调用 `git init` (重新初始化) 是安全的, 不会覆盖任何已经存在的内容
+* The primary reason for rerunning git init is to pick up newly added templates (or to move the repository to another place if --separate-git-dir is given).
+
+```sh
+git init [-q | --quiet] [--bare] [--template=<template-directory>]
+	  [--separate-git-dir <git-dir>] [--object-format=<format>]
+	  [-b <branch-name> | --initial-branch=<branch-name>]
+	  [--shared[=<permissions>]] [<directory>]
+```
+所谓的初始化, 实际上执行的操作是:
+* 在目标目录下, 创建一个 `.git` 的文件夹, 里面存放了 git 正常追踪运行所需要的所有文件
+* 初始化的 git 项目会有一个初始的 branch
+* 这个目标目录实际上使用的是 `$GIT_DIR`, 而如果该环境变量未定义, 则使用 `./.git`, 意为在当前 pwd 下创建 .git 文件夹, 当前 pwd 是仓库根目录
+* `$GID_DIR` 下面存放git 正常追踪运行所需要的所有文件 
+  * objects : 用途 TODO, 似乎是各个追踪的哈希文件, 如果通过 `$GIT_OBJECT_DIRECTORY` 环境变量将 objects 文件夹指定到别的地方, 则会在对应的文件夹下创建 sha1 文件夹
+
+基本参数
+* `-q | --quiet` : 安静执行
+* `-b <branch-name> | --initial-branch=<branch-name>` : 初始的分支名称, 默认是 `master`, 可以通过 config 里的 `init.defaultBranch` 来修改
+* `<directory>` : 在最后提供一个目录, 会将仓库创建在对应的文件夹里, 如果文件夹不存在也会创建新文件夹
+
+
+
+
+## clone 克隆
+
+3. `clone <url>` 用于克隆版本库
+   * `-b, --branch <branch>` 指定要克隆的分支
+   * `--recurse-submodules`  递归的克隆全部的 submodule, initialize and clone submodules within based on the provided pathspec.
 
 # 2. 离线操作
 
