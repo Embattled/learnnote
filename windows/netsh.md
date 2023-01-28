@@ -29,3 +29,15 @@ Netsh context : a group of commands specific to a networking server role or feat
 ## Netsh commands
 
 `netsh[ -a AliasFile] [ -c Context ] [-r RemoteComputer] [ -u [ DomainName\ ] UserName ] [ -p Password | *] [{NetshCommand | -f ScriptFile}]`
+
+
+# netsh interface
+
+网络接口管理命令  
+
+## netsh interface portproxy
+
+代理规则设置, 可以设置各种应用程序的网络代理和转发
+
+
+

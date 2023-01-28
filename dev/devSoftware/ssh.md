@@ -42,7 +42,7 @@ $ ssh-keygen
 # 运行后，在$HOME/.ssh/目录下，会新生成两个文件：id_rsa.pub和id_rsa。前者是你的公钥，后者是你的私钥。
 # 将公钥发送给远程主机的根目录下
 $ scp .ssh/idrsa.pub user_name@192.168.xxx.xxx:/home/user_name/
-# 把拷贝过来的 id_rsa.pub 中的密匙写入 authorized_keys，并给与其 600 权限
+# 把拷贝过来的 id_rsa.pub 中的密匙写入 authorized_keys, 并给与其 600 权限
 $ cat id_rsa.pub >> .ssh/authorized_keys
 $ sudo chmod 600 .ssh/authorized_keys
 ```

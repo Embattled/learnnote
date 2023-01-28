@@ -733,11 +733,11 @@ pstree 命令是以树形结构显示程序和进程之间的关系
 
 # 6. Linux 的服务管理
 
-Linux 服务管理两种方式service和systemctl 
+Linux 服务管理两种方式 service 和 systemctl 
 
-systemd是Linux系统**最新的初始化系统**(init),作用是提高系统的启动速度,尽可能启动较少的进程,尽可能更多进程并发启动。
+systemd 是 Linux系统**最新的初始化系统**(init),作用是提高系统的启动速度,尽可能启动较少的进程,尽可能更多进程并发启动。
 
-systemd对应的进程管理命令就是 `systemctl`
+systemd 是应用程序, 其对应的CLI进程管理命令就是 `systemctl`
 
 ## 6.1. service  
 

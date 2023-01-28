@@ -3,11 +3,12 @@
   - [1.2. 配置编译环境](#12-配置编译环境)
   - [1.3. 配置调试环境](#13-配置调试环境)
   - [1.4. 更详细的配置](#14-更详细的配置)
+
+
 # 1. 在vscode上配置C++开发环境
 
 * The VsCode C/C++ extension does not include a C++ compiler or debugger.
 * You will need to install these tools or use those already installed on your computer.
-
 
 ## 1.1. 在Windows上安装 C++ (MinGW-x64)
 

@@ -15,3 +15,10 @@ Bulid 2020 上宣布的开源的 Windows 软件包管理器, 如同 linux 一样
 # regedit Windows 注册表配置
 
 最原始最底层的配置系统的方式, 功能强大, 使用复杂
+
+
+# Windows OpenSSH
+
+OpenSSH 已于 2018年添加到 Windows 中, 客户端不需要再手动安装  
+
+服务器端仍然需要在可选功能中手动安装, 
