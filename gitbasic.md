@@ -66,11 +66,11 @@ git config -l  # 测试编辑好的机器信息
 ### 1.2.3. pull
 
 
-# Getting and Creating Projects
+# 2. Getting and Creating Projects
 
 开始一个项目的操作
 
-## init 初始化
+## 2.1. init 初始化
 
 初始化一个空的仓库, 或者重新初始化一个已经存在的仓库
 * 在既存的仓库里调用 `git init` (重新初始化) 是安全的, 不会覆盖任何已经存在的内容
@@ -97,13 +97,13 @@ git init [-q | --quiet] [--bare] [--template=<template-directory>]
 
 
 
-## clone 克隆
+## 2.2. clone 克隆
 
 3. `clone <url>` 用于克隆版本库
    * `-b, --branch <branch>` 指定要克隆的分支
    * `--recurse-submodules`  递归的克隆全部的 submodule, initialize and clone submodules within based on the provided pathspec.
 
-# 2. 离线操作
+# 3. 离线操作
 
 * `git init` 在当前目录创建 git 内部文件, 使当前路径称为一个 git 项目
 
@@ -115,7 +115,7 @@ git init [-q | --quiet] [--bare] [--template=<template-directory>]
 
 
 
-## 2.1. gitignore 过滤文件
+## 3.1. gitignore 过滤文件
 在根目录新建 `.gitignore` 来过滤不想跟踪的文件  
   * 以斜杠`/`结尾表示目录  `mtk/` 过滤整个文件夹  `/mtk/do.c` 过滤某个具体文件  `!/mtk/one.txt` 追踪(不过滤)某个具体文件
   * 以星号`*`通配多个字符  `*.zip` 过滤所有.zip文件  
@@ -136,7 +136,7 @@ git init [-q | --quiet] [--bare] [--template=<template-directory>]
 3. 再 `git add -A` 提交推送即可
 
 
-## 2.2. 身兼数职的 checkout
+## 3.2. 身兼数职的 checkout
 
 0. 在 git 2.23 版本以前, 对于丢弃工作区的修改
    * git 会提示使用 `git checkout -- file`
@@ -148,7 +148,7 @@ git init [-q | --quiet] [--bare] [--template=<template-directory>]
    * `git-restore(1)    Restore working tree files.`
 2. 可以看到两个新的命令完美替换掉了 checkout, 因此应该尽量避免使用 checkout
 
-## 2.3. 文件更改 未commit下的
+## 3.3. 文件更改 未commit下的
 
 1. `add` 命令用来添加新文件或者对文件的新修改到暂存区
    * `git add readme.txt`  单独提交一个文件  
@@ -199,7 +199,7 @@ git init [-q | --quiet] [--bare] [--template=<template-directory>]
 在多次stash后,可以指定要恢复的`stash`  
 `git stash apply stash@{0}
 
-## 2.4. 版本提交与回退
+## 3.4. 版本提交与回退
 
 1. `commit` 将暂存区的内容提交到版本库, 每一次commit都是一个保存点,可以从这里还原版本库  
    * `git commit -c <commit>` 懒人代码, 直接复制参数 commit 的 log msg
@@ -254,7 +254,7 @@ $ git commit --amend
      * 在某个版本添加或删除的文件将被复原
      * 对于持续更改的文件, 很容易引起冲突, 需要手动消除冲突
 
-## 2.5. commit message
+## 3.5. commit message
 
 良好的 Message 格式有助于团队理解  
 
@@ -282,9 +282,9 @@ $ git commit --amend
   * 省略 the
   * 需要多行进行详细说明的情况下, 第二行留空行
 
-# 3. 云
+# 4. 云
 
-## 3.1. 远程版本库
+## 4.1. 远程版本库
 
 1. `remote` 命令用于管理和远程相关的事物
    * 使用`git remote`查看远程库的名称  
@@ -334,7 +334,7 @@ $ git commit --amend
    * `git rebase --continue | --abort | --skip | --edit-todo`
    * `git rebase -i` 交互式进行 rebash
 
-## 3.2. submodule 
+## 4.2. submodule 
 
 主要用于在项目庞大的时候进行模块文件抽离, 抽离出来的文件可以单独成为一个 git repo
 
@@ -362,7 +362,7 @@ $ git commit --amend
     * 更新模式 `[--checkout|--rebase|--merge]`
 
 
-# 4. Git的分支管理
+# 5. Branching and Merging 分支管理
 
 `man git` 的 分支相关的命令说明
  * switch              Switch branches.
@@ -370,12 +370,86 @@ $ git commit --amend
  * merge               Join two or more development histories together.
  * (deprecate)checkout Switch branches or restore working tree files.
 
+    branch
+    checkout
+    switch
+    merge
+    mergetool
+    log
+    stash
+    tag
+    worktree
+
+
 - 通常`master`分支是用来发布稳定版本的
 - `dev`分支是用来保存不稳定版本的  
 - 在此之下才是各个团队工作人员自己的分支
 - 开发一个新的feature,最好新建一个分支  
 
-## 4.1. 分支的团队命名
+## branch - List, create, or delete branches
+
+```sh
+git branch [--color[=<when>] | --no-color] [--show-current]
+	[-v [--abbrev=<n> | --no-abbrev]]
+	[--column[=<options>] | --no-column] [--sort=<key>]
+	[--merged [<commit>]] [--no-merged [<commit>]]
+	[--contains [<commit>]] [--no-contains [<commit>]]
+	[--points-at <object>] [--format=<format>]
+	[(-r | --remotes) | (-a | --all)]
+	[--list] [<pattern>…​]
+git branch [--track[=(direct|inherit)] | --no-track] [-f]
+	[--recurse-submodules] <branchname> [<start-point>]
+
+# 链接远程默认分支, 简化之后的 pull 命令
+git branch (--set-upstream-to=<upstream> | -u <upstream>) [<branchname>]
+git branch --unset-upstream [<branchname>]
+
+# 重命名
+git branch (-m | -M) [<oldbranch>] <newbranch>
+
+# 复制
+git branch (-c | -C) [<oldbranch>] <newbranch>
+
+# 删除
+git branch (-d | -D) [-r] <branchname>…​
+git branch --edit-description [<branchname>]
+```
+
+
+* 默认会打印所有本地分支 并在当前分支前方标识一个 <kbd>*</kbd>  
+ * `git branch [<options>] [-r | -a] [--merged | --no-merged]`
+* 创建分支
+ * `git branch [<options>] [-l] [-f] <branch-name> [<start-point>]`
+ * `-f` 用于覆盖的创建分支
+* 重命名 `-m -M`  复制 `-c  -C`  `[<old-branch>] <new-branch>`
+ * 使用 `-m/c` 对一个已存在的分支进行重命名, 或复制出一个新的分支
+ * 大写的 字母 用于覆盖目标名称原本的分支
+* 删除 `-d -D`
+ * ` git branch [<options>] [-r] (-d | -D) <branch-name>...`
+ * 因为创建、合并和删除分支非常快, 所以Git鼓励你使用分支完成某个任务, 合并后再删掉分支, 这和直接在master分支上工作效果是一样的, 但过程更安全。
+ * 使用 `git branch -d <分支名称>`可以删除一个分支
+ * `-D` 命令用于强制删除一个还没有被 merge 的分支
+* 链接远程分支 `--set-upstream-to`
+ * 就算是从远端克隆的repo, 也不会自动关联到远程对应的分支, 需要手动指定本地与远端的链接
+ * 链接的唯一好处就是简化之后的 pull 命令
+ * `git branch --set-upstream-to dev origin/dev`  
+
+## checkout - Switch branches or restore working tree files
+
+```sh
+git checkout [-q] [-f] [-m] [<branch>]
+git checkout [-q] [-f] [-m] --detach [<branch>]
+git checkout [-q] [-f] [-m] [--detach] <commit>
+
+# 从 start-points 来复制的创建一个新的 branch, 相当于  git branch <branch> [<start-point>]
+git checkout [-q] [-f] [-m] [[-b|-B|--orphan] <new-branch>] [<start-point>]
+
+git checkout [-f|--ours|--theirs|-m|--conflict=<style>] [<tree-ish>] [--] <pathspec>…​
+git checkout [-f|--ours|--theirs|-m|--conflict=<style>] [<tree-ish>] --pathspec-from-file=<file> [--pathspec-file-nul]
+git checkout (-p|--patch) [<tree-ish>] [--] [<pathspec>…​]
+```
+
+## 5.1. 分支的团队命名
 
 同 commit message 一样, 合理的命令可以增加团队配合  
 `type/module/snake_case_short_summary`  
@@ -388,29 +462,11 @@ $ git commit --amend
   * 用下划线连接多个小写单词
   * 如果对应的是一个 issue, 则直接写成 issue 编号也行
 
-
-## 4.2. 分支的基础操作
-
+## 5.2. 分支的基础操作
 
 
-1. `branch` 分支管理
-   * 默认会打印所有本地分支 并在当前分支前方标识一个 <kbd>*</kbd>  
-     * `git branch [<options>] [-r | -a] [--merged | --no-merged]`
-   * 创建分支
-     * `git branch [<options>] [-l] [-f] <branch-name> [<start-point>]`
-     * `-f` 用于覆盖的创建分支
-   * 重命名 `-m -M`  复制 `-c  -C`  `[<old-branch>] <new-branch>`
-     * 使用 `-m/c` 对一个已存在的分支进行重命名, 或复制出一个新的分支
-     * 大写的 字母 用于覆盖目标名称原本的分支
-   * 删除 `-d -D`
-     * ` git branch [<options>] [-r] (-d | -D) <branch-name>...`
-     * 因为创建、合并和删除分支非常快, 所以Git鼓励你使用分支完成某个任务, 合并后再删掉分支, 这和直接在master分支上工作效果是一样的, 但过程更安全。
-     * 使用 `git branch -d <分支名称>`可以删除一个分支
-     * `-D` 命令用于强制删除一个还没有被 merge 的分支
-   * 链接远程分支 `--set-upstream-to`
-     * 就算是从远端克隆的repo, 也不会自动关联到远程对应的分支, 需要手动指定本地与远端的链接
-     * 链接的唯一好处就是简化之后的 pull 命令
-     * `git branch --set-upstream-to dev origin/dev`  
+
+
 
 
 2. `switch` 切换分支  不建议使用 `checkout` 命令
@@ -418,7 +474,7 @@ $ git commit --amend
    * `git switch -c dev` 创建并切换, 省去 `branch` 命令, 同理 `-C` 也是覆盖的创建
 
 
-## 4.3. 分支合并
+## 5.3. 分支合并
 
 
 1. `merge` 合并一个分支
@@ -440,7 +496,7 @@ $ git commit --amend
 Git用<kbd><<<<<<<</kbd>, <kbd>=======</kbd>, <kbd>>>>>>>></kbd>标记出不同分支的内容
 
 
-## 4.4. 分支管理策略
+## 5.4. 分支管理策略
 
 通常合并分支时,git会在可能的时候使用`Fast forward`模式,这种模式的缺点就是删除分支后就会丢失分支的信息
 
@@ -449,7 +505,7 @@ Git用<kbd><<<<<<<</kbd>, <kbd>=======</kbd>, <kbd>>>>>>>></kbd>标记出不同�
 `git merge --no-ff -m "merge with no-ff" dev`
 
 
-### 4.4.1. Bug处理
+### 5.4.1. Bug处理
 
 对于一个已经存在于所有分支的bug,git提供了一个`cherry-pick`,能够将一个特定的分支复制到当前分支  
 `git switch dev`
@@ -457,7 +513,7 @@ Git用<kbd><<<<<<<</kbd>, <kbd>=======</kbd>, <kbd>>>>>>>></kbd>标记出不同�
 此时git会自动给dev分支进行一次提交,该commit会获得一个不同的ID, 使用该命令可以省去重复修复bug的过程
 
 
-# 5. Git 的标签管理 tag
+# 6. Git 的标签管理 tag
 
 tag是git版本库的一个标记, 指向某个 commit
 * branch 对应一系列commit, 是很多点连成的一根线
@@ -479,7 +535,7 @@ tag是git版本库的一个标记, 指向某个 commit
 
 3. `git branch <branchName> <tagName>`: 依照 tag 对应的 commit 来建立分支
 
-# 6. Sharing and Updating Projects
+# 7. Sharing and Updating Projects
 
 共享项目以及协同作业
     fetch
@@ -489,7 +545,22 @@ tag是git版本库的一个标记, 指向某个 commit
     submodule
     subtree (貌似非官方)
 
-## 6.1. submodule 子模块
+## fetch 
+
+git-fetch - Download objects and refs from another repository  
+
+```sh
+git fetch [<options>] [<repository> [<refspec>…​]]
+git fetch [<options>] <group>
+git fetch --multiple [<options>] [(<repository> | <group>)…​]
+
+# 从当前 repo 的所有 remote 中进行 fetch
+git fetch --all [<options>]
+```
+
+
+
+## 7.1. submodule 子模块
 
 submodule: 子模块 Mounting one repository inside another
 * 将一个版本库作为子库引入到另一个版本库中
@@ -535,7 +606,7 @@ git submodule [--quiet] absorbgitdirs [--] [<path>…​]
 
 
 
-### 6.1.1. add 添加子库
+### 7.1.1. add 添加子库
 
 `git submodule add git@地址 my_sub_module` 将地址对应的远程仓库作为子库, 保存到当前版本库的对应目录下, 通过 git status 查看父库的状态有:  
 * 对应的 创建/修改 `.gitmodules` 文件
@@ -547,19 +618,19 @@ git submodule [--quiet] absorbgitdirs [--] [<path>…​]
     path = 父库目录下子库的相对路径
     url  = 子库的远程url
 ```
-### 6.1.2. status 查看子库的信息
+### 7.1.2. status 查看子库的信息
 
 `status [--cached] [--recursive] [--] [<path>…​] `  
 
 打印所有子库的名字以及版本信息  
 
-### 6.1.3. init 初始化子库
+### 7.1.3. init 初始化子库
 
 `init [--] [<path>…​] `  
 
 将所有子库的目录初始化为 git 版本控制目录, 该命令也不会正式下载子库的代码, 具体的下载在 `update` 命令中, 该步骤可以通过 `update --init` 直接省略掉
 
-### 6.1.4. update 子库更新核心命令
+### 7.1.4. update 子库更新核心命令
 
 ```sh
 update [--init] [--remote] [-N|--no-fetch] [--[no-]recommend-shallow]
@@ -583,9 +654,9 @@ update [--init] [--remote] [-N|--no-fetch] [--[no-]recommend-shallow]
   * checkout : 默认操作
 
 
-### 6.1.5. foreach 遍历所有子库
+### 7.1.5. foreach 遍历所有子库
 
-## 6.2. subtree 
+## 7.2. subtree 
 
 从1.5.2版本开始, 官方新增Git Subtree并推荐使用这个功能来替代Git Submodule管理仓库共用(子仓库, 子项目)  
 但是官方文档里没有 subtree 的介绍, 不知为何  
@@ -623,7 +694,7 @@ subtree 的不同:
 'git subtree' [<options>] -P <prefix> push <repository> <refspec>
 ```
 
-### 6.2.1. add 添加子库
+### 7.2.1. add 添加子库
 
 由于 subtree 的工作原理是基于分支的, 因此这里添加子库的方法还需要用到一些基础命令  
 1. 单纯添加子库的地址到 remote :    `git remote add subtree-origin git@子库链接` 
@@ -638,11 +709,11 @@ subtree 的不同:
      * 对于一个子库的使用, 需要在整个使用中保持 `--squash` 值的相同, 即要么永远不用, 要么永远用
      * `远程子库上的历史提交合并成一次提交` 会导致在之后不加 squash 的拉取中由于找不到公共父节点导致拉取失败
 
-### 6.2.2. pull 拉取更新
+### 7.2.2. pull 拉取更新
 
-### 6.2.3. push 
+### 7.2.3. push 
 
-### 6.2.4. split
+### 7.2.4. split
 
 subtree 的强大功能, 抽离子库: 开发的过程中发现某些功能可以剥离出来当作公用的子库的时候, 在保留该新子库的所有历史 log 的情况下, 生成一个新的库    
 `git subtree split --prefix=<prefix> [OPTIONS] [<commit>]`
@@ -657,7 +728,7 @@ subtree 的强大功能, 抽离子库: 开发的过程中发现某些功能可�
    * `git push -u origin +master`
 
 
-# 7. git-lfs Large File Storage (LFS)
+# 8. git-lfs Large File Storage (LFS)
 
 replaces large files such as audio samples, videos, datasets, and graphics with `text pointers` inside Git.
 

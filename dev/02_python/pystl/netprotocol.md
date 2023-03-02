@@ -1,10 +1,24 @@
-# Internet Protocols and Support
+- [1. Internet Protocols and Support](#1-internet-protocols-and-support)
+  - [1.1.](#11)
+- [2. urllib](#2-urllib)
+  - [2.1. urllib.request - Extensible library for opening URLs](#21-urllibrequest---extensible-library-for-opening-urls)
+    - [2.1.1. 函数](#211-函数)
+    - [2.1.2. class urllib.request.Request](#212-class-urllibrequestrequest)
+    - [2.1.3. 其他类](#213-其他类)
+  - [2.2. urllib.response — Response classes used by urllib](#22-urllibresponse--response-classes-used-by-urllib)
+  - [2.3. urllib.parse — Parse URLs into components](#23-urllibparse--parse-urls-into-components)
+  - [2.4. urllib.error — Exception classes raised by urllib.request](#24-urlliberror--exception-classes-raised-by-urllibrequest)
+  - [2.5. urllib.robotparser — Parser for robots.txt](#25-urllibrobotparser--parser-for-robotstxt)
+- [3. http](#3-http)
+
+
+# 1. Internet Protocols and Support
 
 * 网络高级API, 提供了对多种协议的支持和处理
 * The modules described in this chapter implement internet protocols and support for related technology.
 
 
-## 
+## 1.1. 
 
 ```py
 def http_post(url,data_json):
@@ -17,7 +31,7 @@ def http_post(url,data_json):
 ```
 
 
-# urllib
+# 2. urllib
 
 urllib is a package that collects several modules for working with URLs 
 
@@ -34,13 +48,13 @@ urllib is a package that collects several modules for working with URLs
 1. urllib.request 实现核心功能
 2. urllib.error 用于 try except 的异常捕捉
 
-## urllib.request - Extensible library for opening URLs
+## 2.1. urllib.request - Extensible library for opening URLs
 
 该库定义了打开 URLs 的相关操作, 算是 python STL 的核心 url 库
 * Use `HTTP/1.1` and includes `Connection:close` header in its HTTP requests
 
 
-### 函数
+### 2.1.1. 函数
 
 函数总结:
 * 核心函数 urlopen
@@ -79,7 +93,7 @@ urllib.request.url2pathname(path)
 
 ```
 
-### class urllib.request.Request 
+### 2.1.2. class urllib.request.Request 
 
 该子包的同名类, 可以作为参数传入 urlopen 函数
 
@@ -100,20 +114,20 @@ class urllib.request.Request(
   * add_header(key, val)    : 相当于给对象的 headers 字典添加一条新的键值对
 
 
-### 其他类
+### 2.1.3. 其他类
 
 
 
-## urllib.response — Response classes used by urllib
+## 2.2. urllib.response — Response classes used by urllib
 
-## urllib.parse — Parse URLs into components
+## 2.3. urllib.parse — Parse URLs into components
 
-## urllib.error — Exception classes raised by urllib.request
+## 2.4. urllib.error — Exception classes raised by urllib.request
 
-## urllib.robotparser — Parser for robots.txt
+## 2.5. urllib.robotparser — Parser for robots.txt
 
 
-# http
+# 3. http
 
 和 HTTP 协议相关的低级库, 算得上 urllib 库的基础  
 

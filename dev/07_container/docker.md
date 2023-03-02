@@ -1,10 +1,11 @@
 - [1. Start Docker](#1-start-docker)
   - [1.1. 基本介绍](#11-基本介绍)
   - [1.2. Docker 架构基本概念](#12-docker-架构基本概念)
-  - [1.3. 安装 Ubuntu](#13-安装-ubuntu)
-    - [1.3.1. 通过仓库安装 docker](#131-通过仓库安装-docker)
-    - [1.3.2. 运行权限](#132-运行权限)
-  - [1.4. storage driver](#14-storage-driver)
+  - [1.3. 安装 Docker](#13-安装-docker)
+  - [1.4. Ubuntu 安装](#14-ubuntu-安装)
+    - [1.4.1. 通过仓库安装 docker](#141-通过仓库安装-docker)
+    - [1.4.2. 运行权限](#142-运行权限)
+  - [1.5. storage driver](#15-storage-driver)
 - [2. Docker App](#2-docker-app)
   - [2.1. build](#21-build)
   - [2.2. image  管理](#22-image--管理)
@@ -17,6 +18,8 @@
     - [2.6.3. 进入容器](#263-进入容器)
     - [2.6.4. 进程管理](#264-进程管理)
 - [3. Dockerfile](#3-dockerfile)
+
+
 # 1. Start Docker 
 
 * Docker 是一个开源的应用容器引擎, 基于 `Go` 语言 并遵从 Apache2.0 协议开源
@@ -61,38 +64,64 @@
 2. 使用远程API来管理和创建Docker容器
 3. Docker 容器通过 Docker 镜像来创建
 
-## 1.3. 安装 Ubuntu
+
+## 1.3. 安装 Docker
+
+Docker 目前分为两个版本
+* Docker Desktop    : GUI 版本的, 在 WSL 环境下并不适合安装该版本
+* Docker Engine     : 原生 CLI 版本的
+  * 一个运行在后台的 daemon : `dockerd`
+  * 一套 API 接口, 可以使程序直接对接 Docker daemon
+  * 一个 CLI 程序接口 : `docker`, 基于 Docker API 来管理 Docker 容器
+
+## 1.4. Ubuntu 安装
 
 * apt 里能搜到的 `docker.io` 是旧版本, 不要安装
   * 卸载已有的版本 `$ sudo apt remove docker docker-engine docker.io containerd runc` 
   * docker 的文件库是 `/var/lib/docker/`  如果想清洁安装的话可以删除掉该文件夹
 
-### 1.3.1. 通过仓库安装 docker
 
-0. 添加docker 的 apt 公钥
-   * `sudo apt-key adv --recv-keys --keyserver keyserver.Ubuntu.com F273FCD8 `
+
+### 1.4.1. 通过仓库安装 docker
+
+
 1. 设置仓库
-   1. 安装 apt 的相关依赖, 使得允许 `apt 通过 http 来使用一个仓库`
-      * sudo apt-get update
-      * sudo apt-get install 
-        * apt-transport-https
-        * ca-certificates
-        * curl
-        * gnupg
-        * lsb-release
-   2. Add Docker’s official GPG key
-      * `curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg`
-   3. 设置 stable(稳定版) 仓库
-      * 在 `stable` 后面添加 `nightly` or `test` 可以获取测试版
-      * `命令不复制了`
-2. 安装 docker 引擎
-   1. 先更新 apt index
-      * `sudo apt-get update`
-   2. 安装最新版的 docker engine
-      * `sudo apt-get install docker-ce docker-ce-cli containerd.io`
-   3. 这样安装的话使用 apt upgrade 即可进行升级
+   * 安装 apt 的相关依赖, 使得允许 `apt 通过 http 来使用一个仓库`
+```bash
+sudo apt-get update
+sudo apt-get install \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release
+```
 
-### 1.3.2. 运行权限
+2. Add Docker’s official GPG key
+```bash
+sudo mkdir -m 0755 -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+```
+
+3. 设置 stable(稳定版) 仓库
+```sh
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+```
+
+4. 开始正式安装
+```sh
+# 先更新 apt index
+`sudo apt-get update`
+
+# 安装
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# 验证
+sudo docker run hello-world
+```
+
+### 1.4.2. 运行权限
 
 * docker's daemon 是通过 Unix socket 来实现的, 而非 TCP port
 * 而 Unix socket 是属于 root, 因此一般的用户执行 docker 命令需要 sudo
@@ -101,7 +130,7 @@
   * `sudo usermod -aG docker $USER`
   * `newgrp docker` 该命令用来刷新用户组的信息
 
-## 1.4. storage driver
+## 1.5. storage driver
 
 storage driver 和 file system 不是同一个东西. 存储驱动是在文件系统之上创建的, 可以使用的存储驱动和文件系统有关:  
     例: `btrfs` 只能在文件系统为 `btrfs` 上的主机上使用

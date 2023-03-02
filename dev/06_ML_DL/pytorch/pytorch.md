@@ -18,6 +18,8 @@
     - [2.4.6. .new\_ 方法](#246-new_-方法)
 - [3. torch](#3-torch)
   - [3.1. 序列化 Serialization](#31-序列化-serialization)
+    - [3.1.1. torch.save](#311-torchsave)
+    - [3.1.2. torch.load](#312-torchload)
   - [3.2. Creation Ops](#32-creation-ops)
     - [3.2.1. torch.tensor](#321-torchtensor)
   - [3.3. Math operations](#33-math-operations)
@@ -37,11 +39,14 @@
       - [5.1.1.2. 网络参数以及存取](#5112-网络参数以及存取)
       - [5.1.1.3. 残差结构](#5113-残差结构)
   - [5.2. Convolution Layers 卷积层](#52-convolution-layers-卷积层)
-  - [5.3. Normalization Layers 归一化层](#53-normalization-layers-归一化层)
-    - [5.3.1. Pooling layers 池化层](#531-pooling-layers-池化层)
-    - [5.3.2. Linear Layers  线性层](#532-linear-layers--线性层)
-    - [5.3.3. 非线性激活函数](#533-非线性激活函数)
-    - [5.3.4. Loss Function 损失函数](#534-loss-function-损失函数)
+  - [5.3. Pooling layers 池化层](#53-pooling-layers-池化层)
+  - [5.4. Padding Layers](#54-padding-layers)
+  - [5.5. Non-linear Activations (weighted sum, nonlinearity) 非线性激活函数](#55-non-linear-activations-weighted-sum-nonlinearity-非线性激活函数)
+  - [5.6. Normalization Layers 归一化层](#56-normalization-layers-归一化层)
+  - [5.7. Linear Layers  线性层](#57-linear-layers--线性层)
+    - [5.7.1. Identity](#571-identity)
+    - [5.7.2. Linear](#572-linear)
+  - [5.8. Loss Function 损失函数](#58-loss-function-损失函数)
 - [6. torch.nn.functional](#6-torchnnfunctional)
 - [7. torch.utils](#7-torchutils)
   - [7.1. torch.utils.data](#71-torchutilsdata)
@@ -112,6 +117,10 @@ pip install torch torchvision  # 这是当前默认的针对 CUDA 10.2
 import torch
 x = torch.rand(5, 3)
 print(x)
+
+torch.cuda.is_available()
+
+
 ```
 
 ## 1.3. API
@@ -329,7 +338,20 @@ To create a tensor with similar type but different size as another tensor, use t
 
 和存储相关, 将各种模型, 张量, 字典等数据类型序列化后存储到文件, 或者从文件中读取  
 
-pytorch 的load()使用 pickle 模组, 不要轻易unpick不信任的序列数据  
+pytorch 的load() 是基于 pickle 模组的, 不要轻易unpick不信任的序列数据  
+
+一共就两个函数
+* torch.save()
+* torch.load()
+
+官方推荐的网络模型存取方式:
+* `torch.save(model.state_dict(), PATH)`
+* `model.load_state_dict(torch.load(PATH))`
+完整模型的存取
+* `torch.save(model, PATH)`
+* `model = torch.load(PATH)`
+
+### 3.1.1. torch.save
 
 ```py
 torch.save(
@@ -339,15 +361,17 @@ torch.save(
   pickle_protocol=2, 
   _use_new_zipfile_serialization=True # 代表使用 pytorch 1.6 后的新的压缩格式
   ) → None
+```
 
-""" 
-obj : 要保存的对象
-f   : a file-like object
-pickle_module   :  
-pickle_protocol :
-"""
+参数意思:
+* `obj`   : 要保存的对象
+* f       : a file-like object
+* pickle_module   :  
+* pickle_protocol :
 
+### 3.1.2. torch.load
 
+```py
 torch.load(
   f, 
   map_location=None, 
@@ -372,12 +396,6 @@ torch.load('tensors.pt', map_location=torch.device('cpu'))
 
 ```
 
-官方推荐的网络模型存取方式:
-* `torch.save(model.state_dict(), PATH)`
-* `model.load_state_dict(torch.load(PATH))`
-完整模型的存取
-* `torch.save(model, PATH)`
-* `model = torch.load(PATH)`
 
 ## 3.2. Creation Ops
 
@@ -626,39 +644,7 @@ print(net.conv1.weight)
 print(net.conv1.bias)
 
 ```
-## 5.3. Normalization Layers 归一化层
-
-用于定义网络的归一化层  
-
-* nn.BatchNorm1d
-* nn.BatchNorm2d
-* nn.BatchNorm3d
-* nn.GroupNorm
-* nn.SyncBatchNorm
-* nn.InstanceNorm1d
-* nn.InstanceNorm2d
-* nn.InstanceNorm3d
-* nn.LayerNorm
-* nn.LocalResponseNorm
-
-
-```py
-class LeNet(nn.Module):
-  def __init__(self, input_dim=1, num_class=10):
-    super(LeNet, self).__init__()
-
-    # Convolutional layers
-    self.conv1 = nn.Conv2d(input_dim, 20,  kernel_size=5, stride=1, padding=0) 
-
-    # 输入参数为通道数
-    self.bn1 = nn.BatchNorm2d(20)
-    self.conv2 = nn.Conv2d(20,    50,  kernel_size=5, stride=1, padding=0) 
-
-    # 输入参数为通道数
-    self.bn2 = nn.BatchNorm2d(50)
-
-```
-### 5.3.1. Pooling layers 池化层
+## 5.3. Pooling layers 池化层
 
 * 最大化池
   * nn.MaxPool1d
@@ -682,32 +668,29 @@ class LeNet(nn.Module):
   * nn.AdaptiveAvgPool2d
   * nn.AdaptiveAvgPool3d
 
+## 5.4. Padding Layers
 
+填充层, 一般对于卷积层的填充直接传入对应的参数即可, 该分类的填充层都是便于使用的常用   
 
-### 5.3.2. Linear Layers  线性层
+具体的填充层有3+1种
+* 如果需要更多维度的 pad, 需要使用 `torch.nn.functional.pad().`
 
-用于构筑网络的全连接层  
+三类支持 1~3D的填充
+* `nn.ReflectionPad(1,2,3)d`
+  * 镜像填充, 从边缘往里的值复制的填充到外边缘
+  * 参数 `填充维度的 int or 2,4,6-tuple`
+* `nn.ReplicationPad(1,2,3)d`
+  * 重复填充, 根据边缘的值赋值的填充到外边缘
+  * 参数 `填充维度的 int or 2,4,6-tuple`
+* `nn.ConstantPad(1,2,3)d`
+  * 固定值填充
+  * 传入的参数 `填充维度的 int or 2,4,6-tuple, 填充值`
 
-* nn.Identity
-* nn.Linear
-* nn.Bilinear
+一类标准 Zeropad
+* `class torch.nn.ZeroPad2d(padding)`
+  *  `填充维度的 int or 4-tuple, 填充值`
 
-```py
-class torch.nn.Linear(in_features, out_features, bias=True)
-
-# in_features   :每个输入样本的大小
-# out_features  :每个输出样本的大小
-# bias          :如果设置为False，则该图层将不会学习加法偏差。 默认值：True
-
-# 定义网络的全连接层
-
-    # Fully connected layers
-    self.fc1 = nn.Linear(800, 500)
-    #self.bn3 = nn.BatchNorm1d(500)
-    self.fc2 = nn.Linear(500, num_class)
-
-```
-### 5.3.3. 非线性激活函数
+## 5.5. Non-linear Activations (weighted sum, nonlinearity) 非线性激活函数
 
 * 加权和，非线性
   * nn.ELU
@@ -749,7 +732,78 @@ class torch.nn.Linear(in_features, out_features, bias=True)
 ```
 
 
-### 5.3.4. Loss Function 损失函数
+## 5.6. Normalization Layers 归一化层
+
+用于定义网络的归一化层  
+
+* nn.BatchNorm1d
+* nn.BatchNorm2d
+* nn.BatchNorm3d
+* nn.GroupNorm
+* nn.SyncBatchNorm
+* nn.InstanceNorm1d
+* nn.InstanceNorm2d
+* nn.InstanceNorm3d
+* nn.LayerNorm
+* nn.LocalResponseNorm
+
+
+```py
+class LeNet(nn.Module):
+  def __init__(self, input_dim=1, num_class=10):
+    super(LeNet, self).__init__()
+
+    # Convolutional layers
+    self.conv1 = nn.Conv2d(input_dim, 20,  kernel_size=5, stride=1, padding=0) 
+
+    # 输入参数为通道数
+    self.bn1 = nn.BatchNorm2d(20)
+    self.conv2 = nn.Conv2d(20,    50,  kernel_size=5, stride=1, padding=0) 
+
+    # 输入参数为通道数
+    self.bn2 = nn.BatchNorm2d(50)
+
+```
+
+
+
+## 5.7. Linear Layers  线性层
+
+用于构筑网络的全连接层, 例如最早期的 MLP  
+
+* nn.Identity
+* nn.Linear
+* nn.Bilinear
+* nn.LazyLinear
+
+### 5.7.1. Identity
+
+用在网络构造定义中的占位符, 类似于 pass, 可以吞入任何参数
+```py
+class
+torch.nn.Identity(*args, **kwargs)
+
+```
+
+### 5.7.2. Linear
+
+```py
+class
+torch.nn.Linear(in_features, out_features, bias=True, device=None, dtype=None)
+
+# in_features   :每个输入样本的大小
+# out_features  :每个输出样本的大小
+# bias          :如果设置为False，则该图层将不会学习加法偏差。 默认值：True
+
+# 定义一个 MLP
+    # Fully connected layers
+    self.fc1 = nn.Linear(800, 500)
+    #self.bn3 = nn.BatchNorm1d(500)
+    self.fc2 = nn.Linear(500, num_class)
+
+```
+
+## 5.8. Loss Function 损失函数
 
 pytorch 的损失函数直接定义在了 torch.nn 中
 
@@ -782,13 +836,15 @@ loss_func = nn.CrossEntropyLoss()
 # 6. torch.nn.functional
 
 不是直接定义层, 而是把各个网络层的运算抽出来的包  
-因为pooling运算没有参数, 所以定义在了这里  
 
-Pytorch 自定义数据库中最重要的部分  
-提供了对 `dataset` 的所种操作模式  
+使用较为基础的运算进行网络定制化的时候需要用到
+
+
 
 # 7. torch.utils
 ## 7.1. torch.utils.data
+Pytorch 自定义数据库中最重要的部分  
+提供了对 `dataset` 的所种操作模式  
 
 ### 7.1.1. 数据集类型
 

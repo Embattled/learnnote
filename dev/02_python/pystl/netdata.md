@@ -1,7 +1,17 @@
-# Internet Data Handling
+- [1. Internet Data Handling and Structured Markup Processing Tools](#1-internet-data-handling-and-structured-markup-processing-tools)
+- [2. json JSON encoder and decoder](#2-json-json-encoder-and-decoder)
+  - [2.1. 读取与保存](#21-读取与保存)
+  - [2.2. Endocer Decoder](#22-endocer-decoder)
+  - [2.3. Exception](#23-exception)
+  - [2.4. python 命令行直接使用](#24-python-命令行直接使用)
+- [3. xml](#3-xml)
+  - [xml.etree.ElementTree](#xmletreeelementtree)
+
+# 1. Internet Data Handling and Structured Markup Processing Tools
 
 用于处理在互联网上常用的数据类型
 
+Internet Data 分类为:  
 用于处理一些网络上的通用数据格式的模组定义在该分类下, 具体包括
 1. email
 2. json
@@ -14,8 +24,13 @@
 9. quopri
 10. uu
 
+除此之外, 还有一个小分组, 用于处理网页的基石, html 和 xml  
+Structured Markup Processing Tools:  
+* xml
+* html
 
-# json JSON encoder and decoder
+
+# 2. json JSON encoder and decoder
 
 JSON 原名 JavaScript Object Notation, 从 JS 的语法衍生而来, Python 提供了 JSON处理的 STL 包  
 
@@ -25,7 +40,7 @@ JSON 目前是 YAML 1.2 的一个子集, 因此该包也可以直接用来处理
 
 该包定义的特殊的 JSON 类是有序的, 算是一个改进后的 dict (python 内建 dict 是key无序的)
 
-## 读取与保存
+## 2.1. 读取与保存
 
 注意 
 * 在 dump 的时候, 字典的所有 key/value 都会被转化成 str, 因此如果 kv 中有non-str 的话 `loads(dumps(x)) != x`
@@ -57,12 +72,28 @@ JSON 目前是 YAML 1.2 的一个子集, 因此该包也可以直接用来处理
 `json.loads(s, *, cls=None, object_hook=None, parse_float=None, parse_int=None, parse_constant=None, object_pairs_hook=None, **kw)`
 * 从字符串中读取 JSON
 
-## Endocer Decoder
+## 2.2. Endocer Decoder
 
 
 
-## Exception
+## 2.3. Exception
 
 
-## python 命令行直接使用
+## 2.4. python 命令行直接使用
 
+
+# 3. xml
+
+Python’s interfaces for processing XML are grouped in the xml package.
+
+The XML handling submodules are:
+* `xml.etree.ElementTree`: the ElementTree API, a simple and lightweight XML processor
+* `xml.dom`: the DOM API definition
+* `xml.dom.minidom`: a minimal DOM implementation
+* `xml.dom.pulldom`: support for building partial DOM trees
+* `xml.sax`: SAX2 base classes and convenience functions
+* `xml.parsers.expat`: the Expat parser binding
+
+## xml.etree.ElementTree
+
+用于以树的形式对 xml 文件进行读取处理  

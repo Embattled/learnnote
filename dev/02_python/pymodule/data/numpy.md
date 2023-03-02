@@ -61,6 +61,8 @@
       - [4.9.8.1. convolve 卷积](#4981-convolve-卷积)
       - [4.9.8.2. clip 裁剪](#4982-clip-裁剪)
       - [4.9.8.3. interp 简易线性插值](#4983-interp-简易线性插值)
+  - [Padding Arrays](#padding-arrays)
+  - [Polynomials 多项式](#polynomials-多项式)
   - [4.10. Sorting, Searching, Counting 排序 搜索 计数](#410-sorting-searching-counting-排序-搜索-计数)
     - [4.10.1. Sorting 排序](#4101-sorting-排序)
       - [4.10.1.1. 基础排序](#41011-基础排序)
@@ -835,6 +837,30 @@ One-dimensional linear interpolation for monotonically increasing sample points.
 * xp : fp 各个元素在 x 轴上的具体坐标, 必须是单调递增的, 除非指定 period, 不能包含 NaN.
 * left, right. 用于指定 x 在超越界限 (大于 `x[-1]` 小于 `x[0]` ) 的时候的输出值
 * period : A period for the x-coordinates, xp 的周期, 一般用来计算角度, 即360 度为一圈, 720度会被正确的放在 0 度的位置
+
+
+## Padding Arrays
+
+numpy 的填充函数, 只有一个函数单独作为了一类, 可以对任意维度进行填充
+
+`numpy.pad(array, pad_width, mode='constant', **kwargs)`  
+* array : array, array_like of rank N
+* pad_width: {sequence, array_like, int}
+* mode : str, 用于表示填充操作的种类
+  * 
+
+
+## Polynomials 多项式
+
+numpy 1.4 引进的多项式包, 是对于之前的函数包 `numpy.poly1d` 的扩展  
+
+概念区分:
+* `polynomial module` 指的是 old API, 定义在了 `numpy.lib.polynomial` 里, 其中包括
+  * 旧的多项式类 `numpy.poly1d`
+  * 其他的 polynomial functions
+* `polynomial package` 值得是 new API, 定义在了 `numpy.polynomial`
+  * convenience classes for the different kinds of polynomials
+
 
 
 ## 4.10. Sorting, Searching, Counting 排序 搜索 计数

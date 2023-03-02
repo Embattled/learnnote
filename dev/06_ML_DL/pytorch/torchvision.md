@@ -6,8 +6,8 @@
   - [全局参数](#全局参数)
   - [3.1. image classification](#31-image-classification)
 - [4. torchvision.utils](#4-torchvisionutils)
-  - [4.1. make_grid](#41-make_grid)
-  - [4.2. save_image](#42-save_image)
+  - [4.1. make\_grid](#41-make_grid)
+  - [4.2. save\_image](#42-save_image)
 - [5. torchvision.transforms](#5-torchvisiontransforms)
   - [5.1. Compositions of transforms](#51-compositions-of-transforms)
   - [5.2. 通用变换函数](#52-通用变换函数)
@@ -22,7 +22,7 @@
   - [5.4. 一般性自定义函数 Generic Transforms](#54-一般性自定义函数-generic-transforms)
 - [6. 基础性变化 Functional Transforms](#6-基础性变化-functional-transforms)
   - [6.1. 类型转换](#61-类型转换)
-    - [6.1.2. convert_image_dtype](#612-convert_image_dtype)
+    - [6.1.2. convert\_image\_dtype](#612-convert_image_dtype)
   - [6.2. Scrpit and Compositions](#62-scrpit-and-compositions)
   - [6.3. Transforms on only 特定函数](#63-transforms-on-only-特定函数)
 
@@ -316,14 +316,14 @@ torchvision.transforms.FiveCrop(size)
 ### 5.2.2. 颜色
 
 随机改变图像的 亮度, 对比度, 饱和度, 色度:
-* ColorJitter(brightness=0, contrast=0, saturation=0, hue=0)
+* `ColorJitter(brightness=0, contrast=0, saturation=0, hue=0)`
   * 四个参数都接受 float 或者 (min,max) 值的元组
   * 前三个都会 chosen uniformly from [max(0, 1 - 输入值), 1 + 输入值] or the given [min, max]
   * hue 会 chosen uniformly from [-hue, hue] or the given [min, max]
 
 ### 5.2.3. 噪点
 
-* GaussianBlur(kernel_size, sigma=(0.1, 2.0))
+* `GaussianBlur(kernel_size, sigma=(0.1, 2.0))`
 * 参数:
     - kernel_size : int or (kx,ky) 高斯模糊的核的大小
     - sigma       : float or (min,max), 指定要被用于模糊的标准差, 

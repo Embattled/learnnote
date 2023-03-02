@@ -736,8 +736,8 @@ pstree 命令是以树形结构显示程序和进程之间的关系
 Linux 服务管理两种方式 service 和 systemctl 
 
 systemd 是 Linux系统**最新的初始化系统**(init),作用是提高系统的启动速度,尽可能启动较少的进程,尽可能更多进程并发启动。
-
-systemd 是应用程序, 其对应的CLI进程管理命令就是 `systemctl`
+* systemd 是应用程序, 其对应的CLI进程管理命令就是 `systemctl`
+* 对于 WSL2 来说, `the system has not been booted with systemd`, 即无法使用对应的 systemctl 任何命令
 
 ## 6.1. service  
 
@@ -1466,8 +1466,8 @@ Bash Shell 在启动时总要配置其运行环境
 
 可以使用env和echo命令来查看linux shell 中的所有环境变量  
 一个相同的环境变会因为用户身份的不同而具有不同的值  
-`env`  
-`echo $<环境变量名称>`  
+* `env`  
+* `echo $<环境变量名称>`  
 
 
 | 环境变量名称 | 作用                                   |
@@ -1499,6 +1499,19 @@ PATH 的载入
 3. 根据上一节配置文件的载入顺序, 用户自己想要配置文件应该写在 `~/.bashrc` 中
    * 此时可以加入 `PATH=$PATH:$HOME/addon`
    * 甚至是对命令提示符的修改 `PS1="[c.biancheng.net]\$ "`
+
+
+#### env 命令
+
+`env [option] [环境变量=值] [命令]`
+* 无参数调用 : 代表输出目前环境的所有环境变量
+* `命令`: 在应用了当前的环境变量后, 执行对应的命令
+* `option`:
+  * `-i --ignore-environment` : 无视环境变量执行命令
+  * `-u 変数名` : 指定某个环境变量无视其, 然后执行命令
+  * `-0` : 在输出全部环境变量的时候用 NULL 来结尾, 而不是换行, 可能用于一些将环境变量保存到字符串时候的操作
+
+该命令可以被用来在 conda 环境里正确的调用 python 解释器, 在 python 程序的首行写入 `#! /usr/bin/env python` 而不是 `#! python`, 这是因为 conda 环境里的 python 解释器是在 bash 启动后写入环境变量的  
 
 ### 10.1.7. Shell 内建命令
 
