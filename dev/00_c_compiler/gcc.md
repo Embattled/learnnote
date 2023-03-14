@@ -287,5 +287,3 @@ gcc hello.c -lm -L /usr/lib -I /usr/include
    * 修改~/.bashrc 或 ~/.bash_profile 文件，即在文件最后一行添加export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:xxx(xxx 为动态库文件的绝对存储路径)。保存之后，执行 source .bashrc 指令(此方式仅对当前登陆用户有效)。
 
 
-
-

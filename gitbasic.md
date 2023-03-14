@@ -99,9 +99,30 @@ git init [-q | --quiet] [--bare] [--template=<template-directory>]
 
 ## 2.2. clone 克隆
 
-3. `clone <url>` 用于克隆版本库
-   * `-b, --branch <branch>` 指定要克隆的分支
-   * `--recurse-submodules`  递归的克隆全部的 submodule, initialize and clone submodules within based on the provided pathspec.
+从远端克隆一个仓库到一个新的文件夹, creates remote-tracking branches for each branch in the cloned repository (visible using `git branch --remotes`), and creates and checks out an initial branch that is forked from the cloned repository’s currently active branch.
+
+完整命令
+```sh
+git clone [--template=<template-directory>]
+	  [-l] [-s] [--no-hardlinks] [-q] [-n] [--bare] [--mirror]
+	  [-o <name>] [-b <name>] [-u <upload-pack>] [--reference <repository>]
+	  [--dissociate] [--separate-git-dir <git-dir>]
+	  [--depth <depth>] [--[no-]single-branch] [--no-tags]
+	  [--recurse-submodules[=<pathspec>]] [--[no-]shallow-submodules]
+	  [--[no-]remote-submodules] [--jobs <n>] [--sparse] [--[no-]reject-shallow]
+	  [--filter=<filter> [--also-filter-submodules]] [--] <repository>
+	  [<directory>]
+```
+
+命令相关:
+* clone 以后
+  * 执行 `git fetch` 会更新所有的 remote-tracking branches
+  * `git pull`  会更新所有的 remote-tracking branches 并将更新的内容合并到本地
+
+常用选项: 
+* `-b <name>, --branch <name>` 指定要克隆的分支
+  * 
+* `--recurse-submodules`  递归的克隆全部的 submodule, initialize and clone submodules within based on the provided pathspec.
 
 # 3. 离线操作
 

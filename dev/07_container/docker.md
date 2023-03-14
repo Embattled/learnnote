@@ -6,17 +6,18 @@
     - [1.4.1. 通过仓库安装 docker](#141-通过仓库安装-docker)
     - [1.4.2. 运行权限](#142-运行权限)
   - [1.5. storage driver](#15-storage-driver)
-- [2. Docker App](#2-docker-app)
-  - [2.1. build](#21-build)
-  - [2.2. image  管理](#22-image--管理)
-  - [2.3. container 管理](#23-container-管理)
-  - [2.4. tag](#24-tag)
-  - [2.5. Docker repo](#25-docker-repo)
-  - [2.6. Docker 运行命令](#26-docker-运行命令)
-    - [2.6.1. 运行镜像](#261-运行镜像)
-    - [2.6.2. 运行容器](#262-运行容器)
-    - [2.6.3. 进入容器](#263-进入容器)
-    - [2.6.4. 进程管理](#264-进程管理)
+- [2. Docker Engine](#2-docker-engine)
+  - [2.1. docker build 镜像编译](#21-docker-build-镜像编译)
+  - [2.2. docker compose 镜像统合](#22-docker-compose-镜像统合)
+  - [2.3. docker image 镜像管理](#23-docker-image-镜像管理)
+  - [2.4. docker container 容器管理](#24-docker-container-容器管理)
+  - [2.5. tag](#25-tag)
+  - [2.6. Docker repo](#26-docker-repo)
+  - [2.7. Docker 运行命令](#27-docker-运行命令)
+    - [2.7.1. docker run 运行镜像](#271-docker-run-运行镜像)
+    - [2.7.2. 运行容器](#272-运行容器)
+    - [2.7.3. 进入容器](#273-进入容器)
+    - [2.7.4. 进程管理](#274-进程管理)
 - [3. Dockerfile](#3-dockerfile)
 
 
@@ -48,9 +49,14 @@
 
 ## 1.2. Docker 架构基本概念
 
-* 镜像（Image）：Docker 本身的镜像（Image）, 就相当于是一个 root 文件系统。
-* 容器（Container）：镜像是静态的定义, 容器是镜像运行时的实体。容器可以被创建、启动、停止、删除、暂停等。
-* 仓库（Repository）：仓库可看成一个代码控制中心, 用来保存镜像。
+基础概念
+* `Dockerfile` : 纯文本, 用于定义一个 Image 的各种参数, 环境, 库 等
+* 镜像 (Image): 由 Dockerfile 编译(Build) 得来, 是一个 root 文件系统, 但是 Image 本身是一个静态的概念
+* 容器 (Container) : 镜像是静态的定义, 容器是镜像运行时的实体. 镜像是容器的 template, 容器可以被创建、启动、停止、删除、暂停等.
+* 应用 (application) : 完整的一个应用程序, 可以包括多个容器, 每个容器运行各自的 process or service, 容器之间通过一定的协议进行通信, 最终实现整个应用程序
+
+
+* 仓库（Repository）: 仓库可看成一个代码控制中心, 用来保存镜像。
   * 每个仓库可以包含多个标签（Tag）；每个标签对应一个镜像。
   * 通常, 一个仓库会包含同一个软件不同版本的镜像, 而标签就常用于对应该软件的各个版本。
   * 通过 <仓库名>:<标签> 的格式来指定具体是这个软件哪个版本的镜像。如果不给出标签, 将以 `latest` 作为默认标签。
@@ -161,23 +167,75 @@ docker支持许多存储驱动, 在 `Ubuntu`下支持 : `overlay2, aufs, btrfs`
   * 但它还很年轻, 在成产环境中使用要谨慎。
 
 
-# 2. Docker App
+# 2. Docker Engine
 
-记录docker的相关基础命令
+记录docker engine 的相关基础CLI运行命令
+
+docker 是一个基础接口, 其下的各种子命令都是独立的 binary, 分别有其各自自己的 --help 和其他各种子命令
+
+## 2.1. docker build 镜像编译
+
+docker build 是 docker engine 的基础命令, 通过 build 来创建一个 image
+
+目前该命令有两个组成部分
+* 从 18.09 版本开始, 以 `Moby BuildKit` 作为默认的 build 工具
+  * creating scoped builder instances
+  * building against multiple nodes concurrently
+  * outputs configuration, inline build caching
+  * specifying target platform
+* 而的 CLI `Docker Buildx`, 则是在 `BuildKit` 的基础上提供了更多的新特性. 使用 `docker buildx build` 来调用更高级的 build 工具
+  * building manifest lists
+  * distributed caching
+  * exporting build results to OCI image tarballs.
 
 
-## 2.1. build
 
 * 使用 `docker build [flags] dockerfile路径` 来创建 docker container
+
   * `-t 项目名` 用于指定该镜像的名称
 
-## 2.2. image  管理
+## 2.2. docker compose 镜像统合
 
-image 和 container 相关的命令比较类似 `docker image ls` 可以用来查看本机当前拥有的 image 以及对应的 tag
-* `docker images` 和 `image ls` 功能相同
+Define and run multi-container applications with Docker.
+
+`docker compose` 即对容器的统一管理, 属于一个整体性的操作.   
+`docker compose` is a tool for managing multi-container Docker applications. It allows you to define and run multiple containers as a single application using a YAML file called `docker-compose.yml`.
+
+如何去定义 `docker-compose.yml` 是使用 compose 命令的关键, 根据定义的具体细则, 有时候可以直接省略掉手动调用 `docker build`
+
+帮助命令 `docker compose --help`
+
+
+`docker compose [-f <arg>...] [--profile <name>...] [options] [COMMAND] [ARGS...]`
+* `-f <arg>...` : 手动指定别的 compose 配置文件.
+  * 默认会读取当前目录下的 `docker-compose.yml` 和 `docker-compose.override.yml`
+    * 因此若不通过 -f 手动指定配置文件, 则需要保证目录下必须要有 `docker-compose.yml`
+    * `docker-compose.override.yml` 默认也会被读取, 会更新替换掉 `docker-compose.yml` 的各种值
+
+`options` compose 全局选项:
+* 
+
+`COMMAND` 子命令:
+* up      : Create and start containers. 创建并运行 app
+* build   : Build or rebuild services
+
+
+
+## 2.3. docker image 镜像管理
+
+一个镜像通过 dockerfile 被编译后, 会存储在当前本机中, 即 Host machine.  默认的存储位置是:
+* linux : `/var/lib/docker` 
+* Windows: `C:\ProgramData\Docker`
+
+`docker image` 和 `docker container` 的使用方法比较类似, 一个是管理系统硬盘上的静态Images, 一个是管理内存中的 动态Container
+
+
+命令简要:
+* `docker image ls`     : 查看本机当前拥有的 image 以及对应的 tag
+  * `docker images` 和 `image ls` 功能相同
 * `docker image rm [imageName]` 和 `docker rmi [imageName]` 用来删除一个 image
 
-## 2.3. container 管理
+## 2.4. docker container 容器管理
 
 * `docker container ls -l` 列出本机正在运行的容器
 * `docker container ls -l --all` 列出本机所有容器, 包括终止运行的容器：
@@ -185,12 +243,12 @@ image 和 container 相关的命令比较类似 `docker image ls` 可以用来�
 * `docker ps -a` 列出所有容器
 * 
 
-## 2.4. tag
+## 2.5. tag
 
 * `docker tag 旧名字 新名字` 用来给一个 image 赋予新的名字
 * 新旧名字会同时存在, 但是都指向同一个 image, ID 是相同的
 
-## 2.5. Docker repo
+## 2.6. Docker repo
 
 * `Docker Hub` 是 docker image 的标准 registry
 * 通过命令行使用推送必须在本机进行登录
@@ -205,9 +263,16 @@ image 和 container 相关的命令比较类似 `docker image ls` 可以用来�
 * 使用 `docker pull` 命令来获取一个 prebuild image
 
 
-## 2.6. Docker 运行命令
+## 2.7. Docker 运行命令
 
-### 2.6.1. 运行镜像
+容器的创建, 停止, 再运行, 进入都分别有各自的命令, 具体的生命线可以是
+
+* docker run    : 一开始的创建, 同时运行. Create and run a new container from an image
+* docker stop   : 停止一个容器的运行
+* docker start  : 容器的再启动
+* docker rm     : 删除一个容器实例
+
+### 2.7.1. docker run 运行镜像
 
 * 使用 `docker run [OPTIONS] IMAGE [COMMAND] [ARG...]` 在本机的 docker engine 上运行一个镜像, 此时会创建一个容器
   * `docker run -dp 3000:3000 getting-started`
@@ -218,13 +283,13 @@ image 和 container 相关的命令比较类似 `docker image ls` 可以用来�
     * `--runtime==nvidia` 指定 docker 使用GPU
       * `-e NVIDIA_VISIBLE_DEVICES=1` 指定容器只能使用 GPU1
 
-### 2.6.2. 运行容器
+### 2.7.2. 运行容器
 
 * 容器可以关闭, 再次启动时不能用`run`
   * 使用命令 `docker start [OPTIONS] CONTAINER [CONTAINER...]`
   * `docker start -i <name>-cuda-10.2`
 
-### 2.6.3. 进入容器
+### 2.7.3. 进入容器
 
 在使用Docker创建了容器之后, 比较关心的就是如何进入该容器了, 其实进入Docker容器有好几多种方式
 
@@ -233,12 +298,14 @@ image 和 container 相关的命令比较类似 `docker image ls` 可以用来�
 3. 使用 nsenter 进入容器, 需要通过 docker 相关命令获得容器的 PID
     
 
-### 2.6.4. 进程管理
+### 2.7.4. 进程管理
 
 * `docker ps`         类似于系统的同名命令, 显示所有正在运行的 docker 容器
 * `docker stop [id]`  停止一个 docker 容器
 * `docker rm <id>`    永久删除一个 docker 容器
   * 可以通过 `rm -f` 来直接停止并删除正在运行的容器
+
+
 
 
 # 3. Dockerfile
