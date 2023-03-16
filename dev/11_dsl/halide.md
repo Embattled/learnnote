@@ -217,15 +217,48 @@ Expr 可以理解为表达式对象, 是一种轻量化的数据结构, 表达�
 * Expr 可能需要非常重的计算
 * Expr 可能不符合 Halide complier 的优化策略
 
+
 事实上, 很多 Halide 头文件下的 Halide 实用函数都是以 Expr 作为输入值和返回值的. 
+* 对于一个 `Func`, 那么 `typeof(Func(x,y)) == Expr`, 根据库函数头的形式决定等式两边的 Func 是用 `Func` 形式还是 `Func(x,y)` 形式
+
 
 ### 5.1.1. Expr routine
 
+#### 5.1.1.1. 数值类型转换
 
-#### 5.1.1.1. 逻辑选择
+Halide::cast 用于显式的将一个 Expr 进行内存转换
 
-根据一定的逻辑选择分支值
-* select    : 类似于 numpy.where 或者 C 语言中的三元表达式, 根据条件从两个输入中选择一个到输出中,
+具体的写法有两种
+```cpp
+template<typename T >
+Expr Halide::cast 	( 	Expr  	a	) 	
+
+Expr Halide::cast 	( 	
+    Type  	t,
+		Expr  	a 
+	) 		
+```
+
+#### 5.1.1.2. 基础数值操作
+
+函数头
+* clamp     : 相当于 min 和 max 的结合, 将一个输入的 Expr 限制在对应的区间以内  
+* select    : 类似于 numpy.where 或者 C 语言中的三元表达式, 根据条件从两个输入中选择一个到输出中
+
+clamp
+```cpp
+/* 
+Clamps an expression to lie within the given bounds.
+The bounds are type-cast to match the expression. Vectorizes as well as min/max.
+ */
+
+Expr Halide::clamp 	( 	
+    Expr  	a,
+		const Expr &  	min_val,
+		const Expr &  	max_val 
+	) 	
+
+```
 
 
 select 详解
@@ -233,7 +266,7 @@ select 详解
 // 基本用法, Halide select 的特点是它不会根据 condition 来计算 true_value 或 flase_value, 而是总是计算好 true_value 和 false_value 再进行赋值, 这点要注意
 // Typically vectorizes cleanly, but benefits from SSE41 or newer on x86. 
 Expr Halide::select 	(
-        Expr  	condition,
+    Expr  	condition,
 		Expr  	true_value,
 		Expr  	false_value 
 	) 		
@@ -242,7 +275,7 @@ Expr Halide::select 	(
 // 如果 c0 为真, 则返回 v0, 否则判断 c1..., 直到最后的 cn 为真则返回 vn, 否则返回 vn+1
 template<typename... Args, typename std::enable_if< Halide::Internal::all_are_convertible< Expr, Args... >::value >::type * = nullptr>
 Expr Halide::select 	( 	
-        Expr  	c0,
+    Expr  	c0,
 		Expr  	v0,
 		Expr  	c1,
 		Expr  	v1,
@@ -269,6 +302,7 @@ Func 在 pipeline 定义中的种类:
   * 单纯用于表示计算过程的 function, 不涉及任何内存layout 或者数据分配
   * 这个概念和 function definition 形成对比, 而后者是包括了 数据的存储和访问形式的.
   * 对于一个 `Func`, 它的第一个 `definition` 必须是一个 `pure definition`, like a mapping from Vars to an Expr.
+  * 对于一个 `Func`, 它的第一个 `Pure definition` 必须是由 Var 构成的, 而不能是一些固定值
 
 * function definition   : 是基于 pure definition 的延申. 简而言之 definition can include computed expressions on both sides
 * 根据具体的操作可以大概进行分类.
@@ -299,9 +333,10 @@ Func Update definition 的写法 rule:
 
 
 
-### 5.2.1. Func scheduling
+### 5.2.1. Func scheduling 
 
 对于定义好的 Func, 可以通过调用对应的句柄来让 Halide 进行并行优化, 这是一个比较有技术含量的工作, 一般的情况下交给 Halide 来自动优化就能取得比较好的效果  
+
 
 各种手动 scheduling 接口 `Func.*`:
 * `reorder(y,x)`    : 手动指定 loop 的执行顺序, 顺序为从左到右是最内loop到外
@@ -325,6 +360,14 @@ Func Update definition 的写法 rule:
   * `Func.split(x, x_outer, x_inner, 2);`
   * `Func.unroll(x_inner);`
   * 通过使用第二个参数来实现的 The shorthand for this is: `Func.unroll(x, 2);`
+
+另一个 scheduling 的系列是 `compute_*, store_*`: 它用于调整整个 Halide pipeline 管线的循环嵌套逻辑:
+* 说明:
+  * **对于默认完全不加修饰的 Func stage, 靠前定义的 Func 会作为内联函数完全嵌入后面的 Func**
+  * The default schedule fully inlines 'producer' into 'consumer'
+  * 这在某些时候会导致 producer 的一些基础资源被重复计算, 因此适时的手动将一些 Func 添加计算顺序是很有必要的
+* `Func.compute_*`   : 调整某个 Func 的计算循环级
+* `Func.store_*`     : 调整某个 Func 的存储循环级, 该接口一般作为附加选项添加到 compute_ 上, 用以实现 存储和计算的分离, 达到更好的效果
 
 
 一个 tutorious 中的整合了所有 scheduling 方法的高速化计算 example:
@@ -421,11 +464,51 @@ Func & Halide::Func::tile 	(
 	) 		
 ```
 
-##### 5.2.1.1.1. TailStrategy  Halide::TailStrategy
+**TailStrategy  Halide::TailStrategy**
+
 
 用于在 tail 的时候, 定义如何处理尾部. 即 维度的宽并不能被 factor 整除的情况下, 如何对应. 因为有的时候可以进行重复计算, 而有些时候不可以.   
 
 感觉很有用, 先定义好章节以后再看 TODO
+
+#### 5.2.1.2. compute_* 系列接口
+
+* `Func::compute_root 	() 	`
+  * Compute all of this function once ahead of time. 
+  * 在执行到 Func 的时候, 会计算所有将要被用到的值, 存储到缓存里
+  * 理论上会最大化降低 redundance work, 但是会占用最多的缓存空间, 同时会显而易见的降低 cache 利用率
+  * 同时, 需要考虑 cache 时效, 即该 Func 的值被利用的时候, 有可能已经被替换出 CPU cache 了, 从而导致性能下降
+* `Func::compute_at ( Func, Var)`
+  * Compute this function as needed for each unique value of the given var for the given calling function f. 
+  * 当该 Func 被需要得时候才会计算对应的值, 且计算结果不会被存储到缓存里, 从缓存 cache 的角度上说这命中率足够高, 但是会产生非常多的重复计算
+  * `Var` 参数被用来考虑 compute_at 所对应的所需要的 Func 的值
+    * 比如说如果 Var 是 x 即内循环的话, 即是 计算单个像素要的 producer Func 的值并存储到缓存里
+    * 如果 Var 是 y 即外循环的话, 即 计算单行像素 所需要的 producer Func 的值并存储到缓存里
+    * 根据情况, 如果 Var 越靠外, 那么 licality 的性能越低, memory cost 越高, 但是 redundant work 会显著降低
+  * 重载函数: `Func::compute_at 	( 	LoopLevel  	loop_level	) 	` 使用 LoopLevel 类作为参数而非 Func, Var
+* `Func::compute_with ()`  : TODO 介绍有点少
+
+#### 5.2.1.3. store_* 系列接口
+
+从 compute 系列接口有些类似, 但是指定的不是计算过程而是存储过程, 该系列结果是 optional, 只在特殊情况下用于将 存储循环级别 以及 计算循环级别分开来, 用以达成更高水平的对 locality 和 redundant work 的 trade-off
+
+* `Func::store_at 	( Func, Var	)`:
+  * 假定 `Func g` 是 producer, `Func F` 是 consumer
+  * `g.compute_at(f, x).store_at(f, y);`  所实现的效果是  
+    * 在 行层面(y 循环) 上生成缓存
+    * 在 x 循环上执行 compute_at
+    * 由于 缓存保存在了 外循环上, 所以当 f 的计算频繁依赖 前后的 x 的时候 (`x-2, x-1` 之类的), 相关的值已经被计算过了所以会直接读取缓存
+    * 相比于只有 `compute_at`的调配, 保持了完全的 locality 性能的同时, 用少量的 memory cost 显著降低了 redundant work 
+  * 根据具体的 `comsumer F`, Halide 会自动进行缓存优化
+    * 为假如 F 只依赖与有限范围内 x 的 `g` 值
+    * 那么即使缓存 `store_at(f,y)` 定义在了 y 循环上, 也不会把整行的 g 值都存储, 而是通过 circular buffer 即循环利用 Buffer 来实现超高的 locality
+  * 同样的具有 `LoopLevel` 作为参数输入的重载
+* `Func::store_root () 	`
+  * 同 `store_at` 等效, 但是 schedules storage outside the outermost loop. 
+  * 将存储过程安排在最外层之外, 即会存储所有中间值
+
+
+
 
 ### 5.2.2. Func realize
 
