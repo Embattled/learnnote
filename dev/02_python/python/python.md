@@ -125,16 +125,11 @@
   - [11.1. 使用正则表达式的基础函数](#111-使用正则表达式的基础函数)
   - [11.2. 正则表达式-单字符](#112-正则表达式-单字符)
   - [11.3. 正则表达式-多次匹配](#113-正则表达式-多次匹配)
-- [12. Python 的包 环境管理](#12-python-的包-环境管理)
-  - [12.1. Python的包管理](#121-python的包管理)
-    - [12.1.1. distutils 和 setuptools](#1211-distutils-和-setuptools)
-  - [12.2. 环境管理](#122-环境管理)
-    - [12.2.1. venv](#1221-venv)
-    - [12.2.2. virtualenv](#1222-virtualenv)
-    - [12.2.3. virtualenvwrapper](#1223-virtualenvwrapper)
-- [13. python 解释器](#13-python-解释器)
-  - [13.1. python Environment variables](#131-python-environment-variables)
-  - [13.2.](#132)
+- [12. Command line and environment](#12-command-line-and-environment)
+  - [12.1. Command line](#121-command-line)
+    - [-m module-name](#-m-module-name)
+    - [杂项选项](#杂项选项)
+  - [12.2. python Environment variables](#122-python-environment-variables)
 
 # 1. Python 的背景
 
@@ -2457,176 +2452,32 @@ re.search('(bar)+', 'foo barbarbar baz')
 
 ```
 
-# 12. Python 的包 环境管理
 
-[官方推荐文档]<https://packaging.python.org/guides/tool-recommendations/>  
-
-
-## 12.1. Python的包管理
-
-包管理工具有很多
-* [pip](./pip.md)
-
-### 12.1.1. distutils 和 setuptools
-
-distutils是 python 标准库的一部分  
-用于方便的打包和安装模块  是常用的 setup.py 的实现模块  
-setuptools 是对 distutils 的增强, 尤其是引入了包依赖管理  
-
-[distutils打包文档]<https://docs.python.org/3.8/distutils/>  
-
-使用方法: 在工作目录下, 要打包的脚本文件是`foo.py` 和 `bar.py`  
-创建 `setup.py`  
-
-```py
-from distutils.core import setup  # 导入打包函数
-setup(
-    name='fooBar',  # 包名 
-    version='1.0',  # 版本
-    author='Will',  # 作者
-    author_email='wilber@sh.com',   # 邮件地址
-    url='http://www.cnblogs.com/wilber2013/',   # 作者网址
-    py_modules=['foo', 'bar'],      # 要打包的文件名称
-)
-```
-
-然后在工作目录下运行  `python setup.py sdist`  则会打包好  `fooBar-1.0.zip`  
-安装者则需要解压压缩包  然后运行  `python setup.py install`  就可以使用包了
-
-
-## 12.2. 环境管理
-
-在开发Python应用程序的时候, 系统安装的Python3只有一个版本：3.4。所有第三方的包都会被pip安装到Python3的site-packages目录下。
-
-如果我们要同时开发多个应用程序, 那这些应用程序都会共用一个Python, 就是安装在系统的Python 3  
-如果应用A需要jinja 2.7, 而应用B需要jinja 2.6怎么办  
-
-有多种虚拟环境配置方法  
-
-### 12.2.1. venv  
-
-Source code: Lib/venv/  
-一般已经安装在了较新的 python 版本中了  因为是从 3.3 版本开始自带的, 这个工具也仅仅支持 python 3.3 和以后版本  
-创建一个轻量级虚拟环境, 与系统的运行环境相独立, 有自己的 Python Binary  
-
-使用 `venv` 命令进行虚拟环境操作  
-
-```shell
-# vene ENV_DIR
-python3 -m venv tutorial-env
-python3 -m venv /path/to/new/virtual/environment
-
-
-# 激活虚拟环境
-source tutorial-env/bin/activate
-
-```
-
-### 12.2.2. virtualenv
-
-virtualenv 是目前最流行的 python 虚拟环境配置工具
-
-- 同时支持 python2 和 python3
-- 可以为每个虚拟环境指定 python 解释器 并选择不继承基础版本的包。
-
-使用pip3安装  
-`pip3 install virtualenv`  
-
-```shell
-# 测试安装 查看版本
-virtualenv --version
-
-# 创建虚拟环境
-cd my_project
-virtualenv my_project_env
-
-# 指定python 执行器
--p /usr/bin/python2.7
-
-# 激活虚拟环境
-source my_project_env/bin/activate
-# 停用 回到系统默认的Python解释器
-deactivate
-```
-
-### 12.2.3. virtualenvwrapper
-
-`pip install virtualenv virtualenvwrapper`  
-
-virtualenvwrapper 是对 virtualenv 的一个封装, 目的是使后者更好用
-使用 shell 脚本开发, 不支持 Windows  
-
-它使得和虚拟环境工作变得愉快许多
-
-- 将您的所有虚拟环境在一个地方。
-- 包装用于管理虚拟环境（创建, 删除, 复制）。
-- 使用一个命令来环境之间进行切换。
-
-```shell
-
-
-#设置环境变量 这样所有的虚拟环境都默认保存到这个目录
-export WORKON_HOME=~/Envs  
-#创建虚拟环境管理目录
-mkdir -p $WORKON_HOME
-
-
-# 每次要想使用virtualenvwrapper 工具时, 都必须先激活virtualenvwrapper.sh
-find / -name virtualenvwrapper.sh #找到virtualenvwrapper.sh的路径
-source 路径 #激活virtualenvwrapper.sh
-
-# 创建虚拟环境  
-# 该工具是统一在当前用户的envs文件夹下创建, 并且会自动进入到该虚拟环境下  
-mkvirtualenv ENV
-mkvirtualenv ENV  --python=python2.7
-
-# 进入虚拟环境目录  
-cdvirtualenv
-
-Create an environment with `mkvirtualenv`
-
-Activate an environment (or switch to a different one) with `workon`
-
-Deactivate an environment with` deactivate`
-
-Remove an environment with`rmvirtualenv`
-
-# 在当前文件夹创建独立运行环境-命名
-# 得到独立第三方包的环境, 并且指定解释器是python3
-$ mkvirtualenv cv -p python3
-
-# 进入虚拟环境  
-source venv/bin/activate  
-
-#接下来就可以在该虚拟环境下pip安装包或者做各种事了, 比如要安装django2.0版本就可以：
-pip install django==2.0
-
-```
-
-**其他命令**:
-
-- workon `ENV`          : 启用虚拟环境
-- deactivate            : 停止虚拟环境
-- rmvirtualenv `ENV`    : 删除一个虚拟环境
-- lsvirtualenv          : 列举所有环境
-- cdvirtualenv          : 导航到当前激活的虚拟环境的目录中, 比如说这样您就能够浏览它的 site-packages
-- cdsitepackages        : 和上面的类似, 但是是直接进入到 site-packages 目录中
-- lssitepackages        : 显示 site-packages 目录中的内容
-
-
-# 13. python 解释器
+# 12. Command line and environment
 
 此节用于学习 python CLI 以及解释器的各种环境配置
 
-## 13.1. python Environment variables
+## 12.1. Command line
+
+使用 python CLI 的形式
+* `python myscript.py` 简单运行一个脚本
+* `python [-bBdEhiIOqsSuvVWx?] [-c command | -m module-name | script | - ] [args]`  完整的 CLI 可能输入
+
+### -m module-name
+
+Search `sys.path` for the named module and execute its contents as the __main__ module.
+
+执行一个 包自己的 `main` 函数 `<pkg>.__main__`, module-name 不需要带上 `.py` 后缀  
+
+
+### 杂项选项
+
+`python -m pip --version`
+
+
+
+## 12.2. python Environment variables
 
 会对 python 解释器起作用的环境变量  
 
 
-## 13.2. 
-
-好像一般的包都不能够通过终端直接访问
-
-`python -m pip --version`
-
-查看一个包的版本  

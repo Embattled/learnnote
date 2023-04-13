@@ -4,8 +4,6 @@
   - [2.2. Endocer Decoder](#22-endocer-decoder)
   - [2.3. Exception](#23-exception)
   - [2.4. python 命令行直接使用](#24-python-命令行直接使用)
-- [3. xml](#3-xml)
-  - [xml.etree.ElementTree](#xmletreeelementtree)
 
 # 1. Internet Data Handling and Structured Markup Processing Tools
 
@@ -82,18 +80,3 @@ JSON 目前是 YAML 1.2 的一个子集, 因此该包也可以直接用来处理
 ## 2.4. python 命令行直接使用
 
 
-# 3. xml
-
-Python’s interfaces for processing XML are grouped in the xml package.
-
-The XML handling submodules are:
-* `xml.etree.ElementTree`: the ElementTree API, a simple and lightweight XML processor
-* `xml.dom`: the DOM API definition
-* `xml.dom.minidom`: a minimal DOM implementation
-* `xml.dom.pulldom`: support for building partial DOM trees
-* `xml.sax`: SAX2 base classes and convenience functions
-* `xml.parsers.expat`: the Expat parser binding
-
-## xml.etree.ElementTree
-
-用于以树的形式对 xml 文件进行读取处理  

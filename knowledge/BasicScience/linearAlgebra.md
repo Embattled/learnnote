@@ -23,3 +23,15 @@ $$A=U\sum V'$$
 奇异值矩阵虽然不是严格的方阵, 但也是按着 45度对角线上存放着权重, 其中大部分都是接近或者等于0 的, 如果把接近 0 的部分丢掉, 则实现了 SVD 压缩
 $$A_{N\times M}\approx U_{N\times r}\sum V_{r\times M}^{-1}$$
  
+
+
+# Invertible matrix
+
+
+## Rule of Sarrus
+
+是一种用于快速记忆 2x2 和 3x3 行列式的值的方法, 
+
+Rule of Sarrus 是 Leibniz Determinants Formula 的特例
+
+

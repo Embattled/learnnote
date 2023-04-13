@@ -17,6 +17,9 @@ Basic knowledge of this node:
 1. [Markdown](markdown.md)  : Markdown's syntax, for this node.
 2. [Git](gitbasic.md)       : Basic usage of git.
 
+Use `(finish)` or `(完)` to indicate that I have finished reading all the content in a chapter while following a document index.
+
+
 # 2. Development
 
 * 各种开发技术的知识, 包括各种开发语言和相应的库

@@ -334,7 +334,7 @@ class argparse.ArgumentParser(
 ArgumentParser.add_argument(
   name or flags...
   [, action]
-  [, nargs]
+  [, nargs]       # 多个参数
   [, const]
   [, default]     # 默认值无需多解释
   [, type]        # 转换的类型
@@ -377,14 +377,36 @@ group = parser.add_mutually_exclusive_group()
 group.add_argument("-v", "--verbose", action="store_true")
 group.add_argument("-q", "--quiet", action="store_true")
 ```  
-
-### 5.2.1. Action class
+### 5.2.1. name or flags
+### 5.2.2. action - Action class
 
 Action classes implement the Action API
 * a callable which returns a callable which processes arguments from the command-line.
 *  Any object which follows this API may be passed as the action parameter to add_argument().
 
+### 5.2.3. nargs
 
+默认情况下, 单个命令行参数是与一个动作绑定的, 但是 nargs 定义可以将多个命令行参数绑定为同一个动作  
+
+`nargs`支持的参数:
+* N (an integer)    : 接下来的 N 个命令行参数会被打包成 list 作为一个参数值
+  * 要注意当 N=1 的时候, 仍然会创建一个包含唯一参数的 list, 这与默认情况下仍然是不同的
+* `'?'` : ? 字符    :  不是很好理解 `[TODO]`
+* `'*'` : 星号字符   : 所有的 CLI 参数都会被打包成 list
+  * 对于位置参数, 创建多个 `nargs='*'` 没有任何意义
+  * 对于可选参数, 因为可以通过选项来进行区分所以可以多个存在, 但是在输入的时候要注意和位置星号参数的关系, 要先输入位置再输入可选
+
+```py
+# 两个可选和一个位置
+parser = argparse.ArgumentParser()
+parser.add_argument('--foo', nargs='*')
+parser.add_argument('--bar', nargs='*')
+parser.add_argument('baz', nargs='*')
+
+# 在进行 parse 的时候需要注意参数的输入顺序
+parser.parse_args('a b --foo x y --bar 1 2'.split())
+Namespace(bar=['1', '2'], baz=['a', 'b'], foo=['x', 'y'])
+```
 
 ## 5.3. 高级 args
 
@@ -412,10 +434,6 @@ group.add_argument('--foo', action='store_true')
 group.add_argument('--bar', action='store_false')
 # 添加至这个组的参数在打印参数说明的时候会单独分隔开, 方便区分
 ```
-
-
-
-
 
 ### 5.3.2. mutual exclusion 矛盾参数
 
