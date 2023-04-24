@@ -799,7 +799,7 @@ func.realize(buffer);
 * 使用 Generator 和 AOT 或 JIT 无关, 都可以使用, 但是对于 AOT 模式特别的方便
 
 
-## 定义书写
+## 6.1. 定义书写
 
 将 pipeline 定义为一个 class  `class myGenerator : public Generator<myGenerator> `
 * 具体的处理管道需要定义在 `generate()` 函数里
@@ -833,7 +833,7 @@ private:
 
 ```
 
-## 定义输入输出  
+## 6.2. 定义输入输出  
 
 定义输出的时候一般会定义为 Buffer, 但是 Halide 本质上是支持把 Func 定义为 Input 的, 以下是原话:
 
@@ -872,7 +872,7 @@ class Tupler : Generator<Tupler> {
 };
 ```
 
-## 编译与库生成
+## 6.3. 编译与库生成
 
 * 在使用的时候和 halide 目录下的 `tools/GenGen.cpp` 一起编译
 

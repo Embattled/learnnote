@@ -551,19 +551,19 @@ ${function arguments}
 
 
 
-### 字符串替换
+### 7.2.1. 字符串替换
 
 * `$(subst from,to,text)`
 * `$(patsubst pattern,replacement,text)`
   
 
-### 字符串调整
+### 7.2.2. 字符串调整
 
 * `$(strip string)`
 * `$(findstring find,in)`
 * `$(filter pattern…,text)`
 
-### 值列表调整
+### 7.2.3. 值列表调整
 
 * `$(sort list)`
 * `$(word n,text)`
@@ -607,7 +607,7 @@ ${function arguments}
 * `$(realpath names…)`                   : 路径转换, 包括转换链接, 消除 `../`, 消除重复的 `/`, 验证路径是否存在, 如果转换失败则返回空字符串
 * `$(abspath names…)`                    : 有些类似于 realpath, 但不进行验证存在, 同时不进行链接转换  
 
-# 8. Using Implicit Rules - 10
+# 8. Using Implicit Rules
 
 
 You can define your own implicit rules by writing `pattern rules`.    
@@ -639,9 +639,11 @@ automatic variable 仅仅只在 recipe 里有效, 让 prerequisite list 里也�
 
 
 对于存在的一个段 `all: library.cpp main.cpp`  
-* `$@` : 本段的`target`  即 `all`, 对于具有多个目标的 pattern rule, `$@` 也是根据 rule 来确定要运行对应 recipe 时候的 target
-* `$<` : `library.cpp`   即第一个 prerequisite, 即使 prerequisite 是根据 implicit 来自动添加的, 也是指的是第一个 
-* `$^` : library.cpp 和 main.cpp  即**所有的** dependencies
+* `$@`          : 本段的`target`  即 `all`, 对于具有多个目标的 pattern rule, `$@` 也是根据 rule 来确定要运行对应 recipe 时候的 target
+* `$<`          : `library.cpp`   即第一个 prerequisite, 即使 prerequisite 是根据 implicit 来自动添加的, 也是指的是第一个 
+* `$^`          : library.cpp 和 main.cpp  即**所有的** dependencies
+* `$?`          : 本次执行中 比 target 新的所有 `prerequisites`, 如果 target 不存在, 则认为所有的 prerequisites 都是新的. 该变量在用于更新 archive lib 的时候很有用
+* `$*`          : 
 
 我们的 dependencies 中的内容, 往往和 g++ 命令中的内容重复,例如: 
 ```makefile
@@ -652,3 +654,9 @@ hello: main.o function1.o function2.o
 hello: main.o function1.o function2.o
         $(CC) $(LFLAGS) $^ -o $@        
 ```
+
+
+# Using make to Update Archive Files
+
+使用 make 来对 archive 进行自动化更新
+

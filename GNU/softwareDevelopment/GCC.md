@@ -1,14 +1,20 @@
-- [1. gcc](#1-gcc)
+- [1. GCC, the GNU Compiler Collection](#1-gcc-the-gnu-compiler-collection)
 - [2. 编译](#2-编译)
-  - [2.1. 分步编译](#21-分步编译)
-  - [2.2. -std 标准选择](#22--std-标准选择)
-  - [2.3. 链接](#23-链接)
-    - [2.3.1. 标准库的链接](#231-标准库的链接)
-    - [2.3.2. 自己的链接库](#232-自己的链接库)
-    - [2.3.3. 动态链接库的显式调用](#233-动态链接库的显式调用)
-    - [2.3.4. 解决找不到库的问题](#234-解决找不到库的问题)
+  - [2.1. -std 标准选择](#21--std-标准选择)
+  - [2.2. 链接](#22-链接)
+    - [2.2.1. 标准库的链接](#221-标准库的链接)
+    - [2.2.2. 自己的链接库](#222-自己的链接库)
+    - [2.2.3. 动态链接库的显式调用](#223-动态链接库的显式调用)
+    - [2.2.4. 解决找不到库的问题](#224-解决找不到库的问题)
+- [3. GCC Command Options](#3-gcc-command-options)
+  - [3.1. Options Controlling the Kind of Output](#31-options-controlling-the-kind-of-output)
+  - [3.2. Compiling C++ Programs](#32-compiling-c-programs)
+  - [3.3. Options Controlling C Dialect](#33-options-controlling-c-dialect)
+  - [3.4. Options Controlling C++ Dialect](#34-options-controlling-c-dialect)
+  - [3.5. Options to Control Diagnostic Messages Formatting](#35-options-to-control-diagnostic-messages-formatting)
+  - [Options to Request or Suppress Warnings](#options-to-request-or-suppress-warnings)
 
-# 1. gcc
+# 1. GCC, the GNU Compiler Collection
 
 GCC 全名: GNU C Complier, 即在 GNU 计划中诞生的 C 语言编译器.
 * 早期的 GCC 确实只用于编译 C 代码, 但是随着版本更替, 现在的 GCC 已经能支持 C++, GO, Objective-C 等多语言
@@ -54,57 +60,9 @@ $ gcc -xc++ -lstdc++ -shared-libgcc HelloWorld.cpp -o a.out # 使用gcc需要加
 通常情况下, 可以选择单命令编译和分步编译, 单命令用于快速编译单个简短程序, 分步编译一般用于 makefile 的书写中, 用于大型程序节省编译时间
 
 
-## 2.1. 分步编译
-
-事实上，从源代码生成可执行文件可以分为四个步骤，分别是预处理(Preprocessing), 编译(Compilation), 汇编(Assembly)和链接(Linking)  
-* 较后的步骤指令会自动执行前面的步骤
-
-1. 预处理  `-E`
-   * `g++ -E demo.cpp -o demo.i`  
-   * 必须使用 -o 选项将该结果输出到指定的 demo.i 文件  
-   * Linux 系统中，通常用 ".i" 或者 ".ii" 作为 C++ 程序预处理后所得文件的后缀名  
-2. 编译 `-S`   编译阶段针对的将不再是 demo.cpp 源文件，而是 demo.i 预处理文件  
-   * `g++ -S demo.i`  
-   *  生成对应的`.s`文件, Linux 发行版通常以 ".s" 作为其后缀名  
-   *  和预处理阶段不同，即便这里不使用 -o 选项，编译结果也会输出到和预处理文件同名(后缀名改为 .s)的新建文件中  
-3. 汇编  `-c`  
-   * 通过给 g++ 指令添加 -c 选项，即可令 GCC 编译器仅对指定的汇编代码文件做汇编操  
-   * ` g++ -c demo.s`  
-   * 默认情况下汇编操作会自动生成一个和汇编代码文件名称相同, 后缀名为 `.o` 的二进制文件(又称为目标文件)
-4. 链接  
-   * 完成链接操作，并不需要给 g++ 添加任何选项  
-   * 可以指定 `-o` 来指定输出的二进制可执行文件的名称, 一般 linux 下可执行文件的后缀都是 `.out`
-
-对于 GCC 的自动文件类型识别来说, 每个编译步骤的文件后缀都不同, 即使是手动, 也尽量遵循该识别规则.  
-
-下表仅仅列出了与 C/CPP 语言相关的 GCC 类型识别规则, 对于其他语言还有别的规则
-| 拓展名                   | GCC的识别                |
-| ------------------------ | ------------------------ |
-| c                        | C源代码                  |
-| cpp cp cc cxx CPP c++ C  | C++源代码                |
-| i                        | 预处理, 未编译的C代码    |
-| ii                       | 预处理后的 C++代码       |
-| s                        | 编译后生成的汇编代码     |
-| h                        | c,c++ 的头文件           |
-| hpp h++ HPP hh H hxx tcc | C++ 头文件               |
-| o                        | 编译后的目标文件(未链接) |
 
 
-```shell
-# 只编译 不链接
-gcc -c hello.cpp 
-
-# 链接或者直接编译出二进制
-gcc hello.cpp
-
-# 指定输出文件
-gcc -o hello hello.cpp
-
-# 严格编译 , 输出信息多
-gcc hello.c -Wall
-```
-
-## 2.2. -std 标准选择
+## 2.1. -std 标准选择
 
 不同版本的 GCC 编译器，**默认使用**的标准版本也不尽相同。  
 
@@ -138,13 +96,13 @@ gcc hello.c -Wall
 | -std=gnu++1z              | C++17和GNU扩展 |
 
 
-## 2.3. 链接
+## 2.2. 链接
 
 将多个库文件链接起来
 * 对于静态库 : Linux 中用 `.a` 表示, Windows 中为 `.lib`
 * 对于动态库 : Linux 中为 `.so`, Windows 为 `.dll`
 
-### 2.3.1. 标准库的链接
+### 2.2.1. 标准库的链接
 
 标准库的大部分函数通常放在文件 `libc.a`  中(文件名后缀.a代表“achieve”，译为“获取”)   
 或者放在用于共享的动态链接文件 `libc.so` 中(文件名后缀.so代表“share object”，译为“共享对象”)  
@@ -182,7 +140,7 @@ gcc hello.c -lm -L /usr/lib -I /usr/include
 
 
 
-### 2.3.2. 自己的链接库
+### 2.2.2. 自己的链接库
 
 当把程序链接到一个`链接库`时，只会链接程序所用到的函数的目标文件。在已编译的目标文件之外，如果创建自己的链接库，可以使用 ar 命令。
 
@@ -238,7 +196,7 @@ gcc hello.c -lm -L /usr/lib -I /usr/include
      `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:xx` 
      保存之后，执行source .bashrc指令(此方式仅对当前登陆用户有效)。
 
-### 2.3.3. 动态链接库的显式调用
+### 2.2.3. 动态链接库的显式调用
 
 动态链接库的调用方式有 2 种，分别是：
 * 隐式调用(静态调用)：将动态链接库和其它源程序文件(或者目标文件)一起参与链接
@@ -256,7 +214,7 @@ gcc hello.c -lm -L /usr/lib -I /usr/include
 这里需要添加 -ldl 选项(使用了 dlfcn.h后 , 该可执行程序需要 libdl.so 动态库的支持)
 `gcc main.c -ldl -o main.exe`  
 
-### 2.3.4. 解决找不到库的问题
+### 2.2.4. 解决找不到库的问题
 
 1. 链接时 
    假设当前 mian.c 文件需要借助 libmymath.a 才能完成链接，则完成链接操作的 gcc 指令有以下 2 种写法
@@ -285,5 +243,103 @@ gcc hello.c -lm -L /usr/lib -I /usr/include
    * 将动态库文件的存储路径，添加到 LD_LIBRARY_PATH 环境变量中。假设动态库文件存储在 /usr 目录中，通知执行export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr指令，即可实现此目的(此方式仅在当前命令行窗口中有效)；
    * 修改动态库文件的存储路径，即将其移动至 GCC 编译器默认的搜索路径中。
    * 修改~/.bashrc 或 ~/.bash_profile 文件，即在文件最后一行添加export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:xxx(xxx 为动态库文件的绝对存储路径)。保存之后，执行 source .bashrc 指令(此方式仅对当前登陆用户有效)。
+
+
+# 3. GCC Command Options
+
+<!-- 头部完 -->
+大部分的 GCC 命令选项都会明确的表明适用的语言, 如果没有标注, 说明适用于所有GCC 支持语言.
+
+GCC 的命令众多, 因此不要把多个命令参数打包, 例如不要把 `-d -v` 打包成 `-dv`, 会是完全不同的意思  
+
+以 `-f` 和 `-W` 开头的命令有超级多, 并且大部分都有正负两种模式, 在文档中列出的都是 非默认模式 的那一边
+* 例如 `-ffoo` 的 negative form 就是 `-fno-foo`
+* `-W` 的 negative form 是 `-Wno-`
+
+还有一些参数支持数字输入, 因此对于数字的有一些要求
+* 必须是正数 unsigned
+* 16进制的数字需要以 `0x` 开头
+* 对于指定数据大小的参数, 可以可选的添加后缀 `kB KiB MB MiB GB GiB` etc
+
+## 3.1. Options Controlling the Kind of Output
+
+GCC 的工作主要包括 预处理, 编译, 汇编,链接. `overall options` 可以指定这整个流程, 使得 gcc 只进行一部分的工作. 
+
+
+从源代码生成可执行文件可以分为四个步骤，分别是预处理(Preprocessing), 编译(Compilation), 汇编(Assembly)和链接(Linking)  
+* 较后的步骤指令会自动执行前面的步骤
+
+1. 预处理  `-E`
+   * `g++ -E demo.cpp -o demo.i`  
+   * 必须使用 -o 选项将该结果输出到指定的 demo.i 文件  
+   * Linux 系统中，通常用 ".i" 或者 ".ii" 作为 C++ 程序预处理后所得文件的后缀名  
+2. 编译 `-S`   编译阶段针对的将不再是 demo.cpp 源文件，而是 demo.i 预处理文件  
+   * `g++ -S demo.i`  
+   *  生成对应的`.s`文件, Linux 发行版通常以 ".s" 作为其后缀名  
+   *  和预处理阶段不同，即便这里不使用 -o 选项，编译结果也会输出到和预处理文件同名(后缀名改为 .s)的新建文件中  
+3. 汇编  `-c`  
+   * 通过给 g++ 指令添加 -c 选项，即可令 GCC 编译器仅对指定的汇编代码文件做汇编操  
+   * ` g++ -c demo.s`  
+   * 默认情况下汇编操作会自动生成一个和汇编代码文件名称相同, 后缀名为 `.o` 的二进制文件(又称为目标文件)
+4. 链接  
+   * 完成链接操作，并不需要给 g++ 添加任何选项  
+   * 可以指定 `-o` 来指定输出的二进制可执行文件的名称, 一般 linux 下可执行文件的后缀都是 `.out`
+
+对于 GCC 的自动文件类型识别来说, 每个编译步骤的文件后缀都不同, 即使是手动, 也尽量遵循该识别规则.  
+
+下表仅仅列出了与 C/CPP 语言相关的 GCC 类型识别规则, 对于其他语言还有别的规则
+| 拓展名                   | GCC的识别                |
+| ------------------------ | ------------------------ |
+| c                        | C源代码                  |
+| cpp cp cc cxx CPP c++ C  | C++源代码                |
+| i                        | 预处理, 未编译的C代码    |
+| ii                       | 预处理后的 C++代码       |
+| s                        | 编译后生成的汇编代码     |
+| h                        | c,c++ 的头文件           |
+| hpp h++ HPP hh H hxx tcc | C++ 头文件               |
+| o                        | 编译后的目标文件(未链接) |
+
+
+```shell
+# 只编译 不链接
+gcc -c hello.cpp 
+
+# 链接或者直接编译出二进制
+gcc hello.cpp
+
+# 指定输出文件
+gcc -o hello hello.cpp
+
+# 严格编译 , 输出信息多
+gcc hello.c -Wall
+```
+
+## 3.2. Compiling C++ Programs
+
+When you compile C++ programs, you should invoke GCC as `g++` instead.
+
+## 3.3. Options Controlling C Dialect
+
+
+## 3.4. Options Controlling C++ Dialect
+
+## 3.5. Options to Control Diagnostic Messages Formatting
+
+用于去控制诊断信息的格式. 传统上, 诊断信息的格式与显示输出设备的方面无关.   
+可以通过 `-f` 命令来控制诊断信息的格式信息, 例如每行多少个字符.  多久报告一次源代码位置信息, 某些语言可能不支持一些选项.  
+
+## Options to Request or Suppress Warnings
+
+Warnings 属于诊断信息, 指明出来的警告在构造的本质上不是错误的, 但是存在风险, 或者可能存在错误. 
+
+独立于语言的 warnging 命令选项不会启动特定的选项, 而是会控制 GCC 生成的诊断类型.
+
+
+| 命令      | 功能                    | 语言 |
+| --------- | ----------------------- | ---- |
+| `-w`      | 禁止所有警告信息        |
+| `-Werror` | 让所有的警告变成 errors |
+`-Werror`|让指定的 warning 变成 error
+
 
 
