@@ -34,6 +34,7 @@
     - [5.7.2. C++的 const](#572-c的-const)
     - [5.7.3. 类的 const 函数](#573-类的-const-函数)
     - [5.7.4. const 对象](#574-const-对象)
+  - [5.8. Inheritance 类的继承](#58-inheritance-类的继承)
 - [6. Templates 模板](#6-templates-模板)
   - [6.1. full (explicit) specializations](#61-full-explicit-specializations)
   - [6.2. partial specializations](#62-partial-specializations)
@@ -51,6 +52,10 @@ C++11
 * C++11 标准对 C++ 语言增添了约 140 个新特性
 * 是C++第二个主要版本 (上一个是 C++98, 后一个是C++17)
 * 从C++03到C++11花了8年, 而从那之后C++开始维持3年一更新的频率
+
+该文档着重记录 C++ reference 中 Language 的部分 
+
+https://en.cppreference.com/w/cpp/language
 
 
 ## 1.1. 程序参数配置
@@ -347,9 +352,11 @@ eXpiring value 的表达式:
 
 # 5. Classes 类
 
-A class is a user-defined type. 
+https://en.cppreference.com/w/cpp/language/classes 
 
+A class is a user-defined type. 
 A class type is defined by class-specifier, which appears in `decl-specifier-seq` of the declaration syntax.
+
 
 
 ## 5.1. 初始化列表
@@ -731,6 +738,36 @@ float getscore() const;
 const  class  object(params);
 class const object(params);
 ```
+
+## 5.8. Inheritance 类的继承
+
+由一个类继承而来的类被称为 派生类 derived class
+
+```cpp
+attr class-or-decltype
+// 1 Specifies a non-virtual inheritance with default member accessibility.
+
+attr virtual class-or-decltype 	
+// 2 Specifies a virtual inheritance with default member accessibility.
+
+attr access-specifier class-or-decltype 	
+// 3 Specifies a non-virtual inheritance with given member accessibility.
+
+attr virtual access-specifier class-or-decltype 	
+// 4 Specifies a virtual inheritance with given member accessibility.
+
+attr access-specifier virtual class-or-decltype 	
+// 5 Same as 4), virtual and access-specifier can appear in any order.
+```
+
+* attr (C++11)          : C++11 的 attributes 特性
+* `access-specifier`    : 访问指示符, 即  	one of private, public, or protected
+* `class-or-decltype`   : 具体的 类 的名称, 可以是
+  *  nested-name-specifier(optional) type-name 
+  *  nested-name-specifier template simple-template-id 
+  *  decltype-specifier (since C++11)
+  *  TODO : An `elaborated type specifier` cannot directly appear as class-or-decltype due to syntax limitations. 
+
 
 # 6. Templates 模板
 

@@ -25,4 +25,11 @@ OpenVINO支持主流的深度学习框架
   * OpenVINO Model Server : 模型服务工具, 类似于 TensorFlow Serving
   * Samples: 示例程序
   * DL Workbench : OpenVINO 的可视化工作台, 用于模型管理, 训练后量化, 可视化网络结构等
-* 
+
+
+# Neural Network Compression Framework (NNCF)
+
+NNCF provides a suite of advanced algorithms for Neural Networks inference optimization in OpenVINO™ with minimal accuracy drop.
+
+NNCF is designed to work with models from PyTorch, TensorFlow, ONNX and OpenVINO™.
+

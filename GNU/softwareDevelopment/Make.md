@@ -361,7 +361,9 @@ clean:
 ```
 而在 rm 命令前面加了一个小减号的意思就是, 也许某些文件出现问题, 但不要管, 继续做后面的事  
 
-# 6. How to Use Variables
+# 6. Writing Recipes in Rules
+
+# 7. How to Use Variables
 
 <!-- (头部完) -->
 makefile 的 variable 是一些被定义为 name 的 string or text, 这些 varable 的值可以替换在任何部分 (target, prerequisites, recipes, etc.)
@@ -376,7 +378,7 @@ variables 的命令规则:
 
 单个特殊符号的变量有特殊用途 (automatic variables)
 
-## 6.1. Basics of Variable References
+## 7.1. Basics of Variable References
 <!-- 完 -->
 我们希望将需要反复输入的命令整合成变量, 用到它们时直接用对应的变量替代, 这样如果将来需要修改这些命令, 则直接修改变量的值即可
 
@@ -422,11 +424,11 @@ clean :
 在makefile中以 $(objects) 的方式来通过变量来管理目标文件   
 如果有新的 .o 文件加入, 简单地修改一下 objects 变量就可以了
 
-## 6.2. The Two Flavors of Variables
+## 7.2. The Two Flavors of Variables
 <!-- 头部完 -->
 对于不同的变量赋值方法, 在 GUN make 被称为 `flavors`, 不同的 flavor 会影响这些变量值在之后的  used and expanded.
 
-### 6.2.1. Recursively Expanded Variable Assignment - 递归扩张
+### 7.2.1. Recursively Expanded Variable Assignment - 递归扩张
 <!-- 完 -->
 `recursively expanded` flavor,  使用 `=` 单等号 或者 `define` 关键字 来赋值
 
@@ -448,7 +450,7 @@ CFLAGS = $(CFLAGS) -O
   * 无法进行变量的拓展
   * 会在每次调用的时候都对内部的变量进行拓展, 即如果是 wildcard 等函数, 不仅会导致重复的调用, 还会导致由于函数调用的时机不同导致的结果不同进而使得 makefile 的行动无法预测
 
-### 6.2.2. Simply Expanded Variable Assignment
+### 7.2.2. Simply Expanded Variable Assignment
 <!-- 完 -->
 主要用于避免 `recursively expanded` flavor 缺点的 另一种主流 flavor
 
@@ -464,11 +466,11 @@ y := $(x) bar  # y := foo bar
 x := later     # x := later
 ```
 
-### 6.2.3. Immediately Expanded Variable Assignment
+### 7.2.3. Immediately Expanded Variable Assignment
 
 TODO
 
-### 6.2.4. Conditional Variable Assignment
+### 7.2.4. Conditional Variable Assignment
 <!-- 完 -->
 条件赋值 `?=` , 这里的条件指的是 左侧的变量还没有定义 (即使变量赋予的是空值也仍然属于已定义的变量)  
 
@@ -481,11 +483,11 @@ ifeq ($(origin FOO), undefined)
 endif
 ```
 
-## 6.3. Advanced Features for Reference to Variables
+## 7.3. Advanced Features for Reference to Variables
 
 使用变量的更高级的技巧  
 
-### 6.3.1. Substitution References
+### 7.3.1. Substitution References
 
 替换引用:  `$(var:a=b)`  or `${var:a=b}`
 
@@ -509,21 +511,21 @@ bar := $(foo:%.o=%.c) # bar = a.c b.c l.a c.c
 ```
 
 
-## 6.4. Setting Variables 设置变量
+## 7.4. Setting Variables 设置变量
 
 To set a variable from the makefile, write a line starting with the variable name followed by one of the assignment operators` ‘=’, ‘:=’, ‘::=’, or ‘:::=’`.  
 Whitespace around the variable name and immediately after the ‘=’ is ignored.   
 对于代码 `objects = main.o foo.o bar.o utils.o`, 则具体的值则是 `main.o foo.o bar.o utils.o`
 
 
-# 7. Functions for Transforming Text
+# 8. Functions for Transforming Text
 
 make 本身提供了可以用于 makefile 里的许多函数, 这些函数大部分都是用来处理 字符串的, 即用于处理各种文件名或者路径  
 
 同时, 用户也可以自定义各种函数  
 
 
-## 7.1. Function Call Syntax
+## 8.1. Function Call Syntax
 
 函数的调用和 变量的使用类似, 但是因为函数有参数, 所以实际的写法 为`函数名 参数` 被圆括号或者大括号括起   
 
@@ -541,7 +543,7 @@ ${function arguments}
   * 不匹配的括号
 
 
-## 7.2. Functions for String Substitution and Analysis
+## 8.2. Functions for String Substitution and Analysis
 
 主要用于字符串处理的一些函数  
 
@@ -551,19 +553,19 @@ ${function arguments}
 
 
 
-### 7.2.1. 字符串替换
+### 8.2.1. 字符串替换
 
 * `$(subst from,to,text)`
 * `$(patsubst pattern,replacement,text)`
   
 
-### 7.2.2. 字符串调整
+### 8.2.2. 字符串调整
 
 * `$(strip string)`
 * `$(findstring find,in)`
 * `$(filter pattern…,text)`
 
-### 7.2.3. 值列表调整
+### 8.2.3. 值列表调整
 
 * `$(sort list)`
 * `$(word n,text)`
@@ -571,7 +573,7 @@ ${function arguments}
 * `$(lastword names…)`
 
 
-## 7.3. Functions for File Names
+## 8.3. Functions for File Names
 <!-- 完 -->
 
 专门用于针对文件的路径进行处理的函数, 包括分离文件名的各个部分等  
@@ -602,19 +604,24 @@ ${function arguments}
 * `$(join a b,.c .o)`           `a.c b.o`
 
 
-路径转换:
+文件检索: 
 * `$(wildcard pattern)`                  : 通配符手动调用函数
+
+路径转换:
 * `$(realpath names…)`                   : 路径转换, 包括转换链接, 消除 `../`, 消除重复的 `/`, 验证路径是否存在, 如果转换失败则返回空字符串
 * `$(abspath names…)`                    : 有些类似于 realpath, 但不进行验证存在, 同时不进行链接转换  
 
-# 8. Using Implicit Rules
+# 9. Run make - make CLI
+
+
+# 10. Using Implicit Rules
 
 
 You can define your own implicit rules by writing `pattern rules`.    
 `Suffix rules` are a more limited way to define implicit rules.  
 `Pattern rules` are more general and clearer, but suffix rules are retained for compatibility. 
 
-## 8.1. Defining and Redefining Pattern Rules
+## 10.1. Defining and Redefining Pattern Rules
 
 通过定义 Pattern rule 可以实现对 implicit rule 进行定义或重定义  
 
@@ -622,7 +629,7 @@ Pattern rule: 从形式上和 ordinary rule 没有区别, 但是包含了 `%` �
 
 Pattern rule 的 `%` 扩展发生在 变量替换和 函数执行 之后
 
-### 8.1.1. Introduction to Pattern Rules
+### 10.1.1. Introduction to Pattern Rules
 
 一个 rule 被称为 pattern rule 是因为它的 target 里包含一个 `%`, 可以匹配任何 nonempty substring, 被 match 的部分被叫做 `stem`  
 A pattern rule contains the character ‘%’ (exactly one of them) in the target
@@ -631,7 +638,7 @@ A pattern rule contains the character ‘%’ (exactly one of them) in the targe
 `%` 的匹配替换是以 target 为主的, 即 `%` 也可以出现在 prerequisite 里, 但是 stem 的值是依据 target 的
 
 
-### 8.1.2. Automatic Variables
+### 10.1.2. Automatic Variables
 
 让 makefile 变成天书的罪魁祸首, `automatic variables` 根据每一项 rule 来重新计算该 variable 的值  
 
@@ -656,7 +663,7 @@ hello: main.o function1.o function2.o
 ```
 
 
-# Using make to Update Archive Files
+# 11. Using make to Update Archive Files
 
 使用 make 来对 archive 进行自动化更新
 

@@ -8,7 +8,7 @@
 
 其中的很多软件都使用了 `BFD, the Binary File Descriptor library`
 
-整个 Binutils 被分成了多个部分, 就连文档也是分开的
+整个 Binutils 被分成了多个部分, 就连文档也是分开的, 但是所有组件的版本都是统一的, 即 `GNU Binutils` 的版本
 * Assembler (gas) 
 * BFD Library (libbfd) 
 * Binary Tools (binutils) 
@@ -70,3 +70,32 @@ ar -M [ <mri-script ]
 
 * `c`       : `create`, 会指定创建 archive 当这个 archive 不存在的时候. 如果不指定该 mod, 则 archive 不存在的时候 ar 会发出警告
 * `s`       : 更新或者重建 一个 archive 的 `object-file index`, 即使 archive 没有发生任何改变. 可以不需要任何 operation 独立的运行 `ar s`, 这种情况下和另一个程序 `ranlib` 的功能相同
+
+
+# 3. GNU linker ld
+
+GNU linker ld (GNU Binutils) version 2.40. 
+
+ld 用于组合多个目标文件和 archive 文件, 重新定位它们的数据并绑定符号引用, 通常一个编译的最后一步过程就是 ld
+
+ld 接受链接器注释语言 (Linker Command Language) files written in a superset of AT&T’s Link Editor Command Language syntax, 用于提供精细的以及完全的链接过程控制  
+
+
+
+# 4. GNU gprof
+
+Profiling a Program: Where Does It Spend Its Time?
+
+gprof 由 Jay Fenlason 书写, 可以:
+* 测定程序的哪一个部分最为消耗时间
+* 测定某一个函数被调用了多少次
+
+
+gprof 的使用方法包括:
+* You must compile and link your program with profiling enabled.
+  * 在编译和链接的时候加入 `-pg` 编译器参数
+  * 如果使用 ld 来进行链接而非编译器的化, 需要指定 `gcrt0.o` as the first input file instead of the usual startup file `crt0.o`, 同时需要将 C library 的库文件由 `libc.a` 替换为 `libc_p.a`, 用于提供对标准库函数的调用次数统计支持
+* You must execute your program to generate a profile data file. 
+* You must run gprof to analyze the profile data. 
+
+

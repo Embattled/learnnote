@@ -13,6 +13,8 @@
   - [3.4. Options Controlling C++ Dialect](#34-options-controlling-c-dialect)
   - [3.5. Options to Control Diagnostic Messages Formatting](#35-options-to-control-diagnostic-messages-formatting)
   - [Options to Request or Suppress Warnings](#options-to-request-or-suppress-warnings)
+    - [语言独立 warning](#语言独立-warning)
+    - [warning 类型](#warning-类型)
 
 # 1. GCC, the GNU Compiler Collection
 
@@ -265,6 +267,8 @@ GCC 的命令众多, 因此不要把多个命令参数打包, 例如不要把 `-
 
 GCC 的工作主要包括 预处理, 编译, 汇编,链接. `overall options` 可以指定这整个流程, 使得 gcc 只进行一部分的工作. 
 
+`--version` : Display the version number and copyrights of the invoked GCC
+
 
 从源代码生成可执行文件可以分为四个步骤，分别是预处理(Preprocessing), 编译(Compilation), 汇编(Assembly)和链接(Linking)  
 * 较后的步骤指令会自动执行前面的步骤
@@ -332,14 +336,19 @@ When you compile C++ programs, you should invoke GCC as `g++` instead.
 
 Warnings 属于诊断信息, 指明出来的警告在构造的本质上不是错误的, 但是存在风险, 或者可能存在错误. 
 
-独立于语言的 warnging 命令选项不会启动特定的选项, 而是会控制 GCC 生成的诊断类型.
 
+### 语言独立 warning
 
-| 命令      | 功能                    | 语言 |
-| --------- | ----------------------- | ---- |
-| `-w`      | 禁止所有警告信息        |
-| `-Werror` | 让所有的警告变成 errors |
-`-Werror`|让指定的 warning 变成 error
+以下独立于语言的 warnging 命令选项不会启动特定的选项, 而是会控制 GCC 生成的诊断类型.
 
+| 命令             | 功能                                                           |
+| ---------------- | -------------------------------------------------------------- |
+| `-fsyntax-only`  | 检查代码的语法错误, 除此之外不做任何事                         |
+| `fmax-errors=n`  | 错误消息的最大数量为 n,超过n则编译器退出, 默认为 0 即不做限制. |
+| `-Wfatal-errors` | 编译器出现第一个错误立马停止编译, 优先级高于 `fmax-errors=n`   |
+| `-w`             | 禁止所有警告信息                                               |
+| `-Werror`        | 让所有的警告变成 errors                                        |
+| `-Werror=`       | 让指定的 warning 变成 error, 同时会隐式的启动对应的警告        |
 
+### warning 类型
 

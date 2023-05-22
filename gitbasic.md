@@ -355,34 +355,6 @@ $ git commit --amend
    * `git rebase --continue | --abort | --skip | --edit-todo`
    * `git rebase -i` 交互式进行 rebash
 
-## 4.2. submodule 
-
-主要用于在项目庞大的时候进行模块文件抽离, 抽离出来的文件可以单独成为一个 git repo
-
-开发流程:
-* 不管主项目中的是否有更新, 只要子项目中修改过代码并提交过, 主项目就需要再提交一次
-* 1. 进入到子项目中对本次更新的代码进行一次提交操作, 并推送到远程
-* 2. 退到主项目中, 对主项目进行一次提交并推送
-
-
-
-* `git submodule` : 
-  * 配置 submodule 后:
-    * 会在项目根目录下新建可见 `.gitmodules` 文件用于管理子仓库
-    * 同时在不可见的 git 内部配置文件 `.git/config` 中添加了响应的配置
-  * `(空)`  : 打印当前仓库的 submodule 信息
-  * `add [options] <仓库地址> [<path>]`   : 给当前仓库添加 submodule
-    * `[<path>]` : 指定该 submodule 在当前 repo 的相对路径
-  * `status`  : 打印 submodule 的版本信息
-    * 对于主仓库来说, git submodule 是以 分支:版本 为基础管理的, 即 子仓库的内容会维持同一个分支的同一个版本不变
-    * 若需要更新子仓库的内容, 需要进入子仓库进行 `git switch`, 这个switch也需要在主仓库里进行一次 commit 
-    * Git认为移动submodule的指针和其他变化一样: 如果我们保存这个改动, 就必须提交到仓库里
-  * `init` : Initialize the submodules recorded in the index, 将对应的 submodule URL 写入本地 .git/config
-  * `update`
-    * `git submodule update --init --recursive` : 懒人命令, 直接完成初始化和下载最新版本
-    * 更新模式 `[--checkout|--rebase|--merge]`
-
-
 # 5. Branching and Merging 分支管理
 
 `man git` 的 分支相关的命令说明
@@ -407,7 +379,7 @@ $ git commit --amend
 - 在此之下才是各个团队工作人员自己的分支
 - 开发一个新的feature,最好新建一个分支  
 
-## branch - List, create, or delete branches
+## 5.1. branch - List, create, or delete branches
 
 ```sh
 git branch [--color[=<when>] | --no-color] [--show-current]
@@ -455,7 +427,7 @@ git branch --edit-description [<branchname>]
  * 链接的唯一好处就是简化之后的 pull 命令
  * `git branch --set-upstream-to dev origin/dev`  
 
-## checkout - Switch branches or restore working tree files
+## 5.2. checkout - Switch branches or restore working tree files
 
 ```sh
 git checkout [-q] [-f] [-m] [<branch>]
@@ -470,7 +442,7 @@ git checkout [-f|--ours|--theirs|-m|--conflict=<style>] [<tree-ish>] --pathspec-
 git checkout (-p|--patch) [<tree-ish>] [--] [<pathspec>…​]
 ```
 
-## 5.1. 分支的团队命名
+## 5.3. 分支的团队命名
 
 同 commit message 一样, 合理的命令可以增加团队配合  
 `type/module/snake_case_short_summary`  
@@ -483,7 +455,7 @@ git checkout (-p|--patch) [<tree-ish>] [--] [<pathspec>…​]
   * 用下划线连接多个小写单词
   * 如果对应的是一个 issue, 则直接写成 issue 编号也行
 
-## 5.2. 分支的基础操作
+## 5.4. 分支的基础操作
 
 
 
@@ -495,7 +467,7 @@ git checkout (-p|--patch) [<tree-ish>] [--] [<pathspec>…​]
    * `git switch -c dev` 创建并切换, 省去 `branch` 命令, 同理 `-C` 也是覆盖的创建
 
 
-## 5.3. 分支合并
+## 5.5. 分支合并
 
 
 1. `merge` 合并一个分支
@@ -517,7 +489,7 @@ git checkout (-p|--patch) [<tree-ish>] [--] [<pathspec>…​]
 Git用<kbd><<<<<<<</kbd>, <kbd>=======</kbd>, <kbd>>>>>>>></kbd>标记出不同分支的内容
 
 
-## 5.4. 分支管理策略
+## 5.6. 分支管理策略
 
 通常合并分支时,git会在可能的时候使用`Fast forward`模式,这种模式的缺点就是删除分支后就会丢失分支的信息
 
@@ -526,7 +498,7 @@ Git用<kbd><<<<<<<</kbd>, <kbd>=======</kbd>, <kbd>>>>>>>></kbd>标记出不同�
 `git merge --no-ff -m "merge with no-ff" dev`
 
 
-### 5.4.1. Bug处理
+### 5.6.1. Bug处理
 
 对于一个已经存在于所有分支的bug,git提供了一个`cherry-pick`,能够将一个特定的分支复制到当前分支  
 `git switch dev`
@@ -566,7 +538,7 @@ tag是git版本库的一个标记, 指向某个 commit
     submodule
     subtree (貌似非官方)
 
-## fetch 
+## 7.1. fetch 
 
 git-fetch - Download objects and refs from another repository  
 
@@ -581,32 +553,16 @@ git fetch --all [<options>]
 
 
 
-## 7.1. submodule 子模块
+## 7.2. submodule 子模块
 
-submodule: 子模块 Mounting one repository inside another
-* 将一个版本库作为子库引入到另一个版本库中
-  * 子库 submodule 有自己的历史
-  * 嵌入子库的库成为 superproject
-* 如果要克隆完整仓库, 
-  * 直接默认的 clone 父仓库的时候, 所有子仓库都只有一个空文件夹  
-  * 需要额外的步骤对子库进行 `init` 和 `update`
-  * `git submodule init`
-  * `git submodule update --recursive`
-* 通过 `.gitmodules` 来进行文件记录和 submodule 的版本信息
-* 如果要删除一个 submodule, 步骤比较繁琐, 没有专用的命令
-  * 需要删除对应子模块的文件夹
-  * 从 `.gitmodules` 中删除对应的项
-  * 提交以上两个改动
-* 子父仓库的代码没有双向关联
-  * 不能在 父版本库中 修改子版本库的代码, 即子库的代码是单向传递给父库的 (某些时候可能是需要该特性的)
-  * 子仓库的代码的修改不会自动反映到父仓库里, 需要手动同步
 
-相关概念
-* `.gitmodules` `$GIT_DIR/config` 文件用于描述 子模块
-* `git submodule` 命令
-* `git <command> --recurse-submodules`  在进行仓库操作的时候, 可以递归操作所有子模块来简化操作
+主要用于在项目庞大的时候进行模块文件抽离, 抽离出来的文件可以单独成为一个 git repo
 
-命令构成:
+开发流程:
+* 不管主项目中的是否有更新, 只要子项目中修改过代码并提交过, 主项目就需要再提交一次
+* 1. 进入到子项目中对本次更新的代码进行一次提交操作, 并推送到远程
+* 2. 退到主项目中, 对主项目进行一次提交并推送
+
 ```sh
 git submodule [--quiet] [--cached]
 git submodule [--quiet] add [<options>] [--] <repository> [<path>]
@@ -625,9 +581,28 @@ git submodule [--quiet] absorbgitdirs [--] [<path>…​]
 -q, --quiet  : 安静执行, Only print error messages.
 ```
 
+* 配置 submodule 后:
+  * 会在项目根目录下新建可见 `.gitmodules` 文件用于管理子仓库
+  * 同时在不可见的 git 内部配置文件 `.git/config` 中添加了响应的配置
+* `(空)`  : 打印当前仓库的 submodule 信息
+
+相关概念
+* `.gitmodules` `$GIT_DIR/config` 文件用于描述 子模块
+* `git <command> --recurse-submodules`  在进行仓库操作的时候, 可以递归操作所有子模块来简化操作
+
+* 子父仓库的代码没有双向关联
+  * 不能在 父版本库中 修改子版本库的代码, 即子库的代码是单向传递给父库的 (某些时候可能是需要该特性的)
+  * 子仓库的代码的修改不会自动反映到父仓库里, 需要手动同步
 
 
-### 7.1.1. add 添加子库
+
+
+### 7.2.1. add 添加子模块
+
+`add [-b <branch>] [-f|--force] [--name <name>] [--reference <repository>] [--depth <depth>] [--] <repository> [<path>]`
+
+将给定的 repo 作为子模块添加到当前 repo
+
 
 `git submodule add git@地址 my_sub_module` 将地址对应的远程仓库作为子库, 保存到当前版本库的对应目录下, 通过 git status 查看父库的状态有:  
 * 对应的 创建/修改 `.gitmodules` 文件
@@ -639,19 +614,52 @@ git submodule [--quiet] absorbgitdirs [--] [<path>…​]
     path = 父库目录下子库的相对路径
     url  = 子库的远程url
 ```
-### 7.1.2. status 查看子库的信息
+
+
+### 7.2.2. 
+
+
+  * `init` : Initialize the submodules recorded in the index, 将对应的 submodule URL 写入本地 .git/config
+
+
+
+submodule: 子模块 Mounting one repository inside another
+* 将一个版本库作为子库引入到另一个版本库中
+  * 子库 submodule 有自己的历史
+  * 嵌入子库的库成为 superproject
+* 如果要克隆完整仓库, 
+  * 直接默认的 clone 父仓库的时候, 所有子仓库都只有一个空文件夹  
+  * 需要额外的步骤对子库进行 `init` 和 `update`
+  * `git submodule init`
+  * `git submodule update --recursive`
+* 通过 `.gitmodules` 来进行文件记录和 submodule 的版本信息
+* 如果要删除一个 submodule, 步骤比较繁琐, 没有专用的命令
+  * 需要删除对应子模块的文件夹
+  * 从 `.gitmodules` 中删除对应的项
+  * 提交以上两个改动
+
+
+
+
+
+### 7.2.3. status 查看子库的信息
 
 `status [--cached] [--recursive] [--] [<path>…​] `  
 
-打印所有子库的名字以及版本信息  
+打印所有子库的名字以及版本信息  .
 
-### 7.1.3. init 初始化子库
+* `status`  : 打印 submodule 的版本信息
+  * 对于主仓库来说, git submodule 是以 分支:版本 为基础管理的, 即 子仓库的内容会维持同一个分支的同一个版本不变
+  * 若需要更新子仓库的内容, 需要进入子仓库进行 `git switch`, 这个switch也需要在主仓库里进行一次 commit 
+  * Git认为移动submodule的指针和其他变化一样: 如果我们保存这个改动, 就必须提交到仓库里
+
+### 7.2.4. init 初始化子库
 
 `init [--] [<path>…​] `  
 
 将所有子库的目录初始化为 git 版本控制目录, 该命令也不会正式下载子库的代码, 具体的下载在 `update` 命令中, 该步骤可以通过 `update --init` 直接省略掉
 
-### 7.1.4. update 子库更新核心命令
+### 7.2.5. update 子库更新核心命令
 
 ```sh
 update [--init] [--remote] [-N|--no-fetch] [--[no-]recommend-shallow]
@@ -661,23 +669,31 @@ update [--init] [--remote] [-N|--no-fetch] [--[no-]recommend-shallow]
       [--] [<path>…​] 
 ```
 
-更新所有子模块, 包括
+更新所有登录的子模块, 使得满足 superproject 的期望, 其中包括
 * 克隆缺失的子模块
-* 获取子模块的新提交
+* fetching missing commits in submodules
 * 更新子模块的工作树 working tree
 
-该命令的无参默认动作可以通过配置文件中的 `submodule.<name>.update` 来指定, 否则执行真正软件层的默认操作  
+该命令的无参默认动作可以通过配置文件中的 `submodule.<name>.update` 来指定, 否则执行真正软件层的默认操作, 即 `checkout`. 
 
 
 参数说明
-* `[--init]` : 自动初始化子模块
 * `--checkout|--rebase|--merge]` 执行具体的怎么样的 update
-  * checkout : 默认操作
+  * checkout : git 的默认操作
+    * commit recorded in the superproject will be checked out in the submodule `on a detached HEAD`.
+    * 将子模块记录中的 commit checkout
+    * If --force is specified, 即使子模块中的 git commit log 与 superfroject 中的记录匹配, 也会重新执行 checkout
+  * rebase  : 子模块的 current branch, 会 rebase 到 superproject 记录的 commit
+  * merge   : 到 superproject 记录的 commit 会 merge 到子模块当前的 current branch 中
 
 
-### 7.1.5. foreach 遍历所有子库
 
-## 7.2. subtree 
+* `[--init]` : 自动初始化子模块
+
+
+### 7.2.6. foreach 遍历所有子库
+
+## 7.3. subtree 
 
 从1.5.2版本开始, 官方新增Git Subtree并推荐使用这个功能来替代Git Submodule管理仓库共用(子仓库, 子项目)  
 但是官方文档里没有 subtree 的介绍, 不知为何  
@@ -715,7 +731,7 @@ subtree 的不同:
 'git subtree' [<options>] -P <prefix> push <repository> <refspec>
 ```
 
-### 7.2.1. add 添加子库
+### 7.3.1. add 添加子库
 
 由于 subtree 的工作原理是基于分支的, 因此这里添加子库的方法还需要用到一些基础命令  
 1. 单纯添加子库的地址到 remote :    `git remote add subtree-origin git@子库链接` 
@@ -730,11 +746,11 @@ subtree 的不同:
      * 对于一个子库的使用, 需要在整个使用中保持 `--squash` 值的相同, 即要么永远不用, 要么永远用
      * `远程子库上的历史提交合并成一次提交` 会导致在之后不加 squash 的拉取中由于找不到公共父节点导致拉取失败
 
-### 7.2.2. pull 拉取更新
+### 7.3.2. pull 拉取更新
 
-### 7.2.3. push 
+### 7.3.3. push 
 
-### 7.2.4. split
+### 7.3.4. split
 
 subtree 的强大功能, 抽离子库: 开发的过程中发现某些功能可以剥离出来当作公用的子库的时候, 在保留该新子库的所有历史 log 的情况下, 生成一个新的库    
 `git subtree split --prefix=<prefix> [OPTIONS] [<commit>]`
