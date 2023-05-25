@@ -11,6 +11,7 @@
     - [3.1.1. 创建路径](#311-创建路径)
     - [3.1.2. PurePath 的运算符重载  /](#312-purepath-的运算符重载--)
     - [3.1.3. 提取路径成分](#313-提取路径成分)
+    - [变更路径成分](#变更路径成分)
   - [3.2. pathlib.Path - Concrete paths](#32-pathlibpath---concrete-paths)
     - [3.2.1. 创建路径](#321-创建路径)
     - [3.2.2. 获取文件信息](#322-获取文件信息)
@@ -256,6 +257,18 @@ path1 = Path('.') / 'folder1' / 'text1.txt'
 print([path1, path1.name, path1.stem, path1.suffix, path1.parent, path1.parent.parent, path1.anchor])
 # [PosixPath('folder1/text1.txt'), 'text1.txt', 'text1', '.txt', PosixPath('folder1'), PosixPath('.'), '']
 ```
+
+### 变更路径成分
+
+pathlib 还提供了函数可以便捷的更换某一个 Path 对象的某个成分
+
+* `PurePath.with_suffix(suffix)` : 更换路径的后缀为输入参数
+  * 如果原本就没有后置, 则会附加
+  * 如果参数的 `suffix` 为空字符串, 则会移除原有的后缀 (同时会删除 . 点号)
+  * 作为参数的 `suffix` 不为空的时候, 首字符必须是 点号, 但 suffix 不能只是一个点号
+  * 一次变更只会对最后一个后缀生效
+
+
 ## 3.2. pathlib.Path - Concrete paths
 
 * Path类是PurePath的子类, 因此继承的方法不多赘述

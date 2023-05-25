@@ -333,7 +333,7 @@ class argparse.ArgumentParser(
 ```py
 ArgumentParser.add_argument(
   name or flags...
-  [, action]
+  [, action]      # 动作
   [, nargs]       # 多个参数
   [, const]
   [, default]     # 默认值无需多解释
@@ -407,6 +407,44 @@ parser.add_argument('baz', nargs='*')
 parser.parse_args('a b --foo x y --bar 1 2'.split())
 Namespace(bar=['1', '2'], baz=['a', 'b'], foo=['x', 'y'])
 ```
+
+### 5.2.4. type
+
+参数的类型, 默认情况下 读取到的 CLI 参数都是作为 string 保存的, 然而某些情况下需要对 string 进行转换, 通过 type 可以便捷地对输入的值进行 转换和检查  
+
+* 注意: 如果 type 参数和 default 参数一起使用, 那么类型转换只会在输入的值为默认值的时候生效  
+* 可以调用的 type:  type 参数的输入可以是一个 callable, 即函数
+  * 定义一个函数, 该函数接受一个 string, 并进行自定义的处理
+  * 函数可以内建 ArgumentTypeError, TypeError, or ValueError, 这些 error 可以被正确的捕获并输出信息
+* 基本上常用的 build-in 类型或者函数 都可以作为 type
+* 对于复杂的类型, 例如 JSON 或者 YAML, 官方不推荐将内容的读取直接作为 callable type 来实现
+
+
+```py
+# 常用的 build-in 都可以作为 type, 
+parser.add_argument('count', type=int)
+parser.add_argument('distance', type=float)
+parser.add_argument('street', type=ascii)
+parser.add_argument('code_point', type=ord)
+parser.add_argument('source_file', type=open)
+
+# 官方不推荐这种 Type, 因为在其他参数不正确输入的情况下会导致文件没被正确的关闭
+parser.add_argument('dest_file', type=argparse.FileType('w', encoding='latin-1'))
+
+# 直接转化成 pathlib.Path
+parser.add_argument('datapath', type=pathlib.Path)
+
+
+# 自定义一个函数作为 type
+def hyphenated(string):
+    return '-'.join([word[:4] for word in string.casefold().split()])
+
+_ = parser.add_argument('short_title', type=hyphenated)
+parser.parse_args(['"The Tale of Two Cities"'])
+# Namespace(short_title='"the-tale-of-two-citi')
+```
+
+
 
 ## 5.3. 高级 args
 

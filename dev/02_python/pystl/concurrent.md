@@ -37,7 +37,7 @@ The appropriate choice of tool will depend on the:
 
 捕获输出
 * `capture_output=False`        : 捕获子进程的 stdout 和 stderr
-  * 捕获子进程的输出和 err, 如果该参数为真, 那么会屏蔽掉 `stdout` 和 `stdin` 的值
+  * 捕获子进程的输出和 err, 如果该参数为真, 那么会屏蔽掉 `stdout` 和 `stderr` 的值
   * 捕获到的输出可以通过该函数返回的类进行访问
   * 实际上进行的操作是 `Popen` object is automatically created with `stdout=PIPE` and `stderr=PIPE`
   * 如果要 capture and combine both streams into one, use `stdout=PIPE` and `stderr=STDOUT` instead of `capture_output`
@@ -54,7 +54,7 @@ The appropriate choice of tool will depend on the:
 * 如果进程的返回的值不为 0 , 则会触发异常 ` CalledProcessError`
 * 此时由于函数没有正常结束, 所以 exit code 可以从异常对象获取, 同理  stdout and stderr if they were captured.
 
-### CompletedProcess
+### 2.1.1. CompletedProcess
 
 <!-- 完 -->
 run 函数的返回值 `class subprocess.CompletedProcess` , 代表了一个子进程的结束, 可以从该类里获取一些信息  
@@ -66,7 +66,7 @@ run 函数的返回值 `class subprocess.CompletedProcess` , 代表了一个子�
 * stderr : 错误信息捕捉
 * `check_returncode()` : 主动查验并报错
 
-### Other Constant
+### 2.1.2. Other Constant
 <!-- over -->
 模组里的一些实用常量
 
@@ -134,7 +134,7 @@ umask=- 1, encoding=None, errors=None, text=None, pipesize=- 1, process_group=No
 
 
 
-## 2.4. Older high-level API
+## 2.3. Older high-level API
 
 由于 run 是3.5 才被加入的, 所以 older api 也很重要, 用来保持与旧版本的兼容性
 

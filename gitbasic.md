@@ -121,8 +121,18 @@ git clone [--template=<template-directory>]
 
 常用选项: 
 * `-b <name>, --branch <name>` 指定要克隆的分支
-  * 
-* `--recurse-submodules`  递归的克隆全部的 submodule, initialize and clone submodules within based on the provided pathspec.
+
+
+子模组:
+* `--recurse-submodules`  递归的克隆全部的 submodule, initialize and clone submodules .
+  * `--recurse-submodules[=<pathspec>]` : 指定具体的 submodules, 如果不指定的话会克隆所有的 submodules
+  * This option can be given multiple times for pathspecs consisting of multiple entries.
+  * 执行克隆的时候会该设置 repo 的 git 的配置  `submodule.active`
+    * set to the provided pathspec
+    * or `.` (meaning all submodules) if no pathspec is provided.
+  * 整个命令相当于一个 clone 后接了一个 `git submodule update --init --recursive <pathspec>`
+  * 如果克隆过程不产生 worktree 的话, 则该命令会被忽视, 即 (if any of `--no-checkout/-n`, `--bare`, or `--mirror` is given, 详情查看各自的说明)
+
 
 # 3. 离线操作
 
@@ -171,12 +181,6 @@ git clone [--template=<template-directory>]
 
 ## 3.3. 文件更改 未commit下的
 
-1. `add` 命令用来添加新文件或者对文件的新修改到暂存区
-   * `git add readme.txt`  单独提交一个文件  
-   * `git add .` 会监控工作区的状态树, 提交文件修改(modified), 以及新文件(new), 但不包括被删除的文件
-   * `git add -u[pdate] ` 仅监控已经被add的文件(tracked file) 他会将被修改的文件提交到暂存区, 不会提交新文件 (untracked file), 提交被修改(modified)和被删除(deleted)文件, 不包括新文件(new)
-   * `add .` 和 `add -u` 有着微妙的区别, 在于对新文件和删除文件的态度上
-   * `git add -A[ll] ` 是上面两个功能的合集 (提交所有变化)
 
 2. `rm` 用于 git 追踪的删除文件
    * `git rm readme.txt`   用来添加一个删除文件的修改到暂存区
@@ -197,15 +201,6 @@ git clone [--template=<template-directory>]
       *  输入两个 commit 则是参数 commit 之间的比较
       *  `--path` 用来指定文件进行改动查看
 
-6. `stash` 现场保存, 用于非 commit 下的工作进度保存
-   * `git stash [push]` : 立刻将工作区的改动存于后台, 并将工作区的文件还原到 HEAD 状态, 此时可以进行切换分支等操作
-     * `-m <message>` : 给 stash 添加描述
-   * `git stash list` : 列出所有 stash 
-   * `git stash show` : 打印 stash 与 commit back 的 diff
-   * `git stash (pop | apply) ` :
-     * apply 恢复,但是stash的内容不删除
-     * pop   恢复的同时也将stash的内容删除了  
-   * `git stash drop` : 删除 stash 
 
 7. `restore` 撤销修改
    * 默认是回到将工作区的内容还原为到暂存区, 即舍弃所有更改
@@ -303,57 +298,30 @@ $ git commit --amend
   * 省略 the
   * 需要多行进行详细说明的情况下, 第二行留空行
 
-# 4. 云
+# 4. Basic Snapshotting - 基础的版本记录
 
-## 4.1. 远程版本库
+在不存在分支的情况下用到的各种版本控制命令
 
-1. `remote` 命令用于管理和远程相关的事物
-   * 使用`git remote`查看远程库的名称  
-   * 使用`git remote -v`可以显示包括url的详细信息  
-   * 使用`git remote add <命名远程库> <url>`  添加一个远程库
-     * `git remote add origin  https://github.com/embattled/learnnote.git`  
-     * origin是默认的远程库叫法,也可以自定义
+## 4.1. add - Add file contents to the index
 
-2. `push` 命令用于推送所有 commit 到远程版本库
-   * `git push <远程库名称> <分支名称>`
-   * `-f  --force` 参数用于强制推送, 可以用于撤销已经 push 的 commit
-   * `-u --set-upstream`   set upstream for git pull/status, 该命令在 `branch` 中也可以设置 
-     * 一般用于执行第一次推送
-     * `git push -u origin master` 命令来第一次推送  
-     * `-u` 在将本地分支推送到远程的基础上,还将本地和远程的该分支关联了起来,在以后的推送或者拉去时可以简化命令
-     * 在这之后的推送使用  `git push origin master`即可
-     * 该配置在 branch 上有必要
+```sh
+git add [--verbose | -v] [--dry-run | -n] [--force | -f] [--interactive | -i] [--patch | -p]
+	  [--edit | -e] [--[no-]all | --[no-]ignore-removal | [--update | -u]] [--sparse]
+	  [--intent-to-add | -N] [--refresh] [--ignore-errors] [--ignore-missing] [--renormalize]
+	  [--chmod=(+|-)x] [--pathspec-from-file=<file> [--pathspec-file-nul]]
+	  [--] [<pathspec>…​]
+```
 
-3. `clone <url>` 用于克隆版本库
-   * `-b, --branch <branch>` 指定要克隆的分支
-   * `--recurse-submodules`  递归的克隆全部的 submodule, initialize and clone submodules within based on the provided pathspec.
+`add` 命令用来添加新文件或者对文件的新修改到暂存区
 
-4. `fetch` 用于从远端拉取代码
-   * Download objects and refs from another repository.
-   * `git fetch [<options>] [<repository> [<refspec>...]]` or `git fetch [<options>] <group>`
-   * `git fetch origin master` 为默认操作
-   * `git fetch origin master:tmp` 用 冒号来指定下载的目标分支, 默认是 `远端名/分支名`
 
-5. `pull` 用于懒人的拉取代码, 会自动merge到本地工作区上
-   * Fetch from and integrate with another repository or a local branch.
-   * 相当于先 fetch 再 `git merge origin/master`
-     * 先从远程的origin的master主分支下载最新的版本到origin/master分支上
-     * 然后比较本地的master分支和origin/master分支的差别并合并
-   * 实际使用中, 用 fetch 更加安全, 因为在中间可以更精细化的比较什么改动被 fetch 下来了
-     * `git fetch origin master:tmp`
-     * `git diff tmp `
-     * `git merge tmp`
+   * `git add readme.txt`  单独提交一个文件  
+   * `git add .` 会监控工作区的状态树, 提交文件修改(modified), 以及新文件(new), 但不包括被删除的文件
+   * `git add -u[pdate] ` 仅监控已经被add的文件(tracked file) 他会将被修改的文件提交到暂存区, 不会提交新文件 (untracked file), 提交被修改(modified)和被删除(deleted)文件, 不包括新文件(new)
+   * `add .` 和 `add -u` 有着微妙的区别, 在于对新文件和删除文件的态度上
+   * `git add -A[ll] ` 是上面两个功能的合集 (提交所有变化)
 
-6. `rebase` 非记录分支的 merge
-   * 在团队协作的时候, 如果总使用 `pull` 或者 `merge` 来拉取更改, 会因为有许多 merge 导致分支图上不是一条直线, 有许多无意义的分支
-   * rebase 用于将最新更改合并到当前工作区中, 但是不创建 commit
-   * `git pull --rebase` 能够实现 `get fetch + git rebase` 的作用
-   * 对于合并时候的冲突
-     * 文件里解决冲突
-     * `git add `
-     * `git rebase --continue`
-   * `git rebase --continue | --abort | --skip | --edit-todo`
-   * `git rebase -i` 交互式进行 rebash
+
 
 # 5. Branching and Merging 分支管理
 
@@ -442,7 +410,89 @@ git checkout [-f|--ours|--theirs|-m|--conflict=<style>] [<tree-ish>] --pathspec-
 git checkout (-p|--patch) [<tree-ish>] [--] [<pathspec>…​]
 ```
 
-## 5.3. 分支的团队命名
+## 5.3. switch - Switch branches
+
+`switch` 切换分支  不建议使用 `checkout` 命令
+   * `git switch [<options>] [<branch>]`
+   * `git switch -c dev` 创建并切换, 省去 `branch` 命令, 同理 `-C` 也是覆盖的创建
+
+
+
+## 5.4. merge - Join two or more development histories together
+
+```sh
+git merge [-n] [--stat] [--no-commit] [--squash] [--[no-]edit]
+	[--no-verify] [-s <strategy>] [-X <strategy-option>] [-S[<keyid>]]
+	[--[no-]allow-unrelated-histories]
+	[--[no-]rerere-autoupdate] [-m <msg>] [-F <file>]
+	[--into-name <branch>] [<commit>…​]
+git merge (--continue | --abort | --quit)
+```
+
+`merge` 合并一个分支
+   * `git merge [<options>] [<commit>...]`
+   * 出现冲突时:
+     * `git merge --abort` 用于放弃本次合并
+     * `git merge --continue` 用于手动处理好冲突后再次合并
+   * 使用 `git merge <分支名称>` 来将分支的工作成果合并到`master` 分支上
+   * 分支本身也会作为一个 commit 被记录
+
+当Git无法执行`快速合并`, 只能试图把各自的修改合并起来, 但这种合并就可能会有冲突  
+必须手动解决冲突后再提交
+
+使用`git status`可以告诉我们冲突的文件
+Git用<kbd><<<<<<<</kbd>, <kbd>=======</kbd>, <kbd>>>>>>>></kbd>标记出不同分支的内容
+
+
+
+### 5.4.1. merge options
+
+提交
+* `--commit`      : merge 然后提交结果, 这算是默认的行动, 也可以在默认行动被更改为 `--no-commit` 的时候用于覆盖默认行动
+* `--no-commit `  : merge 然后不提交 merge commit, 让用户有机会进一步检查合并的结果
+  * Note : fast-forward updates do not create a merge commit and therefore there is no way to stop those merges with --no-commit. If you want to ensure your branch is not changed or updated by the merge command, use --no-ff with --no-commit.
+
+分支属性
+* `--allow-unrelated-histories` : 默认下, merge 会拒绝合并不存在共同祖先的两个分支, 如果要合并两个独立的 branch 项目, 可以用该命令.
+  * 因为该操作非常罕见, 因此不存在于配置文件中, 即无法设置该行动为默认行动
+
+
+## 5.5. stash - Stash the changes in a dirty working directory away
+
+`stash` 现场保存, 用于非 commit 下的工作进度保存, 拥有一整套子命令组
+
+```sh
+git stash list [<log-options>]
+git stash show [-u | --include-untracked | --only-untracked] [<diff-options>] [<stash>]
+git stash drop [-q | --quiet] [<stash>]
+git stash pop [--index] [-q | --quiet] [<stash>]
+git stash apply [--index] [-q | --quiet] [<stash>]
+git stash branch <branchname> [<stash>]
+git stash [push [-p | --patch] [-S | --staged] [-k | --[no-]keep-index] [-q | --quiet]
+	     [-u | --include-untracked] [-a | --all] [(-m | --message) <message>]
+	     [--pathspec-from-file=<file> [--pathspec-file-nul]]
+	     [--] [<pathspec>…​]]
+git stash save [-p | --patch] [-S | --staged] [-k | --[no-]keep-index] [-q | --quiet]
+	     [-u | --include-untracked] [-a | --all] [<message>]
+git stash clear
+git stash create [<message>]
+git stash store [(-m | --message) <message>] [-q | --quiet] <commit>
+
+```
+
+
+
+* `git stash [push]` : 立刻将工作区的改动存于后台, 并将工作区的文件还原到 HEAD 状态, 此时可以进行切换分支等操作
+  * `-m <message>` : 给 stash 添加描述
+* `git stash list` : 列出所有 stash 
+* `git stash show` : 打印 stash 与 commit back 的 diff
+* `git stash (pop | apply) ` :
+  * apply 恢复,但是stash的内容不删除
+  * pop   恢复的同时也将stash的内容删除了  
+* `git stash drop` : 删除 stash 
+
+
+## 5.6. 分支的团队命名
 
 同 commit message 一样, 合理的命令可以增加团队配合  
 `type/module/snake_case_short_summary`  
@@ -455,41 +505,8 @@ git checkout (-p|--patch) [<tree-ish>] [--] [<pathspec>…​]
   * 用下划线连接多个小写单词
   * 如果对应的是一个 issue, 则直接写成 issue 编号也行
 
-## 5.4. 分支的基础操作
 
-
-
-
-
-
-2. `switch` 切换分支  不建议使用 `checkout` 命令
-   * `git switch [<options>] [<branch>]`
-   * `git switch -c dev` 创建并切换, 省去 `branch` 命令, 同理 `-C` 也是覆盖的创建
-
-
-## 5.5. 分支合并
-
-
-1. `merge` 合并一个分支
-   * `git merge [<options>] [<commit>...]`
-   * 出现冲突时:
-     * `git merge --abort` 用于放弃本次合并
-     * `git merge --continue` 用于手动处理好冲突后再次合并
-   * 使用 `git merge <分支名称>` 来将分支的工作成果合并到`master` 分支上
-   * 分支本身也会作为一个 commit 被记录
-
-
-
-
-
-当Git无法执行`快速合并`, 只能试图把各自的修改合并起来, 但这种合并就可能会有冲突  
-必须手动解决冲突后再提交
-
-使用`git status`可以告诉我们冲突的文件
-Git用<kbd><<<<<<<</kbd>, <kbd>=======</kbd>, <kbd>>>>>>>></kbd>标记出不同分支的内容
-
-
-## 5.6. 分支管理策略
+## 5.7. 分支管理策略
 
 通常合并分支时,git会在可能的时候使用`Fast forward`模式,这种模式的缺点就是删除分支后就会丢失分支的信息
 
@@ -498,7 +515,7 @@ Git用<kbd><<<<<<<</kbd>, <kbd>=======</kbd>, <kbd>>>>>>>></kbd>标记出不同�
 `git merge --no-ff -m "merge with no-ff" dev`
 
 
-### 5.6.1. Bug处理
+### 5.7.1. Bug处理
 
 对于一个已经存在于所有分支的bug,git提供了一个`cherry-pick`,能够将一个特定的分支复制到当前分支  
 `git switch dev`
@@ -506,7 +523,61 @@ Git用<kbd><<<<<<<</kbd>, <kbd>=======</kbd>, <kbd>>>>>>>></kbd>标记出不同�
 此时git会自动给dev分支进行一次提交,该commit会获得一个不同的ID, 使用该命令可以省去重复修复bug的过程
 
 
-# 6. Git 的标签管理 tag
+
+# 6. Sharing and Updating Projects
+
+## 6.1. 远程版本库
+
+1. `remote` 命令用于管理和远程相关的事物
+   * 使用`git remote`查看远程库的名称  
+   * 使用`git remote -v`可以显示包括url的详细信息  
+   * 使用`git remote add <命名远程库> <url>`  添加一个远程库
+     * `git remote add origin  https://github.com/embattled/learnnote.git`  
+     * origin是默认的远程库叫法,也可以自定义
+
+2. `push` 命令用于推送所有 commit 到远程版本库
+   * `git push <远程库名称> <分支名称>`
+   * `-f  --force` 参数用于强制推送, 可以用于撤销已经 push 的 commit
+   * `-u --set-upstream`   set upstream for git pull/status, 该命令在 `branch` 中也可以设置 
+     * 一般用于执行第一次推送
+     * `git push -u origin master` 命令来第一次推送  
+     * `-u` 在将本地分支推送到远程的基础上,还将本地和远程的该分支关联了起来,在以后的推送或者拉去时可以简化命令
+     * 在这之后的推送使用  `git push origin master`即可
+     * 该配置在 branch 上有必要
+
+3. `clone <url>` 用于克隆版本库
+   * `-b, --branch <branch>` 指定要克隆的分支
+   * `--recurse-submodules`  递归的克隆全部的 submodule, initialize and clone submodules within based on the provided pathspec.
+
+4. `fetch` 用于从远端拉取代码
+   * Download objects and refs from another repository.
+   * `git fetch [<options>] [<repository> [<refspec>...]]` or `git fetch [<options>] <group>`
+   * `git fetch origin master` 为默认操作
+   * `git fetch origin master:tmp` 用 冒号来指定下载的目标分支, 默认是 `远端名/分支名`
+
+5. `pull` 用于懒人的拉取代码, 会自动merge到本地工作区上
+   * Fetch from and integrate with another repository or a local branch.
+   * 相当于先 fetch 再 `git merge origin/master`
+     * 先从远程的origin的master主分支下载最新的版本到origin/master分支上
+     * 然后比较本地的master分支和origin/master分支的差别并合并
+   * 实际使用中, 用 fetch 更加安全, 因为在中间可以更精细化的比较什么改动被 fetch 下来了
+     * `git fetch origin master:tmp`
+     * `git diff tmp `
+     * `git merge tmp`
+
+6. `rebase` 非记录分支的 merge
+   * 在团队协作的时候, 如果总使用 `pull` 或者 `merge` 来拉取更改, 会因为有许多 merge 导致分支图上不是一条直线, 有许多无意义的分支
+   * rebase 用于将最新更改合并到当前工作区中, 但是不创建 commit
+   * `git pull --rebase` 能够实现 `get fetch + git rebase` 的作用
+   * 对于合并时候的冲突
+     * 文件里解决冲突
+     * `git add `
+     * `git rebase --continue`
+   * `git rebase --continue | --abort | --skip | --edit-todo`
+   * `git rebase -i` 交互式进行 rebash
+
+
+# 7. Git 的标签管理 tag
 
 tag是git版本库的一个标记, 指向某个 commit
 * branch 对应一系列commit, 是很多点连成的一根线
@@ -528,7 +599,7 @@ tag是git版本库的一个标记, 指向某个 commit
 
 3. `git branch <branchName> <tagName>`: 依照 tag 对应的 commit 来建立分支
 
-# 7. Sharing and Updating Projects
+# 8. Sharing and Updating Projects
 
 共享项目以及协同作业
     fetch
@@ -538,7 +609,7 @@ tag是git版本库的一个标记, 指向某个 commit
     submodule
     subtree (貌似非官方)
 
-## 7.1. fetch 
+## 8.1. fetch 
 
 git-fetch - Download objects and refs from another repository  
 
@@ -553,7 +624,7 @@ git fetch --all [<options>]
 
 
 
-## 7.2. submodule 子模块
+## 8.2. submodule 子模块
 
 
 主要用于在项目庞大的时候进行模块文件抽离, 抽离出来的文件可以单独成为一个 git repo
@@ -597,7 +668,7 @@ git submodule [--quiet] absorbgitdirs [--] [<path>…​]
 
 
 
-### 7.2.1. add 添加子模块
+### 8.2.1. add 添加子模块
 
 `add [-b <branch>] [-f|--force] [--name <name>] [--reference <repository>] [--depth <depth>] [--] <repository> [<path>]`
 
@@ -616,7 +687,7 @@ git submodule [--quiet] absorbgitdirs [--] [<path>…​]
 ```
 
 
-### 7.2.2. 
+### 8.2.2. 
 
 
   * `init` : Initialize the submodules recorded in the index, 将对应的 submodule URL 写入本地 .git/config
@@ -642,7 +713,7 @@ submodule: 子模块 Mounting one repository inside another
 
 
 
-### 7.2.3. status 查看子库的信息
+### 8.2.3. status 查看子库的信息
 
 `status [--cached] [--recursive] [--] [<path>…​] `  
 
@@ -653,13 +724,13 @@ submodule: 子模块 Mounting one repository inside another
   * 若需要更新子仓库的内容, 需要进入子仓库进行 `git switch`, 这个switch也需要在主仓库里进行一次 commit 
   * Git认为移动submodule的指针和其他变化一样: 如果我们保存这个改动, 就必须提交到仓库里
 
-### 7.2.4. init 初始化子库
+### 8.2.4. init 初始化子库
 
 `init [--] [<path>…​] `  
 
 将所有子库的目录初始化为 git 版本控制目录, 该命令也不会正式下载子库的代码, 具体的下载在 `update` 命令中, 该步骤可以通过 `update --init` 直接省略掉
 
-### 7.2.5. update 子库更新核心命令
+### 8.2.5. update 子库更新核心命令
 
 ```sh
 update [--init] [--remote] [-N|--no-fetch] [--[no-]recommend-shallow]
@@ -691,9 +762,9 @@ update [--init] [--remote] [-N|--no-fetch] [--[no-]recommend-shallow]
 * `[--init]` : 自动初始化子模块
 
 
-### 7.2.6. foreach 遍历所有子库
+### 8.2.6. foreach 遍历所有子库
 
-## 7.3. subtree 
+## 8.3. subtree 
 
 从1.5.2版本开始, 官方新增Git Subtree并推荐使用这个功能来替代Git Submodule管理仓库共用(子仓库, 子项目)  
 但是官方文档里没有 subtree 的介绍, 不知为何  
@@ -731,7 +802,7 @@ subtree 的不同:
 'git subtree' [<options>] -P <prefix> push <repository> <refspec>
 ```
 
-### 7.3.1. add 添加子库
+### 8.3.1. add 添加子库
 
 由于 subtree 的工作原理是基于分支的, 因此这里添加子库的方法还需要用到一些基础命令  
 1. 单纯添加子库的地址到 remote :    `git remote add subtree-origin git@子库链接` 
@@ -746,11 +817,11 @@ subtree 的不同:
      * 对于一个子库的使用, 需要在整个使用中保持 `--squash` 值的相同, 即要么永远不用, 要么永远用
      * `远程子库上的历史提交合并成一次提交` 会导致在之后不加 squash 的拉取中由于找不到公共父节点导致拉取失败
 
-### 7.3.2. pull 拉取更新
+### 8.3.2. pull 拉取更新
 
-### 7.3.3. push 
+### 8.3.3. push 
 
-### 7.3.4. split
+### 8.3.4. split
 
 subtree 的强大功能, 抽离子库: 开发的过程中发现某些功能可以剥离出来当作公用的子库的时候, 在保留该新子库的所有历史 log 的情况下, 生成一个新的库    
 `git subtree split --prefix=<prefix> [OPTIONS] [<commit>]`
@@ -765,7 +836,7 @@ subtree 的强大功能, 抽离子库: 开发的过程中发现某些功能可�
    * `git push -u origin +master`
 
 
-# 8. git-lfs Large File Storage (LFS)
+# 9. git-lfs Large File Storage (LFS)
 
 replaces large files such as audio samples, videos, datasets, and graphics with `text pointers` inside Git.
 
