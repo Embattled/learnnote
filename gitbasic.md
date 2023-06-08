@@ -101,6 +101,14 @@ git init [-q | --quiet] [--bare] [--template=<template-directory>]
 
 从远端克隆一个仓库到一个新的文件夹, creates remote-tracking branches for each branch in the cloned repository (visible using `git branch --remotes`), and creates and checks out an initial branch that is forked from the cloned repository’s currently active branch.
 
+完整的表现为
+* 为远程每一个分支建立好对应的 remote-tracking, 可以通过 `git branch --remotes` 查看
+* 建立并初始化 一个分支 , 即  cloned repository’s currently active branch.
+* 克隆完成后:
+  * `git fetch`  : 会下载全部的远程分支
+  * `git pull`   : 会下载远程的 master branch 并合并到本地的 master branch
+
+
 完整命令
 ```sh
 git clone [--template=<template-directory>]
@@ -121,6 +129,7 @@ git clone [--template=<template-directory>]
 
 常用选项: 
 * `-b <name>, --branch <name>` 指定要克隆的分支
+* 
 
 
 子模组:
@@ -133,6 +142,9 @@ git clone [--template=<template-directory>]
   * 整个命令相当于一个 clone 后接了一个 `git submodule update --init --recursive <pathspec>`
   * 如果克隆过程不产生 worktree 的话, 则该命令会被忽视, 即 (if any of `--no-checkout/-n`, `--bare`, or `--mirror` is given, 详情查看各自的说明)
 
+
+Shallow 克隆:
+* 
 
 # 3. 离线操作
 
@@ -349,7 +361,10 @@ git add [--verbose | -v] [--dry-run | -n] [--force | -f] [--interactive | -i] [-
 
 ## 5.1. branch - List, create, or delete branches
 
+branch 命令本身集成了多个功能
+
 ```sh
+# 最复杂的反而是最常用的功能, 打印 branch
 git branch [--color[=<when>] | --no-color] [--show-current]
 	[-v [--abbrev=<n> | --no-abbrev]]
 	[--column[=<options>] | --no-column] [--sort=<key>]
@@ -358,6 +373,8 @@ git branch [--color[=<when>] | --no-color] [--show-current]
 	[--points-at <object>] [--format=<format>]
 	[(-r | --remotes) | (-a | --all)]
 	[--list] [<pattern>…​]
+
+# 创建新分支
 git branch [--track[=(direct|inherit)] | --no-track] [-f]
 	[--recurse-submodules] <branchname> [<start-point>]
 
@@ -376,9 +393,6 @@ git branch (-d | -D) [-r] <branchname>…​
 git branch --edit-description [<branchname>]
 ```
 
-
-* 默认会打印所有本地分支 并在当前分支前方标识一个 <kbd>*</kbd>  
- * `git branch [<options>] [-r | -a] [--merged | --no-merged]`
 * 创建分支
  * `git branch [<options>] [-l] [-f] <branch-name> [<start-point>]`
  * `-f` 用于覆盖的创建分支
@@ -394,6 +408,16 @@ git branch --edit-description [<branchname>]
  * 就算是从远端克隆的repo, 也不会自动关联到远程对应的分支, 需要手动指定本地与远端的链接
  * 链接的唯一好处就是简化之后的 pull 命令
  * `git branch --set-upstream-to dev origin/dev`  
+
+### 5.1.1. 分支打印
+
+* 默认会打印所有本地分支 并在当前分支前方标识一个 <kbd>*</kbd>  
+ * `git branch [<options>] [-r | -a] [--merged | --no-merged]`
+
+* `[(-r | --remotes) | (-a | --all)]`
+  * -r --remotes 打印 remote-tracking 分支    该命令可以与 `-d` 分支删除一起使用
+  * -a --all   打印所有本地与远程分支
+
 
 ## 5.2. checkout - Switch branches or restore working tree files
 
@@ -654,7 +678,7 @@ git submodule [--quiet] absorbgitdirs [--] [<path>…​]
 
 * 配置 submodule 后:
   * 会在项目根目录下新建可见 `.gitmodules` 文件用于管理子仓库
-  * 同时在不可见的 git 内部配置文件 `.git/config` 中添加了响应的配置
+  * 同时在不可见的 git 内部配置文件 `.git/config` 中添加了相应的配置
 * `(空)`  : 打印当前仓库的 submodule 信息
 
 相关概念
@@ -686,11 +710,7 @@ git submodule [--quiet] absorbgitdirs [--] [<path>…​]
     url  = 子库的远程url
 ```
 
-
-### 8.2.2. 
-
-
-  * `init` : Initialize the submodules recorded in the index, 将对应的 submodule URL 写入本地 .git/config
+* `init` : Initialize the submodules recorded in the index, 将对应的 submodule URL 写入本地 .git/config
 
 
 
@@ -713,7 +733,7 @@ submodule: 子模块 Mounting one repository inside another
 
 
 
-### 8.2.3. status 查看子库的信息
+### 8.2.2. status 查看子库的信息
 
 `status [--cached] [--recursive] [--] [<path>…​] `  
 
@@ -724,13 +744,13 @@ submodule: 子模块 Mounting one repository inside another
   * 若需要更新子仓库的内容, 需要进入子仓库进行 `git switch`, 这个switch也需要在主仓库里进行一次 commit 
   * Git认为移动submodule的指针和其他变化一样: 如果我们保存这个改动, 就必须提交到仓库里
 
-### 8.2.4. init 初始化子库
+### 8.2.3. init 初始化子库
 
 `init [--] [<path>…​] `  
 
 将所有子库的目录初始化为 git 版本控制目录, 该命令也不会正式下载子库的代码, 具体的下载在 `update` 命令中, 该步骤可以通过 `update --init` 直接省略掉
 
-### 8.2.5. update 子库更新核心命令
+### 8.2.4. update 子库更新核心命令
 
 ```sh
 update [--init] [--remote] [-N|--no-fetch] [--[no-]recommend-shallow]
@@ -762,7 +782,7 @@ update [--init] [--remote] [-N|--no-fetch] [--[no-]recommend-shallow]
 * `[--init]` : 自动初始化子模块
 
 
-### 8.2.6. foreach 遍历所有子库
+### 8.2.5. foreach 遍历所有子库
 
 ## 8.3. subtree 
 
@@ -849,3 +869,40 @@ replaces large files such as audio samples, videos, datasets, and graphics with 
 3. 查看当前 track 的目录或类型 `git lfs track`
 4. track 后, 需要再通过普通的 git add/ commit 方式进行版本管理
 5. 查看被 track 的具体的文件 `git lfs ls-files`
+
+# 10. Github Docs
+
+管理一个 github actions, 使得各种 build, test 行为可以被自动化的执行
+* 对于一个 github actions workflow, 可以被各种行为激活, 例如 PR, issue.
+* 各种 workflow 包含的 jobs 可以被同步的执行在格子的虚拟机中
+* 可以定义各种可重复利用的步骤的 script 用于测试
+
+
+workflows:
+* 一个可配置的自动化过程, 会执行一个或多个 jobs
+* workflows 通过 YAML 文件管理
+* 会根据各种情况触发, 例如 repo 的各种 event, 手动, 或者一个定义好的 schedue
+* 被定义在 `.github.workflows/` , 即一个 repo 可以有多个 workflows, 可以为 build 和 test PR 创建不同的 workflow
+
+Event:
+* Event 主要用于描述可以 triggers a workflow 的 repo 活动
+* creates PR, opens an issue, pushes a commit
+
+Jobs:
+* 是一个 workflow 中的一系列 steps, 这些 job 会在同一个 runner 上执行.
+* 可以是 action 也可以是 shell script
+* job 之间可以设置依赖, 没有依赖的 job 可以被设置成并行执行
+
+Actions:
+* 是 Github 提供的定制化 application 用于比较复杂但是常用的任务
+* 可以减少 workflow file 中的重复代码
+* 例如从 github 中拉取代码, 或者为 cloud provider 提供权力
+
+Runners:
+* runner 是一个 服务器用于执行 workflows
+* Github 本身提供了 Ubuntu Linux, Microsoft Windows, macOS
+* 支持 Host 自己的服务器作为 runner
+
+
+
+

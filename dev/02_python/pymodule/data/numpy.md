@@ -36,7 +36,7 @@
     - [4.3.1. Standard FFTs 标准傅里叶变换](#431-standard-ffts-标准傅里叶变换)
     - [4.3.2. Real FFTs 复数傅里叶变换](#432-real-ffts-复数傅里叶变换)
     - [4.3.3. Hermitian FFTs](#433-hermitian-ffts)
-    - [Helper routines 辅助功能](#helper-routines-辅助功能)
+    - [4.3.4. Helper routines 辅助功能](#434-helper-routines-辅助功能)
   - [4.4. linalg](#44-linalg)
     - [4.4.1. SVD 奇异值分解](#441-svd-奇异值分解)
   - [4.5. numpy Input and Output  Numpy 数据的 IO](#45-numpy-input-and-output--numpy-数据的-io)
@@ -44,7 +44,7 @@
   - [4.6. Linear algebra 线性代数计算](#46-linear-algebra-线性代数计算)
     - [4.6.1. Matrix and vector products 向量矩阵乘法](#461-matrix-and-vector-products-向量矩阵乘法)
       - [4.6.1.1. 矩阵乘法](#4611-矩阵乘法)
-      - [einsum](#einsum)
+      - [4.6.1.2. einsum](#4612-einsum)
     - [4.6.2. Solving equations and inverting matrices 计算矩阵方程或者逆](#462-solving-equations-and-inverting-matrices-计算矩阵方程或者逆)
   - [4.7. Logic functions 逻辑计算](#47-logic-functions-逻辑计算)
     - [4.7.1. Truth value testing](#471-truth-value-testing)
@@ -61,24 +61,25 @@
       - [4.9.8.1. convolve 卷积](#4981-convolve-卷积)
       - [4.9.8.2. clip 裁剪](#4982-clip-裁剪)
       - [4.9.8.3. interp 简易线性插值](#4983-interp-简易线性插值)
-  - [Padding Arrays](#padding-arrays)
-  - [Polynomials 多项式](#polynomials-多项式)
-  - [4.10. Sorting, Searching, Counting 排序 搜索 计数](#410-sorting-searching-counting-排序-搜索-计数)
-    - [4.10.1. Sorting 排序](#4101-sorting-排序)
-      - [4.10.1.1. 基础排序](#41011-基础排序)
-      - [4.10.1.2. 部分有序](#41012-部分有序)
-    - [4.10.2. Searching 元素查找](#4102-searching-元素查找)
-      - [4.10.2.1. 最大值选择](#41021-最大值选择)
-      - [4.10.2.2. 逻辑选择值 where](#41022-逻辑选择值-where)
-      - [4.10.2.3. 非零选择](#41023-非零选择)
-  - [4.11. Statistics 统计](#411-statistics-统计)
-    - [4.11.1. Averages and variances 平均和方差](#4111-averages-and-variances-平均和方差)
-    - [4.11.2. Histograms](#4112-histograms)
-      - [4.11.2.1. histogram 一维数据直方图](#41121-histogram-一维数据直方图)
-      - [4.11.2.2. histogram2d 二维直方图](#41122-histogram2d-二维直方图)
-      - [4.11.2.3. bincount 原子统计](#41123-bincount-原子统计)
-  - [4.12. Set 集合](#412-set-集合)
-    - [4.12.1. unique](#4121-unique)
+  - [4.10. Padding Arrays](#410-padding-arrays)
+  - [4.11. Polynomials 多项式](#411-polynomials-多项式)
+  - [4.12. Random sampling (numpy.random)](#412-random-sampling-numpyrandom)
+  - [4.13. Sorting, Searching, Counting 排序 搜索 计数](#413-sorting-searching-counting-排序-搜索-计数)
+    - [4.13.1. Sorting 排序](#4131-sorting-排序)
+      - [4.13.1.1. 基础排序](#41311-基础排序)
+      - [4.13.1.2. 部分有序](#41312-部分有序)
+    - [4.13.2. Searching 元素查找](#4132-searching-元素查找)
+      - [4.13.2.1. 最大值选择](#41321-最大值选择)
+      - [4.13.2.2. 逻辑选择值 where](#41322-逻辑选择值-where)
+      - [4.13.2.3. 非零选择](#41323-非零选择)
+  - [4.14. Statistics 统计](#414-statistics-统计)
+    - [4.14.1. Averages and variances 平均和方差](#4141-averages-and-variances-平均和方差)
+    - [4.14.2. Histograms](#4142-histograms)
+      - [4.14.2.1. histogram 一维数据直方图](#41421-histogram-一维数据直方图)
+      - [4.14.2.2. histogram2d 二维直方图](#41422-histogram2d-二维直方图)
+      - [4.14.2.3. bincount 原子统计](#41423-bincount-原子统计)
+  - [4.15. Set 集合](#415-set-集合)
+    - [4.15.1. unique](#4151-unique)
 - [5. numpy.random](#5-numpyrandom)
   - [5.1. Generator](#51-generator)
   - [5.2. Random Generation Function](#52-random-generation-function)
@@ -560,7 +561,7 @@ numpy fft 的细则:
 ### 4.3.3. Hermitian FFTs 
 
 
-### Helper routines 辅助功能
+### 4.3.4. Helper routines 辅助功能
 
 * `np.fft.fftshift(x, axes=None)`: 便于 fft 结果的可视化
   * 标准 np.fft 运算的结果, 0频率的部分位于结果数列 `x[0]`, 然而一般为了可视化, 更加倾向于将 0 频率的部分移到数组中间
@@ -697,7 +698,7 @@ np.matmul(a, c).shape :(9, 5, 7, 3)
   * 该函数比较基础, 只接受 a,b 都是向量
   * 生成外积矩阵, 矩阵形状为 (a.len, b.len)
 
-#### einsum  
+#### 4.6.1.2. einsum  
 
 评估操作数的爱因斯坦求和约定
 Evaluates the Einstein summation convention on the operands.
@@ -839,7 +840,7 @@ One-dimensional linear interpolation for monotonically increasing sample points.
 * period : A period for the x-coordinates, xp 的周期, 一般用来计算角度, 即360 度为一圈, 720度会被正确的放在 0 度的位置
 
 
-## Padding Arrays
+## 4.10. Padding Arrays
 
 numpy 的填充函数, 只有一个函数单独作为了一类, 可以对任意维度进行填充
 
@@ -850,7 +851,7 @@ numpy 的填充函数, 只有一个函数单独作为了一类, 可以对任意�
   * 
 
 
-## Polynomials 多项式
+## 4.11. Polynomials 多项式
 
 numpy 1.4 引进的多项式包, 是对于之前的函数包 `numpy.poly1d` 的扩展  
 
@@ -858,19 +859,40 @@ numpy 1.4 引进的多项式包, 是对于之前的函数包 `numpy.poly1d` 的�
 * `polynomial module` 指的是 old API, 定义在了 `numpy.lib.polynomial` 里, 其中包括
   * 旧的多项式类 `numpy.poly1d`
   * 其他的 polynomial functions
-* `polynomial package` 值得是 new API, 定义在了 `numpy.polynomial`
+* `polynomial package` 指的是 new API, 定义在了 `numpy.polynomial`
   * convenience classes for the different kinds of polynomials
+  * 官方推荐在书写新代码的适合使用 numpy.polynomial
+
+该部分决定只阅读新 API numpy.polynomial:
+* 支持多种多项式类型, 包括 : Chebyshev, Hermite (two subtypes), Laguerre, and Legendre polynomials
+* 每种多项式类型都提供一个独特同时接口统一的类来操作
+
+
+具体包括: 6 种多项式的子包和对应的class, 和一个统一的工具
+* Power Series (numpy.polynomial.polynomial)
+* Chebyshev Series (numpy.polynomial.chebyshev)
+* Hermite Series, “Physicists” (numpy.polynomial.hermite)
+* HermiteE Series, “Probabilists” (numpy.polynomial.hermite_e)
+* Laguerre Series (numpy.polynomial.laguerre)
+* Legendre Series (numpy.polynomial.legendre)
+* Polyutils 需要手动精确导入
+  
 
 
 
-## 4.10. Sorting, Searching, Counting 排序 搜索 计数
+
+
+
+## 4.12. Random sampling (numpy.random)
+
+## 4.13. Sorting, Searching, Counting 排序 搜索 计数
 
 这里的 counting 都是很简单的函数, 更详细的统计在 statistics 模块
 
 
-### 4.10.1. Sorting 排序
+### 4.13.1. Sorting 排序
 
-#### 4.10.1.1. 基础排序
+#### 4.13.1.1. 基础排序
 
 * `msort(a)` : Return a copy of an array sorted along the first axis.
 
@@ -891,12 +913,12 @@ numpy 1.4 引进的多项式包, 是对于之前的函数包 `numpy.poly1d` 的�
   * 用于通过 结构体字段的名称或者名称list来指定排序比较的顺序
 
 
-#### 4.10.1.2. 部分有序
+#### 4.13.1.2. 部分有序
 
 * partition(a, kth[, axis, kind, order])    :  Return a partitioned copy of an array.
 * argpartition(a, kth[, axis, kind, order]) : 
 
-### 4.10.2. Searching 元素查找
+### 4.13.2. Searching 元素查找
 
 大概可以分成
 * 极值查找
@@ -910,7 +932,7 @@ numpy 1.4 引进的多项式包, 是对于之前的函数包 `numpy.poly1d` 的�
   * nonzero
   * flatnonzero
 
-#### 4.10.2.1. 最大值选择
+#### 4.13.2.1. 最大值选择
 
 * `argmax(a[, axis, out, keepdims])`
   * Returns the indices of the maximum values along an axis.
@@ -920,7 +942,7 @@ numpy 1.4 引进的多项式包, 是对于之前的函数包 `numpy.poly1d` 的�
 
 
 
-#### 4.10.2.2. 逻辑选择值 where
+#### 4.13.2.2. 逻辑选择值 where
 
 `numpy.extract(condition, arr)`
 * 根据 condition 选择元素, 等同于 
@@ -937,7 +959,7 @@ numpy 1.4 引进的多项式包, 是对于之前的函数包 `numpy.poly1d` 的�
 
 
 
-#### 4.10.2.3. 非零选择
+#### 4.13.2.3. 非零选择
 
 * `nonzero(a)`        : Return the indices of the elements that are non-zero.
   * 返回 a tuple of arrays
@@ -952,11 +974,11 @@ numpy 1.4 引进的多项式包, 是对于之前的函数包 `numpy.poly1d` 的�
   * 功能上几乎等同于 `np.transpose(np.nonzero(a))`  but produces a result of the correct shape for a 0-D array.
 
 
-## 4.11. Statistics 统计
+## 4.14. Statistics 统计
 
 更加完整的统计函数定义在了这里
 
-### 4.11.1. Averages and variances 平均和方差
+### 4.14.1. Averages and variances 平均和方差
 
 较为通用的统计函数, 根据对于 NaN 的处理分为标准版和 `nan*` 版  (average 除外没有 nan 版本) 
 
@@ -983,7 +1005,7 @@ numpy 1.4 引进的多项式包, 是对于之前的函数包 `numpy.poly1d` 的�
   * 标准差
 
 
-### 4.11.2. Histograms
+### 4.14.2. Histograms
 
 
 直方图统计, 在 Statistic 分类的函数中属于一个大类, 不止一个函数  
@@ -991,7 +1013,7 @@ numpy 1.4 引进的多项式包, 是对于之前的函数包 `numpy.poly1d` 的�
 * numpy.histogram    : 普通一维直方图统计, 
 
 
-#### 4.11.2.1. histogram 一维数据直方图
+#### 4.14.2.1. histogram 一维数据直方图
 ```py
 numpy.histogram(a, bins=10, range=None, normed=None, weights=None, density=None)
 ```
@@ -1025,7 +1047,7 @@ numpy.histogram(a, bins=10, range=None, normed=None, weights=None, density=None)
 * bin_edges : 因为 bins 可能是整数或者别的省略的输入方法, 该返回值用于标识完整的区间序列
   * 注意 len(bin_edges) = len(hist)+1 
 
-#### 4.11.2.2. histogram2d 二维直方图
+#### 4.14.2.2. histogram2d 二维直方图
 
 Compute the bi-dimensional histogram of two data samples.   
 并不是单纯的二维数据直方图统计, 而是一种双方向上的统计.  
@@ -1052,16 +1074,16 @@ numpy.histogram2d(x, y, bins=10, range=None, normed=None, weights=None, density=
   * yedges ndarray, shape(ny+1,)
 
 
-#### 4.11.2.3. bincount 原子统计
+#### 4.14.2.3. bincount 原子统计
 
 直方图的简化版本
 
 
 
 
-## 4.12. Set 集合
+## 4.15. Set 集合
 
-### 4.12.1. unique
+### 4.15.1. unique
 
 寻找一组数据中的唯一元素, 可以用来统计元素的种类数  
 除了返回独立的元素种类, 还可以返回

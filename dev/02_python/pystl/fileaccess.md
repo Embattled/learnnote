@@ -11,7 +11,7 @@
     - [3.1.1. 创建路径](#311-创建路径)
     - [3.1.2. PurePath 的运算符重载  /](#312-purepath-的运算符重载--)
     - [3.1.3. 提取路径成分](#313-提取路径成分)
-    - [变更路径成分](#变更路径成分)
+    - [3.1.4. 变更路径成分](#314-变更路径成分)
   - [3.2. pathlib.Path - Concrete paths](#32-pathlibpath---concrete-paths)
     - [3.2.1. 创建路径](#321-创建路径)
     - [3.2.2. 获取文件信息](#322-获取文件信息)
@@ -258,7 +258,7 @@ print([path1, path1.name, path1.stem, path1.suffix, path1.parent, path1.parent.p
 # [PosixPath('folder1/text1.txt'), 'text1.txt', 'text1', '.txt', PosixPath('folder1'), PosixPath('.'), '']
 ```
 
-### 变更路径成分
+### 3.1.4. 变更路径成分
 
 pathlib 还提供了函数可以便捷的更换某一个 Path 对象的某个成分
 

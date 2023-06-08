@@ -2,11 +2,13 @@
 
 ## Top会议
 
-国际顶会 A类
-* Computer Vision and Pattern Recognition Conference            (CVPR)          annual 
 * International Conference on Computer Vision                   (ICCV)          odd
+* International Conference on Machine Learning                  (ICML)          annual 
+         
 * Association for the Advancement of Artificial Intelligence    (AAAI)          annual
-* International Conference on Machine Learning                  (ICML)          annual        
+* Computer Vision and Pattern Recognition Conference            (CVPR)          annual 
+
+* IEEE International Conference on Robotics and Automation      (ICRA)
 
 
 区域顶会
@@ -25,6 +27,6 @@
 
 
 国际顶刊 A类
-* ACM Transactions on Graphics (TOG)
-* IEEE Transactions on Image Processing             (TIP)
+* ACM Transactions on Graphics                                  (TOG)
+* IEEE Transactions on Image Processing                         (TIP)
 * IEEE Transactions on Visualization and Computer Graphics      (TVCG)

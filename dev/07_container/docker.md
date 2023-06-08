@@ -7,18 +7,19 @@
     - [1.4.2. 运行权限](#142-运行权限)
   - [1.5. storage driver](#15-storage-driver)
 - [2. Docker Engine](#2-docker-engine)
-  - [2.1. docker build 镜像编译](#21-docker-build-镜像编译)
+  - [2.1. docker build 镜像编译 - Build an image from a Dockerfile](#21-docker-build-镜像编译---build-an-image-from-a-dockerfile)
+    - [2.1.1. build options](#211-build-options)
   - [2.2. docker compose 镜像统合](#22-docker-compose-镜像统合)
   - [2.3. docker image 镜像管理](#23-docker-image-镜像管理)
   - [2.4. docker container 容器管理](#24-docker-container-容器管理)
-  - [2.5. tag](#25-tag)
-  - [2.6. Docker repo](#26-docker-repo)
-  - [2.7. Docker 运行命令](#27-docker-运行命令)
-    - [2.7.1. docker run 运行镜像](#271-docker-run-运行镜像)
-    - [2.7.2. 运行容器](#272-运行容器)
-    - [2.7.3. 进入容器](#273-进入容器)
-    - [2.7.4. 进程管理](#274-进程管理)
-- [3. Dockerfile](#3-dockerfile)
+  - [2.5. docker tag  -  Create a tag TARGET\_IMAGE that refers to SOURCE\_IMAGE](#25-docker-tag-----create-a-tag-target_image-that-refers-to-source_image)
+  - [2.6. docker run 启动镜像 核心命令](#26-docker-run-启动镜像-核心命令)
+  - [docker stop  - Stop one or more running containers 停止容器](#docker-stop----stop-one-or-more-running-containers-停止容器)
+  - [2.7. docker start - 容器启动(重启) Start one or more stopped containers](#27-docker-start---容器启动重启-start-one-or-more-stopped-containers)
+  - [2.8. docker attach - 接入容器](#28-docker-attach---接入容器)
+  - [2.9. 进程管理](#29-进程管理)
+- [3. Docker Hub](#3-docker-hub)
+- [4. Dockerfile](#4-dockerfile)
 
 
 # 1. Start Docker 
@@ -173,7 +174,16 @@ docker支持许多存储驱动, 在 `Ubuntu`下支持 : `overlay2, aufs, btrfs`
 
 docker 是一个基础接口, 其下的各种子命令都是独立的 binary, 分别有其各自自己的 --help 和其他各种子命令
 
-## 2.1. docker build 镜像编译
+
+容器的创建, 停止, 再运行, 进入都分别有各自的命令, 具体的生命线可以是
+* docker build  : 从 dockerfile 编译出一个镜像
+* docker run    : 一开始的创建, 同时运行. Create and run a new container from an image
+* docker stop   : 停止一个容器的运行
+* docker start  : 容器的再启动
+* docker rm     : 删除一个容器实例
+
+
+## 2.1. docker build 镜像编译 - Build an image from a Dockerfile
 
 docker build 是 docker engine 的基础命令, 通过 build 来创建一个 image
 
@@ -189,10 +199,31 @@ docker build 是 docker engine 的基础命令, 通过 build 来创建一个 ima
   * exporting build results to OCI image tarballs.
 
 
+` docker build [OPTIONS] PATH | URL | -`
+从一个静态的 dockerfile 和 `context` 来编译一个 docker images, 具体的一个 Context 为一个 Path 或者 URL  
+* 具体的 URL 则支持三种类型:
+  *  Git repositories
+  *  pre-packaged tarball contexts
+  *  plain text files
 
-* 使用 `docker build [flags] dockerfile路径` 来创建 docker container
 
-  * `-t 项目名` 用于指定该镜像的名称
+
+
+### 2.1.1. build options
+
+* `--file , -f`  		  : Name of the Dockerfile (Default is PATH/Dockerfile), 即指定 Dockerfile 的名称, 这里要和 Path 区分开来
+
+* `--build-arg` 		  : Set build-time variables, 用于根据 dockerfile 的设定动态的调整编译的结果  
+* `-t --tag 项目名`   : 用于指定该镜像的名称, 最终镜像的名称为 `name:tag` format
+
+
+
+Image 的性能 spec. 配置: 
+* `--cpuset-cpus` 		CPUs in which to allow execution (0-3, 0,1)
+* `--cpuset-mems` 		MEMs in which to allow execution (0-3, 0,1)
+* `--memory , -m` 		Memory limit
+* `--memory-swap` 		Swap limit equal to memory plus swap: -1 to enable unlimited swap
+* 
 
 ## 2.2. docker compose 镜像统合
 
@@ -243,12 +274,101 @@ Define and run multi-container applications with Docker.
 * `docker ps -a` 列出所有容器
 * 
 
-## 2.5. tag
+## 2.5. docker tag  -  Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE
 
 * `docker tag 旧名字 新名字` 用来给一个 image 赋予新的名字
 * 新旧名字会同时存在, 但是都指向同一个 image, ID 是相同的
 
-## 2.6. Docker repo
+
+
+
+## 2.6. docker run 启动镜像 核心命令
+
+`docker run [OPTIONS] IMAGE [COMMAND] [ARG...]`   在本机的 docker engine 上运行一个镜像, 此时会创建一个容器
+该命令会被用来进行各种各样的容器配置
+
+
+* `docker run -dp 3000:3000 getting-started`
+* 使用 flags 来进行特殊设置
+  * `-d` `detached mode` 运行程序, 即后台运行
+  * `-p xx:xx ` 端口映射  `host:container`
+  * `--name` 如果容器有名字的话, 可以使用名字调用
+  * `--runtime==nvidia` 指定 docker 使用GPU
+    * `-e NVIDIA_VISIBLE_DEVICES=1` 指定容器只能使用 GPU1
+
+
+容器行为:
+* `--rm`         		      Automatically remove the container when it exits`, 容器退出的时候自动删除, 清洁命令
+* `--tty , -t` 		        Allocate a pseudo-TTY, 开启虚拟的远程访问接口 TTY
+* `--interactive , -i` 		Keep `STDIN` open even if not attached, 保持 STDIN 的始终开启
+* `-it`                   上面两条命令的结合, 会让整个容器变为可交互式的状态
+* 
+
+容器路径管理:
+* `--volume , -v    <local_path:container_path>` 		Bind mount a volume, 把本地路径挂载到容器的某个路径
+
+spec. 管理:
+* `--gpus <all>` 	      GPU devices to add to the container (‘all’ to pass all GPUs)
+* `--shm-size=??gb` 		Size of /dev/shm, 共有的内存大小管理
+
+网络管理:
+* `--publish , -p  <local_port:container_port>` 		Publish a container’s port(s) to the host
+
+
+docker 环境
+* `--stop-signal` 		    : Signal to stop the container, 更改容器的停止信号
+
+
+## docker stop  - Stop one or more running containers 停止容器
+
+` docker stop [OPTIONS] CONTAINER [CONTAINER...]`
+
+最为简单的命令, 从外部直接停止一个容器
+
+OPTIONS:
+* `--signal , -s`		      : Signal to send to the container, 传送给容器的信息
+* `--time , -t`        		: Seconds to wait before killing the container. 在多少秒后停止容器
+
+这里涉及到一个信号的概念:
+* 默认下, 执行 docker stop 后, container 会受到一个信号  `SIGTERM`, 然后在特定的宽限期后, 收到 `SIGKILL`, docker 应该就是依据这种信号模式来停止容器的
+* 在高级情况下, 可以通过 Dockerfile 的`STOPSIGNAL` 字段 来更改容器的停止信号 
+* 同理, 在 `docker run` 部分也有更改容器停止信号的 OPTION `--stop-signal`
+
+
+## 2.7. docker start - 容器启动(重启) Start one or more stopped containers
+
+容器可以关闭, 再次启动时不能用`run`
+
+使用命令 `docker start [OPTIONS] CONTAINER [CONTAINER...]`
+
+example: `docker start -i <name>-cuda-10.2`
+
+OPTIONS:
+* `--attach , -a` 		  : Attach STDOUT/STDERR and forward signals, 启动的同时执行 attach
+* `--interactive , -i` 	: Attach container’s STDIN, 交互式的 attach
+* `--detach-keys`    		: Override the key sequence for detaching a container, 没太懂, 更改容器的 detach key?, 可能是配合 -a 一起用的
+
+## 2.8. docker attach - 接入容器
+
+Attach local standard input, output, and error streams to a running container
+
+`docker attach [OPTIONS] CONTAINER`
+
+1. 使用 docker 提供的 attach命令 `docker attach 44fc0f0582d9`, 容器是单线程的, 当多个窗口同时用该命令进入容器, 所有的窗口都会同步显示, 有一个窗口阻塞了所有的窗口都不能进行操作
+2. 使用 docker 的 exec 命令, 该命令会在容器中执行一个命令, 可以通过调用容器中的bash 来进入容器  `sudo docker exec -it 775c7c9ee1e1 /bin/bash`
+    
+
+## 2.9. 进程管理
+
+* `docker ps`         类似于系统的同名命令, 显示所有正在运行的 docker 容器
+* `docker stop [id]`  停止一个 docker 容器
+* `docker rm <id>`    永久删除一个 docker 容器
+  * 可以通过 `rm -f` 来直接停止并删除正在运行的容器
+
+
+
+
+# 3. Docker Hub
 
 * `Docker Hub` 是 docker image 的标准 registry
 * 通过命令行使用推送必须在本机进行登录
@@ -262,53 +382,7 @@ Define and run multi-container applications with Docker.
   * tagname 默认是 `latest`
 * 使用 `docker pull` 命令来获取一个 prebuild image
 
-
-## 2.7. Docker 运行命令
-
-容器的创建, 停止, 再运行, 进入都分别有各自的命令, 具体的生命线可以是
-
-* docker run    : 一开始的创建, 同时运行. Create and run a new container from an image
-* docker stop   : 停止一个容器的运行
-* docker start  : 容器的再启动
-* docker rm     : 删除一个容器实例
-
-### 2.7.1. docker run 运行镜像
-
-* 使用 `docker run [OPTIONS] IMAGE [COMMAND] [ARG...]` 在本机的 docker engine 上运行一个镜像, 此时会创建一个容器
-  * `docker run -dp 3000:3000 getting-started`
-  * 使用 flags 来进行特殊设置
-    * `-d` `detached mode` 运行程序, 即后台运行
-    * `-p xx:xx ` 端口映射  `host:container`
-    * `--name` 如果容器有名字的话, 可以使用名字调用
-    * `--runtime==nvidia` 指定 docker 使用GPU
-      * `-e NVIDIA_VISIBLE_DEVICES=1` 指定容器只能使用 GPU1
-
-### 2.7.2. 运行容器
-
-* 容器可以关闭, 再次启动时不能用`run`
-  * 使用命令 `docker start [OPTIONS] CONTAINER [CONTAINER...]`
-  * `docker start -i <name>-cuda-10.2`
-
-### 2.7.3. 进入容器
-
-在使用Docker创建了容器之后, 比较关心的就是如何进入该容器了, 其实进入Docker容器有好几多种方式
-
-1. 使用 docker 提供的 attach命令 `docker attach 44fc0f0582d9`, 容器是单线程的, 当多个窗口同时用该命令进入容器, 所有的窗口都会同步显示, 有一个窗口阻塞了所有的窗口都不能进行操作
-2. 使用 docker 的 exec 命令, 该命令会在容器中执行一个命令, 可以通过调用容器中的bash 来进入容器  `sudo docker exec -it 775c7c9ee1e1 /bin/bash`
-3. 使用 nsenter 进入容器, 需要通过 docker 相关命令获得容器的 PID
-    
-
-### 2.7.4. 进程管理
-
-* `docker ps`         类似于系统的同名命令, 显示所有正在运行的 docker 容器
-* `docker stop [id]`  停止一个 docker 容器
-* `docker rm <id>`    永久删除一个 docker 容器
-  * 可以通过 `rm -f` 来直接停止并删除正在运行的容器
-
-
-
-
-# 3. Dockerfile
+# 4. Dockerfile
 
 * `Dockerfile` 是一个文本文件脚本, 用于创建一个容器镜像(注意没有文件后缀), 放在项目的根目录
 
