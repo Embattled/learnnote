@@ -7,6 +7,7 @@
 * `ls -ah` ls用来输出当前文件夹的所有文件及文件夹  -ah用来输出包括被隐藏的全部
 
 
+
 ## 1.1. git信息命令
 
 
@@ -14,6 +15,8 @@
 ## 1.2. git-config 命令
 
 属于 git 的一个命令行配置命令, 通过CLI的方式直接对 git 配置文件进行一些修改, 语法特别多, 直接对配置文件通过编辑器修改也是可行的  
+
+对某个仓库的默认行为更改后, 如果想手动不遵守定义的默认行为, 则在 CLI 中可以执行带 `-no` 的命令版本, 一般 `-no` 的命令都是 git 的全局默认行为
 
 git配置文件有多个位置:
 * 系统层级的配置文件,对应 `git config --system`, `$(prefix)/etc/gitconfig ` `/etc/gitconfig` 
@@ -62,10 +65,6 @@ git config -l  # 测试编辑好的机器信息
 注意`git config`命令的`--global` 参数, 用了这个参数, 表示该用户在这台机器上所有的Git仓库都会使用这个配置, 当然也可以对某个仓库指定不同的用户名和Email地址
 
 
-
-### 1.2.3. pull
-
-
 # 2. Getting and Creating Projects
 
 开始一个项目的操作
@@ -104,7 +103,7 @@ git init [-q | --quiet] [--bare] [--template=<template-directory>]
 完整的表现为
 * 为远程每一个分支建立好对应的 remote-tracking, 可以通过 `git branch --remotes` 查看
 * 建立并初始化 一个分支 , 即  cloned repository’s currently active branch.
-* 克隆完成后:
+* 该步骤克隆完成后, 如下的命令会产生的执行为:
   * `git fetch`  : 会下载全部的远程分支
   * `git pull`   : 会下载远程的 master branch 并合并到本地的 master branch
 
@@ -127,10 +126,9 @@ git clone [--template=<template-directory>]
   * 执行 `git fetch` 会更新所有的 remote-tracking branches
   * `git pull`  会更新所有的 remote-tracking branches 并将更新的内容合并到本地
 
-常用选项: 
+分支选项: 
 * `-b <name>, --branch <name>` 指定要克隆的分支
-* 
-
+* `--[no-]single-branch `      指定 single-branch 模式, 该 clone 只会下载某一个特定分支的历史记录. 克隆后再执行 git fetch 也不会抓取其他分支的信息, 若重新需要其他分支的信息的话需要重新克隆整个仓库, 一般和 `--branch` 一起使用
 
 子模组:
 * `--recurse-submodules`  递归的克隆全部的 submodule, initialize and clone submodules .

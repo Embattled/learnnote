@@ -1,6 +1,8 @@
 - [1. Internet Data Handling and Structured Markup Processing Tools](#1-internet-data-handling-and-structured-markup-processing-tools)
 - [2. json JSON encoder and decoder](#2-json-json-encoder-and-decoder)
-  - [2.1. 读取与保存](#21-读取与保存)
+  - [2.1. Basic Usage](#21-basic-usage)
+    - [2.1.1. load](#211-load)
+    - [2.1.2. dump](#212-dump)
   - [2.2. Endocer Decoder](#22-endocer-decoder)
   - [2.3. Exception](#23-exception)
   - [2.4. python 命令行直接使用](#24-python-命令行直接使用)
@@ -8,6 +10,7 @@
 # 1. Internet Data Handling and Structured Markup Processing Tools
 
 用于处理在互联网上常用的数据类型
+This chapter describes modules which support handling data formats commonly used on the internet.
 
 Internet Data 分类为:  
 用于处理一些网络上的通用数据格式的模组定义在该分类下, 具体包括
@@ -20,7 +23,6 @@ Internet Data 分类为:
 7. binhex
 8. binascii
 9. quopri
-10. uu
 
 除此之外, 还有一个小分组, 用于处理网页的基石, html 和 xml  
 Structured Markup Processing Tools:  
@@ -34,11 +36,60 @@ JSON 原名 JavaScript Object Notation, 从 JS 的语法衍生而来, Python 提
 
 要注意 JSON 有可能会包含极大数据, 占用过多的 CPU 资源, 因此在使用时要注意数据来源, 设置好数据大小上限
 
-JSON 目前是 YAML 1.2 的一个子集, 因此该包也可以直接用来处理 YAML 数据
+`JSON` 目前是 YAML 1.2 的一个子集, 因此该包也可以直接用来处理 YAML 数据 (as a YAML serializer).
 
-该包定义的特殊的 JSON 类是有序的, 算是一个改进后的 dict (python 内建 dict 是key无序的)
+该包定义的特殊的 JSON 类是有序的, 算是一个改进后的 dict (python 内建 dict 是key无序的), 因此如果不手动转换成 python 的 dict, 则能够保证数据的顺序不变
 
-## 2.1. 读取与保存
+
+快速使用实例
+```python
+import json
+
+# 把序列和字典的符合数据打包
+json.dumps(['foo', {'bar': ('baz', None, 1.0, 2)}])
+# '["foo", {"bar": ["baz", null, 1.0, 2]}]'
+
+print(json.dumps("\"foo\bar"))
+# "\"foo\bar"
+
+print(json.dumps('\u1234'))
+# "\u1234"
+
+print(json.dumps('\\'))
+# "\\"
+
+print(json.dumps({"c": 0, "b": 0, "a": 0}, sort_keys=True))
+# {"a": 0, "b": 0, "c": 0}
+
+from io import StringIO
+io = StringIO()
+json.dump(['streaming API'], io)
+io.getvalue()
+'["streaming API"]'
+
+# dump 出来的 json 通过 Print 漂亮的打印, 
+print(json.dumps({'4': 5, '6': 7}, sort_keys=True, indent=4))
+#{
+    # "4": 5,
+    # "6": 7
+# }
+```
+
+## 2.1. Basic Usage
+
+### 2.1.1. load
+
+`json.load(fp, *, cls=None, object_hook=None, parse_float=None, parse_int=None, parse_constant=None, object_pairs_hook=None, **kw)`
+* 从一个 file like 中读取 JSON
+* `object_hook` : 自定义解码器, 传入的话返回的就不是 dict 了, 需要保证与 dict 的兼容性
+* `object_pairs_hook` : 更加优先的自定义解码器, 跟顺序有关, 不太懂
+* `parse_float` `parse_int` `parse_constant`
+
+`json.loads(s, *, cls=None, object_hook=None, parse_float=None, parse_int=None, parse_constant=None, object_pairs_hook=None, **kw)`
+* 从字符串中读取 JSON
+
+
+### 2.1.2. dump
 
 注意 
 * 在 dump 的时候, 字典的所有 key/value 都会被转化成 str, 因此如果 kv 中有non-str 的话 `loads(dumps(x)) != x`
@@ -58,17 +109,10 @@ JSON 目前是 YAML 1.2 的一个子集, 因此该包也可以直接用来处理
 
 
 `json.dumps(obj, *, skipkeys=False, ensure_ascii=True, check_circular=True, allow_nan=True, cls=None, indent=None, separators=None, default=None, sort_keys=False, **kw)`
-* 把 obj 转化成 JSON format 的字符串
+* 把 obj 转化成 JSON format 的 字符串
+  
 
 
-`json.load(fp, *, cls=None, object_hook=None, parse_float=None, parse_int=None, parse_constant=None, object_pairs_hook=None, **kw)`
-* 从一个 file like 中读取 JSON
-* `object_hook` : 自定义解码器, 传入的话返回的就不是 dict 了, 需要保证与 dict 的兼容性
-* `object_pairs_hook` : 更加优先的自定义解码器, 跟顺序有关, 不太懂
-* `parse_float` `parse_int` `parse_constant`
-
-`json.loads(s, *, cls=None, object_hook=None, parse_float=None, parse_int=None, parse_constant=None, object_pairs_hook=None, **kw)`
-* 从字符串中读取 JSON
 
 ## 2.2. Endocer Decoder
 

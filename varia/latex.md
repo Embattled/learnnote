@@ -442,6 +442,32 @@ $$
 
 ```
 
+### 2.3.3.  amsmath - 矩阵专用
+
+amsmath 中有一些很方便的矩阵环境, 用于便捷的书写矩阵  
+
+语法都为 : `\begin{环境名} &用来分元素 \\用来分行 \end{环境名}`
+* matrix : Plain 矩阵, 没有括号
+* pmatrix : Parenthesess, round brackets . 圆括号
+* bmatrix : Brackets, square brackets . 方括号
+* Bmatrix : Braces, curly brackets. 花括号
+* vmatrix : Pipes, 直线, 即用于表示行列式的情况
+* Vmatrix : Double pipes, 双直线
+
+$$
+ 	\begin{matrix}
+1 & 2 & 3\\
+a & b & c
+\end{matrix}
+$$
+
+$$
+\begin{pmatrix}
+1 & 2 & 3\\
+a & b & c
+\end{pmatrix}
+$$
+
 
 ## 2.4. latex 矢量图
 

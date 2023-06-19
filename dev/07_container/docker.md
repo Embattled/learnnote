@@ -6,20 +6,24 @@
     - [1.4.1. 通过仓库安装 docker](#141-通过仓库安装-docker)
     - [1.4.2. 运行权限](#142-运行权限)
   - [1.5. storage driver](#15-storage-driver)
-- [2. Docker Engine](#2-docker-engine)
-  - [2.1. docker build 镜像编译 - Build an image from a Dockerfile](#21-docker-build-镜像编译---build-an-image-from-a-dockerfile)
-    - [2.1.1. build options](#211-build-options)
-  - [2.2. docker compose 镜像统合](#22-docker-compose-镜像统合)
-  - [2.3. docker image 镜像管理](#23-docker-image-镜像管理)
-  - [2.4. docker container 容器管理](#24-docker-container-容器管理)
-  - [2.5. docker tag  -  Create a tag TARGET\_IMAGE that refers to SOURCE\_IMAGE](#25-docker-tag-----create-a-tag-target_image-that-refers-to-source_image)
-  - [2.6. docker run 启动镜像 核心命令](#26-docker-run-启动镜像-核心命令)
-  - [docker stop  - Stop one or more running containers 停止容器](#docker-stop----stop-one-or-more-running-containers-停止容器)
-  - [2.7. docker start - 容器启动(重启) Start one or more stopped containers](#27-docker-start---容器启动重启-start-one-or-more-stopped-containers)
-  - [2.8. docker attach - 接入容器](#28-docker-attach---接入容器)
-  - [2.9. 进程管理](#29-进程管理)
+- [2. Docker Engine - Command-line reference](#2-docker-engine---command-line-reference)
+  - [2.1. 容器生命周期](#21-容器生命周期)
+    - [2.1.1. docker build 镜像编译 - Build an image from a Dockerfile](#211-docker-build-镜像编译---build-an-image-from-a-dockerfile)
+      - [2.1.1.1. build options](#2111-build-options)
+    - [2.1.2. docker compose 镜像统合](#212-docker-compose-镜像统合)
+    - [2.1.3. docker image 镜像管理](#213-docker-image-镜像管理)
+    - [2.1.4. docker container 容器管理](#214-docker-container-容器管理)
+    - [2.1.5. docker tag  -  Create a tag TARGET\_IMAGE that refers to SOURCE\_IMAGE](#215-docker-tag-----create-a-tag-target_image-that-refers-to-source_image)
+    - [2.1.6. docker run 启动镜像 核心命令](#216-docker-run-启动镜像-核心命令)
+    - [2.1.7. docker stop  - Stop one or more running containers 停止容器](#217-docker-stop----stop-one-or-more-running-containers-停止容器)
+    - [2.1.8. docker start - 容器启动(重启) Start one or more stopped containers](#218-docker-start---容器启动重启-start-one-or-more-stopped-containers)
+    - [2.1.9. docker attach - 接入容器](#219-docker-attach---接入容器)
+  - [2.2. 进程管理](#22-进程管理)
+  - [2.3. docker history - Show the history of an image](#23-docker-history---show-the-history-of-an-image)
 - [3. Docker Hub](#3-docker-hub)
-- [4. Dockerfile](#4-dockerfile)
+- [4. Dockerfile reference](#4-dockerfile-reference)
+  - [4.1. FROM](#41-from)
+  - [4.2. ARG](#42-arg)
 
 
 # 1. Start Docker 
@@ -168,24 +172,44 @@ docker支持许多存储驱动, 在 `Ubuntu`下支持 : `overlay2, aufs, btrfs`
   * 但它还很年轻, 在成产环境中使用要谨慎。
 
 
-# 2. Docker Engine
+# 2. Docker Engine - Command-line reference
 
 记录docker engine 的相关基础CLI运行命令
 
 docker 是一个基础接口, 其下的各种子命令都是独立的 binary, 分别有其各自自己的 --help 和其他各种子命令
 
 
+
+## 2.1. 容器生命周期
+
 容器的创建, 停止, 再运行, 进入都分别有各自的命令, 具体的生命线可以是
 * docker build  : 从 dockerfile 编译出一个镜像
 * docker run    : 一开始的创建, 同时运行. Create and run a new container from an image
 * docker stop   : 停止一个容器的运行
 * docker start  : 容器的再启动
+* docker attach : 容器的接入
 * docker rm     : 删除一个容器实例
 
 
-## 2.1. docker build 镜像编译 - Build an image from a Dockerfile
+* docker image  : 全部镜像管理
+* docker container : 全部容器管理
+
+* docker tag
+
+### 2.1.1. docker build 镜像编译 - Build an image from a Dockerfile
 
 docker build 是 docker engine 的基础命令, 通过 build 来创建一个 image
+
+` docker build [OPTIONS] PATH | URL | -`
+从一个静态的 `dockerfile` 和 `context` 来编译一个 docker images, 具体的一个 Context 为一个 Path 或者 URL  
+* 具体的 URL 则支持三种类型:
+  *  Git repositories
+  *  pre-packaged tarball contexts
+  *  plain text files
+
+
+
+
 
 目前该命令有两个组成部分
 * 从 18.09 版本开始, 以 `Moby BuildKit` 作为默认的 build 工具
@@ -199,17 +223,10 @@ docker build 是 docker engine 的基础命令, 通过 build 来创建一个 ima
   * exporting build results to OCI image tarballs.
 
 
-` docker build [OPTIONS] PATH | URL | -`
-从一个静态的 dockerfile 和 `context` 来编译一个 docker images, 具体的一个 Context 为一个 Path 或者 URL  
-* 具体的 URL 则支持三种类型:
-  *  Git repositories
-  *  pre-packaged tarball contexts
-  *  plain text files
 
 
 
-
-### 2.1.1. build options
+#### 2.1.1.1. build options
 
 * `--file , -f`  		  : Name of the Dockerfile (Default is PATH/Dockerfile), 即指定 Dockerfile 的名称, 这里要和 Path 区分开来
 
@@ -225,7 +242,7 @@ Image 的性能 spec. 配置:
 * `--memory-swap` 		Swap limit equal to memory plus swap: -1 to enable unlimited swap
 * 
 
-## 2.2. docker compose 镜像统合
+### 2.1.2. docker compose 镜像统合
 
 Define and run multi-container applications with Docker.
 
@@ -252,7 +269,7 @@ Define and run multi-container applications with Docker.
 
 
 
-## 2.3. docker image 镜像管理
+### 2.1.3. docker image 镜像管理
 
 一个镜像通过 dockerfile 被编译后, 会存储在当前本机中, 即 Host machine.  默认的存储位置是:
 * linux : `/var/lib/docker` 
@@ -266,7 +283,7 @@ Define and run multi-container applications with Docker.
   * `docker images` 和 `image ls` 功能相同
 * `docker image rm [imageName]` 和 `docker rmi [imageName]` 用来删除一个 image
 
-## 2.4. docker container 容器管理
+### 2.1.4. docker container 容器管理
 
 * `docker container ls -l` 列出本机正在运行的容器
 * `docker container ls -l --all` 列出本机所有容器, 包括终止运行的容器：
@@ -274,15 +291,12 @@ Define and run multi-container applications with Docker.
 * `docker ps -a` 列出所有容器
 * 
 
-## 2.5. docker tag  -  Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE
+### 2.1.5. docker tag  -  Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE
 
 * `docker tag 旧名字 新名字` 用来给一个 image 赋予新的名字
 * 新旧名字会同时存在, 但是都指向同一个 image, ID 是相同的
 
-
-
-
-## 2.6. docker run 启动镜像 核心命令
+### 2.1.6. docker run 启动镜像 核心命令
 
 `docker run [OPTIONS] IMAGE [COMMAND] [ARG...]`   在本机的 docker engine 上运行一个镜像, 此时会创建一个容器
 该命令会被用来进行各种各样的容器配置
@@ -319,7 +333,7 @@ docker 环境
 * `--stop-signal` 		    : Signal to stop the container, 更改容器的停止信号
 
 
-## docker stop  - Stop one or more running containers 停止容器
+### 2.1.7. docker stop  - Stop one or more running containers 停止容器
 
 ` docker stop [OPTIONS] CONTAINER [CONTAINER...]`
 
@@ -335,7 +349,7 @@ OPTIONS:
 * 同理, 在 `docker run` 部分也有更改容器停止信号的 OPTION `--stop-signal`
 
 
-## 2.7. docker start - 容器启动(重启) Start one or more stopped containers
+### 2.1.8. docker start - 容器启动(重启) Start one or more stopped containers
 
 容器可以关闭, 再次启动时不能用`run`
 
@@ -348,7 +362,7 @@ OPTIONS:
 * `--interactive , -i` 	: Attach container’s STDIN, 交互式的 attach
 * `--detach-keys`    		: Override the key sequence for detaching a container, 没太懂, 更改容器的 detach key?, 可能是配合 -a 一起用的
 
-## 2.8. docker attach - 接入容器
+### 2.1.9. docker attach - 接入容器
 
 Attach local standard input, output, and error streams to a running container
 
@@ -358,7 +372,7 @@ Attach local standard input, output, and error streams to a running container
 2. 使用 docker 的 exec 命令, 该命令会在容器中执行一个命令, 可以通过调用容器中的bash 来进入容器  `sudo docker exec -it 775c7c9ee1e1 /bin/bash`
     
 
-## 2.9. 进程管理
+## 2.2. 进程管理
 
 * `docker ps`         类似于系统的同名命令, 显示所有正在运行的 docker 容器
 * `docker stop [id]`  停止一个 docker 容器
@@ -366,7 +380,9 @@ Attach local standard input, output, and error streams to a running container
   * 可以通过 `rm -f` 来直接停止并删除正在运行的容器
 
 
+## 2.3. docker history - Show the history of an image
 
+`docker history [OPTIONS] IMAGE`
 
 # 3. Docker Hub
 
@@ -382,9 +398,25 @@ Attach local standard input, output, and error streams to a running container
   * tagname 默认是 `latest`
 * 使用 `docker pull` 命令来获取一个 prebuild image
 
-# 4. Dockerfile
+# 4. Dockerfile reference
 
 * `Dockerfile` 是一个文本文件脚本, 用于创建一个容器镜像(注意没有文件后缀), 放在项目的根目录
+* 可以被 docker build 读取并执行一个完整的 镜像编译流程
+
+所有的 Dockerfile 的命令都满足以下格式
+```Dockerfile
+# Comment
+INSTRUCTION arguments
+```
+* instruction 是一个 not case-sensitive, 约定大写便于识别
+* 一个Dockerfile 的执行内容必须以 `FROM` 开始
+  * 在 FROM 之前可以存在 parser directives, comments, globally scoped `ARG`s
+  * FROM 指定了当前构筑的镜像的 Parent Image
+* 在行中的 # 不会被视为注释
+  * 注释行会在整个 Dockerfile 被执行之前被全部移除
+* 指令行首的空格会被移除, 然而命令中的空格会被保留, 即使是多行命令  
+
+
 
 ```
 FROM node:12-alpine
@@ -393,3 +425,33 @@ COPY . .
 RUN yarn install --production
 CMD ["node", "src/index.js"]
 ```
+
+
+## 4.1. FROM
+
+
+```Dockerfile
+FROM [--platform=<platform>] <image> [AS <name>]
+FROM [--platform=<platform>] <image>[:<tag>] [AS <name>]
+FROM [--platform=<platform>] <image>[@<digest>] [AS <name>]
+```
+
+一个 Dockerfile 必须有一个有效的 FROM 指令  
+比较推荐从一些 Public Repositories pull 一些基本的 Base image 作为整个镜像的基石
+
+* 只有 ARG 被允许在 FROM 之前出现
+* 同一个 Dockerfile 可以出现多次 FROM
+  * 用于在一个 Dockerfile 中编译多个 images
+  * 用于把前面的 image 作为依赖项供后面的 image 使用, 要注意,  Each FROM instruction clears any state created by previous instructions, 因此必须 Simply make a note of the last image ID output by the commit before each new FROM instruction.
+* `AS <name>` : 在一个 Dockerfile 中存在多个 FROM 的时候, 用于方便后面的 FROM 以之前的 image 作为 base
+  * 可以用于之后的 FROM 和 `COPY --from=<name>` to refer to the image built in this stage.
+* `:<tag>`  `@<digest>`  : 给与一个镜像一个 tag, 如果不指定的话会生成默认的 `latest` 
+
+
+## 4.2. ARG
+
+`ARG <name>[=<default value>]`
+
+用于事先定义一些可以通过 CLI 来指定的编译时的变量, 通过 docker build 的 `--build-arg <varname>=<value>` 参数来指定, 如果传入了没被定义为 ARG 的参数, build 会 Warning
+
+* 官方不建议把一些私密信息通过该方式传入 build 过程中, 因为 能够被其他用户通过 `docker history` 看到

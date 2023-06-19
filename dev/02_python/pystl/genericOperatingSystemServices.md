@@ -363,7 +363,8 @@ parser.add_argument('short_title', type=hyphenated)
 4. `choices`  该参数只能是特定值中的某一项, 否则会报错, 用于防止输入非法的值
 
 
-**argparse的使用**
+### 5.2.1. name or flags
+
 ```python
 
 # action="store_true"
@@ -377,12 +378,13 @@ group = parser.add_mutually_exclusive_group()
 group.add_argument("-v", "--verbose", action="store_true")
 group.add_argument("-q", "--quiet", action="store_true")
 ```  
-### 5.2.1. name or flags
+
+
 ### 5.2.2. action - Action class
 
 Action classes implement the Action API
 * a callable which returns a callable which processes arguments from the command-line.
-*  Any object which follows this API may be passed as the action parameter to add_argument().
+* Any object which follows this API may be passed as the action parameter to add_argument().
 
 ### 5.2.3. nargs
 
