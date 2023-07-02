@@ -72,7 +72,69 @@ $ sudo chmod 600 .ssh/authorized_keys
 # 用于写在 ProxyCommand 中进行跳板  
 -W host:port
 ```
-## 3.1. ssh_config
+
+大部分的 CLI 参数都可以直接写在 config 中, 具体能不能写则会在文档中具体给出
+
+## 3.1. ssh 端口转发
+
+端口转发的配置都可以直接定义在 Config 中
+
+简要说明: -R 和 -L 是一个相反意思但是功能有重叠的命令, 二者之间的抉择主要基于安全考量
+* -R  : 将远程的端口转发到本地  (Local Port Forwarding)
+  * connections to the given TCP port or Unix socket on the remote (server) host are to be forwarded to the local side. 
+  * 在远端应用已经运行了一个监听在(远端)本地端口 8080的时候, 将该服务暴露给远端
+  * 会锁定远端的端口
+  * 可以理解为把远端的活儿揽到自己身上
+
+* -L  : 将本地的端口转发到远程  (Remote Port Forwarding)
+  * connections to the given TCP port or Unix socket on the local (client) host are to be forwarded to the given host and port, or Unix socket, on the remote side
+  * 会把本地的端口锁定
+  * 可以把自己活推给远端
+* 依据安全要求, 选择 -R 或者 -L
+* bind_address 在不指明的情况下默认等同于 `local_host`
+
+
+```sh
+
+-L [bind_address:]port:host:hostport
+ssh -L 80:localhost:80 SUPERSERVER
+# 将连接到本地 localhost 80 端口的访问转发到 目标(这里是 SUPERSERVER) 的 80 端口上
+# 这意味这任何访问 (包括本地作为服务器由第三方用户访问的时候) 本地计算机80端口 (即浏览器) 的时候, 会得到 SUPERSERVER 的80端口的服务回应
+# 此时 localhost 不运行任何 webserver
+
+-L [bind_address:]port:remote_socket
+-L local_socket:host:hostport
+-L local_socket:remote_socket
+
+
+-R [bind_address:]port:host:hostport
+ssh -R 80:localhost:80 tinyserver
+# 所有访问 tinyserver 80端口的连接都会转发到 本机 localhost 的 80 端口
+# 此时可以理解为 tinyserver 是一个性能弱小的 server, 而 localhost 是一个性能强劲的服务器
+# tinyserver 不运行 webserver, 本地运行, 但对于访问 tinyserver 的第三方用户感知到的是 tinyserver 是 webserver
+
+# 更复杂的应用场景, 假设本地 localhost 是性能强力的服务器, 且在不同的端口同时运行着多个 webserver
+# 由不同的 tinyserver 作为服务接入端
+ssh -R 80:localhost:30180 tinyserver1
+ssh -R 80:localhost:30280 tinyserver2
+# 更甚至于, 使用 ssh 来把本地变成一个中继站, 用于连接 SUPERSERVER 和 tinyserver, 注意, 此时可能需要添加 -g 命令
+ssh -R 80:SUPERSERVER:30180 tinyserver1
+ssh -R 80:SUPERSERVER:30280 tinyserver2
+
+-R [bind_address:]port:local_socket
+-R remote_socket:host:hostport
+-R remote_socket:local_socket
+-R [bind_address:]port
+
+```
+
+辅佐命令 
+* `-g`    : 启动全局转发
+  * Allows remote hosts to connect to local forwarded ports.
+  * If used on a multiplexed connection, then this option `must` be specified on the master process. 
+
+
+## 3.2. ssh_config
 
 通过配置文件保存密码
 
@@ -93,7 +155,7 @@ Host 别名
     User 用户名
 ```
 
-### 3.1.1. 防止自动断开
+### 3.2.1. 防止自动断开
 
 用ssh链接服务端，一段时间不操作或屏幕没输出（比如复制文件）的时候，会自动断开  
 
@@ -114,7 +176,7 @@ ClientAliveInterval 60
 ClientAliveCountMax 1
 ```
 
-### 3.1.2. ProxyCommand 跳板
+### 3.2.2. ProxyCommand 跳板
 
 很多环境都有一台统一登录跳板机,我们需要先登录跳板机,然后再登录自己的目标机器.  
 ProxyCommand是openssh的特性,如果使用putty,xshell,那么是没有这个功能的  
@@ -127,7 +189,7 @@ ProxyCommand是openssh的特性,如果使用putty,xshell,那么是没有这个�
 * %h:%p : 表示要连接的目标机端口,可以直接写死固定值,但是使用%h和%p可以保证在Hostname和Port变化的情况下ProxyCommand这行不用跟着变化.
 
 
-### 3.1.3. SHA1 支持
+### 3.2.3. SHA1 支持
 
 新版Openssh中认为SHA1这种hash散列算法过于薄弱，已经不再支持，所以我们需要手动去enable对于SHA1的支持
 
