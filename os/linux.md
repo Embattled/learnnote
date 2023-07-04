@@ -324,7 +324,7 @@ Linux 基金会的 FHS标准 制定了文件目录的标准
 
 规定了 Linux 系统中**所有**一级目录以及部分二级目录（/usr 和 /var）的用途  
 
-## 3.1.1. 根目录 
+## 3.1. 根目录 
 
 ```shell
 
@@ -370,7 +370,7 @@ $ ls /sys/class/net
 /srv/
 
 ```
-### 3.1.2. 软件目录 /usr
+### 3.1.1. 软件目录 /usr
 
 注意不是 user, 全称为 `Unix Software Resource`  
 FHS 建议所有开发者,应把软件产品的数据`合理的放置在 /usr 目录下的各子目录中`  
@@ -408,17 +408,17 @@ FHS 建议所有开发者,应把软件产品的数据`合理的放置在 /usr �
 
 ```
 
-### 3.1.3. /var 目录 
+### 3.1.2. /var 目录 
 
 目录用于存储动态数据,例如缓存、日志文件、软件运行过程中产生的文件等  
 
-### 3.2. /dev/  设备文件  
+### 3.1.3. /dev/  设备文件  
 
 * /dev 下的文件是真实的设备 由UDEV在运行时创建
 * udev 是Linux kernel 2.6系列的设备管理器, 它主要的功能是管理/dev目录底下的设备节点
 
 
-### 3.2.1. /dev/null 丢弃
+### 3.1.4. /dev/null 丢弃
 
 只有一个用途, 就是丢弃各种输出流
 * 使用if来转储无用的数据, 在其中输出, 这样它就不会占用系统内存和处理能力
@@ -431,17 +431,17 @@ FHS 建议所有开发者,应把软件产品的数据`合理的放置在 /usr �
 * 它会吸收任何输入, 并且不返回任何内容,   
 * 如果你使用 cat 去读取这个文件, 那么它只会返回文件终点
 
-###  3.2.2. 存储
+###  3.1.5. 存储
 
 /dev/sda 可能是您的主硬盘驱动器
 
 /dev/sdb 可能是您现在正在使用的笔记本驱动器的文件
 
-## 3.3. /etc/  Editable Text Configuration
+## 3.2. /etc/  Editable Text Configuration
 
 FHS规定用来放配置文件
 
-### 3.3.1. /etc/resolv.conf - resolver configuration file
+### 3.2.1. /etc/resolv.conf - resolver configuration file
 
 The file is designed to be human readable and contains a list of keywords with values that provide various types of resolver information.  
 
@@ -1028,7 +1028,7 @@ List information about the FILEs. 默认查看当前位置
 | -i   | 不用硬盘容量显示, 而是以含有 inode 的数量来显示。               |
 
 
-### mount 挂载
+### 7.2.4. mount 挂载
 
 Linux 下所有硬件设备都必须挂载后才能使用, 区别是硬盘分区挂载被写入了系统启动脚本, 而其他设备(例如U盘等)需要手动挂载
 
@@ -1501,7 +1501,7 @@ PATH 的载入
    * 甚至是对命令提示符的修改 `PS1="[c.biancheng.net]\$ "`
 
 
-#### env 命令
+#### 10.1.6.1. env 命令
 
 `env [option] [环境变量=值] [命令]`
 * 无参数调用 : 代表输出目前环境的所有环境变量
