@@ -17,9 +17,15 @@
   * Mid-term data association : 匹配地图元素中 距离相机较近 同时 drift 较小的元素, 能够实现在已绘制地图的区域中实现 0 drift
   * Long-term data association : 主要用于在大型环境中保证 SLAM 的精度, 基于 place recognition, 允许重设 drift 为 0, 以及矫正既存地图
 
+### Stereo SLAM
+
+* 过远的点由于立体图形的时差过小, 会导致 depth 不能可靠的测量, 需要一些 trick
+* 
 
 
-## Algorithms
+
+
+## Algorithms 
 
 
 
@@ -48,7 +54,9 @@ Map Management and Query : estimate the pose of newly coming frames
 
 
 
-##
+## Single
+
+
 ORB-SLAM3: An Accurate Open-Source Library for Visual, Visual-Inertial and Multi-Map SLAM.  
 Campos, C., Elvira, R., Rodriguez, J. J. G., M. Montiel, J. M., & D. Tardos, J. (2021).  
 IEEE Transactions on Robotics, 1874–1890. https://doi.org/10.1109/tro.2021.3075644  

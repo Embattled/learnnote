@@ -10,6 +10,7 @@
   - [2.1. 容器生命周期](#21-容器生命周期)
     - [2.1.1. docker build 镜像编译 - Build an image from a Dockerfile](#211-docker-build-镜像编译---build-an-image-from-a-dockerfile)
       - [2.1.1.1. build options](#2111-build-options)
+      - [2.1.1.2. spec options](#2112-spec-options)
     - [2.1.2. docker compose 镜像统合](#212-docker-compose-镜像统合)
     - [2.1.3. docker image 镜像管理](#213-docker-image-镜像管理)
     - [2.1.4. docker container 容器管理](#214-docker-container-容器管理)
@@ -208,9 +209,6 @@ docker build 是 docker engine 的基础命令, 通过 build 来创建一个 ima
   *  plain text files
 
 
-
-
-
 目前该命令有两个组成部分
 * 从 18.09 版本开始, 以 `Moby BuildKit` 作为默认的 build 工具
   * creating scoped builder instances
@@ -233,7 +231,7 @@ docker build 是 docker engine 的基础命令, 通过 build 来创建一个 ima
 * `--build-arg` 		  : Set build-time variables, 用于根据 dockerfile 的设定动态的调整编译的结果  
 * `-t --tag 项目名`   : 用于指定该镜像的名称, 最终镜像的名称为 `name:tag` format
 
-
+#### 2.1.1.2. spec options
 
 Image 的性能 spec. 配置: 
 * `--cpuset-cpus` 		CPUs in which to allow execution (0-3, 0,1)
@@ -301,14 +299,15 @@ Define and run multi-container applications with Docker.
 `docker run [OPTIONS] IMAGE [COMMAND] [ARG...]`   在本机的 docker engine 上运行一个镜像, 此时会创建一个容器
 该命令会被用来进行各种各样的容器配置
 
-
 * `docker run -dp 3000:3000 getting-started`
+
+
 * 使用 flags 来进行特殊设置
   * `-d` `detached mode` 运行程序, 即后台运行
   * `-p xx:xx ` 端口映射  `host:container`
   * `--name` 如果容器有名字的话, 可以使用名字调用
   * `--runtime==nvidia` 指定 docker 使用GPU
-    * `-e NVIDIA_VISIBLE_DEVICES=1` 指定容器只能使用 GPU1
+  * `-e NVIDIA_VISIBLE_DEVICES=1` 指定容器只能使用 GPU1
 
 
 容器行为:
@@ -318,8 +317,11 @@ Define and run multi-container applications with Docker.
 * `-it`                   上面两条命令的结合, 会让整个容器变为可交互式的状态
 * 
 
-容器路径管理:
+容器环境配置:
 * `--volume , -v    <local_path:container_path>` 		Bind mount a volume, 把本地路径挂载到容器的某个路径
+* `--env , -e`  为容器添加单个环境变量  `--env-file`  通过文件添加
+  * `docker run -e MYVAR1 --env MYVAR2=foo --env-file ./env.list ubuntu bash`
+  * `docker run --env VAR1 --env VAR2 ubuntu` 将已经在本地存在的环境变量值直接传入到容器中
 
 spec. 管理:
 * `--gpus <all>` 	      GPU devices to add to the container (‘all’ to pass all GPUs)
