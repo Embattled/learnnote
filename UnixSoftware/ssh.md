@@ -94,6 +94,9 @@ $ sudo chmod 600 .ssh/authorized_keys
 * bind_address 在不指明的情况下默认等同于 `local_host`
 
 
+相关配合命令:
+* `-N` : 不在远端执行 command, 这对于搭建端口转发的时候很有用.  
+
 ```sh
 
 -L [bind_address:]port:host:hostport
@@ -105,6 +108,9 @@ ssh -L 80:localhost:80 SUPERSERVER
 -L [bind_address:]port:remote_socket
 -L local_socket:host:hostport
 -L local_socket:remote_socket
+
+# 发往本机的80端口访问转发到192.168.1.1的8080端口
+ssh -C -f -N -g -L 80:192.168.1.1:8080 user@192.168.1.1
 
 
 -R [bind_address:]port:host:hostport
@@ -126,15 +132,46 @@ ssh -R 80:SUPERSERVER:30280 tinyserver2
 -R remote_socket:local_socket
 -R [bind_address:]port
 
+# 把发往192.168.1.1的8080访问转发到本机的80端口
+ssh -C -f -N -g -R 80:192.168.1.1:8080 user@192.168.1.1
 ```
+
+* `-D` : 动态 application-level port 转发
+  * 主要用于搭建 SOCKS4 服务器
+  * Currently the SOCKS4 and SOCKS5 protocols are supported
+
+
+
+
+## 其他命令
 
 辅佐命令 
 * `-g`    : 启动全局转发
   * Allows remote hosts to connect to local forwarded ports.
   * If used on a multiplexed connection, then this option `must` be specified on the master process. 
 
+* `-C` : 要求对所有传输的数据进行压缩化传输, 这回提高在低配置网络下的访问速度, 但会减慢在高配网络下的速度
 
-## 3.2. ssh_config
+
+* `-f` : 
+
+
+
+# 4. ssh_config
+
+ssh_config — OpenSSH client configuration file
+
+ssh 命令的执行会遵从如下顺序来获取相应的信息
+1. CLI 参数
+2. user's configuration file `~/.ssh/config`
+3. system-wide configuration file `/etc/ssh/ssh_config`
+
+config 文件包括关键字参数对, 每行一个, `#` 开头的行作为注释    
+参数可以用 `"` 括起来, 用以表示包含空格的参数, 配置选项可以用空格或者可选空格和一个 `=` 分割
+
+
+
+
 
 通过配置文件保存密码
 
@@ -155,7 +192,7 @@ Host 别名
     User 用户名
 ```
 
-### 3.2.1. 防止自动断开
+### 4.0.1. 防止自动断开
 
 用ssh链接服务端，一段时间不操作或屏幕没输出（比如复制文件）的时候，会自动断开  
 
@@ -176,7 +213,7 @@ ClientAliveInterval 60
 ClientAliveCountMax 1
 ```
 
-### 3.2.2. ProxyCommand 跳板
+### 4.0.2. ProxyCommand 跳板
 
 很多环境都有一台统一登录跳板机,我们需要先登录跳板机,然后再登录自己的目标机器.  
 ProxyCommand是openssh的特性,如果使用putty,xshell,那么是没有这个功能的  
@@ -189,7 +226,7 @@ ProxyCommand是openssh的特性,如果使用putty,xshell,那么是没有这个�
 * %h:%p : 表示要连接的目标机端口,可以直接写死固定值,但是使用%h和%p可以保证在Hostname和Port变化的情况下ProxyCommand这行不用跟着变化.
 
 
-### 3.2.3. SHA1 支持
+### 4.0.3. SHA1 支持
 
 新版Openssh中认为SHA1这种hash散列算法过于薄弱，已经不再支持，所以我们需要手动去enable对于SHA1的支持
 
@@ -205,10 +242,12 @@ KexAlgorithms +diffie-hellman-group1-sha1
 ```
 
 
-# 4. SCP(secure copy )远程拷贝文件与文件夹
+# 5. SCP(secure copy )远程拷贝文件与文件夹
 
 scp 是 linux 系统下基于 ssh 登陆进行安全的远程文件拷贝命令。  
 scp 是加密的，rcp 是不加密的，scp 是 rcp 的加强版。  
+
+openssh 8.0 将 scp 标记为过时的不建议使用的, 推荐用 sftp 或者 rsync 来代替 scp  
 
 `scp [可选参数] file_source file_target `  
 
@@ -269,4 +308,4 @@ scp -r www.runoob.com:/home/root/others/ /home/space/music/
 ```
 
 
-# 
+# 6. 

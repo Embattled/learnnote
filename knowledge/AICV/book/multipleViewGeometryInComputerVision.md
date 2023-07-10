@@ -9,8 +9,8 @@
 - [5. Algorithm Evaluation - 算法评价和误差分析](#5-algorithm-evaluation---算法评价和误差分析)
 - [6. Camera Models - 摄像机模型](#6-camera-models---摄像机模型)
   - [6.1. Finite cameras - 有限摄像机](#61-finite-cameras---有限摄像机)
-- [\\end{pmatrix}](#endpmatrix)
-  - [The projective camera - 射影摄像机](#the-projective-camera---射影摄像机)
+  - [6.2. The projective camera - 射影摄像机](#62-the-projective-camera---射影摄像机)
+    - [6.2.1. Camera anatomy 摄像机矩阵的构造](#621-camera-anatomy-摄像机矩阵的构造)
 - [7. Computation of the Camera Matrix P](#7-computation-of-the-camera-matrix-p)
     - [7.0.1. Distortion in Camera Calibration](#701-distortion-in-camera-calibration)
     - [7.0.2. camera matrix](#702-camera-matrix)
@@ -62,8 +62,8 @@
 - [5. Algorithm Evaluation - 算法评价和误差分析](#5-algorithm-evaluation---算法评价和误差分析)
 - [6. Camera Models - 摄像机模型](#6-camera-models---摄像机模型)
   - [6.1. Finite cameras - 有限摄像机](#61-finite-cameras---有限摄像机)
-- [\\end{pmatrix}](#endpmatrix)
-  - [The projective camera - 射影摄像机](#the-projective-camera---射影摄像机)
+  - [6.2. The projective camera - 射影摄像机](#62-the-projective-camera---射影摄像机)
+    - [6.2.1. Camera anatomy 摄像机矩阵的构造](#621-camera-anatomy-摄像机矩阵的构造)
 - [7. Computation of the Camera Matrix P](#7-computation-of-the-camera-matrix-p)
     - [7.0.1. Distortion in Camera Calibration](#701-distortion-in-camera-calibration)
     - [7.0.2. camera matrix](#702-camera-matrix)
@@ -233,7 +233,7 @@ single perspective camera 单个透视摄像机
 * camera centra (摄像机中心) : 即投影中心, 也称为光心 (optical centre)
 * principal axis / principal point (主轴, 主射线) : 摄像机中心到图像平面的垂线
 * principal point (主点) : 主轴与图像平面的交点
-* principal plane (主平米) : 过摄像机中心且平行于图像平面的平面
+* principal plane (主平面) : 过摄像机中心且平行于图像平面的平面
 
 用齐次坐标来表示中心投影, 首先数学表示上
 * $diag$ 表示对角矩阵
@@ -242,12 +242,18 @@ single perspective camera 单个透视摄像机
 * 投影过程可以简化表示为 $x=PX$
 
 $$
-\begin{pmatrix}X\\Y\\Z\\1\end{pmatrix}
-\rightarrowtail
 \begin{pmatrix}
-  fX\\fY\\Z
+  X \\
+  Y \\
+  Z \\
+  1
 \end{pmatrix}
-=
+\rightarrow
+\begin{pmatrix}
+  fX \\
+  fY \\
+  Z \\
+\end{pmatrix}=
 \begin{bmatrix}
   f &&&0\\
   &f&&0\\
@@ -327,7 +333,48 @@ $$K=\begin{bmatrix}
 
 <!-- 完 -->
 
-## The projective camera - 射影摄像机  
+## 6.2. The projective camera - 射影摄像机  
+
+在上节的最后, 讨论了 一般射影摄像机, 即有 11 个自由度的任意相机矩阵的摄像机. 其中左边 3x3 子矩阵为任意秩为 3 的矩阵
+
+一个一般摄影机 P 按照公式 $x=PX$ 来吧世界点 X 映射到图像点 x, 在这个基础上, 本节讨论摄像机模型的分解, 用以揭示一些几何元素 (例如摄像机中心) 在矩阵种是如何编码的  
+
+在讨论摄像机的性质的时候, 要注意 有限射影摄像机 和 一般摄像机的性质区别, 有些性质仅适用于有限射影摄像机
+
+
+本章总结:
+* 
+
+### 6.2.1. Camera anatomy 摄像机矩阵的构造
+
+复习, 一般摄像机的模型 $P$ 可以拆分成 $x=PX=KR[I|-\tilde{C}]X$
+
+一般射影摄像机的模型 P 可以按照 $P = [M|p_4]$ 分开, 其中 M 是一个 3x3 矩阵, 再次重申, M 如果是非奇异的 (non-singular), 则 P 是有限摄像机, 反之则不然
+
+**摄像机中心**: 矩阵 P 有一个 1 维 右零空间 (right null-space), 即4列秩3的矩阵的基本特性.  假定该零空间由 4 维向量 C 生成, 即 $PC=0$, 则可以证明 $C$ 是用齐次向量表示的世界坐标系的摄像机中心.  
+
+对于包括 C 和三维空间中任意一点 $A$ 的直线, 三维下直线上的点可以表示成
+$$X(\lambda) = \lambda A + (1-\lambda) C$$
+
+而在摄像机映射下, 该三维直线在投影到图像平面的时候
+$$x=PX(\lambda) =\lambda PA + (-1\lambda) PC = \lambda PA$$
+即这条三维直线总是会被投影到图像上的固定点 $PA$ 上, 因此, C 是摄像机中心  
+
+注意: 摄像机中心是空间中唯一的 图像没有定义的点  
+
+
+**列向量** : 摄像机 P 的列是3维向量, 它们的几何含义是特殊的图像点. 对于四个列向量
+* $p_1,p_2,p_3$ 分别是 世界坐标 X,Y,Z 轴的消影点
+* $p_4$ 是世界原点的图像
+
+**行向量** : P 的行是 4 维向量, 记为 $P^{iT}$
+
+**主平面** (The principal plane) : 过摄像机中心且平行于图像平面的平面, 它由投影到图像上无穷远的点集$X$所构成 , 即满足 $PX=(x,y,0)^T$. 
+* 加上行向量的考虑, 即有点 X 在摄像机主平面上的充要条件是 $P^{3T}X=0$
+* $P^{3T} 是摄像机主屏幕的向量表示$
+* 由于 $PC=\bold{0}$, 因此 $P^{3T}C=0$, 即摄像机中心也在摄像机主平面上 
+
+
 
 
 # 7. Computation of the Camera Matrix P

@@ -63,6 +63,7 @@
       - [4.9.8.3. interp 简易线性插值](#4983-interp-简易线性插值)
   - [4.10. Padding Arrays](#410-padding-arrays)
   - [4.11. Polynomials 多项式](#411-polynomials-多项式)
+    - [Power Series (numpy.polynomial.polynomial)](#power-series-numpypolynomialpolynomial)
   - [4.12. Random sampling (numpy.random)](#412-random-sampling-numpyrandom)
   - [4.13. Sorting, Searching, Counting 排序 搜索 计数](#413-sorting-searching-counting-排序-搜索-计数)
     - [4.13.1. Sorting 排序](#4131-sorting-排序)
@@ -869,7 +870,7 @@ numpy 1.4 引进的多项式包, 是对于之前的函数包 `numpy.poly1d` 的�
 
 
 具体包括: 6 种多项式的子包和对应的class, 和一个统一的工具
-* Power Series (numpy.polynomial.polynomial)
+* Power Series (numpy.polynomial.polynomial)          最基础的多项式, 其他的都是新加入的  
 * Chebyshev Series (numpy.polynomial.chebyshev)
 * Hermite Series, “Physicists” (numpy.polynomial.hermite)
 * HermiteE Series, “Probabilists” (numpy.polynomial.hermite_e)
@@ -878,8 +879,37 @@ numpy 1.4 引进的多项式包, 是对于之前的函数包 `numpy.poly1d` 的�
 * Polyutils 需要手动精确导入
   
 
+6 种多项式的 class 是不需要进入到子模组进行使用的, `np.polynomial` 的 `__init__` 中已经将6种类导入了
+```py
+from .polynomial import Polynomial
+from .chebyshev import Chebyshev
+from .legendre import Legendre
+from .hermite import Hermite
+from .hermite_e import HermiteE
+from .laguerre import Laguerre
+```
 
 
+### Power Series (numpy.polynomial.polynomial)
+
+提供了一些用于处理多项式的接口, 包括一个 `Polynomial` 类 以及其他的方便接口
+
+基本上对于多项式的处理都是面向对象的操作形式, 类提供了标准数值运算接口   
+`‘+’, ‘-’, ‘*’, ‘//’, ‘%’, ‘divmod’, ‘**’, and ‘()’`  
+
+类 : `class numpy.polynomial.polynomial.Polynomial(coef, domain=None, window=None, symbol='x')`
+* `coef` : array_like, 用以表示系数, 以 degree 增加的顺序来表示
+  * (1,2,3) 会生成 `1+2*x+3*x**2`
+* 区间映射:
+  * `domain` : (2,) array_like, optional, The default value is `[-1, 1]`.
+  * `window` : (2,) array_like, optional, The default value is `[-1, 1]`.
+  * 区间缩放以及映射, 会根据将 `(domain[0],domain[1])` 的数值映射到 `(window[0],window[1])` 的缩放系数来决定最终输出数据的缩放和偏移
+  * `symbol` : (New in version 1.24.)str, optional. 在打印多项式的方程式的时候, 用于表示变量的字符, 默认是 `x`
+
+
+Methods:
+* `__call__(arg)`  : 将多项式作为一个函数来调用
+* copy()          : 返回一个多项式的拷贝
 
 
 

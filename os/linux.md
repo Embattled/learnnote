@@ -739,9 +739,30 @@ systemd 是 Linux系统**最新的初始化系统**(init),作用是提高系统�
 * systemd 是应用程序, 其对应的CLI进程管理命令就是 `systemctl`
 * 对于 WSL2 来说, `the system has not been booted with systemd`, 即无法使用对应的 systemctl 任何命令
 
-## 6.1. service  
+## 6.1. service  - run a System V init script
 
-service命令其实是去`/etc/init.d`目录下,去执行相关程序, 已经被淘汰
+service 命令可以用来运行一个 System V init script 或者  systemd unit 
+
+关于 System V init script :
+* 是一种用于启动, 停止和管理系统服务的脚本系统, 是早期 Unix 系统的常用的一种初始化系统
+* 通常以脚本文件的形式存在, 且通常存储在 `/etc/init.d/` 目录下, 脚本会负责在系统引导过程中自动启动和停止服务, 并提供管理服务的相关功能, 例如启动, 停止, 重启, 查看状态等
+* System V init 脚本帮助了管理员在系统启动时自动启动所需要的服务, 并在系统关闭的时候优雅地停止这些服务  
+* 现代 Linux 系统的服务管理已经开始使用新的 `systemd` 和 `Upstart` 标准, 这些系统提供了更加强大和灵活的服务管理功能, 已经取代了传统的 System V init
+
+语法:
+* `service SCRIPT COMMAND [OPTIONS]`
+* `service --status-all`             查看当前的所有由系统启动的服务的状态 (status for sysvint jobs)
+  * `[+]` 正在运行
+  * `[-]` 停止
+  * `[?]` 没有 status 接口的服务
+* `service --help | -h | --version`  查看帮助和版本, 没什么用处
+
+参数:
+* SCRIPT  :  用于指定一个置于 `/etc/init.d/` 目录下的 System V init script, 或者一个 systemd unit. 对于同时存在的同名单元, systemd unit 的内容优先级更高
+* COMMAND : 具体可以执行的 COMMAND 由各个 SCRIPT 来决定, service 做的仅仅是把 `COMMAND` 的 `OPTIONS` 传递给对应的script
+  * 对于 systemd unit,  start, stop, status, and reload are passed through to their `systemctl/initctl` equivalents
+  * 对于一个 System V init script, 其最起码需要支持 start 和 stop 命令
+
 
 ```shell
 # service命令启动redis脚本

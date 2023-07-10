@@ -22,8 +22,13 @@
 - [19. Working context](#19-working-context)
 - [20. User information](#20-user-information)
 - [21. System context](#21-system-context)
-  - [21.1. uname: Print system information](#211-uname-print-system-information)
-  - [21.2. hostname: Print or set system name](#212-hostname-print-or-set-system-name)
+  - [21.1. date: Print or set system date and time](#211-date-print-or-set-system-date-and-time)
+  - [21.2. arch: Print machine hardware name](#212-arch-print-machine-hardware-name)
+  - [21.3. nproc: Print the number of available processors](#213-nproc-print-the-number-of-available-processors)
+  - [21.4. uname: Print system information](#214-uname-print-system-information)
+  - [21.5. hostname: Print or set system name](#215-hostname-print-or-set-system-name)
+  - [21.6. hostid: Print numeric host identifier](#216-hostid-print-numeric-host-identifier)
+  - [21.7. uptime: Print system uptime and load](#217-uptime-print-system-uptime-and-load)
 - [22. SELinux context](#22-selinux-context)
 - [23. Modified command invocation](#23-modified-command-invocation)
 - [24. Process control](#24-process-control)
@@ -293,9 +298,46 @@ Unix-like 操作系统的特殊文件类型要少于其他操作系统, 但并�
 
 This section describes commands that print or change system-wide information. 
 打印或者更改系统层面的相关信息  
+有些难界定是否能输出硬件相关的信息  
 
-## 21.1. uname: Print system information
+需要注意很多不会被默认安装, 因此在编写 script 的时候要留意
 
+
+## 21.1. date: Print or set system date and time
+
+
+## 21.2. arch: Print machine hardware name
+<!-- 完 -->
+arch prints the machine hardware name, and is equivalent to `uname -m`. 
+过于简单, 可能仅仅只是为了记不住 uname 的参数而编写的程序  
+
+arch 没有其他任何参数
+
+`arch is not installed by default, so portable scripts should not rely on its existence. `
+需要移植的脚本不应该依赖该软件, 因为不会被默认安装
+
+
+## 21.3. nproc: Print the number of available processors
+<!-- 完 -->
+
+`nproc [option]`  
+打印可以使用的处理单元个数 number of processing units available, 总是输出大于 0 的数字  
+
+很严谨的说明是, number of processing units available to the `current process`
+即有可能因为当前 process 的各种限制实际上输出会少于 online processors
+
+If this information is not accessible, then print the number of processors installed.  
+
+If the `OMP_NUM_THREADS` or `OMP_THREAD_LIMIT` environment variables are set, then they will determine the minimum and maximum returned value respectively.  
+
+
+
+参数:
+* `--all` : Print the number of installed processors on the system, which may be greater than the number online or available to the current process.
+* `--ignore=number` : 如果可能的话, 在基础上减去该数量的个数, 算是为 nproc 的输出进行一个带判定的减法, 即还是保证结果大于 0
+
+## 21.4. uname: Print system information
+<!-- 完 -->
 uname 看起来像是打印 用户名 User-name 的样子, 实际上是输出系统的名字
 
 `uname [option]…`   默认会输出 `-s` 的内容
@@ -318,13 +360,36 @@ machine processor hardware-platform operating-system
 * `-o --operating-system`   : 输出操作系统的名称 实测为`GNU/Linux`, 而并非发行版的名称
 * `-a --all`        : 打印所有, except omit the `processor` type and the `hardware platform name` if they are unknown. 
 
-## 21.2. hostname: Print or set system name
 
+## 21.5. hostname: Print or set system name
+<!-- 完 -->
 `hostname [name]`
 
 输出或者这设置当前的 hostname, `name of the current host system` , 如果设置的话需要有对应的系统权限  
 
 该命令的输出 与 uname -n 的 nodename (network node hostname) 在实测中是相同的, 但是意思可能有些不同
+
+没有其他任何参数
+
+hostname is not installed by default, and other packages also supply a hostname command, so portable scripts should not rely on its existence or on the exact behavior documented above. 
+
+
+## 21.6. hostid: Print numeric host identifier
+
+<!-- 完 -->
+打印数字的当前 host 的 id, 以 16 进制数字输出, 该程序没有任何参数, 除了 help 和 version
+
+一般 id 会是长度为 8 的16进制数字, 即 32位信息, 理论上这与 ip 地址的 32 位有关, 但是事实上可能并非如此
+
+`hostid` 只会安装在有 `gethostid` 的机器上. 
+
+同样的 `portable scripts should not rely on its existence.`
+
+
+## 21.7. uptime: Print system uptime and load
+
+好像是非常有用的命令, 输出的信息都很关键    
+
 
 
 # 22. SELinux context
@@ -403,8 +468,13 @@ machine processor hardware-platform operating-system
 - [19. Working context](#19-working-context)
 - [20. User information](#20-user-information)
 - [21. System context](#21-system-context)
-  - [21.1. uname: Print system information](#211-uname-print-system-information)
-  - [21.2. hostname: Print or set system name](#212-hostname-print-or-set-system-name)
+  - [21.1. date: Print or set system date and time](#211-date-print-or-set-system-date-and-time)
+  - [21.2. arch: Print machine hardware name](#212-arch-print-machine-hardware-name)
+  - [21.3. nproc: Print the number of available processors](#213-nproc-print-the-number-of-available-processors)
+  - [21.4. uname: Print system information](#214-uname-print-system-information)
+  - [21.5. hostname: Print or set system name](#215-hostname-print-or-set-system-name)
+  - [21.6. hostid: Print numeric host identifier](#216-hostid-print-numeric-host-identifier)
+  - [21.7. uptime: Print system uptime and load](#217-uptime-print-system-uptime-and-load)
 - [22. SELinux context](#22-selinux-context)
 - [23. Modified command invocation](#23-modified-command-invocation)
 - [24. Process control](#24-process-control)
