@@ -11,9 +11,13 @@
   - [6.1. Finite cameras - 有限摄像机](#61-finite-cameras---有限摄像机)
   - [6.2. The projective camera - 射影摄像机](#62-the-projective-camera---射影摄像机)
     - [6.2.1. Camera anatomy 摄像机矩阵的构造](#621-camera-anatomy-摄像机矩阵的构造)
-- [7. Computation of the Camera Matrix P](#7-computation-of-the-camera-matrix-p)
-    - [7.0.1. Distortion in Camera Calibration](#701-distortion-in-camera-calibration)
-    - [7.0.2. camera matrix](#702-camera-matrix)
+  - [Cameras at infinity - 无穷远摄像机](#cameras-at-infinity---无穷远摄像机)
+- [7. Computation of the Camera Matrix P - 摄像机矩阵 P 的计算](#7-computation-of-the-camera-matrix-p---摄像机矩阵-p-的计算)
+    - [7.0.1. camera matrix](#701-camera-matrix)
+  - [Basic equations - 基本方程](#basic-equations---基本方程)
+  - [Geometric erro - 几何误差](#geometric-erro---几何误差)
+  - [7.1. Radial distoration - 径向畸变  失真](#71-radial-distoration---径向畸变--失真)
+    - [7.1.1. Tangential Distortion](#711-tangential-distortion)
 - [8. N-View Computational Methods - N 视图计算方法](#8-n-view-computational-methods---n-视图计算方法)
 
 
@@ -64,9 +68,13 @@
   - [6.1. Finite cameras - 有限摄像机](#61-finite-cameras---有限摄像机)
   - [6.2. The projective camera - 射影摄像机](#62-the-projective-camera---射影摄像机)
     - [6.2.1. Camera anatomy 摄像机矩阵的构造](#621-camera-anatomy-摄像机矩阵的构造)
-- [7. Computation of the Camera Matrix P](#7-computation-of-the-camera-matrix-p)
-    - [7.0.1. Distortion in Camera Calibration](#701-distortion-in-camera-calibration)
-    - [7.0.2. camera matrix](#702-camera-matrix)
+  - [Cameras at infinity - 无穷远摄像机](#cameras-at-infinity---无穷远摄像机)
+- [7. Computation of the Camera Matrix P - 摄像机矩阵 P 的计算](#7-computation-of-the-camera-matrix-p---摄像机矩阵-p-的计算)
+    - [7.0.1. camera matrix](#701-camera-matrix)
+  - [Basic equations - 基本方程](#basic-equations---基本方程)
+  - [Geometric erro - 几何误差](#geometric-erro---几何误差)
+  - [7.1. Radial distoration - 径向畸变  失真](#71-radial-distoration---径向畸变--失真)
+    - [7.1.1. Tangential Distortion](#711-tangential-distortion)
 - [8. N-View Computational Methods - N 视图计算方法](#8-n-view-computational-methods---n-视图计算方法)
 
 
@@ -217,6 +225,8 @@ single perspective camera 单个透视摄像机
 摄像机模型主要讨论点的投影
 
 ## 6.1. Finite cameras - 有限摄像机
+
+<!-- 完 -->
 
 从具体且最简单的摄像机模型即基本的针孔摄像机开始, 通过一系列的升级来将模型一般化  
 
@@ -374,44 +384,29 @@ $$x=PX(\lambda) =\lambda PA + (-1\lambda) PC = \lambda PA$$
 * $P^{3T} 是摄像机主屏幕的向量表示$
 * 由于 $PC=\bold{0}$, 因此 $P^{3T}C=0$, 即摄像机中心也在摄像机主平面上 
 
+**轴平面** (Axis planes) : 
+
+## Cameras at infinity - 无穷远摄像机 
 
 
 
-# 7. Computation of the Camera Matrix P
-Camera Calibration 相机标定
 
-也被叫做 camera resectioning
+# 7. Computation of the Camera Matrix P - 摄像机矩阵 P 的计算
 
-pinhole camera 是一种最简单的相机, 没有 lens, 只有一个光圈 aperture.  
-光线通过光圈然后将图像的颠倒投影在相机里.  
+介绍计算摄像机矩阵的 数值方法 (numerical methods). 该过程也被叫做 Camera Resectioning 或 Camera Calibration 相机标定
 
-### 7.0.1. Distortion in Camera Calibration
+基本思想是: 获取 3D 点 X 与映射的图像点 x 之间的对应关系, 只要知道足够多的 $X_i \leftrightarrow x_i$ 便可以确定矩阵 P  
+* 同理, 也可以通过 世界与图像之间的直线的对应来确定 P
 
-在整个 Camera Calibration 算法中都不会考虑镜头畸变 (lens  distortion), 即相机是作为 pinhole 相机进行处理的, 而 pinhole 相机没有 Lens
+在基本要求中, 如果摄像机像素是正方形, 那么该 restricted camera (受限摄像机) 的矩阵可以由 世界与图像的对应来估计  
 
-需要考虑的畸变有 径向 radial 和 切向 tangential 畸变 distortion
-* $x,y$ 指代未经过畸变的 pixel locations, 这里的 $x,y$ 都是在 normalized image coordinates 下的, 即转换到光学中心, 并且除以以像素为单位的焦距的.
-* $r^2 = x^2+y^2$ 半径的平方?, 可以理解为点的到光学中心的距离平方  
+补充说明
+* 内参数 K 可以利用 6.2.4 节的分解来得到
+* 第 8 章会介绍跳过完整的 P 的计算, 直接只计算 K 的方法 
 
 
-Radial distortion : 镜头越小, 畸变越大. 光线在镜头边缘附近比其在光学中心弯曲得多
-* radial distortion coefficients model radial distortion
-* distorted points are denoted as $(x_{distorted}, y_{distorted})$
-  * Normalized image coordinates are calculated from pixel coordinates by translating to the optical center and dividing by the focal length in pixels. 
-  * Thus, x and y are dimensionless. 
-* $k_1,k_2,k_3$ 具体的 radial distortion coefficients 
-* $x_{distorted} = x(1+k_1r^2+k2r^4+k_3r^6)$
-* $y_{distorted} = y(1+k_1r^2+k2r^4+k_3r^6)$
-* 通常情况下, 两个系数 k1,k2 足够对径向畸变进行矫正, 对于严重畸变例如广角镜头, 则可以加入 k3
 
-
-Tangential Distortion : 当镜头和成像平面不平行的时候会发生切向畸变
-* $p_1, p_2$ , 切向畸变系数
-* $x_{distorted} = x + [2p_1xy+p_2(r^2+2x^2)]$
-* $y_{distorted} = y + [p_1(r^2+2y^2)+2p_2xy]$
-
-
-### 7.0.2. camera matrix
+### 7.0.1. camera matrix
 可以想象为:
 * 真实的3-D 物体投影到一个 Virtual Image Plane 上, 然后颠倒后映射在相机传感器里
 * Virtual image plane 到光圈和 传感器到光圈的距离相同, 都被称为  Focal length
@@ -449,6 +444,71 @@ $$
   * $s = f_x \tan\alpha$ alpha 是坐标轴的偏斜角度
 * 
 
+## Basic equations - 基本方程
+
+## Geometric erro - 几何误差
+
+
+## 7.1. Radial distoration - 径向畸变  失真
+<!-- 完 -->
+
+在整个 Camera Calibration 算法中都不会考虑镜头畸变 (lens  distortion), 即相机是作为 pinhole 相机进行处理的, 而 pinhole 相机没有 Lens
+
+到目前为止, 推理总是假定了 线性模型是成像过程的精确模型.  这假定了:
+* 世界点, 图像点和光心共线. 
+* 世界直线被成像为直线  
+* 然而事实上, 对于 non-pinhole 相机来说这种假设不成立, 通常最重要的偏差是 radial distortion.  
+
+radial distortion 会在 focal length 焦距以及镜头的价格 减少的时候变得更显著  
+
+通过矫正过程, 使得成像最终仍然是一个线性装置.  矫正过程在成像过程的位置需要仔细考量.  
+* 首先要明确的是, 径向失真(或者说所有镜头失真)发生在世界向图像平面的初始投影中
+* 随后才根据相机标定矩阵将 图像平面的物理位置翻译成像素坐标  
+* 矫正过程需要在标定之前进行  
+
+可以推断 实际上的径向失真图像点 $(x_d,y_d)$ 和线性投影理想图像点的关系为$(\tilde{x}, \tilde{y})$
+
+$$
+\begin{pmatrix}
+  x_d \\ y_d
+\end{pmatrix}
+= L(\tilde{r})
+\begin{pmatrix}
+  \tilde{x} \\ \tilde{y}
+\end{pmatrix}
+$$
+
+* $(\tilde{x}, \tilde{y})$ 指代未经过畸变的 pixel locations, 这里的 $x,y$ 都是在 normalized image coordinates 下的, 即转换到光学中心, 并且除以以像素为单位的焦距的.
+* 理想的图像点到径向失真中心的距离 $\tilde{r} = \sqrt{\tilde{x}^2+\tilde{y}^2}$  
+* $L(\tilde{r})$ 是一个失真因子, 它是关于理想点到失真中心距离的函数  
+
+Radial distortion : 镜头越小, 畸变越大. 光线在镜头边缘附近比其在光学中心弯曲得多
+
+基本上, $L(\tilde{r})$ 都会满足 $L(0)=1$, 并且仅当 r 为正值的时候 $L(\tilde{r})$ 有定义, 任意函数 $L(\tilde{r})$ 都可以由泰勒展开式来近似, 这也是 径向畸变的建模方法
+
+$$L(r)=1+k_1r+k_2r^2+k_3r^3...$$
+
+* 这里的 $k_1,k_2, k_3$ 为 radial distortion coefficients model, 它们也会作为 摄像机内标定的一部分. 根据建模的手法, 有些模型会跳过 $k_1, k_3$,即函数为 $x_{distorted} = x(1+k_1r^2+k2r^4+k_3r^6)$ 因此需要注意.
+* 通常情况下, 两个系数 k1,k2 足够对径向畸变进行矫正, 对于严重畸变例如广角镜头, 则可以加入 k3
+
+对于正向畸变过程, 在像素坐标中, 径向失真会被表示为  
+$$x_d=x_c+L(r)(x-x_c), y_d=y_c+L(r)(y-y_c)$$
+
+这里 $x_c, y_c$ 即失真中心. (PS)虽然主点经常被作为径向失真的中心, 但事实上它和失真中心并不一定重合.  在迭代的过程中一般不需要实际对图像像素进行矫正后的输出, 仅仅是映射好坐标即可.
+
+
+
+**失真函数的计算** : $L(r)$ 的计算可以在摄像机标定矩阵的同时进行, 即使用 Tsai grids, 最小化一个基于线性映射的偏差的代价函数, 来同时迭代计算 $k_i, P$. 
+
+<!-- 完 -->
+### 7.1.1. Tangential Distortion
+
+书中好像没有涉及到的畸变 - 切向畸变
+
+当镜头和成像平面不平行的时候会发生切向畸变
+* $p_1, p_2$ , 切向畸变系数
+* $x_{distorted} = x + [2p_1xy+p_2(r^2+2x^2)]$
+* $y_{distorted} = y + [p_1(r^2+2y^2)+2p_2xy]$
 
 
 <!-- omit from toc -->

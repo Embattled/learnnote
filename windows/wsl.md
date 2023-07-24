@@ -28,7 +28,7 @@
 3. 更改使用`wsl`命令时默认启动的分发版  
    `wsl -s <DistributionName>`  例如 `wsl -s Ubuntu`
    `wsl -d <DistributionName>` 运行特定的分发版  
-   `wsl -u <Username>`  以特定用户的身份运行   
+
 4. 若要查看特定于分发版的命令
     `[distro.exe] /?`  例如 `ubuntu /?`  
 5. 删除与重新安装  
@@ -38,8 +38,13 @@
 
 从命令行运行 WSL 的最佳方式是使用 ` wsl.exe` , 这会保留当前的工作命令并切换到linux中  
 
+## 1.3. CLI 参数
 
-## 1.3. 系统相关
+`wsl -u <Username>`  以特定用户的身份运行   
+* 可以用于在 windows 层面来运行一些需要 sudo 的指令
+* `wsl -u root`  就可以在不输入 sudo 密码的情况下进行系统层面的功能, 例如服务启动等
+
+## 1.4. 系统相关
 在Linux中的项目尽量保存到Linux的文件系统中,才能更快的访问  
 
 在Linux的根目录 输入 ` explorer.exe . `(不要忘记最后的点) 使用Windows文件资源管理器打开WSL文件系统  
@@ -53,7 +58,7 @@
   
 
 
-## 1.4. 扩展 WSL 2 虚拟硬件磁盘的大小  
+## 1.5. 扩展 WSL 2 虚拟硬件磁盘的大小  
 WSL 2 使用虚拟硬件磁盘 (VHD) 来存储 Linux 文件。 如果达到其最大大小，则可能需要对其进行扩展。
 
 WSL 2 VHD 使用 ext4 文件系统。 此 VHD 会自动调整大小以满足你的存储需求，并且其最大大小为 256GB。 如果你的分发版大小增长到大于 256GB，则会显示错误，指出磁盘空间不足。 可以通过扩展 VHD 大小来纠正此错误。
@@ -84,12 +89,12 @@ WSL 2 VHD 使用 ext4 文件系统。 此 VHD 会自动调整大小以满足你�
         sudo resize2fs /dev/sdXX
         使用前面复制的值。 可能还需要安装 resize2fs：apt install resize2fs
 
-## x11
+## 1.6. x11
 
 export DISPLAY=$(awk '/nameserver / {print $2; exit}' /etc/resolv.conf 2>/dev/null):0 # in WSL 2
 export LIBGL_ALWAYS_INDIRECT=1
 
-# usbipd
+# 2. usbipd
 
 桥接物理 usb 设备与 wsl
 
@@ -98,10 +103,74 @@ usbipd wsl list
 usbipd wsl attach
 usbipd wsl detach --busid 4-4
 
-# wsl.conf
 
-Advanced settings configuration in WSL  
+# 3. Concepts
+
+8秒规则 : 所有对 wsl 配置的修改都需要经过 `wsl --list --running` 确认容器已经完全停止的情况下, 重启才会刷新配置  
 
 
-## Network settings
+ 
+## 3.1. Advanced settings configuration in WSL
+
+两个文件 `wsl.conf` `.wslconfig` 用于为每个 wsl 系统和 所有 wsl 系统进行个性化配置  
+
+
+    .wslconfig to configure settings globally across all installed distributions running on WSL 2.
+    wsl.conf to configure settings per-distribution for Linux distros running on WSL 1 or WSL 2.
+
+
+### 3.1.1. wsl.conf
+
+可以同时用于 wsl1 wsl2 , 为单个 wsl distribution 进行配置  
+
+全局拥有 5 个模块
+* automount
+* network
+* interop
+* user
+* boot 新追加的
+
+**Automount settings** : `[automount]`
+
+
+**Network settings** : `[network]`
+
+| key                | 类型    | 默认值           | 功能                                                              |
+| ------------------ | ------- | ---------------- | ----------------------------------------------------------------- |
+| generateHosts      | boolean | true             | 设置 wsl 自动生成 `/etc/hosts`, 包括主机名以及对应的 ip 静态地址  |
+| generateResolvConf | boolean | true             | 设置 wsl 自动生成 `/etc/resolv.conf` , 包括了 wsl 使用的 DNS 列表 |
+| hostname           | string  | Windows hostname | Sets hostname to be used for WSL distribution.                    |
+
+**Interop settings** : `[interop]`   available in Insider Build 17713 and later.
+| key               | 类型    | 默认值 | 功能                                                       |
+| ----------------- | ------- | ------ |
+| enabled           | boolean | true   | 决定 wsl 中是否可以调用 windows 的进程                     |
+| appendWindowsPath | boolean | true   | 决定是否把 windows 的环境变量 PATH 追加到 wsl 的环境变量中 |
+
+
+**User settings** : `[user]` available in Build 18980 and later.
+| key     | 类型   | 默认值                                    | 功能                                    |
+| ------- | ------ | ----------------------------------------- |
+| default | string | The initial username created on first run | 指定 wsl 终端启动的时候要用的默认的用户 |
+
+**Boot setting** : `[boot]` available on Windows 11 and Server 2022.
+
+许多 linux 发行版默认运行在 systemd 上, 但是 WSL 默认并非如此, 如果要启动 systemd 需要 wsl 模块作为单独的 package 安装在系统上 (需要windows 11) 并在 0.67.6 版本以上
+在重启后可通过 `systemctl list-unit-files --type=service`  来确认 systemd 内核是否启动  
+| key     | 类型   | 默认值                                    | 功能                                    |
+| ------- | ------ | ----------------------------------------- |
+command  | string | `""` | 用于在 wsl 启动的时候自动以 root 运行的命令, 主要用于服务启动
+systemd | boolean | false | systemd 管理命令
+
+```sh
+[boot]
+systemd=true
+command = service docker start
+```
+
+### 3.1.2. .wslconfig
+
+
+
+
 

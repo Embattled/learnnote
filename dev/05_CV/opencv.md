@@ -51,6 +51,8 @@ Opencv4, Main Modules: 除此之外还有 other
 Extra modules: 拓展模组
 * `ximgproc`. 		Extended Image Processing
 
+按照 main modules 为一级标题来管理该笔记
+
 ## 1.2. opencv C++
 
 ### 1.2.1. API Concepts 
@@ -126,9 +128,9 @@ opencv-python 的 API 都定义在了 cv2 包中, 为了保证代码的可执行
 定义了 OpenCV 中最核心的类 (图像), 以及一些对于 array 的数学上的操作 
 * 有些图像处理的功能可能没有定义在图像部分, 而是在 array 对象的更原始的层面里实现了
 
-## Basic structures OpenCV 的基础数据结构
+## 2.1. Basic structures OpenCV 的基础数据结构
 
-### 2.1. mat  core/mat.hpp
+### 2.1.1. mat  core/mat.hpp
 
 同 numpy 一样, opencv并没有特地的图片类, 而是用矩阵来表示 -> `cv::Mat`  
 
@@ -163,7 +165,7 @@ Python:
   * gamma 是最后的标量
   * 由此可见对于 RGBA 图像, 需要先将 alpha 通道独立出来
 
-### mixChannels 通道重排列
+### 2.2.2. mixChannels 通道重排列
 
 `mixChannels()`  将 src 指定的通道拷贝到 dst 指定的通道里 
 * 非常 tools 的函数
@@ -177,90 +179,7 @@ Python:
 * `fromTo` : 一个一维数列, 按着拷贝顺序存储通道index, `s1,d1,s2,d2...`
 
 
-# 3. imgcodecs  Image file reading and writing 
-
-同 Image Process 不同, 该模组中的函数都是图像 IO 相关的  
-
-`#include <opencv2/imgcodecs.hpp>` 
-
-## 3.1. Flags used for image file reading and writing
-
-用作图片 IO 的参数, 一般都是枚举类型, 用于指定图片的规格等
-
-* 在C++下, OpenCV 会以内建的 Mat 类来处理图像
-* 在 Python OpenCV 中则使用 numpy.ndarry 来处理, 因此 Mat 类的方法在 Python 下不能使用
-
-### 3.1.1. ImreadModes
-
-用于读取时候的模式
-
-EXIF : 图像格式标记, 包括了该图像正确的展示方向, OpenCV 读取的时候会默认参考该标记得到正确的显示方向
-
-此处省略 `IMREAD_`
-* UNCHANGED			: 原汁原味, 返回原本的图像 (其实区别就是对待 png 图片时会有 alpha 通道). Ignore EXIF orientation. 
-* GRAYSCALE			: 灰度 , 读取的时候会自动进行色彩转换
-* COLOR				: 默认 , 总是自动转换成 BGR 三通道
-* ANYDEPTH			: 高深度图像, 支持输入 16-bit 或 32bit 色深图像
-* ANYCOLOR			: 任意颜色格式 (不太懂, 是不进行BGR转换的意思?)
-* LOAD_GDAL 		: 使用 gdal driver for loading the image (不懂)
-* IGNORE_ORIENTATION: 忽视 Exif 的方向标签
-* REDUCE 系列, 在读取的时候自动将图片的大小降低对应系数
-  * REDUCED_GRAYSCALE_2 
-  * REDUCED_COLOR_2 
-  * REDUCED_GRAYSCALE_4 
-  * REDUCED_COLOR_4 
-  * REDUCED_GRAYSCALE_8 
-  * REDUCED_COLOR_8 
-
-
-位表记
-| 位  | 对应 Flag          |
-| --- | ------------------ |
-| 全0 | GRAYSCALE          |
-| 1   | COLOR              |
-| 2   | ANYDEPTH           |
-| 4   | ANYCOLOR           |
-| 8   | LOAD_GDAL          |
-| 16  | REDUCE_2           |
-| 32  | REDUCE_4           |
-| 64  | REDUCE_8           |
-| 128 | IGNORE_ORIENTATION |
-| 255 | UNCHANGED          |
-
-## 3.2. 基础图像读写
-
-`imread()` 用于从一个文件路径中读取图像
-* filename  :Name of file to be loaded.
-* flags     :Flag that can take values of `cv::ImreadModes`
-  * 默认的读取模式是 `IMREAD_COLOR`
-
-`imwrite()` 用于把一个 `cv::Mat` 类写入到硬盘中
-* filename	:Name of the file.
-* img	      :(Mat or vector of Mat) Image or Images to be saved.
-* params	  :Format-specific parameters encoded as pairs
-  * (paramId_1, paramValue_1, paramId_2, paramValue_2, ... .)
-  * see `cv::ImwriteFlags`
-
-
-```cpp
-Mat cv::imread 	(
-  const String &  	filename,
-	int  	flags = IMREAD_COLOR )
-
-bool cv::imwrite 	(
-  const String &  	filename,
-	InputArray  	img,
-	const std::vector< int > &  	params = std::vector< int >() 
-)
-
-
-// python
-cv.imread(filename[, flags]	) -> 	retval
-
-cv.imwrite(	filename, img[, params]	) -> 	retval
-```
-
-# 4. imgproc  Image Processing
+# 3. imgproc  Image Processing
 
 `#include <opencv2/imgproc.hpp>`  
 
@@ -271,57 +190,13 @@ cv.imwrite(	filename, img[, params]	) -> 	retval
   * C++ 的 dst 一般都在参数里
   * Python 的 dst 可以是参数也可以是返回值
 
-
-## 4.1. 色彩空间转换 Color Space Conversions
-
-opencv 支持近乎所有的图形格式之间·`互相`转换  
-
-### 4.1.1. cvtColor
-
-```cpp
-void cv::cvtColor 	( 	InputArray  	src,
-		OutputArray  	dst,
-		int  	code,
-		int  	dstCn = 0 
-	) 		
-Python:
-	cv.cvtColor(	src, code[, dst[, dstCn]]	) -> 	dst
-```
-
-参数:
-* src	: 输入图像
-* code	: 转换模式
-* dstCn	: dst图像的通道数. 一般置零用来自动判定
-
-注意:
-* 该函数是(部分)支持输入图像是小数格式的 (0,1) , 在默写转换模式下甚至推荐使用小数格式
-  * 对于 Luv 转换 e.g. COLOR_BGR2Luv , 是应该使用标准化来将图像放到 (0,1) 中的
-  * 对于 Demosaic 转换, 即 Bayer 的转换只支持整数类型 `Assertion failed) depth == CV_8U || depth == CV_16U in function 'demosaicing'`
-* OpenCV 只支持32 bit 小数, 即单精度, 因此对于 numpy 来说不要使用 float64
+全局的 enum 常量
+* cv::InterpolationFlags	: 定义插值方法
+* cv::InterpolationMasks 	: 不懂
+* cv::WarpPolarMode			: 不懂
 
 
-### 4.1.2. ColorConversionCodes
-
-通过 `enum cv::ColorConversionCodes` 枚举类型来表示转换的模式, 以下列出所有支持的图片格式的名称, 转换模式即为 `<A>2<B>` 
-* BGR RGB LRGB LBGR
-  * 565
-  * 555
-  * 
-* BGRA
-* RGBA
-* GRAY
-* XYZ
-* YCrCb
-* Lab
-* Luv
-* HSV
-  * HSV_FULL
-* HLS
-  * HLS_FULL
-* Bayer
-* 太多了算了
-
-## 4.2. Image Filtering 滤波函数
+## 3.1. Image Filtering 滤波函数
 
 用于对 2D 图像进行各种 线性/非线性 的filtering 操作
 * 对于图像中的每个像素 (x,y), 通过其周围像素的值来决定该像素新的值
@@ -334,7 +209,7 @@ Python:
 * ddepth
 `when ddepth=-1, the output image will have the same depth as the source. `
 
-### 4.2.1. Smoothing Filtering
+### 3.1.1. Smoothing Filtering
 
 平滑图片, 即 smoothing, 常被用来:
 * reduce noise
@@ -358,7 +233,7 @@ Python:
   * 如果 normalize 是 false 的话, 相当于计算了各个位置上的 窗口核, 主要用于计算其他 Filter 的中间量
   * 因此该函数主要用于辅助别的函数实现
 
-### 4.2.2. Morphological Transformation 形态学变化
+### 3.1.2. Morphological Transformation 形态学变化
 
 OpenCV 的形态学变化也放在了 Filtering 模块中
 
@@ -370,7 +245,7 @@ OpenCV 的形态学变化也放在了 Filtering 模块中
 * iterations: 可以直接在函数参数中设置重复执行多次  
 
 
-#### 4.2.2.1. 基础 膨胀腐蚀
+#### 3.1.2.1. 基础 膨胀腐蚀
 
 * dilate() 	膨胀
 * erode()	腐蚀
@@ -400,7 +275,7 @@ Python:
 	cv.erode(	src, kernel[, dst[, anchor[, iterations[, borderType[, borderValue]]]]]	) -> 	dst
 ```
 
-#### 4.2.2.2. 高级组合操作
+#### 3.1.2.2. 高级组合操作
 
 Performs advanced morphological transformations. 
 
@@ -428,7 +303,7 @@ op 是一个枚举类型, 除了组合的形态学变化也把基础的变化加
 * MORPH_BLACKHAT 		: `close(src,element)−src`
 * MORPH_HITMISS 		: 只支持 CV_8UC1 binary images 
 
-### 4.2.3. edge detection
+### 3.1.3. edge detection
 
 OpenCV实现了如下几种边缘检测算子:
 * Sobel		: Kernel 是 1 2 1
@@ -491,23 +366,25 @@ Python:
 	cv.Canny(	dx, dy, threshold1, threshold2[, edges[, L2gradient]]	) -> 	edges
 ```
 
-### 4.2.4. 通用自定义 Filtering
+### 3.1.4. 通用自定义 Filtering
 
 ...
 
-## 4.3. Geometric Image Transformations
+
+
+## 3.2. Geometric Image Transformations
 
 存放了重要的几何变换函数, 包括最基础的 resize
 * 一些更加泛用的操作函数在文档中没有放在这里, 而是放在了 core/operations on arrays 中
 * 凡是需要意识到图像的, 都放在这里, 例如 resize 需要进行插值所以
 
 
-### 4.3.1. InterpolationFlags
+### 3.2.1. InterpolationFlags
 
 插值方法标志 
 
 
-### 4.3.2. resize
+### 3.2.2. resize
 
 更改图像的尺寸
 
@@ -529,7 +406,7 @@ Python:
 * fx, fy	: 代表 横, 纵 的缩放比例
 
 
-### 4.3.3. Affine 和 Perspective
+### 3.2.3. Affine 和 Perspective
 
 经典几何变换
 * cv::getAffineTransform
@@ -571,13 +448,61 @@ Python:
 ```
 
 
+## 3.3. 色彩空间转换 Color Space Conversions
 
-## 4.4. 杂项 Miscellaneous Image Transformations 
+opencv 支持近乎所有的图形格式之间·`互相`转换  
 
-### 4.4.1. 二值化 threshold
+### 3.3.1. cvtColor
+
+```cpp
+void cv::cvtColor 	( 	InputArray  	src,
+		OutputArray  	dst,
+		int  	code,
+		int  	dstCn = 0 
+	) 		
+Python:
+	cv.cvtColor(	src, code[, dst[, dstCn]]	) -> 	dst
+```
+
+参数:
+* src	: 输入图像
+* code	: 转换模式
+* dstCn	: dst图像的通道数. 一般置零用来自动判定
+
+注意:
+* 该函数是(部分)支持输入图像是小数格式的 (0,1) , 在默写转换模式下甚至推荐使用小数格式
+  * 对于 Luv 转换 e.g. COLOR_BGR2Luv , 是应该使用标准化来将图像放到 (0,1) 中的
+  * 对于 Demosaic 转换, 即 Bayer 的转换只支持整数类型 `Assertion failed) depth == CV_8U || depth == CV_16U in function 'demosaicing'`
+* OpenCV 只支持32 bit 小数, 即单精度, 因此对于 numpy 来说不要使用 float64
 
 
-#### 4.4.1.1. 阈值类型
+### 3.3.2. ColorConversionCodes
+
+通过 `enum cv::ColorConversionCodes` 枚举类型来表示转换的模式, 以下列出所有支持的图片格式的名称, 转换模式即为 `<A>2<B>` 
+* BGR RGB LRGB LBGR
+  * 565
+  * 555
+  * 
+* BGRA
+* RGBA
+* GRAY
+* XYZ
+* YCrCb
+* Lab
+* Luv
+* HSV
+  * HSV_FULL
+* HLS
+  * HLS_FULL
+* Bayer
+* 太多了算了
+
+## 3.4. 杂项 Miscellaneous Image Transformations 
+
+### 3.4.1. 二值化 threshold
+
+
+#### 3.4.1.1. 阈值类型
 
 ```cpp
 enum  	cv::ThresholdTypes {
@@ -602,7 +527,7 @@ enum  	cv::AdaptiveThresholdTypes {
 }
 
 ```
-#### 4.4.1.2. threshold 和 自适应 adaptive
+#### 3.4.1.2. threshold 和 自适应 adaptive
 
 
 `double cv::threshold`
@@ -655,8 +580,119 @@ Python:
     * `ADAPTIVE_THRESH_GAUSSIAN_C ` : 区块内像素的高斯权重和
 
 
+# 4. imgcodecs  Image file reading and writing 
 
-# 5. highgui  High-level GUI
+同 Image Process 不同, 该模组中的函数都是图像 IO 相关的  
+
+`#include <opencv2/imgcodecs.hpp>` 
+
+## 4.1. Flags used for image file reading and writing
+
+用作图片 IO 的参数, 一般都是枚举类型, 用于指定图片的规格等
+
+* 在C++下, OpenCV 会以内建的 Mat 类来处理图像
+* 在 Python OpenCV 中则使用 numpy.ndarry 来处理, 因此 Mat 类的方法在 Python 下不能使用
+
+### 4.1.1. ImreadModes
+
+用于读取时候的模式
+
+EXIF : 图像格式标记, 包括了该图像正确的展示方向, OpenCV 读取的时候会默认参考该标记得到正确的显示方向
+
+此处省略 `IMREAD_`
+* UNCHANGED			: 原汁原味, 返回原本的图像 (其实区别就是对待 png 图片时会有 alpha 通道). Ignore EXIF orientation. 
+* GRAYSCALE			: 灰度 , 读取的时候会自动进行色彩转换
+* COLOR				: 默认 , 总是自动转换成 BGR 三通道
+* ANYDEPTH			: 高深度图像, 支持输入 16-bit 或 32bit 色深图像
+* ANYCOLOR			: 任意颜色格式 (不太懂, 是不进行BGR转换的意思?)
+* LOAD_GDAL 		: 使用 gdal driver for loading the image (不懂)
+* IGNORE_ORIENTATION: 忽视 Exif 的方向标签
+* REDUCE 系列, 在读取的时候自动将图片的大小降低对应系数
+  * REDUCED_GRAYSCALE_2 
+  * REDUCED_COLOR_2 
+  * REDUCED_GRAYSCALE_4 
+  * REDUCED_COLOR_4 
+  * REDUCED_GRAYSCALE_8 
+  * REDUCED_COLOR_8 
+
+
+位表记
+| 位  | 对应 Flag          |
+| --- | ------------------ |
+| 全0 | GRAYSCALE          |
+| 1   | COLOR              |
+| 2   | ANYDEPTH           |
+| 4   | ANYCOLOR           |
+| 8   | LOAD_GDAL          |
+| 16  | REDUCE_2           |
+| 32  | REDUCE_4           |
+| 64  | REDUCE_8           |
+| 128 | IGNORE_ORIENTATION |
+| 255 | UNCHANGED          |
+
+## 4.2. 基础图像读写
+
+`imread()` 用于从一个文件路径中读取图像
+* filename  :Name of file to be loaded.
+* flags     :Flag that can take values of `cv::ImreadModes`
+  * 默认的读取模式是 `IMREAD_COLOR`
+
+`imwrite()` 用于把一个 `cv::Mat` 类写入到硬盘中
+* filename	:Name of the file.
+* img	      :(Mat or vector of Mat) Image or Images to be saved.
+* params	  :Format-specific parameters encoded as pairs
+  * (paramId_1, paramValue_1, paramId_2, paramValue_2, ... .)
+  * see `cv::ImwriteFlags`
+
+
+```cpp
+Mat cv::imread 	(
+  const String &  	filename,
+	int  	flags = IMREAD_COLOR )
+
+bool cv::imwrite 	(
+  const String &  	filename,
+	InputArray  	img,
+	const std::vector< int > &  	params = std::vector< int >() 
+)
+
+
+// python
+cv.imread(filename[, flags]	) -> 	retval
+
+cv.imwrite(	filename, img[, params]	) -> 	retval
+```
+
+
+
+# 5. videoio Video I/O
+
+除了面向视频文件的API, 与摄像头设备有关的接口也定义在了该模组中
+
+
+
+## 5.1. OpenCV VideoIO 构成
+
+视频文件的处理还算简单, 但是与摄像头的交互因为涉及到系统接口层面, 有很多底层内容
+
+这里列出 OpenCV IO的构成方法
+* 最底层- 源
+  * 视频文件
+  * 摄像头
+  * 网络流
+* 操作系统
+  * 制造商库文件
+  * Backends 后端库文件
+  * CODECS(fourcc)
+  * O.S. 库文件
+* 中层
+  * OpenCV API
+    * VideoCaputre
+    * VideoWriter
+  * 其他制造商驱动 (C/C++ 等API)
+* 用户软件
+
+# 6. highgui  High-level GUI
 
 独立于具体图像处理之外的 GUI 功能, 可以用来显示图像等调试功能
 * 用于快速尝试功能并可视化结果
@@ -669,7 +705,7 @@ Python:
 
 `#include <opencv2/highgui.hpp>`
 
-## 5.1. 键盘响应
+## 6.1. 键盘响应
 
 * waitKey : Waits for a pressed key. 
   * delay : Delay in milliseconds. 如果小于等于0 意为无限期等待
@@ -704,9 +740,9 @@ Python:
 	cv.pollKey(		) -> 	retval
 ```
 
-## 5.2. 简易窗口
+## 6.2. 简易窗口
 
-### 5.2.1. imshow() 显示图片在窗口中
+### 6.2.1. imshow() 显示图片在窗口中
 
 ```cpp
 void cv::imshow 	( 	const String &  	winname,
@@ -727,7 +763,7 @@ Python:
 * 该函数必须后接一个 `cv::waitKey or cv::pollKey` 来保证窗口可操作
 * `waitKey(0)` will display the window infinitely until any keypress
 
-## 5.3. windows 操作
+## 6.3. windows 操作
 
 1. 创建窗口 `cv.namedWindow(winname, flags)`
 	* as a placeholder for images and trackbars
@@ -781,7 +817,7 @@ cv.namedWindow(	winname[, flags]	) -> 	None
 cv.setWindowTitle(	winname, title	) -> 	None
 cv.setWindowProperty(	winname, prop_id, prop_value	) -> 	None
 ```
-### 5.3.1. cv::WindowFlags 创建窗口时候的 flag
+### 6.3.1. cv::WindowFlags 创建窗口时候的 flag
 
 Flags for cv::namedWindow  枚举类型
 
@@ -796,7 +832,7 @@ Flags for cv::namedWindow  枚举类型
 | WINDOW_GUI_EXPANDED | status bar and tool bar                          |
 
 
-## 5.4. Trackbar 
+## 6.4. Trackbar 
 
 
 1. 创建  `cv::createTrackbar()`
@@ -852,7 +888,7 @@ Python:
 
 ```
 
-## 5.5. mouse 鼠标事件
+## 6.5. mouse 鼠标事件
 
 OpenCV GUI模块也提供了和鼠标的交互, 相比于 trackBar 等模块, 鼠标的管理函数更少, 但是对应的 flags 更复杂
 
@@ -902,38 +938,11 @@ void cv::setMouseCallback 	(
   * EVENT_FLAG_ALTKEY 		: ALT Key is pressed
 
 
-# 6. videoio Video I/O
-
-除了面向视频文件的API, 与摄像头设备有关的接口也定义在了该模组中
-
-
-
-## 6.1. OpenCV VideoIO 构成
-
-视频文件的处理还算简单, 但是与摄像头的交互因为涉及到系统接口层面, 有很多底层内容
-
-这里列出 OpenCV IO的构成方法
-* 最底层- 源
-  * 视频文件
-  * 摄像头
-  * 网络流
-* 操作系统
-  * 制造商库文件
-  * Backends 后端库文件
-  * CODECS(fourcc)
-  * O.S. 库文件
-* 中层
-  * OpenCV API
-    * VideoCaputre
-    * VideoWriter
-  * 其他制造商驱动 (C/C++ 等API)
-* 用户软件
-
-## 6.2. class VideoCaputre
+## 6.6. class VideoCaputre
 
 不论是视频文件还是摄像头或者网络提供的图像流, 在OpenCV的上层接口里都被认为是相同的类型, 使用相同的类来处理  
 
-### 6.2.1. 构造函数 VideoCapture () open()
+### 6.6.1. 构造函数 VideoCapture () open()
 
 构造函数, 共有五个重载, 同理在 python 中则是不同的输入形式  
 
@@ -991,7 +1000,7 @@ Python:
   * 默认值0 , 代表跟随当前系统的默认摄像头
 
 
-### 6.2.2. 读取帧
+### 6.6.2. 读取帧
 
 读取下一帧图像在 OpenCV 中也有多层实现
 * `grab()` 	: 仅仅只是读取, 返回值是 bool, 代表读取是否成功
@@ -1015,7 +1024,7 @@ Python:
 ```
 
 
-### 6.2.3. 配置参数管理
+### 6.6.3. 配置参数管理
 
 * `get()` 方法不是取帧, 而是获取对应的配置参数
 * `set()` 用于设置配置参数
@@ -1034,7 +1043,7 @@ Python:
 ```
 
 
-## 6.3. class VideoWriter
+## 6.7. class VideoWriter
 
 Video writer class.  
 The class provides C++ API for writing video files or image sequences. 
@@ -1049,7 +1058,7 @@ The constructors/functions initialize video writers.
     On MacOSX AVFoundation is used.
 
 
-### 6.3.1. 构造函数  open()
+### 6.7.1. 构造函数  open()
 
 类的构造函数  
 * 同 VideoCapture 的形式一样, 通过空构造函数预先定义对象, 再通过 `open()` 进行初始化
@@ -1108,7 +1117,7 @@ Python:
 * params 		: 同 VideoCapture
 
 
-### 6.3.2. 写入 write
+### 6.7.2. 写入 write
 
 ```cpp
 virtual void cv::VideoWriter::write 	( 	InputArray  	image	) 	
@@ -1123,9 +1132,20 @@ Python:
 * Motion Analysis 动作(运动)分析
 * Object Tracking 物体追踪
 
-# 8. objdetect Object Detection 最常用的物体检测模型
+# 8. calib3d - Camera Calibration and 3D Reconstruction
 
-## 8.1. Cascade 模型 Cascade Classifier for Object Detection
+涉及 3D 重构和相机标定的主要模组  
+
+
+
+## fisheye camera model  - 设计鱼眼相机的接口被单独定义作为子模组
+
+
+
+
+# 9. objdetect Object Detection 最常用的物体检测模型
+
+## 9.1. Cascade 模型 Cascade Classifier for Object Detection
 
 一个经典的级联传统机器学习模型
 
@@ -1137,7 +1157,7 @@ Python:
 
 
 
-# 9. photo Computational Photography 计算图像处理
+# 10. photo Computational Photography 计算图像处理
 
 包括了几个基于计算的图像处理领域的算法实现
 
@@ -1148,7 +1168,7 @@ Python:
     * Alexandru Telea. An image inpainting technique based on the fast marching method. Journal of graphics tools, 9(1):23–34, 2004.
 
 
-## 9.1. inpainting
+## 10.1. inpainting
 
 图像补全, 该分类下只有一个函数
 
@@ -1176,15 +1196,15 @@ Python:
   * `cv::INPAINT_NS`
   * `cv::INPAINT_TELEA`
 
-# 10. contrib : ximgoproc  Extended Image Processing
+# 11. contrib : ximgoproc  Extended Image Processing
 
 contrib 包, 拓展的图像处理  
 
 
-## 10.1. Filter
+## 11.1. Filter
 
 
-### 10.1.1. Guided Filter
+### 11.1.1. Guided Filter
 
 ```cpp
 void cv::ximgproc::guidedFilter 	( 	

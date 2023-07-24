@@ -25,6 +25,7 @@
 - [4. Dockerfile reference](#4-dockerfile-reference)
   - [4.1. FROM](#41-from)
   - [4.2. ARG](#42-arg)
+  - [4.3. ENV](#43-env)
 
 
 # 1. Start Docker 
@@ -457,3 +458,11 @@ FROM [--platform=<platform>] <image>[@<digest>] [AS <name>]
 用于事先定义一些可以通过 CLI 来指定的编译时的变量, 通过 docker build 的 `--build-arg <varname>=<value>` 参数来指定, 如果传入了没被定义为 ARG 的参数, build 会 Warning
 
 * 官方不建议把一些私密信息通过该方式传入 build 过程中, 因为 能够被其他用户通过 `docker history` 看到
+
+
+## 4.3. ENV
+
+语法 : `ENV <key>=<value> ...` 可以在一行语句中同时设置多个环境变量  
+
+为 Docker 容器设置环境变量, 这些环境变量不仅在 容器中可以使用, 在接下来的 Dockerfile 里也可以使用. 
+在 Dockerfile 中可以多次更改替换这些 ENV 的值, 

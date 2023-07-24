@@ -15,14 +15,30 @@
   - [12.3. mkdir - Make directories](#123-mkdir---make-directories)
 - [13. Changing file attributes](#13-changing-file-attributes)
 - [14. File space usage](#14-file-space-usage)
+  - [14.1. df: Report file system space usage](#141-df-report-file-system-space-usage)
+  - [14.2. du: Estimate file space usage](#142-du-estimate-file-space-usage)
+  - [14.3. sync: Synchronize cached writes to persistent storage](#143-sync-synchronize-cached-writes-to-persistent-storage)
 - [15. Printing text](#15-printing-text)
+  - [15.1. echo: Print a line of text](#151-echo-print-a-line-of-text)
 - [16. Conditions](#16-conditions)
 - [17. Redirection](#17-redirection)
 - [18. File name manipulation](#18-file-name-manipulation)
 - [19. Working context](#19-working-context)
+  - [19.1. pwd: Print working directory](#191-pwd-print-working-directory)
+  - [19.2. stty: Print or change terminal characteristics](#192-stty-print-or-change-terminal-characteristics)
+  - [19.3. printenv: Print all or some environment variables](#193-printenv-print-all-or-some-environment-variables)
+  - [19.4. tty: Print file name of terminal on standard input](#194-tty-print-file-name-of-terminal-on-standard-input)
 - [20. User information](#20-user-information)
+  - [20.1. id: Print user identity](#201-id-print-user-identity)
+  - [20.2. logname : Print current login name](#202-logname--print-current-login-name)
+  - [20.3. whoami : Print effective user name](#203-whoami--print-effective-user-name)
+  - [20.4. groups](#204-groups)
+  - [20.5. users : Print login names of users currently logged in](#205-users--print-login-names-of-users-currently-logged-in)
+  - [20.6. who : Print who is currently logged in](#206-who--print-who-is-currently-logged-in)
 - [21. System context](#21-system-context)
   - [21.1. date: Print or set system date and time](#211-date-print-or-set-system-date-and-time)
+    - [Time conversion specifiers - 时间转义符](#time-conversion-specifiers---时间转义符)
+    - [Date conversion specifiers - 日期转义符](#date-conversion-specifiers---日期转义符)
   - [21.2. arch: Print machine hardware name](#212-arch-print-machine-hardware-name)
   - [21.3. nproc: Print the number of available processors](#213-nproc-print-the-number-of-available-processors)
   - [21.4. uname: Print system information](#214-uname-print-system-information)
@@ -31,6 +47,15 @@
   - [21.7. uptime: Print system uptime and load](#217-uptime-print-system-uptime-and-load)
 - [22. SELinux context](#22-selinux-context)
 - [23. Modified command invocation](#23-modified-command-invocation)
+  - [23.1. chroot: Run a command with a different root directory](#231-chroot-run-a-command-with-a-different-root-directory)
+  - [23.2. env: Run a command in a modified environment](#232-env-run-a-command-in-a-modified-environment)
+    - [23.2.1. General options](#2321-general-options)
+    - [23.2.2. -S/--split-string usage in scripts](#2322--s--split-string-usage-in-scripts)
+    - [23.2.3. -S/--split-string syntax](#2323--s--split-string-syntax)
+  - [23.3. nice: Run a command with modified niceness](#233-nice-run-a-command-with-modified-niceness)
+  - [23.4. nohup: Run a command immune to hangups](#234-nohup-run-a-command-immune-to-hangups)
+  - [23.5. stdbuf: Run a command with modified I/O stream buffering](#235-stdbuf-run-a-command-with-modified-io-stream-buffering)
+  - [23.6. timeout: Run a command with a time limit](#236-timeout-run-a-command-with-a-time-limit)
 - [24. Process control](#24-process-control)
 - [25. Delaying](#25-delaying)
 - [26. Numeric operations](#26-numeric-operations)
@@ -47,6 +72,7 @@ GNU Coreutils 的工具绝大多数都与 POSIX 标准相兼容, 遵循了 POSIX
 
 一些命令 (sort, date) 提供了 `--debug` 命令, 可以用于快速寻找问题
 
+很多以为是 linux 基本命令, 其实是 GNU 的 Coreutils 的一个软件  
 
 # 2. Common options
 
@@ -219,11 +245,54 @@ Unix-like 操作系统的特殊文件类型要少于其他操作系统, 但并�
     14.4 sync: Synchronize cached writes to persistent storage
     14.5 truncate: Shrink or extend the size of a file
 
+用于文件容量的管理, 可以查看系统容量的空间状态, 文件的容量信息, 缓冲区信息等
+
+## 14.1. df: Report file system space usage
+
+df 命令打印的是文件系统的空间, 即整个电脑的空间使用率
+
+`df [option]… [file]…`  
+没有 `file` 参数的话, 会打印所有 mount 挂载的容量信息 (all currently mounted file systems)   
+
+## 14.2. du: Estimate file space usage
+
+
+## 14.3. sync: Synchronize cached writes to persistent storage
+<!-- 完, 但不太理解 -->
+
+将缓存中或者文件系统中的文件 同步到永久存储中, 用于强制将内存中的数据写入磁盘，以确保数据的持久化和同步。该命令对于确保文件系统的一致性和数据的安全性非常重要   
+writes any data buffered in memory out to the storage device.  
+This can include (but is not limited to) modified superblocks, modified inodes, and delayed reads and writes.  
+
+`sync [option] [file]…`  
+
+这是一个 kernel 必要的程序, 该程序的实际工作由 system call 来完成, 具体的为调用 `sync, syncfs, fsync, and fdatasync`
+
+内存数据主要用于提高计算机的反应速度, 但如果计算机由于内存占满或者其他原因导致的崩溃, 则需要把内存数据写入到永久存储中防止数据丢失. 操作系统一般会在适当的时候自动执行该命令, 因此大多时候不需要手动执行.    
+
+如果指定了 `file` 参数, 则会仅写入指定的文件, 通过 `fsync` 系统调用
+
+如果指定了 `file`, 则可以使用参数:
+* `-d --data` : 仅同步文件相关的缓存, 包括 data for the file, any metadata required to maintain file system consistency.  通过 `fdatasync` 系统调用来实现  
+* `-f --file-system` : 使用 `syncfs` 来将各种系统相关的缓存写入
+  * all the I/O waiting for the file systems that contain the file
+
+
 # 15. Printing text
 
     15.1 echo: Print a line of text
     15.2 printf: Format and print data
     15.3 yes: Print a string until interrupted
+
+## 15.1. echo: Print a line of text
+
+`echo [option]… [string]…`
+
+将 string 打印到 std output, 并且在每一个 string 后面加一个空格, 在最终的 string 后面加换行符  
+
+根据 shell 的不同, 该命令有可能实际上会调用不同的 binary, 因此可以使用 `env echo` 来确保使用的是操作系统的 echo  
+
+
 
 # 16. Conditions
 
@@ -270,6 +339,20 @@ Unix-like 操作系统的特殊文件类型要少于其他操作系统, 但并�
     19.3 printenv: Print all or some environment variables
     19.4 tty: Print file name of terminal on standard input
 
+This section describes commands that display or alter the context in which you are working: the current directory, the terminal settings, and so forth. See also the user-related commands in the next section. 
+
+关于当前工作环境的一些上下文软件  
+
+## 19.1. pwd: Print working directory
+
+## 19.2. stty: Print or change terminal characteristics
+
+
+## 19.3. printenv: Print all or some environment variables
+
+## 19.4. tty: Print file name of terminal on standard input
+
+
 # 20. User information
 
     20.1 id: Print user identity
@@ -278,6 +361,133 @@ Unix-like 操作系统的特殊文件类型要少于其他操作系统, 但并�
     20.4 groups: Print group names a user is in
     20.5 users: Print login names of users currently logged in
     20.6 who: Print who is currently logged in
+
+This section describes commands that print user-related information: logins, groups, and so forth. 
+
+<!-- 完 -->
+
+## 20.1. id: Print user identity
+
+打印一个 user 的信息  
+`id [option]… [user]…`
+
+这里 `[user]` 可以输入 ID 或者 用户 name, name 的优先级更高, 在加了前缀 `+` 的时候会优先查找 ID
+
+默认动作 : 打印 
+* real user ID
+* real group ID
+* effective user ID if different from the real user ID
+* effective group ID if different from the real group ID
+* supplemental group IDs. 
+* In addition, if SELinux is enabled and the `POSIXLY_CORRECT` environment variable is not set, then print ‘context=c’, where c is the security context. 
+
+信息的构成: Each of these numeric values is preceded by an identifying string and followed by the corresponding user or group name in parentheses. 
+
+参数: 用于指定只打印 默认动作的一部分信息, 在指定信息的时候一次只能指定一种
+* `-g --group`  : 只打印 group ID
+* `-G --groups` : 只打印 group ID 以及 supplementary groups
+* `-u --user`   : 只打印 user ID
+* `-n --name`   : Print the user or group name instead of the ID number.  不能单独启用该命令, 必须与 `-u -g -G` 一起
+* `-Z --context` :  If neither `SELinux` or `SMACK` is enabled then print a warning and set the exit status to 1. 
+* `-z --zero` : 用于一些特殊场景, 会将元素分隔符替换成 `ASCII NUL`, 该选项不能在默认输出的时候启用
+  * 主要用于 `--groups` 的输出
+  * When multiple users are specified, and the --groups option is also in effect, groups are delimited with a single NUL character, while users are delimited with two NUL characters
+
+<!-- 完 -->
+## 20.2. logname : Print current login name
+
+`logname` 所打印的用户名是 calling user's name, 原理上会从 system-maintained file `/var/run/utmp` 或者 `/etc/utmp` 中查找
+
+如果查找到了, 会输出并返回 0.  
+如果没有查找到, 则会输出错误 `logname: no login name` 并返回 1.  对于本地用户wsl来说, 因为不存在 login 因此不会查找到  
+
+<!-- 完 -->
+
+## 20.3. whoami : Print effective user name
+
+打印 user name associated with the current effective user ID  
+
+该行为等同于 `id -un`     不存在其他参数
+
+<!-- 完 -->
+
+## 20.4. groups
+
+打印组 names of the primary and any supplementary groups for each given `username`.
+`groups [username]…`  同 id 一样,  该查找软件一样可以指定用户名, 但只能指定 name 不能指定 ID
+
+因此该软件等同于 `id -Gn`  , 而且还没有 id 的 -z 更改输出分隔符的功能  
+
+关于组的继承:  在登陆后更改用户的组信息后, 组信息并不会立即反映在当前的 session 上  
+Primary and supplementary groups for a process are normally inherited from its parent and are usually unchanged since login. This means that if you change the group database after logging in, groups will not reflect your changes within your existing login session. Running groups with a list of users causes the user and group database to be consulted afresh, and so will give a different result. 
+
+<!-- 完 -->
+
+## 20.5. users : Print login names of users currently logged in
+
+`users [file]`  
+
+打印一个 a single line a blank-separated list of user names  `(of users currently logged in to the current host)`  
+* 即对于服务器来说, 查看当前也连入了改服务器的用户名
+* Each user name corresponds to `a login session`, so if a user has more than one login session, that user’s name will appear the same number of times in the output.
+
+`[file]` 仅仅只是用于指定其他的 tmp file
+* 默认的系统维护文件查找目标是  `/var/run/utmp` or `/etc/utmp`
+* 一个常用的查找目标可能是  `/var/log/wtmp`  
+
+The users command is installed only on platforms with the POSIX `<utmpx.h>` include file or equivalent, so portable scripts should not rely on its existence on non-POSIX platforms.   
+
+该软件接口也是 轻量化系统所非必须的
+
+<!-- 完 -->
+
+## 20.6. who : Print who is currently logged in
+
+是一个强化版的 `users`  , 但是是以 processes 为单位的
+
+`who` prints information about users who are currently logged on.  
+`who [option] [file] [am i]`
+
+默认行为会打印 :  following information for each user currently logged on
+* login name
+* terminal line
+* login time
+* remote hostname or X display. 
+
+`[file]`  : 同样的, 用于指定特殊系统配置下的 系统维护文件目录, 即 `var/run/utmp` or `/etc/utmp` 以外的目录  
+`[am i]`  : 变相的 `whoami`, 在服务器上会得到相同的结果, 但是 `whoami` 的查找方式不同因此能够查找到本地用户的名称, 而 `who am i` 不行
+
+参数: 用于指定要打印的信息  
+* `-b boot`: 打印 the date and time of last system boot. 实测在 wsl 和 docker 环境里没有输出
+* `-d --dead` : 打印 information corresponding to dead processes.  打印停止的 processes
+* `-l --login` : 打印正在等待用户登录的进程相对应的条目, 
+  * List only the entries that correspond to processes via which the system is waiting for a user to login. 
+  * The user name is always ‘LOGIN’. 
+* `-p -process`  :  List active processes spawned by init. 打印出由 init 调用的活动进程 
+* `-r --runlevel` : Print the current (and maybe previous) run-level of the init process. 
+* `-t --time` : Print last system clock change. 
+* `-u`        : After the login time, print the number of hours and minutes that the user has been idle. 
+  * 打印用户的空闲时间??? (`IDLE`)
+  * `.` 表示用户在当前最后一分钟仍然处于活跃
+  * `old` 表示用户已经超越24小时保持空闲
+* `-w -T --mesg --message --writable` : 在每一个用户名的后面打印一个字符用户  indicating the user’s message status: 
+  * ‘+’ allowing write messages
+  * ‘-’ disallowing write messages
+  * ‘?’ cannot find terminal device
+* `-H --heading` :  Print a line of column headings. 在打印的时候加上表头.
+* `-a all` : 打印全部, 相当于 `-b -d --login -p -r -t -T -u`. 注意没有: `-H`, 需要手动指定 `who -a -H`
+  * 其他的 `-a` 不会代表的选项记录在下面
+* `-m`  : 相当于 `who am i`
+* `-q --count`   : Print only the login names and the number of users logged on. Overrides all other options. 
+* `--lookup` : 尝试通过 DNS 来查找 `utmp` 所出现的主机名, 非默认行为, 可能会导致巨大延迟.
+* `-s`  : 兼容性命令, 已不再使用  
+
+
+
+The `who` command is installed only on platforms with the POSIX `<utmpx.h>` include file or equivalent, so portable scripts should not rely on its existence on non-POSIX platforms. 
+who也是轻量化系统所非必须的软件接口  
+
+<!-- 完 -->
 
 # 21. System context
 
@@ -305,6 +515,40 @@ This section describes commands that print or change system-wide information.
 
 ## 21.1. date: Print or set system date and time
 
+打印当前时间的命令, 但是意外的很复杂  
+
+```sh
+date [option]… [+format]
+date [-u|--utc|--universal] [ MMDDhhmm[[CC]YY][.ss] ]
+```
+
+
+### Time conversion specifiers - 时间转义符
+
+| 转义符(省略前置的 `%` ) | 意思                                                                      |
+| ----------------------- | ------------------------------------------------------------------------- |
+| H                       | 24小时制的时, 用0 始终占 2 位                                             |
+| h                       | 12 小时制的时, 用0 始终占 2 位                                            |
+| k                       | 24 小时制的时, 用空格 始终占 2 位, GNU 拓展                               |
+| l                       | 12 小时制的时, 用空格 始终占 2 位, GNU 拓展                               |
+| M                       | 分钟, 0占 2位                                                             |
+| N                       | nanoseconds  ` (‘000000000’…‘999999999’)` GNU 拓展                        |
+| p                       | 上午或者下午  `AM PM`, 但是在很多语言环境中都是空白                       |
+| r                       | locale’s time representation 当地的 12 小时制的时间, 格式为 `11:11:04 PM` |
+| X                       | locale’s time representation 当地的 24 小时制的时间, 格式为 `23:13:48`    |
+| R                       | 24 小时制的时间, 格式为 `%H:%M`                                           |
+| T                       | 24 小时制的时间 , 相当于 `%H:%M:%S`                                       |
+| s                       | seconds since the Epoch, ,经典 但是是GNU 拓展                             |
+| S                       | second `(‘00’…‘60’)`  注意, 如果系统支持闰秒的话, 则该值可以是 60         |
+| z                       | Four-digit numeric time zone, e.g., ‘-0600’ or ‘+0530’, or ‘-0000’        |
+| :z                      | 带冒号 `:`的 Four-digit numeric time zone, e.g. `-06:00`                  |
+| ::z                     | 带冒号带秒的 time zone, `-06:00:00`                                       |
+| :::z                    | 用最小的准确精度表示的 time zone, e.g. `-06   +05:30`                     |
+| Z                       | 用 alphabetic 表示的 time zone                                            |
+
+### Date conversion specifiers - 日期转义符
+
+| 转义符(省略前置的 `%` ) | 意思     
 
 ## 21.2. arch: Print machine hardware name
 <!-- 完 -->
@@ -338,7 +582,8 @@ If the `OMP_NUM_THREADS` or `OMP_THREAD_LIMIT` environment variables are set, th
 
 ## 21.4. uname: Print system information
 <!-- 完 -->
-uname 看起来像是打印 用户名 User-name 的样子, 实际上是输出系统的名字
+uname 看起来像是打印 用户名 User-name 的样子, 实际上是输出系统的名字, 关于用户的信息记录在上一章节 `User information` 中  
+
 
 `uname [option]…`   默认会输出 `-s` 的内容
   
@@ -397,6 +642,10 @@ hostname is not installed by default, and other packages also supply a hostname 
     22.1 chcon: Change SELinux context of file
     22.2 runcon: Run a command in specified SELinux context
 
+在不适用 SELinux 的情况下好像用不到该命令  
+
+
+
 # 23. Modified command invocation
 
     23.1 chroot: Run a command with a different root directory
@@ -413,6 +662,54 @@ hostname is not installed by default, and other packages also supply a hostname 
     23.4 nohup: Run a command immune to hangups
     23.5 stdbuf: Run a command with modified I/O stream buffering
     23.6 timeout: Run a command with a time limit
+
+主要用于更改 command 的调用行为  
+
+## 23.1. chroot: Run a command with a different root directory
+
+## 23.2. env: Run a command in a modified environment
+
+在一个指定的修改后的 environment 下运行命令, 语法:
+
+```sh  
+env [option]… [name=value]… [command [args]…]
+env -[v]S'[option]… [name=value]… [command [args]…]'
+env
+
+# 熟知的 env 常常被用来书写 #! 解释器
+#!/usr/bin/env command
+#!/usr/bin/env -[v]S[option]… [name=value]… command [args]…
+```
+* `env [option]… [name=value]… [command [args]…]`
+  * 除去 option 以外, 第一个不包含 `=` 的参数会作为 command 来在 env 的环境下运行
+  * command 会根据 `PATH` 环境变量来查找
+  * 剩下的 args 则会直接传入 command 里
+  * 对于应用程序的名称包含了 `=` 的极其特殊情况, 可以使用其他的解释器或者终端作为中介, 程序名称以 args 传入, 例如 `sh bash python` 等
+* `env` : 打印所有环境变量, 同 `printenv` 的行为一样  
+
+
+关于环境变量:
+* 通常都是 `k=v` 的键值对形式
+* 可以设置 `key=` 即值为空, 值为空  与  键值对未定义是 `不一样`  的
+* 运行时对于环境变量是从左往右读取的, 因此如果 读取了相同的 环境变量两次, 则前一次的会被覆盖, 被 ignore.
+* 环境变量的命名规则
+  * 从语法上, variable names 可以为空, 并且可以包括出去 `=` 和 `ASCII NUL` 之外的任何空格
+  * 从惯例上, 最好限制只由 下划线, 数字, 字母组成,  并且以非数字开头
+
+
+### 23.2.1. General options
+
+### 23.2.2. -S/--split-string usage in scripts
+
+### 23.2.3. -S/--split-string syntax
+
+## 23.3. nice: Run a command with modified niceness
+
+## 23.4. nohup: Run a command immune to hangups
+
+## 23.5. stdbuf: Run a command with modified I/O stream buffering
+
+## 23.6. timeout: Run a command with a time limit
 
 # 24. Process control
 
@@ -461,14 +758,30 @@ hostname is not installed by default, and other packages also supply a hostname 
   - [12.3. mkdir - Make directories](#123-mkdir---make-directories)
 - [13. Changing file attributes](#13-changing-file-attributes)
 - [14. File space usage](#14-file-space-usage)
+  - [14.1. df: Report file system space usage](#141-df-report-file-system-space-usage)
+  - [14.2. du: Estimate file space usage](#142-du-estimate-file-space-usage)
+  - [14.3. sync: Synchronize cached writes to persistent storage](#143-sync-synchronize-cached-writes-to-persistent-storage)
 - [15. Printing text](#15-printing-text)
+  - [15.1. echo: Print a line of text](#151-echo-print-a-line-of-text)
 - [16. Conditions](#16-conditions)
 - [17. Redirection](#17-redirection)
 - [18. File name manipulation](#18-file-name-manipulation)
 - [19. Working context](#19-working-context)
+  - [19.1. pwd: Print working directory](#191-pwd-print-working-directory)
+  - [19.2. stty: Print or change terminal characteristics](#192-stty-print-or-change-terminal-characteristics)
+  - [19.3. printenv: Print all or some environment variables](#193-printenv-print-all-or-some-environment-variables)
+  - [19.4. tty: Print file name of terminal on standard input](#194-tty-print-file-name-of-terminal-on-standard-input)
 - [20. User information](#20-user-information)
+  - [20.1. id: Print user identity](#201-id-print-user-identity)
+  - [20.2. logname : Print current login name](#202-logname--print-current-login-name)
+  - [20.3. whoami : Print effective user name](#203-whoami--print-effective-user-name)
+  - [20.4. groups](#204-groups)
+  - [20.5. users : Print login names of users currently logged in](#205-users--print-login-names-of-users-currently-logged-in)
+  - [20.6. who : Print who is currently logged in](#206-who--print-who-is-currently-logged-in)
 - [21. System context](#21-system-context)
   - [21.1. date: Print or set system date and time](#211-date-print-or-set-system-date-and-time)
+    - [Time conversion specifiers - 时间转义符](#time-conversion-specifiers---时间转义符)
+    - [Date conversion specifiers - 日期转义符](#date-conversion-specifiers---日期转义符)
   - [21.2. arch: Print machine hardware name](#212-arch-print-machine-hardware-name)
   - [21.3. nproc: Print the number of available processors](#213-nproc-print-the-number-of-available-processors)
   - [21.4. uname: Print system information](#214-uname-print-system-information)
@@ -477,6 +790,15 @@ hostname is not installed by default, and other packages also supply a hostname 
   - [21.7. uptime: Print system uptime and load](#217-uptime-print-system-uptime-and-load)
 - [22. SELinux context](#22-selinux-context)
 - [23. Modified command invocation](#23-modified-command-invocation)
+  - [23.1. chroot: Run a command with a different root directory](#231-chroot-run-a-command-with-a-different-root-directory)
+  - [23.2. env: Run a command in a modified environment](#232-env-run-a-command-in-a-modified-environment)
+    - [23.2.1. General options](#2321-general-options)
+    - [23.2.2. -S/--split-string usage in scripts](#2322--s--split-string-usage-in-scripts)
+    - [23.2.3. -S/--split-string syntax](#2323--s--split-string-syntax)
+  - [23.3. nice: Run a command with modified niceness](#233-nice-run-a-command-with-modified-niceness)
+  - [23.4. nohup: Run a command immune to hangups](#234-nohup-run-a-command-immune-to-hangups)
+  - [23.5. stdbuf: Run a command with modified I/O stream buffering](#235-stdbuf-run-a-command-with-modified-io-stream-buffering)
+  - [23.6. timeout: Run a command with a time limit](#236-timeout-run-a-command-with-a-time-limit)
 - [24. Process control](#24-process-control)
 - [25. Delaying](#25-delaying)
 - [26. Numeric operations](#26-numeric-operations)
