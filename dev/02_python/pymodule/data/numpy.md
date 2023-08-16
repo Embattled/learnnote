@@ -40,7 +40,9 @@
   - [4.4. linalg](#44-linalg)
     - [4.4.1. SVD 奇异值分解](#441-svd-奇异值分解)
   - [4.5. numpy Input and Output  Numpy 数据的 IO](#45-numpy-input-and-output--numpy-数据的-io)
-    - [4.5.1. Text Files](#451-text-files)
+    - [4.5.1. NumPy binary files (NPY, NPZ) - 标准Numpy格式的二进制的 io](#451-numpy-binary-files-npy-npz---标准numpy格式的二进制的-io)
+    - [4.5.2. Text files](#452-text-files)
+    - [Raw binary files](#raw-binary-files)
   - [4.6. Linear algebra 线性代数计算](#46-linear-algebra-线性代数计算)
     - [4.6.1. Matrix and vector products 向量矩阵乘法](#461-matrix-and-vector-products-向量矩阵乘法)
       - [4.6.1.1. 矩阵乘法](#4611-矩阵乘法)
@@ -63,7 +65,7 @@
       - [4.9.8.3. interp 简易线性插值](#4983-interp-简易线性插值)
   - [4.10. Padding Arrays](#410-padding-arrays)
   - [4.11. Polynomials 多项式](#411-polynomials-多项式)
-    - [Power Series (numpy.polynomial.polynomial)](#power-series-numpypolynomialpolynomial)
+    - [4.11.1. Power Series (numpy.polynomial.polynomial)](#4111-power-series-numpypolynomialpolynomial)
   - [4.12. Random sampling (numpy.random)](#412-random-sampling-numpyrandom)
   - [4.13. Sorting, Searching, Counting 排序 搜索 计数](#413-sorting-searching-counting-排序-搜索-计数)
     - [4.13.1. Sorting 排序](#4131-sorting-排序)
@@ -627,8 +629,38 @@ numpy 对于各种类型的输出支持的很好, 要注意对于 pandas 的 Dat
   * 用于指定数据在输出时候的格式
   * 可能在别的地方有完整的文档, 保留为 [TODO]
 
+### 4.5.1. NumPy binary files (NPY, NPZ) - 标准Numpy格式的二进制的 io
 
-### 4.5.1. Text Files
+* load
+  * 对于 npy 文件,  a single array is returned.
+  * 对于 npz 文件 dictionary-like object is returned, containing {filename: array} key-value pairs, one for each file in the archive.
+* save 
+* 特殊格式 .npz 的存储 savez
+* 带压缩的 .npz 的存储 savez_compressed
+
+
+* `numpy.load(file, mmap_mode=None, allow_pickle=False, fix_imports=True, encoding='ASCII', *, max_header_size=10000)`
+  * 从 numpy 标准二进制格式文件 `.npy .npz` 中读取一个 arrays or objects
+  * `file` : 支持  file-like object, string, or `pathlib.Path` 
+  * `mmap_mode = None`  : 文件读取时候的内存映射.
+    * 主要用于 memory-mapped array, 由于其数据是保存在 disk 上的, 但是仍然可以通过正常的切片进行访问.
+    * mmap_mode 主要参考 `numpy.memap` 
+    * 对于访问大文件的小片段而不将整个文件读取内存的应用场景特别有用
+  * `allow_pickle=False` : 是否允许加载使用 pickle 打包的数据对象, 由于 pickle 的安全问题默认为 False
+  * `fix_imports=True` : 是否兼容 python2 的 pickled 文件, 默认为真
+  * `encoding='ASCII'` : 也是用于兼容 python2 的 pickled 文件的, 支持  ‘latin1’, ‘ASCII’, and ‘bytes’ 
+  * `max_header_size=10000` : 需要参照 python 语言的语法类 `ast.literal_eval`, 过大的 headers 可能会不安全.  
+
+* `numpy.save(file, arr, allow_pickle=True, fix_imports=True)`
+  * `file`, file, str, or pathlib.Path. 注意, 这个保存路径可以不包括 `.npy` 的后缀, 如果没有该后缀的话会被自动加上
+  *  arr :要保存的 array
+
+
+
+
+### 4.5.2. Text files
+
+以可以直接读取的 txt 文件来存储数据  
 
 保存 save :
 * `numpy.savetxt(fname, X, fmt='%.18e', delimiter=' ', newline='\n', header='', footer='', comments='# ', encoding=None)`
@@ -641,11 +673,28 @@ numpy 对于各种类型的输出支持的很好, 要注意对于 pandas 的 Dat
   * comments: 会被添加到 header 和 footer 
 
 
+### Raw binary files
+
+操作系统以及 numpy 库无关的纯二进制式文件存取, 可以被用于 Raw 图像的IO
 
 
+* `numpy.fromfile(file, dtype=float, count=-1, sep='', offset=0, *, like=None)`
+  * 从一个 binary or txt file 中构建一个 array, 即本身也支持从 txt 来读取
+  * 更多的时候是与 `tofile` 接口配合使用
+  * 在知道数据类型 data-type 的时候, 是一个更加高效的读取数据的方法.
+  * `file`: file or str or Path, Open file object or filename.
+  * `dtype=float` : binary 数据的格式, 主要用于决定 byte-order 以及具体的数据大小, 支持大部分 builtin types
+  * `count=-1` : Number of items to read. -1 means all items. 这里的 items 的意思不太懂, 应该是 array 的单个元素
+  * `sep=''` : 用于 txt file 的读取, 当默认值的时候, 即 empty separator 的时候代表该文件是 binary.
+  * `offset=0` : 同理, 基本的文件读取的接口, 用于 offset (in bytes) from the file’s current position. 只在 binary 的时候有效
+  * `like=None` : 与 `like` 关键字有关, Reference object to allow the creation of arrays which are not NumPy arrays
 
 
-
+* `ndarray.tofile(fid, sep='', format='%s')`
+  * 将一个 array 作为 binary(默认情况) 或者 txt 写入文件
+  * `fid` : file or str or Path, An open file object, or a string containing a filename.
+  * `sep=''` : 默认情况下作为 binary 写入 等同于 `file.write(a.tobytes())`, 当 sep 不为空的时候作为 txt. 
+  * `format='%s'` : 当文件作为 txt 输出的时候, 用于对每个元素进行格式化输出, 具体表现为输出的内容为 ` "format" % item`
 
 ## 4.6. Linear algebra 线性代数计算 
 
@@ -890,7 +939,7 @@ from .laguerre import Laguerre
 ```
 
 
-### Power Series (numpy.polynomial.polynomial)
+### 4.11.1. Power Series (numpy.polynomial.polynomial)
 
 提供了一些用于处理多项式的接口, 包括一个 `Polynomial` 类 以及其他的方便接口
 

@@ -302,6 +302,7 @@ pathlib 还提供了函数可以便捷的更换某一个 Path 对象的某个成
 * 解释 用户主目录符号 `~`
   * `Path('~').expanduser()  ->  PosixPath('/home/longubuntu') `
   * 注意, 带有 `~` 的 path 必须在通过该解释函数后才能正确使用
+  * 踩坑过一次, 重要!!!
 * 转化成绝对路径
   * `Path.resolve(strict=False)`
   * 解释路径中的所有 `.`  `..` 等

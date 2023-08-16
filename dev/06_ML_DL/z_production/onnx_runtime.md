@@ -1,2 +1,0 @@
-# ONNX Runtime (ORT) 
-

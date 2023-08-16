@@ -125,9 +125,9 @@ torch.cuda.is_available()
 
 ## 1.3. API
 
-至2020年11月  
-torch 最新版是 1.7  
-中文文档更新到1.4  
+至2023年8月  
+torch 最新版是 2.0
+
 
 ```py
 # 开始使用
@@ -336,19 +336,22 @@ To create a tensor with similar type but different size as another tensor, use t
 
 ## 3.1. 序列化 Serialization
 
-和存储相关, 将各种模型, 张量, 字典等数据类型序列化后存储到文件, 或者从文件中读取  
+和存储相关, 将各种模型, 张量, 字典等数据类型序列化后存储到文件, 或者从文件中读取, 并不单只能用来存取网络  
 
 pytorch 的load() 是基于 pickle 模组的, 不要轻易unpick不信任的序列数据  
+
+Pytorch 的约定是 用 `.pt` 来保存 tensors
 
 一共就两个函数
 * torch.save()
 * torch.load()
 
 官方推荐的网络模型存取方式:
-* `torch.save(model.state_dict(), PATH)`
-* `model.load_state_dict(torch.load(PATH))`
+* `torch.save(model.state_dict(), PATH)`          ： 即只保存网络的参数, 不保存网络的格式
+* `model.load_state_dict(torch.load(PATH))`       : 创建好网络之后, 再从文件中读取参数
+
 完整模型的存取
-* `torch.save(model, PATH)`
+* `torch.save(model, PATH)`    : 直接保存整个网络
 * `model = torch.load(PATH)`
 
 ### 3.1.1. torch.save
@@ -357,8 +360,8 @@ pytorch 的load() 是基于 pickle 模组的, 不要轻易unpick不信任的序�
 torch.save(
   obj, 
   f: Union[str, os.PathLike, BinaryIO], 
-  pickle_module=<module 'pickle' from '/opt/conda/lib/python3.6/pickle.py'>,
-  pickle_protocol=2, 
+  pickle_module=pickle,
+  pickle_protocol=DEFAULT_PROTOCOL, 
   _use_new_zipfile_serialization=True # 代表使用 pytorch 1.6 后的新的压缩格式
   ) → None
 ```
@@ -366,8 +369,9 @@ torch.save(
 参数意思:
 * `obj`   : 要保存的对象
 * f       : a file-like object
-* pickle_module   :  
-* pickle_protocol :
+* pickle_module   :   module used for pickling metadata and objects
+* pickle_protocol :   can be specified to override the default protocol
+* _use_new_zipfile_serialization : 如果要读取 pytorch 1.6 之前的旧数据, 传入 False
 
 ### 3.1.2. torch.load
 
@@ -375,27 +379,23 @@ torch.save(
 torch.load(
   f, 
   map_location=None, 
-  pickle_module=<module 'pickle' from '/opt/conda/lib/python3.6/pickle.py'>, 
+  pickle_module=pickle, 
+  *,
+  weights_only=False, 
   **pickle_load_args
   )
 
-""" 
+torch.load('tensors.pt')
+# Load all tensors onto the CPU
+torch.load('tensors.pt', map_location=torch.device('cpu'))
+# Map tensors from GPU 1 to GPU 0
+torch.load('tensors.pt', map_location={'cuda:1':'cuda:0'})
+```
+
 f   : a file-like object
 map_location    : a function, torch.device, string or a dict specifying how to remap storage locations
 pickle_module   :  
 pickle_load_args: (Python 3 only) optional keyword arguments passed over to pickle_module.load() and pickle_module.Unpickler()
-"""
-
-torch.load('tensors.pt')
-
-# Load all tensors onto the CPU
-torch.load('tensors.pt', map_location=torch.device('cpu'))
-
-# Map tensors from GPU 1 to GPU 0
->>> torch.load('tensors.pt', map_location={'cuda:1':'cuda:0'})
-
-```
-
 
 ## 3.2. Creation Ops
 

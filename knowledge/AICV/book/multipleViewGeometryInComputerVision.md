@@ -11,13 +11,15 @@
   - [6.1. Finite cameras - 有限摄像机](#61-finite-cameras---有限摄像机)
   - [6.2. The projective camera - 射影摄像机](#62-the-projective-camera---射影摄像机)
     - [6.2.1. Camera anatomy 摄像机矩阵的构造](#621-camera-anatomy-摄像机矩阵的构造)
-  - [Cameras at infinity - 无穷远摄像机](#cameras-at-infinity---无穷远摄像机)
+  - [6.3. Cameras at infinity - 无穷远摄像机](#63-cameras-at-infinity---无穷远摄像机)
+  - [6.4. A generic fisheye camera model for robotic applications](#64-a-generic-fisheye-camera-model-for-robotic-applications)
+    - [6.4.1. camera model defination](#641-camera-model-defination)
 - [7. Computation of the Camera Matrix P - 摄像机矩阵 P 的计算](#7-computation-of-the-camera-matrix-p---摄像机矩阵-p-的计算)
     - [7.0.1. camera matrix](#701-camera-matrix)
-  - [Basic equations - 基本方程](#basic-equations---基本方程)
-  - [Geometric erro - 几何误差](#geometric-erro---几何误差)
-  - [7.1. Radial distoration - 径向畸变  失真](#71-radial-distoration---径向畸变--失真)
-    - [7.1.1. Tangential Distortion](#711-tangential-distortion)
+  - [7.1. Basic equations - 基本方程](#71-basic-equations---基本方程)
+  - [7.2. Geometric erro - 几何误差](#72-geometric-erro---几何误差)
+  - [7.3. Radial distoration - 径向畸变  失真](#73-radial-distoration---径向畸变--失真)
+    - [7.3.1. Tangential Distortion](#731-tangential-distortion)
 - [8. N-View Computational Methods - N 视图计算方法](#8-n-view-computational-methods---n-视图计算方法)
 
 
@@ -68,13 +70,15 @@
   - [6.1. Finite cameras - 有限摄像机](#61-finite-cameras---有限摄像机)
   - [6.2. The projective camera - 射影摄像机](#62-the-projective-camera---射影摄像机)
     - [6.2.1. Camera anatomy 摄像机矩阵的构造](#621-camera-anatomy-摄像机矩阵的构造)
-  - [Cameras at infinity - 无穷远摄像机](#cameras-at-infinity---无穷远摄像机)
+  - [6.3. Cameras at infinity - 无穷远摄像机](#63-cameras-at-infinity---无穷远摄像机)
+  - [6.4. A generic fisheye camera model for robotic applications](#64-a-generic-fisheye-camera-model-for-robotic-applications)
+    - [6.4.1. camera model defination](#641-camera-model-defination)
 - [7. Computation of the Camera Matrix P - 摄像机矩阵 P 的计算](#7-computation-of-the-camera-matrix-p---摄像机矩阵-p-的计算)
     - [7.0.1. camera matrix](#701-camera-matrix)
-  - [Basic equations - 基本方程](#basic-equations---基本方程)
-  - [Geometric erro - 几何误差](#geometric-erro---几何误差)
-  - [7.1. Radial distoration - 径向畸变  失真](#71-radial-distoration---径向畸变--失真)
-    - [7.1.1. Tangential Distortion](#711-tangential-distortion)
+  - [7.1. Basic equations - 基本方程](#71-basic-equations---基本方程)
+  - [7.2. Geometric erro - 几何误差](#72-geometric-erro---几何误差)
+  - [7.3. Radial distoration - 径向畸变  失真](#73-radial-distoration---径向畸变--失真)
+    - [7.3.1. Tangential Distortion](#731-tangential-distortion)
 - [8. N-View Computational Methods - N 视图计算方法](#8-n-view-computational-methods---n-视图计算方法)
 
 
@@ -386,8 +390,46 @@ $$x=PX(\lambda) =\lambda PA + (-1\lambda) PC = \lambda PA$$
 
 **轴平面** (Axis planes) : 
 
-## Cameras at infinity - 无穷远摄像机 
+## 6.3. Cameras at infinity - 无穷远摄像机 
 
+
+
+## 6.4. A generic fisheye camera model for robotic applications
+
+Courbon J, Mezouar Y, Eckt L, Martinet P.   
+A generic fisheye camera model for robotic applications.   
+In2007 IEEE/RSJ International Conference on Intelligent Robots and Systems 2007 Oct 29 (pp. 1683-1688). IEEE.  
+
+非书上的内容, 论文阅读笔记  
+
+The radial distortions models for fisheye cameras can be classified into three main groups. 鱼眼相机的径向扭曲可以被分3类
+* pinhole model based : 一个 3D 的点首先被投影到成像平面, 然后镜像扭曲被应用到 所有的投影点来获取扭曲后的图像
+* captured ray based  : 定义一个 从 incidence ray direction 与 成像点到成像中心的距离  的映射
+* unfied catadioptric camera model based : 主要基于鱼眼相机和 折反射相机 的共同特征
+
+
+
+### 6.4.1. camera model defination
+
+首先定义 Fc 和 Fm 为两个 frames, 分别 attach 到 传统相机以及 unitary sphere, 那么就有 Fc 和 Fm 是可以通过一个简单的 Z 轴变换相关联起来的.  
+* 这里定义 c 是传统相机的光学中心 optical center, m 是 unitary sphere 的主投影中心.  
+* 这里假设 c 和 m 都是沿着 Z 轴的
+* 定义 c 光心有坐标 $[0,0, -\xi ]^T$ , 这里 $\xi$ 是用于实现 generic 的相机模型超参数  
+* 成像平面与 Z 轴正交, 同时成像平面与广信 c 的距离为 fc
+
+
+投影过程
+* 定义一个世界点 $\chi$, 坐标以 Fm 为中心, 有 $\text{X}=[X Y Z]^T$ , 该点最终会被投影到图像齐次坐标 $m=[x y 1]^T$ 上
+* 步骤1, 世界点投影到单位球面上, 即 点和球心的连线与球面的交点 
+  * 有点到球心的距离 $\rho=||X||=\sqrt{X^2+Y^2+Z^2}$
+  * 投影点的坐标为 $X_m = X/\rho$
+* 步骤2, 投影到球面上的点 $X_m$ 再经过正常的  perspective project 投影到 normalized image plane $Z=1-\xi$ (这里没太懂为啥图像平面是这个坐标  )
+* 步骤3, 最终的 m 坐标仍然需要通过一个 plane-to-plane collineation $K$ of the 2D projective point of coordinates $\underbar{x}$
+  * $m = K \underbar{x}$
+  * K 就是相机矩阵, 可以写成 $K=K_pM$, 其中 $K_p$ 是投影相机的内部参数
+  * $M$ 是一个对角矩阵, 用于链接 the frame attached to the unitary sphere to the camera frame Fm
+
+<!-- unfinish -->
 
 
 
@@ -444,12 +486,12 @@ $$
   * $s = f_x \tan\alpha$ alpha 是坐标轴的偏斜角度
 * 
 
-## Basic equations - 基本方程
+## 7.1. Basic equations - 基本方程
 
-## Geometric erro - 几何误差
+## 7.2. Geometric erro - 几何误差
 
 
-## 7.1. Radial distoration - 径向畸变  失真
+## 7.3. Radial distoration - 径向畸变  失真
 <!-- 完 -->
 
 在整个 Camera Calibration 算法中都不会考虑镜头畸变 (lens  distortion), 即相机是作为 pinhole 相机进行处理的, 而 pinhole 相机没有 Lens
@@ -501,7 +543,7 @@ $$x_d=x_c+L(r)(x-x_c), y_d=y_c+L(r)(y-y_c)$$
 **失真函数的计算** : $L(r)$ 的计算可以在摄像机标定矩阵的同时进行, 即使用 Tsai grids, 最小化一个基于线性映射的偏差的代价函数, 来同时迭代计算 $k_i, P$. 
 
 <!-- 完 -->
-### 7.1.1. Tangential Distortion
+### 7.3.1. Tangential Distortion
 
 书中好像没有涉及到的畸变 - 切向畸变
 

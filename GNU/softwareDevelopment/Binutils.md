@@ -9,7 +9,7 @@
 
 超级大的 collection of binary tools.
 
-很多被认为是 linux 基础的一些软件开发命令其实都属于该 GNU 的工具组
+很多被认为是 linux 基础的一些 `软件开发命令` 其实都属于该 GNU 的工具组
 
 列表省略
 

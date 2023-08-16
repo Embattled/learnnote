@@ -143,7 +143,7 @@ ssh -C -f -N -g -R 80:192.168.1.1:8080 user@192.168.1.1
 
 
 
-## 其他命令
+## 3.2. 其他命令
 
 辅佐命令 
 * `-g`    : 启动全局转发
@@ -154,6 +154,18 @@ ssh -C -f -N -g -R 80:192.168.1.1:8080 user@192.168.1.1
 
 
 * `-f` : 
+
+## 连接配置
+
+
+* `-n`  : Redirects stdin from /dev/null (actually, prevents reading from stdin)
+  * 将输入流重定位到 /dev/null
+  * 该命令可以用于测试 ssh 连通性  `ssh -n -o ConnectTimeout=10 target` 即用很短的时间测试一个服务器的连通性
+  * 该命令的主要用途是在远端启动一个 x11 window 程序 `ssh -n <如果配置没有开启x11 forward 的话需要加-X> target xclock &`, 结尾的 & 是让一整个程序从一开始就运行在后台
+
+* `-o option` : 在 CLI 中指定用于覆盖 ssh config 的各种详细配置, 支持的详细内容可以直接参照 ssh_config
+
+
 
 
 
