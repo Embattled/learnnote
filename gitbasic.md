@@ -955,6 +955,19 @@ git apply [--stat] [--numstat] [--summary] [--check] [--index | --intent-to-add]
 	  [--exclude=<path>] [--include=<path>] [--directory=<root>]
 	  [--verbose | --quiet] [--unsafe-paths] [--allow-empty] [<patch>…​]
 ```
+超多参数  
+
+用于非 commit 管理的文件更改 ( 应用 diff 命令输出的 .patch 文件 的修改 )
+* 该操作不需要项目在 git 存储库中
+* 在子目录运行时, 目录外部的修补路径会被忽略
+
+
+基础参数:
+* `--index`   : 在应用于 working tree 的同时将 patch 修改应用于 索引
+* `--cached`  : 将 patch 只应用于 索引 
+
+
+
 
 ## 6.3. cherry-pick - Apply the changes introduced by some existing commits
 

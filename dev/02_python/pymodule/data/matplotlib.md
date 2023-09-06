@@ -555,7 +555,7 @@ ax.yaxis
 
 #### 4.2.1.1. Axes limit
 
-xlim ylim 的值, 即在图上显示的坐标区间, 会对数据进行阶段, 即传入了 plot 但是不会显示在图上
+xlim ylim 的值, 即在图上显示的坐标区间, 会对数据进行截断, 即传入了 plot 但是不会显示在图上
 
 * `Axes.set_xlim` : Set the x-axis view limits.
   * `(left=None, right=None, *, emit=True, auto=False, xmin=None, xmax=None)`

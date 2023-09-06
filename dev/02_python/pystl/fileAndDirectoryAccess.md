@@ -268,6 +268,14 @@ pathlib 还提供了函数可以便捷的更换某一个 Path 对象的某个成
   * 作为参数的 `suffix` 不为空的时候, 首字符必须是 点号, 但 suffix 不能只是一个点号
   * 一次变更只会对最后一个后缀生效
 
+* `PurePath.with_name(name)`
+  * 如果原本的 path 就没有 name (即只有根路径或者只有盘符) 则会报错  
+
+* `PurePath.with_stem(stem)`
+  * 在不更改文件后缀名的情况下, 更改 stem
+  * 注意如果文件有多重后缀名的情况下不要轻易用这个方法
+
+
 
 ## 3.2. pathlib.Path - Concrete paths
 

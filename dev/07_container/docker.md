@@ -26,6 +26,8 @@
   - [4.1. FROM](#41-from)
   - [4.2. ARG](#42-arg)
   - [4.3. ENV](#43-env)
+- [Compose file reference](#compose-file-reference)
+  - [Compose Specification](#compose-specification)
 
 
 # 1. Start Docker 
@@ -250,8 +252,6 @@ Define and run multi-container applications with Docker.
 
 如何去定义 `docker-compose.yml` 是使用 compose 命令的关键, 根据定义的具体细则, 有时候可以直接省略掉手动调用 `docker build`
 
-帮助命令 `docker compose --help`
-
 
 `docker compose [-f <arg>...] [--profile <name>...] [options] [COMMAND] [ARGS...]`
 * `-f <arg>...` : 手动指定别的 compose 配置文件.
@@ -466,3 +466,17 @@ FROM [--platform=<platform>] <image>[@<digest>] [AS <name>]
 
 为 Docker 容器设置环境变量, 这些环境变量不仅在 容器中可以使用, 在接下来的 Dockerfile 里也可以使用. 
 在 Dockerfile 中可以多次更改替换这些 ENV 的值, 
+
+# Compose file reference
+
+
+## Compose Specification 
+
+可以解释为一种 Docker 的 compose 配置的一种格式, 通过该格式可以便捷的定义 多 Docker 应用的 Dokcer 环境  
+
+目前 (2023.08) 的 Docker 中 (above 1.27.0)
+* 应用了 Compose V2
+* 将传统的 Compose file format 的 2.x 3.x 的各种功能都整合到了 `Compose Specification` 中  
+
+`Compose V1 no longer receives updates and will not be available in new releases of Docker Desktop after June 2023.`
+

@@ -9,24 +9,26 @@
   - [2.4. 作用域](#24-作用域)
 - [3. 内置函数 Build-in Function](#3-内置函数-build-in-function)
   - [3.1. 基本函数](#31-基本函数)
-  - [3.2. 类函数](#32-类函数)
+  - [3.2. 内置类函数](#32-内置类函数)
   - [3.3. 类型转换函数](#33-类型转换函数)
   - [3.4. 作用域变量获取函数](#34-作用域变量获取函数)
-  - [3.5. print()](#35-print)
-    - [3.5.1. 格式化输出](#351-格式化输出)
-    - [3.5.2. 控制输出方式](#352-控制输出方式)
-  - [3.6. input()](#36-input)
-  - [3.7. open() 基础文件操作](#37-open-基础文件操作)
-    - [3.7.1. read](#371-read)
-    - [3.7.2. write](#372-write)
-    - [3.7.3. position](#373-position)
-  - [3.8. 序列类型数据的操作函数](#38-序列类型数据的操作函数)
-    - [3.8.1. range()](#381-range)
-    - [3.8.2. zip()](#382-zip)
-    - [3.8.3. reserved()](#383-reserved)
-    - [3.8.4. sorted()](#384-sorted)
-    - [3.8.5. enumerate() 遍历对象函数](#385-enumerate-遍历对象函数)
-    - [3.8.6. sum() 提取并相加迭代器的所有元素](#386-sum-提取并相加迭代器的所有元素)
+  - [3.5. 类/包相关的函数](#35-类包相关的函数)
+  - [3.6. 数学逻辑函数](#36-数学逻辑函数)
+  - [3.7. print()](#37-print)
+    - [3.7.1. 格式化输出](#371-格式化输出)
+    - [3.7.2. 控制输出方式](#372-控制输出方式)
+  - [3.8. input()](#38-input)
+  - [3.9. open() 基础文件操作](#39-open-基础文件操作)
+    - [3.9.1. read](#391-read)
+    - [3.9.2. write](#392-write)
+    - [3.9.3. position](#393-position)
+  - [3.10. 序列类型数据的操作函数](#310-序列类型数据的操作函数)
+    - [3.10.1. range()](#3101-range)
+    - [3.10.2. zip()](#3102-zip)
+    - [3.10.3. reserved()](#3103-reserved)
+    - [3.10.4. sorted()](#3104-sorted)
+    - [3.10.5. enumerate() 遍历对象函数](#3105-enumerate-遍历对象函数)
+    - [3.10.6. sum() 提取并相加迭代器的所有元素](#3106-sum-提取并相加迭代器的所有元素)
 - [4. Python的操作符与变量](#4-python的操作符与变量)
   - [4.1. 基础类型](#41-基础类型)
   - [4.2. 转义字符](#42-转义字符)
@@ -127,8 +129,8 @@
   - [11.3. 正则表达式-多次匹配](#113-正则表达式-多次匹配)
 - [12. Command line and environment](#12-command-line-and-environment)
   - [12.1. Command line](#121-command-line)
-    - [-m module-name](#-m-module-name)
-    - [杂项选项](#杂项选项)
+    - [12.1.1. -m module-name](#1211--m-module-name)
+    - [12.1.2. 杂项选项](#1212-杂项选项)
   - [12.2. python Environment variables](#122-python-environment-variables)
 
 # 1. Python 的背景
@@ -347,19 +349,18 @@ def spam():
 
 其他未学习的内置函数
 ```
-abs()  delattr()  hash()    
-all()      min()  setattr()
-any()  dir()    next()  slicea()
+ hash()    
+ dir()    next()  slicea()
 ascii()  divmod()   object()  
       staticmethod()
 breakpoint() 
-  filter()  issubclass()  pow()  super()
+  filter()  issubclass()   super()
     iter()  
 callable()  format()  len()  property() 
 frozenset()     
-classmethod()  getattr()  
+classmethod()  
 compile()    map()   
-complex()  hasattr()  max()  round()
+complex()  round()
 ```
 ## 3.1. 基本函数
 
@@ -378,7 +379,7 @@ complex()  hasattr()  max()  round()
 - `__import__()`
 
 
-## 3.2. 类函数
+## 3.2. 内置类函数
 
 这些内置函数实际上是内置类的定义函数, 具体用法查看下文的内置类  
 
@@ -424,7 +425,47 @@ complex()  hasattr()  max()  round()
 - locals()    : 将局部空间的所有变量以字典形式返回, 等同于 `vars(空)`
 - globals()   : 将全局空间的所有变量以字典形式返回, 注意以本 module 为基准, 不包括调用的module
 
-## 3.5. print()
+## 3.5. 类/包相关的函数  
+
+attr系列
+* `getattr(object, name, default)`  : 从一个 object 中提取名为 name 的成员, name 必须是  string, 如果设置了 default 则 object 中不存在该成员的时候会返回该 default, 否则报 `AttributeError`
+* `setattr(object, name, value)`    : 为一个 object 设置名为 name 的成员, 如果对象允许的话, 会把值赋予对应的 name 成员
+* `hasattr(object, name)`           : 简单的逻辑判断 object 中是否有名为 name 的成员
+* `delattr(object, name)`           : 可以理解为 setattr 的反函数, 删除名为 name 的成员, 相当于 `del object.name`
+
+
+## 3.6. 数学逻辑函数
+
+
+数学函数
+* `pow(base, exp, mod=None)`    : 返回 base 的 exp 次方, 如果数值过大的话可以传入 mod, 会返回结果的取模值.  传入2个参数的时候与 `base**exp` 的功能相同
+  * 注意, 如果 base 是整数 , exp 是负数, 则返回值是小数
+  * 如果 base 是负数或 float, 而 exp 是非整数, 则返回值是 复数
+  * 如果 mod 存在, 而 exp 是负数, 则 base 必须与 mod 互质, 此时会计算 模的逆运算?? 没看懂
+* `abs(x)`      : 简单的计算绝对值, x 必须是 integer or float. 或者一个实现了 `__abs__()` 接口的类
+  *  If the argument is a complex number, its magnitude is returned.
+* 
+
+
+值筛选函数
+* min max 支持两种传值, 单个 iterable 传值或者多个位置参数直接传值
+* defalut 用于 iterable 为空的时候的返回值, 如果不设置的话 iterable 为空的时候会返回 ValueError
+* key 用于指定排序的方法 
+* max
+  * `max(iterable, *, default, key=None)`
+  * `max(arg1, arg2, *args, key=None)`
+* min
+  * `min(iterable, *, default, key=None)`
+  * `min(arg1, arg2, *args, key=None)`
+
+
+
+逻辑函数
+* `all(iterable)`   : 如果所有的成员都是 True, 或者 参数本身是一个空的 iterable, 则返回 True
+* `any(iterable)`   : 与 all 相对, 如果所有的成员都是 False 或者是空的 iterable 则返回 False
+
+
+## 3.7. print()
 
 `print (value,...,sep=' ',end='\n',file=sys.stdout,flush=False)`  
 
@@ -443,7 +484,7 @@ f = open("demo.txt","w")
 print('123456',file=f)
 ```
 
-### 3.5.1. 格式化输出
+### 3.7.1. 格式化输出
 
 类似于C语言的格式化输出, print() 函数提供了类似的功能
 
@@ -475,7 +516,7 @@ print("%s已经%d岁了, 它的网址是%s。" % (name, age, url))
 | %r     | 使用 repr() 函数将表达式转换为字符串   |
 | %s     | 使用 str() 函数将表达式转换为字符串    |
 
-### 3.5.2. 控制输出方式
+### 3.7.2. 控制输出方式
 
 转换说明符的`%`和类型字符中间可以加入控制内容
 
@@ -506,7 +547,7 @@ print("%+08.3f" % f)
 
 ```
 
-## 3.6. input()
+## 3.8. input()
 
 字符串形式接受用户输入  
 
@@ -515,7 +556,7 @@ print("%+08.3f" % f)
 - str   : 表示输入存入的变量
 - tipmsg: 表示在控制台中输出的提示信息, 提示输入什么内容
 
-## 3.7. open() 基础文件操作
+## 3.9. open() 基础文件操作
 
 open() 函数用于创建或打开指定文件, 返回一个 `file object`  
 `open(file, mode='r', buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None)`  
@@ -532,7 +573,7 @@ open() 函数用于创建或打开指定文件, 返回一个 `file object`
 - x 如果文件已存在则失败
 
 file object 是python的一个内置类, 包含了一些基础函数用于读写文件
-### 3.7.1. read
+### 3.9.1. read
 
 * f.read(size)
 * f.readline()
@@ -544,17 +585,17 @@ This is memory efficient, fast, and leads to simple code:
 for line in f:
   print(line, end='')
 ```
-### 3.7.2. write
+### 3.9.2. write
 
 * f.write(str)
 
-### 3.7.3. position
+### 3.9.3. position
 
 * f.tell()
 * f.seek(offset,whence)
 
-## 3.8. 序列类型数据的操作函数
-### 3.8.1. range()
+## 3.10. 序列类型数据的操作函数
+### 3.10.1. range()
 
 - range() 函数能够轻松地生成一系列的数字  
 - 函数的返回值并不直接是列表类型 list  而是 range
@@ -568,7 +609,7 @@ for line in f:
 even_numbers = list(range(2,11,2))
 
 ```
-### 3.8.2. zip()
+### 3.10.2. zip()
 
 - 可以将多个序列（列表、元组、字典、集合、字符串以及 range() 区间构成的列表）“压缩”成一个 zip 对象
 - 所谓“压缩”, 其实就是将这些序列中对应位置的元素重新组合, 生成一个个新的元组
@@ -592,7 +633,7 @@ print([x for x in zip(my_pychar,my_shechar)])
 
 ```
 
-### 3.8.3. reserved()
+### 3.10.3. reserved()
 
 - `reversed(seq)` 并不会修改原来序列中元素的顺序
 - 对于给定的序列（包括列表、元组、字符串以及 range(n) 区间）, 该函数可以返回一个逆序列表的`迭代器`
@@ -607,7 +648,7 @@ print([x for x in reversed((1,2,3,4,5))])
 # 逆序元组, 返回的还是一个列表
 ```
 
-### 3.8.4. sorted()
+### 3.10.4. sorted()
 
 - `list = sorted(iterable, key=None, reverse=False)`
 - iterable 表示指定的序列
@@ -632,7 +673,7 @@ chars=['http://c.biancheng.net',\
 print(sorted(chars,key=lambda x:len(x)))
 ```
 
-### 3.8.5. enumerate() 遍历对象函数
+### 3.10.5. enumerate() 遍历对象函数
 
 - 一般用在 for 循环中, 将一个可遍历的数据对象组合成一个索引序列  
 - 可以同时列出数据和数据下标
@@ -646,7 +687,7 @@ seq = ['one', 'two', 'three']
 for i, element in enumerate(seq):
    print i, element
 ```
-### 3.8.6. sum() 提取并相加迭代器的所有元素
+### 3.10.6. sum() 提取并相加迭代器的所有元素
 
 `sum(iterable, /, start=0)`
 Changed in version 3.8: The start parameter can be specified as a keyword argument.
@@ -2464,14 +2505,14 @@ re.search('(bar)+', 'foo barbarbar baz')
 * `python myscript.py` 简单运行一个脚本
 * `python [-bBdEhiIOqsSuvVWx?] [-c command | -m module-name | script | - ] [args]`  完整的 CLI 可能输入
 
-### -m module-name
+### 12.1.1. -m module-name
 
 Search `sys.path` for the named module and execute its contents as the __main__ module.
 
 执行一个 包自己的 `main` 函数 `<pkg>.__main__`, module-name 不需要带上 `.py` 后缀  
 
 
-### 杂项选项
+### 12.1.2. 杂项选项
 
 `python -m pip --version`
 

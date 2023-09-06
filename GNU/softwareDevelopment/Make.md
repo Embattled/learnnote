@@ -26,7 +26,10 @@ makefile文件最好直接命名为`makefile`或`Makefile`
 如果要指定特定的Makefile, 你可以使用make的 -f 和 --file 参数, 如:  `make -f Make.Linux` 或 `make --file Make.AIX`
 
 
-# 2. make CLI
+官方文档
+https://www.gnu.org/software/make/manual/make.html
+
+## 1.1. make CLI
 
 * `-j [N], --jobs[=N]`
     * Allow N jobs at once; infineite jobs with no arg.
@@ -35,7 +38,7 @@ makefile文件最好直接命名为`makefile`或`Makefile`
 * `-f, --file` 
     * 当 makefile 文件不是默认的时候, 用该参数来指定要执行的 makefile 文件
 
-# 3. makefile
+# 2. makefile
 
 
 makefile 可以简单理解为更高级的 shell 脚本, 具有一些检测功能, 一个 makefile 可以按照以下 5 种部件来构成
@@ -60,7 +63,7 @@ makefile 可以简单理解为更高级的 shell 脚本, 具有一些检测功�
 
 
 
-## 3.1. 基础 makefile 
+## 2.1. 基础 makefile 
 
 
 ```makefile
@@ -97,38 +100,7 @@ clean:
 
 
 
-## 3.2. 特殊符号
-
-可以极大的简化 makefile 的书写, 同时极大的提高 makefile 的阅读门槛
-
-
-
-## 3.3. 自动检测目录
-自动检测目录下所有的 cpp 文件呢？此外 main.cpp 和 main.o 只差一个后缀, 能不能自动生成对象文件的名字, 将其设置为源文件名字后缀换成 .o 的形式
-
-`wildcard` 用于获取符合特定规则的文件名  
-```makefile
-SOURCE_DIR = . # 如果是当前目录, 也可以不指定
-SOURCE_FILE = $(wildcard $(SOURCE_DIR)/*.cpp)
-#  $(wildcard *.cpp))
-target:
-    # 输出的为当前目录下所有的 .cpp 文件
-    @echo $(SOURCE_FILE)
-```
-其中 @echo 前加 @是为了避免命令回显, 上文中 make clean 调用了 `rm -rf` 会在 terminal 中输出这行命令, 如果在 `rm` 前加了 `@` 则不会输出了  
-
-`patsubst`用它可以方便地将 .cpp 文件的后缀换成 .o  
-它的基本语法是: `$(patsubst 原模式, 目标模式, 文件列表) ` 
-```makefile
-SOURCES = main.cpp function1.cpp function2.cpp
-# 目标文件都是 .o 结尾的, 那么就将其表示为 %.o
-OBJS = $(patsubst %.cpp, %.o, $(SOURCES))
-target:
-        @echo $(SOURCES)
-        @echo $(OBJS)
-```
-
-## 3.4. 自动推导(简化makefile代码)
+## 2.2. 自动推导(简化makefile代码)
 
 Static Pattern Rule  
 `targets: target-pattern: prereq-patterns`  
@@ -147,9 +119,9 @@ $(OBJS):%.o:%.cpp
 
 ```
 
-# 4. 高级操作
+# 3. 高级操作
 
-## 4.1. 多makefile处理
+## 3.1. 多makefile处理
 
 在Makefile使用 include 关键字可以把别的Makefile包含进来, 这很像C语言的 `#include`  
 
@@ -177,10 +149,10 @@ include foo.make a.mk b.mk c.mk e.mk f.mk
 
 
 
-# 5. Writing Rules
+# 4. Writing Rules
 
 
-## 5.1. Recipe syntax
+## 4.1. Recipe syntax
 
 makefile 的规则 是以下的形式  
 ```makefile
@@ -210,7 +182,7 @@ foo.o : foo.c defs.h       # module for twiddling the frobs
 * 作为一个通识, 编写 makefile 的时候会将 first rule 用于描述整个项目程序的生成, 该 target 经常写成 `all`
 
 
-## 5.2. Recipe Echoing
+## 4.2. Recipe Echoing
 
 规则回声: 对于每一条 recipe, make 默认会在执行前把要执行的具体 shell 命令打印到 shell 输出里, 这个过程被叫做 echoing  
 
@@ -224,7 +196,7 @@ foo.o : foo.c defs.h       # module for twiddling the frobs
 * 一个 build-in target `.SILENT` 也有和 `@` 相同的效果
   
 
-## 5.3. Types of Prerequisites 
+## 4.3. Types of Prerequisites 
 <!-- 完 -->
 Prequisites 的种类 : normal prerequisites, order-only prerequisites
 
@@ -249,7 +221,8 @@ $(OBJDIR):
 ```
 
 
-## 5.4. Using Wildcard Characters in File Names
+## 4.4. Using Wildcard Characters in File Names
+
 <!-- 完 -->
 在文件名中使用 Wildcard 来进行文件名通配符匹配  
 * 匹配得到的文件列表会被排序
@@ -281,14 +254,14 @@ foo : $(objects)
         cc -o foo $(objects)
 ```
 
-## 5.5. Searching Directories for Prerequisites
+## 4.5. Searching Directories for Prerequisites
 
 对于大型项目, 通常会将 源代码 和 二进制 文件放于不同的目录中, make 提供了目录搜索功能:
 * 通过自动搜索多个目录来查找 prerequisites  
 * 当目录之间重新分配文件时, 不需要更改单独的规则, 只需要更改搜索路径  
 * 所有的搜索都发生在 target or prerequisites 不在当前目录的情况下
 
-### 5.5.1. VPATH: Search Path for All Prerequisites
+### 4.5.1. VPATH: Search Path for All Prerequisites
 
 `VPATH` 是一个 make variable, 用于指定 list of directories that make should search.  
 * 多数情况下 : `VPATH` 用于指定那些目录 包含了 `prerequisite files` that are not in the current directory
@@ -306,7 +279,7 @@ VPATH = src:../headers
 foo.o : foo.c
 ```
 
-### 5.5.2. The vpath Directive
+### 4.5.2. The vpath Directive
 
 `vpath` (小写), 是类似与 `VPATH`, 但是更加具有选择性的一种目录指定方法, 可以对不同的文件类型指定不同的搜索目录  
 
@@ -322,7 +295,7 @@ vpath 使用的关键在于 pattern 的定义, 对于一个 pattern
 * 
 
 
-## 5.6. Phony Target 
+## 4.6. Phony Target 
 
 Phony Target 是一种特殊的目标, 他并不是一个真实的生成目标文件, 更像是一个 recipe 的集合的命名, 主要用于 make 执行具体的 request 的时候  
 * to avoid a conflict with a file of the same name
@@ -343,7 +316,7 @@ clean :
 * 解决办法就是, 将 clean rule 实现声明为 Phony Target
 
 
-## 5.7. Special Built-in Target Names
+## 4.7. Special Built-in Target Names
 
 一些特殊的 name 作为 Target 的时候会有特殊的意思
 
@@ -361,9 +334,9 @@ clean:
 ```
 而在 rm 命令前面加了一个小减号的意思就是, 也许某些文件出现问题, 但不要管, 继续做后面的事  
 
-# 6. Writing Recipes in Rules
+# 5. Writing Recipes in Rules
 
-# 7. How to Use Variables
+# 6. How to Use Variables
 
 <!-- (头部完) -->
 makefile 的 variable 是一些被定义为 name 的 string or text, 这些 varable 的值可以替换在任何部分 (target, prerequisites, recipes, etc.)
@@ -378,7 +351,7 @@ variables 的命令规则:
 
 单个特殊符号的变量有特殊用途 (automatic variables)
 
-## 7.1. Basics of Variable References
+## 6.1. Basics of Variable References
 <!-- 完 -->
 我们希望将需要反复输入的命令整合成变量, 用到它们时直接用对应的变量替代, 这样如果将来需要修改这些命令, 则直接修改变量的值即可
 
@@ -424,11 +397,11 @@ clean :
 在makefile中以 $(objects) 的方式来通过变量来管理目标文件   
 如果有新的 .o 文件加入, 简单地修改一下 objects 变量就可以了
 
-## 7.2. The Two Flavors of Variables
+## 6.2. The Two Flavors of Variables
 <!-- 头部完 -->
 对于不同的变量赋值方法, 在 GUN make 被称为 `flavors`, 不同的 flavor 会影响这些变量值在之后的  used and expanded.
 
-### 7.2.1. Recursively Expanded Variable Assignment - 递归扩张
+### 6.2.1. Recursively Expanded Variable Assignment - 递归扩张
 <!-- 完 -->
 `recursively expanded` flavor,  使用 `=` 单等号 或者 `define` 关键字 来赋值
 
@@ -450,7 +423,7 @@ CFLAGS = $(CFLAGS) -O
   * 无法进行变量的拓展
   * 会在每次调用的时候都对内部的变量进行拓展, 即如果是 wildcard 等函数, 不仅会导致重复的调用, 还会导致由于函数调用的时机不同导致的结果不同进而使得 makefile 的行动无法预测
 
-### 7.2.2. Simply Expanded Variable Assignment
+### 6.2.2. Simply Expanded Variable Assignment
 <!-- 完 -->
 主要用于避免 `recursively expanded` flavor 缺点的 另一种主流 flavor
 
@@ -466,13 +439,15 @@ y := $(x) bar  # y := foo bar
 x := later     # x := later
 ```
 
-### 7.2.3. Immediately Expanded Variable Assignment
+### 6.2.3. Immediately Expanded Variable Assignment
 
 TODO
 
-### 7.2.4. Conditional Variable Assignment
+### 6.2.4. Conditional Variable Assignment
 <!-- 完 -->
 条件赋值 `?=` , 这里的条件指的是 左侧的变量还没有定义 (即使变量赋予的是空值也仍然属于已定义的变量)  
+
+仅当 左侧的变量还处于未定义的状态, 才会将右侧的值赋予左侧  
 
 ```makefile
 FOO ?= bar
@@ -483,11 +458,11 @@ ifeq ($(origin FOO), undefined)
 endif
 ```
 
-## 7.3. Advanced Features for Reference to Variables
+## 6.3. Advanced Features for Reference to Variables
 
 使用变量的更高级的技巧  
 
-### 7.3.1. Substitution References
+### 6.3.1. Substitution References
 
 替换引用:  `$(var:a=b)`  or `${var:a=b}`
 
@@ -511,11 +486,52 @@ bar := $(foo:%.o=%.c) # bar = a.c b.c l.a c.c
 ```
 
 
-## 7.4. Setting Variables 设置变量
+## 6.4. Setting Variables 设置变量
 
 To set a variable from the makefile, write a line starting with the variable name followed by one of the assignment operators` ‘=’, ‘:=’, ‘::=’, or ‘:::=’`.  
 Whitespace around the variable name and immediately after the ‘=’ is ignored.   
 对于代码 `objects = main.o foo.o bar.o utils.o`, 则具体的值则是 `main.o foo.o bar.o utils.o`
+
+# 7. Conditional Parts of Makefiles
+
+<!-- 头部完 -->
+
+makefile 中的条件分歧, 根据变量值来使得 makefile 中的一部分指令被执行或者忽视
+* 条件决定了 make 实际读取到的 makefile 的内容, 即可以把条件理解为 编译过程中的预处理指令
+* 因此 makefile 中的条件分歧并不能实现在 make 执行过程中产生条件分歧
+
+比较简单的一个章节
+
+## 7.1. Example of a Conditional - 快速实例
+
+<!-- 完 -->
+一个根据编译器是 gcc 还是其他的编译器, 来决定链接库的 makefile 示例:
+
+```makefile
+libs_for_gcc = -lgnu
+normal_libs = # other libs
+
+foo: $(objects)
+ifeq ($(CC),gcc)
+        $(CC) -o foo $(objects) $(libs_for_gcc)
+else
+        $(CC) -o foo $(objects) $(normal_libs)
+endif
+
+```
+
+从示例中可以看出, 条件分歧使用了三个指令 `ifeq` `else` `endif` 有点类似于 shell 
+
+`ifeq` 的用法包含两个参数, 用逗号分隔它们并用括号包围起来  `ifeq ($(CC),gcc)`
+* 对于两个参数各自执行变量替换后
+* 对它们进行匹配比较
+* 如果为真, 则执行对应 ifeq 后面的 指令
+
+`else` 在分歧中是可选的模块, 在 ifeq 的结果为假的时候执行该部分的内容   
+
+`endif` 意为 条件部分的终止, 是必须的, 每个 conditional 必须以 `endif` 结尾   
+
+## 7.2. Syntax of Conditionals - 完整的 makefile 条件语法
 
 
 # 8. Functions for Transforming Text
@@ -549,9 +565,6 @@ ${function arguments}
 
 索引:
 * filter                : 过滤掉不满足 pattern 的, removing any words that do not match
-
-
-
 
 ### 8.2.1. 字符串替换
 
@@ -587,18 +600,19 @@ ${function arguments}
 * `$(suffix names…)`    : 提取后缀, 如果文件没有后缀则返回空, 即返回的数值个数可能会变少
 * `$(basename names…)`  : 提取非后缀的部分, 同理如果没有后缀则不更改
 
-执行结果
+示例: 执行结果
 * `$(dir src/foo.c hacks)`   `src/ ./` 
 * `$(notdir src/foo.c hacks)`  `foo.c hacks`
 * `$(suffix src/foo.c src-1.0/bar.c hacks)`  `.c .c`
 * `$(basename src/foo.c src-1.0/bar hacks)`  `src/foo src-1.0/bar hacks`
+
 
 路径修改函数
 * `$(addsuffix suffix,names…)`          : 追加后缀
 * `$(addprefix prefix,names…)`          : 追加前缀
 * `$(join list1,list2)`                 : 两个 list 的元素依次结合, 如果元素个数不匹配, 尾部剩余的部分则会原样拷贝  
 
-示例
+示例 : 执行结果
 * `$(addsuffix .c,foo bar)`     `foo.c bar.c`
 * `$(addprefix src/,foo bar)`   `src/foo src/bar`
 * `$(join a b,.c .o)`           `a.c b.o`
@@ -606,16 +620,74 @@ ${function arguments}
 
 文件检索: 
 * `$(wildcard pattern)`                  : 通配符手动调用函数
+  * 详细的通配符使用方法需要查阅 章节 4.4 Using Wildcard Characters in File Names
 
 路径转换:
 * `$(realpath names…)`                   : 路径转换, 包括转换链接, 消除 `../`, 消除重复的 `/`, 验证路径是否存在, 如果转换失败则返回空字符串
 * `$(abspath names…)`                    : 有些类似于 realpath, 但不进行验证存在, 同时不进行链接转换  
 
-# 9. Run make - make CLI
+# 9. How to Run make - make CLI
+
+
+记载了关于 make CLI 的相关使用方法  
+
+make 程序本身的退出代码书写在了章节开头 
+* 0     : 成功运行
+* 2     : 遇到错误, 同时会打印相关的错误描述信息
+* 1     : 与 CLi 中的 `-q` 标志相关, 在 make 确认某些目标尚未更新的情况下
+
+## 9.1. Arguments to Specify the Makefile
+<!-- 完 -->
+通过 `-f` or `--file` 参数, 指定要运行的 makefile 文件.  
+
+通过多次调用 `-f` 参数, 可以传入多个 makefile 文件, 同时各个文件会 joint 成为最终运行的文件  
+
+默认情况下运行的文件名按顺序为 `GNUmakefile` `makefile` `Makefile`
+
+## 9.2. Arguments to Specify the Goals
+<!-- 完 -->
+编译目标  goals , 从逻辑上来说, 本次运行 make 所要达成的最终的更新目标  
+
+默认下, make 会运行所定义的 第一个 `非点号开头的` target, 因此约定俗成中, 第一个 target 总是用来编译整个程序.   
+
+可以通过特殊变量 `.DEFAULT_GOAL` 来更改默认的编译目标  
+
+target 可以被指定为由隐式规则生成的, 因此即使在 makefile 中没有被显式的定义也可以被指定.  
+
+
+在 CLI 中, 可以传递一个或者多个 target 用于指定要执行的目标, 多个 target 会由 make 根据 `the order you name them` 的顺序来实行
+* 通过 CLI 传入的 target 会作为一个特殊变量 `MAKECMDGOALS`, 如果没传入 则该变量为空. 注意该变量只能在特殊情况下使用, 不要轻易调用
+* 一种可选的`MAKECMDGOALS`使用方法是, 通过检测 GOALS 是不是 clean, 来避免一些不必要的生成再立即删除的操作  
+
+
+CLI 中可以显式的让 make 执行 Phony Target, 以下是典型的 Phony 以及 empty target names, 约定俗成下会经常使用它们. 
+* `all`   : 执行所有 makefile top-level targets
+* `clean` : 删除所有 由运行 make 所生成的文件
+* `mostlyclean`   : 用于避免一些可能并不需要或者不想重新编译的文件, 例如 libgcc.a
+* `distclean`, `realclean`, `clobber` : 这几个 target 一般用来指代会删除比 clean 更多的文件, 例如一些用于编译的由用户创建的配置文件等
+* `install`     : linux 系统意义上的安装, 即复制各种可执行文件到用户搜索目录下
+* `print`       : 打印 listings of the source files that have changed.
+* `tar`         : 打包源文件, 创建 tar 文件
+* `shar`        : 创建一个 shell archive (shar) 的源文件打包
+* `dist`        : 更加广义上的打包用于源码发布, 可以是 tar 或者 shar 或者其他的方式
+* `TAGS`        : 更新 tags table 
+* `check`, `test`  : 运行一些该项目的测试程序  
+
+同时作为 GNU 软件的话还有另外一个 list 代表所有 GNU 软件所必须定义的 target, 参阅 `Standard Targets for Users`
+
+
+## 9.3. Overriding Variables
+
+<!-- 完 -->
+
+在 CLI 中, 通过 `v=x` 的方式可以传入变量, 这种情况下变量会覆盖掉 makefile 中所定义的具体的值.  
+
+例如: makefile 中定义 `CFLAGS=-g` 则在 CLI 中可以传入 `make CFLAGS='-g -O'` 用以实现编译的不同动作.  
+
+同理, simply-expanded variable 也可作为 CLI 变量被传入, 此时使用的是 `:=` 而不是 `=`
 
 
 # 10. Using Implicit Rules
-
 
 You can define your own implicit rules by writing `pattern rules`.    
 `Suffix rules` are a more limited way to define implicit rules.  

@@ -170,20 +170,20 @@ print_when() 功能则是更加细化成条件输出, 即可以设置成只有�
 Halide 编译甚至可以直接使用 c++ 的输出流来打印, 具体输出的则是 Expr 的最终表达式, 在构建非常复杂的算法的时候很有用, 会在编译 Halide Filter的时候进行输出
 
 ```cpp
-        Var fizz("fizz"), buzz("buzz");
-        Expr e = 1;
-        for (int i = 2; i < 100; i++) {
-            if (i % 3 == 0 && i % 5 == 0) {
-                e += fizz * buzz;
-            } else if (i % 3 == 0) {
-                e += fizz;
-            } else if (i % 5 == 0) {
-                e += buzz;
-            } else {
-                e += i;
-            }
-        }
-        std::cout << "Printing a complex Expr: " << e << "\n";
+Var fizz("fizz"), buzz("buzz");
+Expr e = 1;
+for (int i = 2; i < 100; i++) {
+    if (i % 3 == 0 && i % 5 == 0) {
+        e += fizz * buzz;
+    } else if (i % 3 == 0) {
+        e += fizz;
+    } else if (i % 5 == 0) {
+        e += buzz;
+    } else {
+        e += i;
+    }
+}
+std::cout << "Printing a complex Expr: " << e << "\n";
 
 ```
 
@@ -599,7 +599,7 @@ Func & Halide::Func::tile 	(
 * `Func.compute_*`   : 调整某个 Func 的计算循环级
 * `Func.store_*`     : 调整某个 Func 的存储循环级, 该接口一般作为附加选项添加到 compute_ 上, 用以实现 存储和计算的分离, 达到更好的效果
 
-### 6.6.0.1. compute_* 系列接口
+### 6.6.1. compute_* 系列接口
 
 * `Func::compute_root 	() 	`
   * Compute all of this function once ahead of time. 
@@ -652,7 +652,7 @@ producer_2.compute_at(consumer_2, y);
 
 ```
 
-### 6.6.1. store_* 系列接口
+### 6.6.2. store_* 系列接口
 
 从 compute 系列接口有些类似, 但是指定的不是计算过程而是存储过程, 该系列结果是 optional, 只在特殊情况下用于将 存储循环级别 以及 计算循环级别分开来, 用以达成更高水平的对 locality 和 redundant work 的 trade-off
 
@@ -673,7 +673,7 @@ producer_2.compute_at(consumer_2, y);
 
 
 
-### 6.6.2. Func.update()
+### 6.6.3. Func.update()
 
 获取单个下一个 update definition 句柄 , 根据 update definition 的定义顺序依次赋予 index 
 * `Stage Halide::Func::update 	( 	int  	idx = 0	) 	`
@@ -914,12 +914,44 @@ class Tupler : Generator<Tupler> {
 };
 ```
 
-## 8.3. 编译与库生成
+## 8.3. 定义 GeneratorParam  
 
-* 在使用的时候和 halide 目录下的 `tools/GenGen.cpp` 一起编译
+用于在 Halide 库编译生成时候的参数指定
+
 
 ```cpp
+// You can define GeneratorParams of all the basic scalar types. 
+// For numeric types you can optionally provide a minimum and maximum value.
 
+//  bool 类型的参数
+GeneratorParam<bool> parallel{"parallel", /* default value */ true};
+
+// 带有范围限定的参数
+GeneratorParam<float> scale{"scale",
+                            1.0f /* default value */,
+                            0.0f /* minimum value */,
+                            100.0f /* maximum value */};
+
+// 甚至可以定义枚举类型的参数  
+//  To make this work you must provide a mapping from strings to your enum values.
+enum class Rotation { None,
+                      Clockwise,
+                      CounterClockwise };
+GeneratorParam<Rotation> rotation{"rotation",
+                                  /* default value */
+                                  Rotation::None,
+                                  /* map from names to values */
+                                  {{"none", Rotation::None},
+                                    {"cw", Rotation::Clockwise},
+                                    {"ccw", Rotation::CounterClockwise}}};
+
+```
+
+## 8.4. 编译与库生成
+
+* 在使用的时候和 halide 目录下的 `tools/GenGen.cpp` 一起编译, GenGen 里面包含了 main 函数以及对应的 CLI , 用于在后续中生成对应的库 
+* 需要在代码中告诉 Halide 要生成为 generator 的信息
+```cpp
 // 告诉 GenGen.cpp 该 generator 的相关信息
 HALIDE_REGISTER_GENERATOR(MyFirstGenerator, my_first_generator)
 ```
@@ -1139,15 +1171,44 @@ cast 函数
 * `Expr Halide::cast 	(Type t, Expr  	a )`                      : 不使用 template 的 cast, 将 Expr 转化为某个 Halide::Type() 类型
 * ` template<typename T > Expr Halide::cast 	( 	Expr  	a	)`  : 使用 template, 将 Expr 转化为某个 C++ 的数据类型
 
+# 11. Halide::Internal
 
-# 11. Halide::Target
+位于 Internal 空间下的成员都算是 Halide 的内部构造, 了解一些相关类可以快速的理解代码
+
+## Halide::Internal::Dimension
+
+
+* `Expr Halide::Internal::Dimension::min 	( 		) 	const`    : 获取一个 Expr 代表图像的该 dimension 的最小坐标
+* `Expr Halide::Internal::Dimension::max 	( 		) 	const`    : 获取一个 Expr 代表图像的该 dimension 的最大坐标
+* `Expr Halide::Internal::Dimension::extent 	( 		) 	const`  : 获取 Expr 表示图像在该 dimension 的 extent
+* `Expr Halide::Internal::Dimension::stride 	( 		) 	const`  : 获取一个 Expr 代表该图像在该 dimension 下的步长
+* `Dimension Halide::Internal::Dimension::set_min 	( 	Expr  	min	) 	`   : 将给定维度的最小值设置成 min, 一般设置成 0 可以简化寻址数学
+* `Dimension Halide::Internal::Dimension::set_extent 	( 	Expr  	extent	) 	` : 设置对应维度的 extent
+  * 主动设置 extent 可以让 halide简化一些边界检查
+  * `im.dim(0).set_extent(100);`
+  * `im.dim(0).set_extent(im.dim(1).extent());`  方形 extent
+  * `im.dim(0).set_extent((im.dim(0).extent()/32)*32);` extent 是 32 的倍数
+* `Dimension Halide::Internal::Dimension::set_bounds 	( 	Expr  	min, Expr  	extent )` : 同时设置 min 和 extent 		
+* `Dimension Halide::Internal::Dimension::set_estimate 	( 	Expr  	min, Expr  	extent ) ` : 同其他 estimate 一样, 主要用于 auto-scheduler , 没有实际上的限制作用  
+  * 两个分开的单独 estimate 命令
+  * `Expr Halide::Internal::Dimension::min_estimate 	( 		) 	const`
+  * `Expr Halide::Internal::Dimension::extent_estimate 	( 		) 	const`
+* `Dimension Halide::Internal::Dimension::set_stride 	( 	Expr  	stride	) 	` : 设置对应维度的 stride
+  * 主要用于更好的进行 vectoring.  
+  * Known strides for the vectorized dimension generate better code. 
+
+* `Dimension Halide::Internal::Dimension::dim 	( 	int  	i	) 	const`    : 获取该 dimension 所属的 buffer 的其他 dimension
+
+
+
+# 12. Target
 
 A struct representing a target machine and os to generate code for.  
 
 用于具体的实现 Halide 的 cross-compliation
 
 
-## 11.1. Halide 空间里的 API
+## 12.1. Halide 空间里的 API
 
 获取 Target
 * `Target Halide::get_host_target()`                  : 直接获取当前环境的 Target 信息
@@ -1162,11 +1223,11 @@ A struct representing a target machine and os to generate code for.
   * 该检查函数不是线程安全的
 * 
 
-## 11.2. struct 结构体
+## 12.2. struct 结构体
 
 
 
-## 11.3. 例程
+## 12.3. 例程
 
 ```cpp
 // Let's use this to compile a 32-bit arm android version of this code:
@@ -1206,7 +1267,7 @@ target.set_features(armv7s_features);
 brighter.compile_to_file("lesson_11_arm_32_ios", args, "brighter", target);
 ```
 
-### 11.3.1. find GPU 例程
+### 12.3.1. find GPU 例程
 
 ```cpp
 // A helper function to check if OpenCL, Metal or D3D12 is present on the host machine.
