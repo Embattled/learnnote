@@ -1,7 +1,7 @@
-# 特征提取 feature extraction
+# 1. 特征提取 feature extraction
 
 
-## ORB (Oriented FAST and Rotated BRIEF) - 一种快速特征点提取和描述算法
+## 1.1. ORB (Oriented FAST and Rotated BRIEF) - 一种快速特征点提取和描述算法
 
 Ethan Rublee, Vincent Rabaud, Kurt Konolige, Rary R.Bradski
 ORB: An Efficient Alternative to SIFT or SURF  (2011)
@@ -11,7 +11,7 @@ ORB 特征分为两个部分
 * 特征点描述    ： 由 BRIEF (Binary Robust Independent Elementary Features) 特征算法改进而来
 * 总的来说 ORB = oFAST + rrBRIEF。 速度是 sift 的 100 倍, surf 的10 倍, 在 SLAM 和 无人机视觉等领域得到了广泛的应用
 
-### FAST keypoint Orientation
+### 1.1.1. FAST keypoint Orientation
 
 使用 FAST 算法提出特征点后, 附加上一个 特征点方向, 以此来保证 特征点的旋转不变性  
 
@@ -31,7 +31,7 @@ ORB 特征分为两个部分
 * 
 
 
-### rBRIEF 改进后的 BRIEF
+### 1.1.2. rBRIEF 改进后的 BRIEF
 
 BRIEF 算法： 生成一个二进制串的特征描述符
 * 在一个特征点的邻域内, 选择 n 对像素点 Pi, Qi.  i=1,2,...,n

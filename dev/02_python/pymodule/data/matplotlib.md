@@ -15,9 +15,10 @@
     - [2.2.1. pyplot.figure](#221-pyplotfigure)
     - [2.2.2. pyplot.subplots](#222-pyplotsubplots)
 - [3. matplotlib.figure Figure](#3-matplotlibfigure-figure)
-  - [3.1. 添加子图 Axes](#31-添加子图-axes)
-    - [3.1.1. fig.add\_axes](#311-figadd_axes)
-    - [3.1.2. figure.add\_subplot](#312-figureadd_subplot)
+  - [3.1. Figure 类](#31-figure-类)
+  - [3.2. 添加子图 Axes](#32-添加子图-axes)
+    - [3.2.1. fig.add\_axes](#321-figadd_axes)
+    - [3.2.2. figure.add\_subplot](#322-figureadd_subplot)
 - [4. matplotlib.axes Axes](#4-matplotlibaxes-axes)
   - [4.1. Plotting](#41-plotting)
     - [4.1.1. Basic 基础图](#411-basic-基础图)
@@ -32,21 +33,21 @@
     - [4.1.6. 2D arrays 二维数据](#416-2d-arrays-二维数据)
       - [4.1.6.1. Axes.imshow 图像显示](#4161-axesimshow-图像显示)
     - [4.1.7. Text and annotations 文字和标注](#417-text-and-annotations-文字和标注)
-  - [4.2. Axis / limits](#42-axis--limits)
+  - [4.2. Axis / limits - 操作数据轴的一些表现](#42-axis--limits---操作数据轴的一些表现)
     - [4.2.1. Axis limits and direction](#421-axis-limits-and-direction)
       - [4.2.1.1. Axes limit](#4211-axes-limit)
       - [4.2.1.2. Axes direction](#4212-axes-direction)
-    - [Axes bound](#axes-bound)
-    - [4.2.2. Axis labels, title, and legend](#422-axis-labels-title-and-legend)
-      - [4.2.2.1. Axes title](#4221-axes-title)
-      - [4.2.2.2. Axis labels 坐标轴 label](#4222-axis-labels-坐标轴-label)
-      - [4.2.2.3. legend 图例说明](#4223-legend-图例说明)
-    - [4.2.3. Axis scales](#423-axis-scales)
-    - [4.2.4. Autoscling and margins](#424-autoscling-and-margins)
-      - [4.2.4.1. Autoscaling](#4241-autoscaling)
-      - [4.2.4.2. margins](#4242-margins)
-    - [4.2.5. Aspect ratio](#425-aspect-ratio)
-    - [4.2.6. Ticks and tick labels](#426-ticks-and-tick-labels)
+    - [4.2.2. Axes bound](#422-axes-bound)
+    - [4.2.3. Axis labels, title, and legend - 图的标题, 坐标轴设置](#423-axis-labels-title-and-legend---图的标题-坐标轴设置)
+      - [4.2.3.1. Axis labels - 图坐标轴的标签](#4231-axis-labels---图坐标轴的标签)
+      - [4.2.3.2. Axes title - 图的标题](#4232-axes-title---图的标题)
+      - [4.2.3.3. legend - 图例说明](#4233-legend---图例说明)
+    - [4.2.4. Axis scales - 坐标轴的比例](#424-axis-scales---坐标轴的比例)
+    - [4.2.5. Autoscling and margins](#425-autoscling-and-margins)
+      - [4.2.5.1. Autoscaling](#4251-autoscaling)
+      - [4.2.5.2. margins](#4252-margins)
+    - [4.2.6. Aspect ratio](#426-aspect-ratio)
+    - [4.2.7. Ticks and tick labels](#427-ticks-and-tick-labels)
   - [4.3. 以前的内容](#43-以前的内容)
     - [4.3.1. 坐标轴设置 axes](#431-坐标轴设置-axes)
     - [4.3.2. 标签标题设置 label](#432-标签标题设置-label)
@@ -214,8 +215,8 @@ fig, axs = plt.subplots(2, 2)  # a figure with a 2x2 grid of Axes
 
 ```
 
+或者 直接使用 pyplot 包的懒人函数创建各种图形, 可以非常快, 但是资源不能复用, 这部分的函数需要单独写在一段里  
 
-2. 直接使用 pyplot 包的懒人函数创建各种图形, 可以非常快, 但是资源不能复用, 这部分的函数需要单独写在一段里  
 
 ### 2.2.1. pyplot.figure
 
@@ -290,13 +291,35 @@ Create a figure and a set of subplots.
 
 Figure 在 matplotlib 中是最高级的类, `Top level Artist`, 保存了对所有图片中元素的链接  
 
-* `matplotlib.pyplot.figure()`
-* `class matplotlib.figure.Figure()`
+在 matplotlib.figure 模组中, 实现的内容包括
+* Figure 类, 即最高级别的 Artist  `class matplotlib.figure.Figure()`
+* SubFigure , 嵌入式的 子图类
+* SubplotParams , 用于控制子图类默认的空间
+
+对于用户来说, 创建 figure 一般通过 pyplot 的接口
+* figure
+* subplots
+* subplot_mosaic
+
+对于开发一个嵌入在应用程序内的图表来说, 可能需要手动实例化一个 figure 类
+
+## 3.1. Figure 类
+
+```py
+class matplotlib.figure.Figure(
+  figsize=None, dpi=None, *, 
+  facecolor=None, edgecolor=None, 
+  linewidth=0.0, 
+  frameon=None, 
+  subplotpars=None, 
+  tight_layout=None, 
+  constrained_layout=None, layout=None, **kwargs)
+```
 
 
-## 3.1. 添加子图 Axes
+## 3.2. 添加子图 Axes
 
-### 3.1.1. fig.add_axes
+### 3.2.1. fig.add_axes
 
 Add an Axes to the figure.
 函数原型 `add_axes(*args, **kwargs)`  
@@ -310,7 +333,7 @@ add_axes(ax)
   *  
 
 
-### 3.1.2. figure.add_subplot
+### 3.2.2. figure.add_subplot
 
 Add an Axes to the figure as part of a subplot arrangement.
 
@@ -341,6 +364,8 @@ add_subplot()
 继承上来看 `artist.Artist -> axes._base._AxesBase -> axes._axes.Axes`
 
 通常来说, 一个二维图的 axes 里有 2个 axis  
+
+整个模组里主要就是关于 `Axes` 类的操作
 
 
 ## 4.1. Plotting
@@ -390,7 +415,7 @@ plot(y, 'r+')     # ditto, but with red plusses
 画出多个图
 * 由于 matplotlib 是基于状态的库 所以直接依次多次调用 plot 即可在同一张图片上画多个折现
 * 可以直接将 x, 或者 y 变成多维, 来直接传入多个曲线, 这里注意, matplotlib 的坐标轴维度(属性)在前, 数据index在后
-  * 若单条数据有 N 个点, 共计 m 条数据, 则 y 的维度应该是 (N,m) 而不是 (m,N), 这与一些数据分析的维度顺序相反
+  * 若单条数据有 N 个点, 共计 m 条数据 即画出 m 条折线, 则 y 的维度应该是 (N,m) 而不是 (m,N), 这与一些数据分析的维度顺序相反
   *  If both x and y are 2D, they must have the same shape.
   *  If only one of them is 2D with shape (N, m) the other must have length N and will be used for every data set m.
 * 也可以使用 `*args` 的特性, 依次传入多个图的 `x,y,fmt` 即可
@@ -532,7 +557,7 @@ Display data as an image, i.e., on a 2D regular raster.
 ### 4.1.7. Text and annotations 文字和标注
 
 
-## 4.2. Axis / limits
+## 4.2. Axis / limits - 操作数据轴的一些表现 
 
 坐标轴, limits  
 
@@ -576,16 +601,28 @@ xlim ylim 的值, 即在图上显示的坐标区间, 会对数据进行截断, �
 * `Axes.xaxis_inverted()`  返回目前的调转状态
 * `Axes.yaxis_inverted()`
 
-### Axes bound
+### 4.2.2. Axes bound
 
 
 
 
-### 4.2.2. Axis labels, title, and legend
+### 4.2.3. Axis labels, title, and legend - 图的标题, 坐标轴设置  
 
-对于一个图来说不可或缺的说明内容
+对于一个图来说不可或缺的说明内容, 尤其是当单个图例有多条数据线的时候  
 
-#### 4.2.2.1. Axes title 
+#### 4.2.3.1. Axis labels - 图坐标轴的标签
+
+用于后手指定 x,y 的坐标轴
+
+* `Axes.set_xlabel(xlabel, fontdict=None, labelpad=None, *, loc=None, **kwargs)`   Set the label for the x-axis.
+* `Axes.set_ylabel(ylabel, fontdict=None, labelpad=None, *, loc=None, **kwargs)`   Set the label for the y-axis.
+  * labelpad 用于指定某种间距, 不太清楚, 传入 `float` 
+  * loc  用于指定坐标轴的 label 位于坐标轴的位置, 可以传入  `{'left', 'center', 'right'}`
+
+* `Axes.get_xlabel()`   Get the xlabel text string.
+* `Axes.get_ylabel()`   Get the ylabel text string.
+
+#### 4.2.3.2. Axes title - 图的标题
 
 一个图不能没有标题, 这里指定的是 axes 的 title, 理论上如果一个 figure 里只有一个子图的话和 figure 里的指定并没有区别, 应该主要用于有多个子图的情况
 
@@ -601,25 +638,14 @@ xlim ylim 的值, 即在图上显示的坐标区间, 会对数据进行截断, �
   * loc : `{'center', 'left', 'right'}`, str, default: 'center'
  
 
-#### 4.2.2.2. Axis labels 坐标轴 label
 
-用于后手指定 x,y 的坐标轴
-
-* `Axes.set_xlabel(xlabel, fontdict=None, labelpad=None, *, loc=None, **kwargs)`   Set the label for the x-axis.
-* `Axes.set_ylabel(ylabel, fontdict=None, labelpad=None, *, loc=None, **kwargs)`   Set the label for the y-axis.
-  * labelpad 用于指定某种间距, 不太清楚, 传入 `float` 
-  * loc  用于指定坐标轴的 label 位于坐标轴的位置, 可以传入  `{'left', 'center', 'right'}`
-
-* `Axes.get_xlabel()`   Get the xlabel text string.
-* `Axes.get_ylabel()`   Get the ylabel text string.
-
-#### 4.2.2.3. legend 图例说明
+#### 4.2.3.3. legend - 图例说明
 
 起码在拥有多条折线的图例, 各个线的图例是不可或缺的   
 
 `Axes.legend(*args, **kwargs)    Place a legend on the Axes.`
 * `handles` sequence of Artist, optional
-* `label` slist of str, optional
+* `label` list of str, optional
 * return : legend 对象, `matplotlib.legend`
 * 还有其他对于 legend box 的各种样式/位置指定参数, 可以直接去参照 `matplotlib.legend` 的文档, 或者日后要用的时候在参照该函数的文档
 
@@ -665,7 +691,7 @@ h, l = ax.get_legend_handles_labels()
 ax.legend(h, l)
 ```
 
-### 4.2.3. Axis scales
+### 4.2.4. Axis scales - 坐标轴的比例  
 
 设置坐标轴 axis 的 `scale`, 例如坐标轴的坐标是指数增长之类的  
 
@@ -678,7 +704,7 @@ ax.legend(h, l)
 * Axes.get_xscale  : Return the xaxis' scale (as a str).
 * Axes.get_yscale  : Return the yaxis' scale (as a str).
 
-### 4.2.4. Autoscling and margins
+### 4.2.5. Autoscling and margins
 
 xlim ylim 的值, 即在图上显示的坐标区间, 自动调整的功能能被称作 Autoscaling  
 
@@ -688,7 +714,7 @@ margin 则是 :  所输入的 Data 的范围再左右扩充, 即一定程度上�
 * 默认值为 True
 * Setting this to False ensures that the specified margins will be applied, even if the plot includes an image
 
-#### 4.2.4.1. Autoscaling
+#### 4.2.5.1. Autoscaling
 
 * `Axes.autoscale(enable=True, axis='both', tight=None)`
   * Autoscale the axis view to the data (toggle).
@@ -726,7 +752,7 @@ margin 则是 :  所输入的 Data 的范围再左右扩充, 即一定程度上�
 
 
 
-#### 4.2.4.2. margins 
+#### 4.2.5.2. margins 
 
 
 注意: 一些特殊的 plot, 例如 created with Axes.imshow 的假色彩图像, 会不受 margins 的影响
@@ -752,7 +778,7 @@ margin 则是 :  所输入的 Data 的范围再左右扩充, 即一定程度上�
 
 
 
-### 4.2.5. Aspect ratio
+### 4.2.6. Aspect ratio
 
 设置 Axes 的比例  
 
@@ -794,7 +820,7 @@ margin 则是 :  所输入的 Data 的范围再左右扩充, 即一定程度上�
     *  view limits.
 
 
-### 4.2.6. Ticks and tick labels
+### 4.2.7. Ticks and tick labels
 
 坐标刻度管理  
 

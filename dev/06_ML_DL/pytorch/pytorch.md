@@ -17,20 +17,19 @@
     - [2.4.5. tensor复制](#245-tensor复制)
     - [2.4.6. .new\_ 方法](#246-new_-方法)
 - [3. torch](#3-torch)
-  - [3.1. 序列化 Serialization](#31-序列化-serialization)
-    - [3.1.1. torch.save](#311-torchsave)
-    - [3.1.2. torch.load](#312-torchload)
-  - [3.2. Creation Ops](#32-creation-ops)
-    - [3.2.1. torch.tensor](#321-torchtensor)
+  - [3.1. Tensors](#31-tensors)
+    - [3.1.1. Creation Ops](#311-creation-ops)
+      - [3.1.1.1. torch.tensor](#3111-torchtensor)
+    - [3.1.2. Indexing, Slicing, Joining, Mutating Ops 拼接与截取等](#312-indexing-slicing-joining-mutating-ops-拼接与截取等)
+  - [3.2. 序列化 Serialization](#32-序列化-serialization)
+    - [3.2.1. torch.save](#321-torchsave)
+    - [3.2.2. torch.load](#322-torchload)
   - [3.3. Math operations](#33-math-operations)
     - [3.3.1. Pointwise Ops 元素为单位的操作](#331-pointwise-ops-元素为单位的操作)
     - [3.3.2. Reduction Ops 元素之间的操作(降维)](#332-reduction-ops-元素之间的操作降维)
       - [3.3.2.1. 极值操作](#3321-极值操作)
     - [3.3.3. Comparison Ops](#333-comparison-ops)
       - [3.3.3.1. topk](#3331-topk)
-  - [3.4. Indexing, Slicing, Joining, Mutating Ops 拼接与截取等](#34-indexing-slicing-joining-mutating-ops-拼接与截取等)
-    - [3.4.1. torch.stack](#341-torchstack)
-    - [3.4.2. torch.cat](#342-torchcat)
 - [4. Tensor views](#4-tensor-views)
 - [5. torch.nn](#5-torchnn)
   - [5.1. Containers 网络容器](#51-containers-网络容器)
@@ -61,14 +60,13 @@
     - [8.3.1. Optimizer 基类](#831-optimizer-基类)
     - [8.3.2. optimization step](#832-optimization-step)
     - [8.3.3. per-parameter options](#833-per-parameter-options)
-- [9. TorchScript](#9-torchscript)
-  - [9.1. Tracing Modules](#91-tracing-modules)
-  - [9.2. Convert Modules](#92-convert-modules)
-  - [9.3. Mixing Scripting and Tracing](#93-mixing-scripting-and-tracing)
-  - [9.4. Saving and Loading models](#94-saving-and-loading-models)
-  - [9.5. API torch.jit](#95-api-torchjit)
-- [10. Pytorch C++ API](#10-pytorch-c-api)
-  - [10.1. ATen](#101-aten)
+- [9. torch.jit - TorchScript](#9-torchjit---torchscript)
+  - [9.1. Introduction to TorchScript](#91-introduction-to-torchscript)
+    - [9.1.1. Tracing Modules](#911-tracing-modules)
+    - [9.1.2. Using Scripting to Convert Modules](#912-using-scripting-to-convert-modules)
+    - [9.1.3. Mixing Scripting and Tracing](#913-mixing-scripting-and-tracing)
+    - [9.1.4. Saving and Loading models](#914-saving-and-loading-models)
+  - [9.2. API torch.jit](#92-api-torchjit)
 - [11. 例程](#11-例程)
   - [11.1. MNIST LeNet 例程](#111-mnist-lenet-例程)
     - [11.1.1. Network structure](#1111-network-structure)
@@ -334,7 +332,65 @@ To create a tensor with similar type but different size as another tensor, use t
 * 还提供了许多工具来高效的序列化 tensors 以及其他任意数据格式   
 * 该包有 CUDA 对应  
 
-## 3.1. 序列化 Serialization
+The torch package contains data structures for multi-dimensional tensors and defines mathematical operations over these tensors. Additionally, it provides many utilities for efficient serialization of Tensors and arbitrary types, and other useful utilities.
+
+It has a CUDA counterpart, that enables you to run your tensor computations on an NVIDIA GPU with compute capability >= 3.0.
+
+## 3.1. Tensors 
+
+张量操作相关的接口  
+
+
+### 3.1.1. Creation Ops
+
+基本上所有创建 tensor 的函数都位于 `torch.` 下  
+
+创建tensor 有许多通用的参数
+* `dtype  =`
+* `device =`
+
+#### 3.1.1.1. torch.tensor
+
+* 从 python list 或者 numpy array 来创建张量
+* `torch.tensor()` 函数总是会进行数据拷贝
+  * 防止拷贝可以使用 `torch.as_tensor()`
+```py
+torch.tensor(data, *, dtype=None, device=None, requires_grad=False, pin_memory=False) → Tensor
+``` 
+
+
+
+### 3.1.2. Indexing, Slicing, Joining, Mutating Ops 拼接与截取等
+
+`torch.stack(tensors, dim=0, *, out=None) → Tensor`  
+
+* 将多个 tensor 叠加到一起, 并产生一个新的 dimension
+* Concatenates a sequence of tensors along a new dimension.
+* 因此所有 tensor 必须相同大小
+* dim 指定新的 dimension 的位置
+
+
+`torch.cat(tensors, dim=0, *, out=None) → Tensor`  
+
+* 将多个 tensor 链接, 沿着最外层 index 或者指定 dim 链接
+* All tensors must either have the same shape (except in the concatenating dimension) or be empty.
+* dim (int, optional) – the dimension over which the tensors are concatenated
+
+
+
+`torch.squeeze(input, dim = None)`
+* 把一个 tensor 的所有 size 为 1 的 维度移除
+* 通过指定 dim 可以限定操作的维度
+* input (Tensor) – the input tensor.
+* dim (int or tuple of ints, optional).  
+
+`torch.unsqueeze(input, dim) → Tensor`
+* Returns a new tensor with a dimension of size one inserted at the specified position.
+* 在指定位置添加一个维度
+* dim(int) 为必须参数, 可以是  `[-input.dim() - 1, input.dim() + 1)` 中的值
+
+
+## 3.2. 序列化 Serialization
 
 和存储相关, 将各种模型, 张量, 字典等数据类型序列化后存储到文件, 或者从文件中读取, 并不单只能用来存取网络  
 
@@ -354,7 +410,7 @@ Pytorch 的约定是 用 `.pt` 来保存 tensors
 * `torch.save(model, PATH)`    : 直接保存整个网络
 * `model = torch.load(PATH)`
 
-### 3.1.1. torch.save
+### 3.2.1. torch.save
 
 ```py
 torch.save(
@@ -373,7 +429,7 @@ torch.save(
 * pickle_protocol :   can be specified to override the default protocol
 * _use_new_zipfile_serialization : 如果要读取 pytorch 1.6 之前的旧数据, 传入 False
 
-### 3.1.2. torch.load
+### 3.2.2. torch.load
 
 ```py
 torch.load(
@@ -396,23 +452,6 @@ f   : a file-like object
 map_location    : a function, torch.device, string or a dict specifying how to remap storage locations
 pickle_module   :  
 pickle_load_args: (Python 3 only) optional keyword arguments passed over to pickle_module.load() and pickle_module.Unpickler()
-
-## 3.2. Creation Ops
-
-基本上所有创建 tensor 的函数都位于 `torch.` 下  
-
-创建tensor 有许多通用的参数
-* `dtype  =`
-* `device =`
-
-### 3.2.1. torch.tensor
-
-* 从 python list 或者 numpy array 来创建张量
-* `torch.tensor()` 函数总是会进行数据拷贝
-  * 防止拷贝可以使用 `torch.as_tensor()`
-```py
-torch.tensor(data, *, dtype=None, device=None, requires_grad=False, pin_memory=False) → Tensor
-``` 
 
 ## 3.3. Math operations
 
@@ -456,25 +495,6 @@ torch.tensor(data, *, dtype=None, device=None, requires_grad=False, pin_memory=F
 * dim, int 只能指定单独维度, 默认会对最后一个维度进行操作
 * largest: bool, true 则选择最大的top, 否则选择最小的 top
 * sorted: bool, 是否按对应的顺序返回这k个值
-
-
-## 3.4. Indexing, Slicing, Joining, Mutating Ops 拼接与截取等
-
-### 3.4.1. torch.stack
-`torch.stack(tensors, dim=0, *, out=None) → Tensor`  
-
-* 将多个 tensor 叠加到一起, 并产生一个新的 dimension
-* Concatenates a sequence of tensors along a new dimension.
-* 因此所有 tensor 必须相同大小
-* dim 指定新的 dimension 的位置
-
-### 3.4.2. torch.cat
-
-`torch.cat(tensors, dim=0, *, out=None) → Tensor`  
-
-* 将多个 tensor 链接, 沿着最外层 index 或者指定 dim 链接
-* All tensors must either have the same shape (except in the concatenating dimension) or be empty.
-* dim (int, optional) – the dimension over which the tensors are concatenated
 
 
 # 4. Tensor views
@@ -1126,7 +1146,7 @@ optim.SGD([
             ], lr=1e-2, momentum=0.9)
 ```
 
-# 9. TorchScript
+# 9. torch.jit - TorchScript
 
 
 对于一个从Pytorch创建的一个可优化和串行的模型, 使其可以运行在其他非Python的平台上  
@@ -1135,13 +1155,28 @@ optim.SGD([
 
 TorchScript provides tools to capture the definition of your model, even in light of the flexible and dynamic nature of PyTorch.  
 
-1. TorchScript 有自己的解释器, 这个解释器类似于受限制的 Python 解释器, 该解释器不获取全局解释器锁，因此可以在同一实例上同时处理许多请求。
+1. TorchScript 有自己的解释器, 这个解释器类似于受限制的 Python 解释器, 该解释器不获取全局解释器锁，因此可以在同一实例上同时处理许多请求
 2. TorchScript 可以是我们把整个模型保存到磁盘上, 并在另一个运行环境中载入, 例如非Python的运行环境
 3. TorchScript 可以进行编译器优化并以此获得更高的执行效率
 4. TorchScript 可以允许与许多后端设备运行接口, 这些运行环境往往需要比单独的操作器更广泛的程序视野.
 
+TorchScript 是 Pytorch model (nn.Module 的子类) 的中间表示形式, 可以在 C++ 等高性能环境中运行
 
-## 9.1. Tracing Modules
+## 9.1. Introduction to TorchScript
+
+TorchScript 的全局教学
+https://pytorch.org/tutorials/beginner/Intro_to_TorchScript_tutorial.html
+
+
+要点:
+* `torch.jit.trace`
+* `torch.jit.script`
+
+### 9.1.1. Tracing Modules
+
+首先, Pytorch 本身是使用了 autograd 思想, 在计算的过程中动态的生成计算图, 这样可以不必再一开始就为整个网络构造显式的定义导数  
+
+那么 TorchScript 自然也要兼容该方法 , 提供了能够捕获模型定义的工具, 首先就是 `tracing`
 
 Trace:
 1. invoked the Module
@@ -1149,9 +1184,11 @@ Trace:
 3. created an instance of torch.jit.ScriptModule (of which TracedModule is an instance)
    根据输入模型的运算流 创建出对应的 TorchScript 模型对象
 
+简要的说, 创建了一个解析后的称为 `torch.jit.ScriptModule` 的模型, 该模型也可以和原本的 nn.Module 一样 forward  
+可以通过 `ScriptModule.graph` 来检查生成的计算图, 但是没什么可读性  
+可以通过 `ScriptModule.code` 来检查从计算图中还原出来的  Python-syntax 的计算流程
 
 ```py
-
 class MyCell(torch.nn.Module):
     def __init__(self):
         super(MyCell, self).__init__()
@@ -1172,7 +1209,6 @@ traced_cell = torch.jit.trace(my_cell, (x, h))
 # 两个模型的运行结果没有区别
 print(my_cell(x, h))
 print(traced_cell(x, h))
-
 
 # 打印 traced 对象
 print(traced_cell)
@@ -1212,9 +1248,9 @@ def forward(self,
 
 ```
 
-## 9.2. Convert Modules
+### 9.1.2. Using Scripting to Convert Modules
 
-* 对于一个带有控制流的子模型, 直接使用 Trace 不能正确的捕捉整个程序流程  
+* 对于一个带有控制流的子模型 (带有 if 的 Module), 直接使用 Trace 不能正确的捕捉整个程序流程  
 * 使用 `script compiler` 即可, 可以直接分析Python 源代码来导出 TorchScript
 
 ```py
@@ -1258,7 +1294,7 @@ def forward(self,
   _3 = torch.tanh(torch.add(_1, h, alpha=1))
   return (_3, _3) """
 
-
+# 这里使用 script 方法
 # 从子模型的类直接推出 TorchScript 对象
 scripted_gate = torch.jit.script(MyDecisionGate())
 # 用 scripted 的对象定义主模型
@@ -1282,7 +1318,7 @@ my_cell(x,h)
 
 ```
 
-## 9.3. Mixing Scripting and Tracing
+### 9.1.3. Mixing Scripting and Tracing
 
 混合 Script 和 Trace
 
@@ -1348,7 +1384,7 @@ def forward(self,
 
 ```
 
-## 9.4. Saving and Loading models
+### 9.1.4. Saving and Loading models
 
 save and load TorchScript modules  
 这种形式的存储 包括了代码,参数,性质还有Debug信息
@@ -1364,7 +1400,7 @@ print(loaded.code)
 
 ```
 
-## 9.5. API torch.jit
+## 9.2. API torch.jit
 
 * script(obj[, optimize, _frames_up, _rcb])
 * trace(func, example_inputs[, optimize, …])
@@ -1377,10 +1413,6 @@ print(loaded.code)
 * load(f[, map_location, _extra_files])
 * ignore([drop])
 * unused(fn)
-
-# 10. Pytorch C++ API
-
-## 10.1. ATen
 
 
 

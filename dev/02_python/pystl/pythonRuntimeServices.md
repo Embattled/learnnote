@@ -25,7 +25,7 @@
 * `sys.__stdout__`
 * `sys.__stderr__`
 
-## sys.path 库查找路径
+## 2.2. sys.path 库查找路径
 
 `sys.path` 是一个 string 的 list 对象  
 * 会参照系统的 `PYTHONPATH` 的内容来初始化
@@ -41,7 +41,7 @@
   * `/lib/python3.10/site-packages`
 * 通过往该路径加入新的元素可以动态扩充包的搜索路径  
 
-## sys.platform 平台识别
+## 2.3. sys.platform 平台识别
 
 
 
@@ -77,9 +77,34 @@
 # 5. traceback 用于异常溯源
 
 
-# site Site-specific configuration hook¶
+# 6. site Site-specific configuration hook¶
 
 这是一个会被 python 解释器自动导入的包  
 * This module is automatically imported during initialization.
 * The automatic import can be suppressed using the interpreter’s -S option.
 * 用于自动导入几个 python 解释器默认的路径  
+
+
+# 7. abc - Abstract Base Class
+
+该包提供了 Python 用于定义虚基类 ABC 的基础设置, 在 PEP3119 中被引述.  
+此外 numbers 模组中的层次数字类是基于 ABC 的, 可以参阅 PEP3141
+
+collections 中的一部分类也是基于 ABC的, 同时 可以通过访问 collections.abc 来访问具体的虚基类  
+
+abc 的模块提供了所谓的 metaclass `ABCMEta` 用于具体的定义一个 ABC, 以及一个辅助类 `ABC` 用于通过继承来定义 ABC
+
+
+虚基类的多重继承可能会导致冲突, 因此要小心
+```py
+
+# New in version 3.4
+class abc.ABC
+# 用于通过继承来定义虚基类, 具体使用方法为
+
+from abc import ABC
+class MyABC(ABC):
+  pass
+
+#
+```

@@ -117,16 +117,17 @@ OpenVINO 的具体的部署流程
 * 预处理 preprocessing optimization  等等.
 
 OpenVINO 提供了几种不同的工具用于在不同阶段对模型进行优化
-* Model Optimizer : 用于对模型的参数进行调整, 包括但不限于 mean/scale values, batch size, RGB vs BGR input channels. 以及其他用于加速推论的预处理
+* Model Optimizer : 用于对模型的参数进行调整, 包括但不限于 mean/scale values, batch size, RGB vs BGR input channels. 以及其他用于加速推论的预处理, 详细内容在 Model Preparation 章节
+
 * Post-traning Quantization : 用于在学习后量化优化 DL 模型, 不需要 retraining or fine-tuning
   * 在 accuracy 与 performance 的 trade-off 中受到一定程度的限制, 精度在某些情况下会降低
   * 因此 training-time optimization 能够获得更好的优化效果
-* Training-time Optimization : 用于在学习中对模型进行量化, supports methods like Quantization-aware Training and Filter Pruning. 
-  * NNCF - 优化后的模型可以在 OpenVINO 的工作流中使用  
+* Training-time Optimization : 用于在学习中对模型进行量化, supports methods like `Quantization-aware Training` and `Filter Pruning`. 
+  * NNCF优化后的模型可以在 OpenVINO 的工作流中使用  
 
 
 
-### 3.2.1. Quantizing Models Post-training
+### 3.2.1. Quantizing Models Post-training - Post-training Quantization
 
 
 训练后优化是通过一些方法使得不经过 retraining or fine-tuning 来优化模型使其更加 hardware-friendly.  
@@ -148,6 +149,18 @@ OpenVINO 目前在实际操作上支持两种 workflow 用于应用 post-trainin
 * Post-training Quantization with POT - 即通过 OpenVINO IR 本身　(OpenVINO 2023.0 deprecated)
 * Post-training Quantization with NNCF - 跨框架的解决方法, 适用于多种框架下的模型, 同时 API 更加简单
 
+#### 3.2.1.1. Post-training Quantization with POT
+
+使用 Post-training Optimization Tool (POT) 来实现 uniform integer quantization
+
+该方法可以将 weights 和 activations  floating-point precision 移动到 integer precision, 例如 8-bit.
+量化后模型会被转化, 具体的量化操作发生在推论的时候
+
+#### 3.2.1.2. Post-training Quantization with NNCF (new)
+
+NNCF 更多的用于 Training-time Quantization, 但也提供了 API 用于 Post-training 方法. 
+
+
 
 ### 3.2.2. Compressing Models During Training
 
@@ -164,6 +177,7 @@ OpenVINO 的 training-time model compression 通过外置的 NNCF tool 来实现
 * Training and validation datasets.
   
 尽管如此, 通过 NNCF 为训练添加压缩优化仅仅只需要几行代码, 对压缩优化的配置并不是通过代码而是通过 configuration file 来指定的.  
+NNCF学习后的模型可以通过 OpenVINO 环境推论, 即不再能够通过原本的学习框架推论  
 
 NNCF 的 Training-time compression methods:
 * Quantization 量化学习
@@ -178,6 +192,69 @@ NNCF 的 Training-time compression methods:
   * Sparsity
   * Binarization
 
+
+#### 3.2.2.1. Quantization-aware Training (QAT) - 通过 NNCF 来实现量化学习
+
+记录了基于 PyTorch 或 TensorFlow 的详细 量化学习工作方法  
+
+要点
+* nncf 要在 torch 之后立刻导入
+* 从 nncf 导入 NNCFConfig
+
+```python
+import torch
+import nncf  # Important - should be imported right after torch
+from nncf import NNCFConfig
+from nncf.torch import create_compressed_model, register_default_init_args
+
+nncf_config_dict = {
+    "input_info": {"sample_size": [1, 3, 224, 224]}, # input shape required for model tracing
+    "compression": {
+        "algorithm": "quantization",  # 8-bit quantization with default settings
+    },
+}
+
+nncf_config = NNCFConfig.from_dict(nncf_config_dict)
+nncf_config = register_default_init_args(nncf_config, train_loader) # train_loader is an instance of torch.utils.data.DataLoader
+
+# 对进行优化 wrap the original model object with the create_compressed_model() API 
+model = TorchModel() # instance of torch.nn.Module
+compression_ctrl, model = create_compressed_model(model, nncf_config)
+
+# 如果要使用分布式 GPU 进行多 GPU 训练的话, 要调用该接口
+compression_ctrl.distributed() # call it before the training loop
+
+# tune quantized model for 5 epochs as the baseline
+for epoch in range(0, 5):
+    # NNCF 特殊的 epoch_step 管理 API
+    compression_ctrl.scheduler.epoch_step() # Epoch control API
+
+    for i, data in enumerate(train_loader):
+        # 同理
+        compression_ctrl.scheduler.step()   # Training iteration control API
+        ... # training loop body
+
+# 通过 pytorch 训练的模型只能导出为 onnx
+compression_ctrl.export_model("compressed_model.onnx")
+
+# checkpoint 的保存与载入, NNCF 训练的模型具有特殊的 checkpoint 格式
+checkpoint = {
+    'state_dict': model.state_dict(),
+    'compression_state': compression_ctrl.get_compression_state(),
+    ... # the rest of the user-defined objects to save
+}
+torch.save(checkpoint, path_to_checkpoint)
+
+# 通过 torch.load 获取 checkpint object
+resuming_checkpoint = torch.load(path_to_checkpoint)
+# 获取对应 NNCF 的压缩信息
+compression_state = resuming_checkpoint['compression_state']
+# 使用创建好的空模型 object, nncf_config, compression_state 重新 wrap model
+compression_ctrl, model = create_compressed_model(model, nncf_config, compression_state=compression_state)
+# 之后再单独读取 stat_dict
+state_dict = resuming_checkpoint['state_dict']
+model.load_state_dict(state_dict)
+```
 
 # 4. OpenVINO python API
 

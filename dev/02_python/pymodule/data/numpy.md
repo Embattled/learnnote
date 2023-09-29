@@ -7,98 +7,100 @@
   - [1.4. Calculation 降维运算](#14-calculation-降维运算)
   - [1.5. Copies and Views](#15-copies-and-views)
   - [1.6. Indexing routines](#16-indexing-routines)
-- [2. numpy other](#2-numpy-other)
-  - [2.1. 内存排列规则](#21-内存排列规则)
-- [3. Array objects](#3-array-objects)
-  - [3.1. Standard array subclasses](#31-standard-array-subclasses)
-- [4. Routines  array常规操作 API](#4-routines--array常规操作-api)
-  - [4.1. Array creation](#41-array-creation)
-    - [4.1.1. From shape or value](#411-from-shape-or-value)
-    - [4.1.2. From existing data](#412-from-existing-data)
-      - [4.1.2.1. From File](#4121-from-file)
-      - [4.1.2.2. From Data](#4122-from-data)
-      - [4.1.2.3. From Memory](#4123-from-memory)
-    - [4.1.3. Numerical ranges 创建范围的array](#413-numerical-ranges-创建范围的array)
-  - [4.2. Array manipulation 操纵更改 Array](#42-array-manipulation-操纵更改-array)
-    - [4.2.1. Changing array shape 形态转换](#421-changing-array-shape-形态转换)
-    - [4.2.2. Transpose-like operations 转置操作](#422-transpose-like-operations-转置操作)
-    - [4.2.3. Changing number of dimensions 维度个数操作](#423-changing-number-of-dimensions-维度个数操作)
-      - [4.2.3.1. expand\_dims 升维](#4231-expand_dims-升维)
-      - [4.2.3.2. squeeze 压缩维度](#4232-squeeze-压缩维度)
-    - [4.2.4. Joining arrays 拼接](#424-joining-arrays-拼接)
-    - [4.2.5. Splitting arrays 拆分](#425-splitting-arrays-拆分)
-    - [4.2.6. Tiling arrays](#426-tiling-arrays)
-    - [4.2.7. Adding and removing elements 修改元素](#427-adding-and-removing-elements-修改元素)
-      - [4.2.7.1. append](#4271-append)
-      - [4.2.7.2. resize 强行更改 shape](#4272-resize-强行更改-shape)
-    - [4.2.8. Rearranging elements 重新排列元素](#428-rearranging-elements-重新排列元素)
-  - [4.3. Discrete Fourier Transform (numpy.fft)](#43-discrete-fourier-transform-numpyfft)
-    - [4.3.1. Standard FFTs 标准傅里叶变换](#431-standard-ffts-标准傅里叶变换)
-    - [4.3.2. Real FFTs 复数傅里叶变换](#432-real-ffts-复数傅里叶变换)
-    - [4.3.3. Hermitian FFTs](#433-hermitian-ffts)
-    - [4.3.4. Helper routines 辅助功能](#434-helper-routines-辅助功能)
-  - [4.4. linalg](#44-linalg)
-    - [4.4.1. SVD 奇异值分解](#441-svd-奇异值分解)
-  - [4.5. numpy Input and Output  Numpy 数据的 IO](#45-numpy-input-and-output--numpy-数据的-io)
-    - [4.5.1. NumPy binary files (NPY, NPZ) - 标准Numpy格式的二进制的 io](#451-numpy-binary-files-npy-npz---标准numpy格式的二进制的-io)
-    - [4.5.2. Text files](#452-text-files)
-    - [Raw binary files](#raw-binary-files)
-  - [4.6. Linear algebra 线性代数计算](#46-linear-algebra-线性代数计算)
-    - [4.6.1. Matrix and vector products 向量矩阵乘法](#461-matrix-and-vector-products-向量矩阵乘法)
-      - [4.6.1.1. 矩阵乘法](#4611-矩阵乘法)
-      - [4.6.1.2. einsum](#4612-einsum)
-    - [4.6.2. Solving equations and inverting matrices 计算矩阵方程或者逆](#462-solving-equations-and-inverting-matrices-计算矩阵方程或者逆)
-  - [4.7. Logic functions 逻辑计算](#47-logic-functions-逻辑计算)
-    - [4.7.1. Truth value testing](#471-truth-value-testing)
-  - [4.8. Masked array operations](#48-masked-array-operations)
-  - [4.9. Mathematical function 数学操作](#49-mathematical-function-数学操作)
-    - [4.9.1. Trigonometric functions 三角函数](#491-trigonometric-functions-三角函数)
-    - [4.9.2. Hyperbolic functions 双曲线函数](#492-hyperbolic-functions-双曲线函数)
-    - [4.9.3. Rounding 最近值](#493-rounding-最近值)
-    - [4.9.4. Sums, products, differences 求和求积求差](#494-sums-products-differences-求和求积求差)
-    - [4.9.5. Exponents and logarithms 指数](#495-exponents-and-logarithms-指数)
-    - [4.9.6. Rational routines 最大公因数 最小公倍数](#496-rational-routines-最大公因数-最小公倍数)
-    - [4.9.7. Extrema Finding 极值寻找](#497-extrema-finding-极值寻找)
-    - [4.9.8. 杂项](#498-杂项)
-      - [4.9.8.1. convolve 卷积](#4981-convolve-卷积)
-      - [4.9.8.2. clip 裁剪](#4982-clip-裁剪)
-      - [4.9.8.3. interp 简易线性插值](#4983-interp-简易线性插值)
-  - [4.10. Padding Arrays](#410-padding-arrays)
-  - [4.11. Polynomials 多项式](#411-polynomials-多项式)
-    - [4.11.1. Power Series (numpy.polynomial.polynomial)](#4111-power-series-numpypolynomialpolynomial)
-  - [4.12. Random sampling (numpy.random)](#412-random-sampling-numpyrandom)
-  - [4.13. Sorting, Searching, Counting 排序 搜索 计数](#413-sorting-searching-counting-排序-搜索-计数)
-    - [4.13.1. Sorting 排序](#4131-sorting-排序)
-      - [4.13.1.1. 基础排序](#41311-基础排序)
-      - [4.13.1.2. 部分有序](#41312-部分有序)
-    - [4.13.2. Searching 元素查找](#4132-searching-元素查找)
-      - [4.13.2.1. 最大值选择](#41321-最大值选择)
-      - [4.13.2.2. 逻辑选择值 where](#41322-逻辑选择值-where)
-      - [4.13.2.3. 非零选择](#41323-非零选择)
-  - [4.14. Statistics 统计](#414-statistics-统计)
-    - [4.14.1. Averages and variances 平均和方差](#4141-averages-and-variances-平均和方差)
-    - [4.14.2. Histograms](#4142-histograms)
-      - [4.14.2.1. histogram 一维数据直方图](#41421-histogram-一维数据直方图)
-      - [4.14.2.2. histogram2d 二维直方图](#41422-histogram2d-二维直方图)
-      - [4.14.2.3. bincount 原子统计](#41423-bincount-原子统计)
-  - [4.15. Set 集合](#415-set-集合)
-    - [4.15.1. unique](#4151-unique)
-- [5. numpy.random](#5-numpyrandom)
-  - [5.1. Generator](#51-generator)
-  - [5.2. Random Generation Function](#52-random-generation-function)
-    - [5.2.1. Simple Random 简单的随机生成](#521-simple-random-简单的随机生成)
-    - [5.2.2. Permutations 排列](#522-permutations-排列)
-    - [5.2.3. Distributions 分布函数](#523-distributions-分布函数)
-- [6. Universal functions (ufunc)](#6-universal-functions-ufunc)
-- [7. numpy 常规功能](#7-numpy-常规功能)
-  - [7.1. numpy 的IO](#71-numpy-的io)
-    - [7.1.1. 类型转换](#711-类型转换)
-    - [7.1.2. numpy binary files](#712-numpy-binary-files)
-    - [7.1.3. text file](#713-text-file)
-- [8. config](#8-config)
-  - [8.1. np.set\_printoptions](#81-npset_printoptions)
-    - [8.1.1. numpy.shape](#811-numpyshape)
-    - [8.1.2. numpy.dot()  矩阵点乘](#812-numpydot--矩阵点乘)
+- [2. NumPy fundamentals](#2-numpy-fundamentals)
+  - [2.1. Broadcasting](#21-broadcasting)
+    - [2.1.1. General Broadcasting Rules](#211-general-broadcasting-rules)
+- [3. Routines  array常规操作 API](#3-routines--array常规操作-api)
+  - [3.1. Array creation](#31-array-creation)
+    - [3.1.1. From shape or value](#311-from-shape-or-value)
+    - [3.1.2. From existing data](#312-from-existing-data)
+      - [3.1.2.1. From File](#3121-from-file)
+      - [3.1.2.2. From Data](#3122-from-data)
+      - [3.1.2.3. From Memory](#3123-from-memory)
+    - [3.1.3. Numerical ranges 创建范围的array](#313-numerical-ranges-创建范围的array)
+  - [3.2. Array manipulation 操纵更改 Array](#32-array-manipulation-操纵更改-array)
+    - [3.2.1. Changing array shape 形态转换](#321-changing-array-shape-形态转换)
+    - [3.2.2. Transpose-like operations 转置操作](#322-transpose-like-operations-转置操作)
+    - [3.2.3. Changing number of dimensions 维度个数操作](#323-changing-number-of-dimensions-维度个数操作)
+      - [3.2.3.1. expand\_dims 升维](#3231-expand_dims-升维)
+      - [3.2.3.2. squeeze 压缩维度](#3232-squeeze-压缩维度)
+    - [3.2.4. Joining arrays 拼接](#324-joining-arrays-拼接)
+    - [3.2.5. Splitting arrays 拆分](#325-splitting-arrays-拆分)
+    - [3.2.6. Tiling arrays](#326-tiling-arrays)
+    - [3.2.7. Adding and removing elements 修改元素](#327-adding-and-removing-elements-修改元素)
+      - [3.2.7.1. append](#3271-append)
+      - [3.2.7.2. resize 强行更改 shape](#3272-resize-强行更改-shape)
+    - [3.2.8. Rearranging elements 重新排列元素](#328-rearranging-elements-重新排列元素)
+  - [3.3. Data type routines](#33-data-type-routines)
+  - [3.4. Data type information](#34-data-type-information)
+    - [3.4.1. Data type testing](#341-data-type-testing)
+  - [3.5. Discrete Fourier Transform (numpy.fft)](#35-discrete-fourier-transform-numpyfft)
+    - [3.5.1. Standard FFTs 标准傅里叶变换](#351-standard-ffts-标准傅里叶变换)
+    - [3.5.2. Real FFTs 复数傅里叶变换](#352-real-ffts-复数傅里叶变换)
+    - [3.5.3. Hermitian FFTs](#353-hermitian-ffts)
+    - [3.5.4. Helper routines 辅助功能](#354-helper-routines-辅助功能)
+  - [3.6. linalg](#36-linalg)
+    - [3.6.1. SVD 奇异值分解](#361-svd-奇异值分解)
+  - [3.7. numpy Input and Output  Numpy 数据的 IO](#37-numpy-input-and-output--numpy-数据的-io)
+    - [3.7.1. NumPy binary files (NPY, NPZ) - 标准Numpy格式的二进制的 io](#371-numpy-binary-files-npy-npz---标准numpy格式的二进制的-io)
+    - [3.7.2. Text files](#372-text-files)
+    - [3.7.3. Raw binary files](#373-raw-binary-files)
+  - [3.8. Linear algebra 线性代数计算](#38-linear-algebra-线性代数计算)
+    - [3.8.1. Matrix and vector products 向量矩阵乘法](#381-matrix-and-vector-products-向量矩阵乘法)
+      - [3.8.1.1. 矩阵乘法](#3811-矩阵乘法)
+      - [3.8.1.2. einsum](#3812-einsum)
+    - [3.8.2. Solving equations and inverting matrices 计算矩阵方程或者逆](#382-solving-equations-and-inverting-matrices-计算矩阵方程或者逆)
+  - [3.9. Logic functions 逻辑计算](#39-logic-functions-逻辑计算)
+    - [3.9.1. Truth value testing](#391-truth-value-testing)
+  - [3.10. Masked array operations](#310-masked-array-operations)
+  - [3.11. Mathematical function 数学操作](#311-mathematical-function-数学操作)
+    - [3.11.1. Trigonometric functions 三角函数](#3111-trigonometric-functions-三角函数)
+    - [3.11.2. Hyperbolic functions 双曲线函数](#3112-hyperbolic-functions-双曲线函数)
+    - [3.11.3. Rounding 最近值](#3113-rounding-最近值)
+    - [3.11.4. Sums, products, differences 求和求积求差](#3114-sums-products-differences-求和求积求差)
+    - [3.11.5. Exponents and logarithms 指数](#3115-exponents-and-logarithms-指数)
+    - [3.11.6. Rational routines 最大公因数 最小公倍数](#3116-rational-routines-最大公因数-最小公倍数)
+    - [3.11.7. Extrema Finding 极值寻找](#3117-extrema-finding-极值寻找)
+    - [3.11.8. 杂项](#3118-杂项)
+      - [3.11.8.1. convolve 卷积](#31181-convolve-卷积)
+      - [3.11.8.2. clip 裁剪](#31182-clip-裁剪)
+      - [3.11.8.3. interp 简易线性插值](#31183-interp-简易线性插值)
+  - [3.12. Padding Arrays](#312-padding-arrays)
+  - [3.13. Polynomials 多项式](#313-polynomials-多项式)
+    - [3.13.1. Power Series (numpy.polynomial.polynomial)](#3131-power-series-numpypolynomialpolynomial)
+  - [3.14. Random sampling (numpy.random)](#314-random-sampling-numpyrandom)
+  - [3.15. Sorting, Searching, Counting 排序 搜索 计数](#315-sorting-searching-counting-排序-搜索-计数)
+    - [3.15.1. Sorting 排序](#3151-sorting-排序)
+      - [3.15.1.1. 基础排序](#31511-基础排序)
+      - [3.15.1.2. 部分有序](#31512-部分有序)
+    - [3.15.2. Searching 元素查找](#3152-searching-元素查找)
+      - [3.15.2.1. 最大值选择](#31521-最大值选择)
+      - [3.15.2.2. 逻辑选择值 where](#31522-逻辑选择值-where)
+      - [3.15.2.3. 非零选择](#31523-非零选择)
+  - [3.16. Statistics 统计](#316-statistics-统计)
+    - [3.16.1. Averages and variances 平均和方差](#3161-averages-and-variances-平均和方差)
+    - [3.16.2. Histograms](#3162-histograms)
+      - [3.16.2.1. histogram 一维数据直方图](#31621-histogram-一维数据直方图)
+      - [3.16.2.2. histogram2d 二维直方图](#31622-histogram2d-二维直方图)
+      - [3.16.2.3. bincount 原子统计](#31623-bincount-原子统计)
+  - [3.17. Set 集合](#317-set-集合)
+    - [3.17.1. unique](#3171-unique)
+- [4. numpy.random](#4-numpyrandom)
+  - [4.1. Generator](#41-generator)
+  - [4.2. Random Generation Function](#42-random-generation-function)
+    - [4.2.1. Simple Random 简单的随机生成](#421-simple-random-简单的随机生成)
+    - [4.2.2. Permutations 排列](#422-permutations-排列)
+    - [4.2.3. Distributions 分布函数](#423-distributions-分布函数)
+- [5. Universal functions (ufunc)](#5-universal-functions-ufunc)
+- [6. numpy 常规功能](#6-numpy-常规功能)
+  - [6.1. numpy 的IO](#61-numpy-的io)
+    - [6.1.1. 类型转换](#611-类型转换)
+    - [6.1.2. numpy binary files](#612-numpy-binary-files)
+    - [6.1.3. text file](#613-text-file)
+- [7. config](#7-config)
+  - [7.1. np.set\_printoptions](#71-npset_printoptions)
+    - [7.1.1. numpy.shape](#711-numpyshape)
+    - [7.1.2. numpy.dot()  矩阵点乘](#712-numpydot--矩阵点乘)
 
 * python数值包 最基础的列表处理包 被其他许多包所依赖  
 * python stl 中的 math 有许多同名函数, 但不支持向量输入, 因此机器学习中更多的使用 numpy
@@ -194,20 +196,51 @@ del a  # the memory of ``a`` can be released.
 
 有很多包函数没有放在 numpy routines, 而是放在该部分, 以后再读   
 
-# 2. numpy other
+# 2. NumPy fundamentals
+
+These documents clarify concepts, design decisions, and technical constraints in NumPy. This is a great place to understand the fundamental NumPy ideas and philosophy.
+
+用于阐述一些非 API 的 numpy 关键性概念
 
 
-## 2.1. 内存排列规则
+## 2.1. Broadcasting
 
-order{‘K’, ‘A’, ‘C’, ‘F’}, optional
+https://numpy.org/doc/stable/user/basics.broadcasting.html
 
-# 3. Array objects 
+broadcast 是 numpy 中用于对不同 shape 的 array 进行运算操作的一个名词, 在某些限制下, 较小的数组会 broadcast 到较大的数组的 shape 下, 使得它们之间可以进行运算. 
 
-## 3.1. Standard array subclasses
+无需制作不必要的数据 copy, 并且可以帮助算法高效的实现, 然而 某些情况下 自动 broadcast 可能会导致内存使用效率低下导致运算减速  
+
+
+### 2.1.1. General Broadcasting Rules
+
+普遍 broadcast 规则  
+* 两个 array 进行比较时, 从 shape 的最右侧 (即元素层) 的维度开始比较 并向左移动
+* 如果两个维度称为兼容的, 则应该满足
+  * 这两个维度的长度相同 or
+  * 其中一个维度长度为 1
+* 否则不可以进行 Broadcast , numpy 会报错  `ValueError: operands could not be broadcast together `
+
+
+一个常用的例子, 对于 channel-last 的图像进行 scale
+
+
+```sh
+Image  (3d array): 256 x 256 x 3
+Scale  (1d array):             3
+Result (3d array): 256 x 256 x 3
+```
+
+一个反直觉的例子, 两个 array 的 shape 互相交错的等于 1
+```sh
+A      (4d array):  8 x 1 x 6 x 1
+B      (3d array):      7 x 1 x 5
+Result (4d array):  8 x 7 x 6 x 5
+```
 
 
 
-# 4. Routines  array常规操作 API
+# 3. Routines  array常规操作 API
 
 对 Array 数据的各种常规操作
 
@@ -218,7 +251,7 @@ order{‘K’, ‘A’, ‘C’, ‘F’}, optional
 2. 返回改变后的值和改变自身(inplace)
 
 
-## 4.1. Array creation
+## 3.1. Array creation
 
 numpy.array 的各种创建函数能够创建各种各样的预设 array
 
@@ -227,7 +260,7 @@ numpy.array 的各种创建函数能够创建各种各样的预设 array
 * 部分函数里有 `like`  参数 : array_like, optional, 用于将返回值创建成 np.array 以外的数据类型
 
 
-### 4.1.1. From shape or value
+### 3.1.1. From shape or value
 
 基础创建函数, 需要指定 array 的 shape  
 * `*_like` 版本函数, 输入的不再是 shape 而是另一个 array, 相当于 `func(a.shape,...)` 的另一种写法
@@ -246,11 +279,11 @@ numpy.array 的各种创建函数能够创建各种各样的预设 array
 * `eye(N[, M, k, dtype, order, like])`  创建2d对角线矩阵, 传入的 shape 可以是长方形, k 则代表对角线的偏移
 
 
-### 4.1.2. From existing data
+### 3.1.2. From existing data
 
 从既存的数据中创建一个 array, 某种程度上也算是 numpy 的文件 Input
 
-#### 4.1.2.1. From File 
+#### 3.1.2.1. From File 
 
 `numpy.fromfile(file, dtype=float, count=- 1, sep='', offset=0, *, like=None)`  文件读取
 * `file`  : Open file object or str or Path, 1.17.0 pathlib.Path objects are now accepted.
@@ -259,7 +292,7 @@ numpy.array 的各种创建函数能够创建各种各样的预设 array
 * `sep`   : 指定了该文件是否是 binary 或者 text file, 默认是空字符代表了二进制文件, 如果是空格分隔符 ` `, 则代表 text 文件, 同时分割匹配符会匹配1到多个空白字符
 * `offset`: 读取时候的向后偏移, 只在 binary 的时候起作用
 
-#### 4.1.2.2. From Data
+#### 3.1.2.2. From Data
 
 `numpy.array(object, dtype=None, *, copy=True, order='K', subok=False, ndmin=0, like=None)`  
 * 从数据中创建一个 np.array , Create an array.
@@ -289,7 +322,7 @@ numpy.array 的各种创建函数能够创建各种各样的预设 array
 * 返回一个 array 的主动拷贝
 * subok 默认是 False, 即子类会被转化
 
-#### 4.1.2.3. From Memory
+#### 3.1.2.3. From Memory
 
 `numpy.frombuffer(buffer, dtype=float, count=- 1, offset=0, *, like=None)`
 * 从一个 bytes 数据中读取数据
@@ -305,7 +338,7 @@ numpy.array 的各种创建函数能够创建各种各样的预设 array
 
 
 
-### 4.1.3. Numerical ranges 创建范围的array
+### 3.1.3. Numerical ranges 创建范围的array
 
 该部分的函数都是类似于 range 之类的, 设定开始终止值来生成一个顺序数列
 
@@ -331,7 +364,7 @@ numpy.array 的各种创建函数能够创建各种各样的预设 array
     * 代表了该空间下每个点的具体坐标数列  
     * 点的坐标依次是 `( x1[0],x2[0],...,xn[0]  ) , (x1[1],x2[1],..,xn[1])`
 
-## 4.2. Array manipulation 操纵更改 Array
+## 3.2. Array manipulation 操纵更改 Array
 
 有各种各样的 array 操作函数, 主要包括 array 形态, 顺序的方面
 
@@ -346,7 +379,7 @@ numpy.array 的各种创建函数能够创建各种各样的预设 array
   * where : array of bool, 附加的元素选择
   * casting : cast模式, 在别的地方应该能学到此处略
 
-### 4.2.1. Changing array shape 形态转换
+### 3.2.1. Changing array shape 形态转换
 
 除了转置以外的其他各种形态操作  
 
@@ -380,7 +413,7 @@ numpy.array 的各种创建函数能够创建各种各样的预设 array
   * `a.flat[1]`
 
 
-### 4.2.2. Transpose-like operations 转置操作
+### 3.2.2. Transpose-like operations 转置操作
 
 用于改变维度的`顺序`, 即类似转置的操作
 
@@ -399,7 +432,7 @@ numpy.array 的各种创建函数能够创建各种各样的预设 array
 
 
 
-### 4.2.3. Changing number of dimensions 维度个数操作
+### 3.2.3. Changing number of dimensions 维度个数操作
 
 对 array 的维度 (而不是shape)进行操作的函数
 
@@ -409,7 +442,7 @@ atleast_函数集: 注意该输入是 `*arry` 即多参数转化成元组输入,
 * `atleast_3d(*arys)`
 * return ndarray
 
-#### 4.2.3.1. expand_dims 升维
+#### 3.2.3.1. expand_dims 升维
 
 朴素升降维:
 * `numpy.expand_dims(a, axis)`
@@ -422,7 +455,7 @@ atleast_函数集: 注意该输入是 `*arry` 即多参数转化成元组输入,
 2. `arr=np.array([arr])`
 
 
-#### 4.2.3.2. squeeze 压缩维度 
+#### 3.2.3.2. squeeze 压缩维度 
 * `numpy.squeeze(a, axis=None)`
   * 删掉 shape 为 1 的维度
   * axis : None or int or tuple of ints, optional. 可以指定, 但是指定的维度必须确保 shape == 1
@@ -439,7 +472,7 @@ atleast_函数集: 注意该输入是 `*arry` 即多参数转化成元组输入,
 (1, 3)
 ```
 
-### 4.2.4. Joining arrays 拼接
+### 3.2.4. Joining arrays 拼接
 
 ```py
 numpy.concatenate((a1, a2, ...), axis=0, out=None, dtype=None, casting="same_kind")
@@ -460,7 +493,7 @@ numpy.concatenate((a1, a2, ...), axis=0, out=None, dtype=None, casting="same_kin
   * 将 1D array 视作列进行左右拼接
   * 在处理 2D array 时与 hstack 相同
 
-### 4.2.5. Splitting arrays 拆分 
+### 3.2.5. Splitting arrays 拆分 
 
 `numpy.split(ary, indices_or_sections, axis=0)`
 * 把一个 array 拆成复数个 sub-array, 返回值是一个 list
@@ -479,7 +512,7 @@ numpy.concatenate((a1, a2, ...), axis=0, out=None, dtype=None, casting="same_kin
 * 相当于指定 axis=1, 对于 1维数列不报错并执行 axis=0,`numpy.hsplit(ary, indices_or_sections)`  
 * 相当于执行 axis=2 `numpy.dsplit(ary, indices_or_sections)`
 
-### 4.2.6. Tiling arrays
+### 3.2.6. Tiling arrays
 
 平铺一个 array 
 
@@ -497,11 +530,11 @@ numpy.concatenate((a1, a2, ...), axis=0, out=None, dtype=None, casting="same_kin
   * axis : int, optional. 该函数默认会使用并输出 flatten 的 array, 因此大多数时候需要指定 axis
 
 
-### 4.2.7. Adding and removing elements 修改元素
+### 3.2.7. Adding and removing elements 修改元素
 
 将 np.ndarray 以类似于普通 list 的视角操作
 
-#### 4.2.7.1. append
+#### 3.2.7.1. append
 
 该函数不存在 in-place 模式, Append values to the end of an array.
 
@@ -515,7 +548,7 @@ numpy.concatenate((a1, a2, ...), axis=0, out=None, dtype=None, casting="same_kin
   * return : A copy of arr with values appended to axis. 
   
 
-#### 4.2.7.2. resize 强行更改 shape
+#### 3.2.7.2. resize 强行更改 shape
 
 不同于 reshape 的resize
 * 会带有填充以及裁剪的更改 array 形态
@@ -526,7 +559,7 @@ numpy.concatenate((a1, a2, ...), axis=0, out=None, dtype=None, casting="same_kin
 * 
 
 
-### 4.2.8. Rearranging elements 重新排列元素  
+### 3.2.8. Rearranging elements 重新排列元素  
 
 最经典的 reshape 也被包括在这里, 但是上面写了这里就省略
 
@@ -538,8 +571,47 @@ flip 以及 懒人 flip : Reverse the order of elements in an array along the gi
 * `numpy.fliplr(m)`
   * 反转左右, 列, 要求输入数据必须是 2维以上, axis=1
 
+## 3.3. Data type routines 
 
-## 4.3. Discrete Fourier Transform (numpy.fft)
+在需要谨慎操作不同数据之间的类型的时候, 使用该部分接口来进行验证  
+
+## 3.4. Data type information
+
+* `class numpy.iinfo(type)`
+  * 从一个  integer type, dtype, or instance 中创建一个 整数的 信息类
+  * min, max : 获取该整数类型的最小最大值
+  * dtype: 返回具体的 dtype 
+  * bits : 返回该类型所占据的 bits 数
+
+* `class numpy.finfo(dtype)`
+  * 类似的 从 float, dtype, or instance 中创建一个 浮点数的信息类
+  * 官方提示不要在模组层定义该类的实例, 因为计算量很重
+  * 可访问的属性超级多...
+
+### 3.4.1. Data type testing
+
+
+* `numpy.issctype(rep)`
+  * 验证一个输入是不是 scalar data-type , 返回 bool
+  * 要注意字符串也是 scalar, `np.int32` 等
+  * 不是 scalar 的可以是 `list` `1.1`小数等
+
+
+* `numpy.issubdtype(arg1, arg2)`
+  * 有点类似于 python 的内置函数 `issubclass`, 但是是针对 numpy dtype 的
+  * 返回 True 如果 arg1 是 typecode <= arg2 的
+  * 不能用来进行位宽 size 的比较 `np.float64 np.float32` 之间总是 false
+  * `np.issubdtype(floats.dtype, np.floating)` True
+  * `np.issubdtype(ints.dtype, np.integer) ` True
+
+
+* `numpy.issubsctype(arg1, arg2)`
+  * 更加抽象了, 似乎和 numpy 本身没什么关联, 说明也是  if the first argument is a subclass of the second argument.
+  * `np.issubsctype('S8', str)` False
+  * `np.issubsctype(np.array([1]), int)` True
+  * `np.issubsctype(np.array([1]), float)` False
+
+## 3.5. Discrete Fourier Transform (numpy.fft)
 
 The SciPy module `scipy.fft` is a more comprehensive superset of numpy.fft, which includes only a basic set of routines.
 * numpy 的傅里叶变换包只提供了一些基础的 routines 
@@ -557,14 +629,14 @@ numpy fft 的细则:
 * 
 
 
-### 4.3.1. Standard FFTs 标准傅里叶变换
+### 3.5.1. Standard FFTs 标准傅里叶变换
 
-### 4.3.2. Real FFTs 复数傅里叶变换
+### 3.5.2. Real FFTs 复数傅里叶变换
 
-### 4.3.3. Hermitian FFTs 
+### 3.5.3. Hermitian FFTs 
 
 
-### 4.3.4. Helper routines 辅助功能
+### 3.5.4. Helper routines 辅助功能
 
 * `np.fft.fftshift(x, axes=None)`: 便于 fft 结果的可视化
   * 标准 np.fft 运算的结果, 0频率的部分位于结果数列 `x[0]`, 然而一般为了可视化, 更加倾向于将 0 频率的部分移到数组中间
@@ -576,9 +648,9 @@ numpy fft 的细则:
   * differ by one sample for odd-length x
 
 
-## 4.4. linalg 
+## 3.6. linalg 
 
-### 4.4.1. SVD 奇异值分解
+### 3.6.1. SVD 奇异值分解
 
 Singular Value Decomposition  
 * M = U * s * Vh  
@@ -620,7 +692,7 @@ s_percentage = (s/sum(s)*100).round(2)
 ```
 As a general rule, you should consider solutions maintaining from 70 to 99 percent of the original information.  
 
-## 4.5. numpy Input and Output  Numpy 数据的 IO
+## 3.7. numpy Input and Output  Numpy 数据的 IO
 
 numpy 对于各种类型的输出支持的很好, 要注意对于 pandas 的 DataFrame 支持写在了别的段里  
 
@@ -629,7 +701,7 @@ numpy 对于各种类型的输出支持的很好, 要注意对于 pandas 的 Dat
   * 用于指定数据在输出时候的格式
   * 可能在别的地方有完整的文档, 保留为 [TODO]
 
-### 4.5.1. NumPy binary files (NPY, NPZ) - 标准Numpy格式的二进制的 io
+### 3.7.1. NumPy binary files (NPY, NPZ) - 标准Numpy格式的二进制的 io
 
 * load
   * 对于 npy 文件,  a single array is returned.
@@ -658,7 +730,7 @@ numpy 对于各种类型的输出支持的很好, 要注意对于 pandas 的 Dat
 
 
 
-### 4.5.2. Text files
+### 3.7.2. Text files
 
 以可以直接读取的 txt 文件来存储数据  
 
@@ -673,7 +745,7 @@ numpy 对于各种类型的输出支持的很好, 要注意对于 pandas 的 Dat
   * comments: 会被添加到 header 和 footer 
 
 
-### Raw binary files
+### 3.7.3. Raw binary files
 
 操作系统以及 numpy 库无关的纯二进制式文件存取, 可以被用于 Raw 图像的IO
 
@@ -696,7 +768,7 @@ numpy 对于各种类型的输出支持的很好, 要注意对于 pandas 的 Dat
   * `sep=''` : 默认情况下作为 binary 写入 等同于 `file.write(a.tobytes())`, 当 sep 不为空的时候作为 txt. 
   * `format='%s'` : 当文件作为 txt 输出的时候, 用于对每个元素进行格式化输出, 具体表现为输出的内容为 ` "format" % item`
 
-## 4.6. Linear algebra 线性代数计算 
+## 3.8. Linear algebra 线性代数计算 
 
 包含了 numpy 的各种线性代数计算函数, 其中一些函数定义在子包 `numpy.linalg` 中  
 * numpy 的线性代数函数基于各种 BLAS 和 LAPACK 库来实现, 提供了高速的各种线性代数计算
@@ -705,10 +777,10 @@ numpy 对于各种类型的输出支持的很好, 要注意对于 pandas 的 Dat
   * pros scipy 的库更加全面, 有一些 numpy 中没有的计算函数, 对于重合的函数, scipy 也有一些额外的参数
   * cons numpy 的有些函数对于 array 的 broadcasting 的效果更好
 
-### 4.6.1. Matrix and vector products 向量矩阵乘法
+### 3.8.1. Matrix and vector products 向量矩阵乘法
 
 
-#### 4.6.1.1. 矩阵乘法
+#### 3.8.1.1. 矩阵乘法
 * `numpy.dot(a, b, out=None)`  矩阵点乘, 可以理解为尽可能执行矩阵乘法, 对于高维是有一定拓展性的, 但是不适用于 Tensor
   * 因为是函数, 所以不存在手动加 T 之类的, 只根据 a,b 的维度来决定操作
   * a,b 都是 1D, 执行 向量内积
@@ -748,7 +820,7 @@ np.matmul(a, c).shape :(9, 5, 7, 3)
   * 该函数比较基础, 只接受 a,b 都是向量
   * 生成外积矩阵, 矩阵形状为 (a.len, b.len)
 
-#### 4.6.1.2. einsum  
+#### 3.8.1.2. einsum  
 
 评估操作数的爱因斯坦求和约定
 Evaluates the Einstein summation convention on the operands.
@@ -761,7 +833,7 @@ Evaluates the Einstein summation convention on the operands.
 
 `numpy.einsum(subscripts, *operands, out=None, dtype=None, order='K', casting='safe', optimize=False)`
 
-### 4.6.2. Solving equations and inverting matrices 计算矩阵方程或者逆
+### 3.8.2. Solving equations and inverting matrices 计算矩阵方程或者逆
 
 * `numpy.linalg.inv(a)`  计算一个矩阵的逆
   * 具体在代码上表现为 `dot(a, ainv) = dot(ainv, a) = eye(a.shape[0])`  
@@ -769,43 +841,43 @@ Evaluates the Einstein summation convention on the operands.
   * 返回值 ainv 也满足 shape `(...,M,M)`
 
 
-## 4.7. Logic functions 逻辑计算
+## 3.9. Logic functions 逻辑计算
 
 包括 ndarray 之间的逻辑运算以及自身元素的检查逻辑
 
-### 4.7.1. Truth value testing
+### 3.9.1. Truth value testing
 
 只有两个函数
 * `numpy.all(a, axis=None, out=None, keepdims=<no value>, *, where=<no value>)` 是否全部为 True
 * `numpy.any(a, axis=None, out=None, keepdims=<no value>, *, where=<no value>)` 是否有 True
 
-## 4.8. Masked array operations 
+## 3.10. Masked array operations 
 
 同 Logic 操作非常相似, 主要是通过各种逻辑判断来生成 mask 数据  
 
 
 
-## 4.9. Mathematical function 数学操作
+## 3.11. Mathematical function 数学操作
 
 绝大多数常用的数学基础函数都属于该分类
 
-### 4.9.1. Trigonometric functions 三角函数
+### 3.11.1. Trigonometric functions 三角函数
 
-### 4.9.2. Hyperbolic functions 双曲线函数
+### 3.11.2. Hyperbolic functions 双曲线函数
 
 
 
-### 4.9.3. Rounding 最近值
+### 3.11.3. Rounding 最近值
 
-### 4.9.4. Sums, products, differences 求和求积求差
+### 3.11.4. Sums, products, differences 求和求积求差
 
 * sum()
 * cumsum(a) 累加求和
 
-### 4.9.5. Exponents and logarithms 指数
-### 4.9.6. Rational routines 最大公因数 最小公倍数
+### 3.11.5. Exponents and logarithms 指数
+### 3.11.6. Rational routines 最大公因数 最小公倍数
 
-### 4.9.7. Extrema Finding 极值寻找
+### 3.11.7. Extrema Finding 极值寻找
 
 应该是用的比较多的一类方法, 总的上来说就 min 和 max, 但是根据使用场景的不同分出了四种
 
@@ -839,7 +911,7 @@ Evaluates the Einstein summation convention on the operands.
   * 同 amax 完全一致, 但是对于 NaN 会无视
   * 如果某一个比较的 slices 都是 NaN , 则会报警告, 并返回 NaN
 
-### 4.9.8. 杂项
+### 3.11.8. 杂项
 
 有时候需要的很特殊的功能, 没办法分类, 目前学习的有
 
@@ -847,7 +919,7 @@ Evaluates the Einstein summation convention on the operands.
 * clip
 * interp
 
-#### 4.9.8.1. convolve 卷积
+#### 3.11.8.1. convolve 卷积
 
 Returns the discrete, linear convolution of two one-dimensional sequences.
 * 常用在信号处理中
@@ -869,7 +941,7 @@ Returns the discrete, linear convolution of two one-dimensional sequences.
     * 只计算 a 和 v 完全 overlap 的卷积
     * 得到   max(M, N) - min(M, N) + 1. 个值
 
-#### 4.9.8.2. clip 裁剪
+#### 3.11.8.2. clip 裁剪
 
 `numpy.clip(a, a_min, a_max, out=None, **kwargs)`
 * 裁剪一个 array, 比用最大最小值实现要快, 且代码更清晰
@@ -878,7 +950,7 @@ Returns the discrete, linear convolution of two one-dimensional sequences.
   * 注意 a_min a_max 是没有大小比较验证的, 需要用户自己保证
 
 
-#### 4.9.8.3. interp 简易线性插值
+#### 3.11.8.3. interp 简易线性插值
 
 `numpy.interp(x, xp, fp, left=None, right=None, period=None)`  
 One-dimensional linear interpolation for monotonically increasing sample points.
@@ -890,7 +962,7 @@ One-dimensional linear interpolation for monotonically increasing sample points.
 * period : A period for the x-coordinates, xp 的周期, 一般用来计算角度, 即360 度为一圈, 720度会被正确的放在 0 度的位置
 
 
-## 4.10. Padding Arrays
+## 3.12. Padding Arrays
 
 numpy 的填充函数, 只有一个函数单独作为了一类, 可以对任意维度进行填充
 
@@ -901,7 +973,7 @@ numpy 的填充函数, 只有一个函数单独作为了一类, 可以对任意�
   * 
 
 
-## 4.11. Polynomials 多项式
+## 3.13. Polynomials 多项式
 
 numpy 1.4 引进的多项式包, 是对于之前的函数包 `numpy.poly1d` 的扩展  
 
@@ -939,7 +1011,7 @@ from .laguerre import Laguerre
 ```
 
 
-### 4.11.1. Power Series (numpy.polynomial.polynomial)
+### 3.13.1. Power Series (numpy.polynomial.polynomial)
 
 提供了一些用于处理多项式的接口, 包括一个 `Polynomial` 类 以及其他的方便接口
 
@@ -962,16 +1034,16 @@ Methods:
 
 
 
-## 4.12. Random sampling (numpy.random)
+## 3.14. Random sampling (numpy.random)
 
-## 4.13. Sorting, Searching, Counting 排序 搜索 计数
+## 3.15. Sorting, Searching, Counting 排序 搜索 计数
 
 这里的 counting 都是很简单的函数, 更详细的统计在 statistics 模块
 
 
-### 4.13.1. Sorting 排序
+### 3.15.1. Sorting 排序
 
-#### 4.13.1.1. 基础排序
+#### 3.15.1.1. 基础排序
 
 * `msort(a)` : Return a copy of an array sorted along the first axis.
 
@@ -992,12 +1064,12 @@ Methods:
   * 用于通过 结构体字段的名称或者名称list来指定排序比较的顺序
 
 
-#### 4.13.1.2. 部分有序
+#### 3.15.1.2. 部分有序
 
 * partition(a, kth[, axis, kind, order])    :  Return a partitioned copy of an array.
 * argpartition(a, kth[, axis, kind, order]) : 
 
-### 4.13.2. Searching 元素查找
+### 3.15.2. Searching 元素查找
 
 大概可以分成
 * 极值查找
@@ -1011,7 +1083,7 @@ Methods:
   * nonzero
   * flatnonzero
 
-#### 4.13.2.1. 最大值选择
+#### 3.15.2.1. 最大值选择
 
 * `argmax(a[, axis, out, keepdims])`
   * Returns the indices of the maximum values along an axis.
@@ -1021,7 +1093,7 @@ Methods:
 
 
 
-#### 4.13.2.2. 逻辑选择值 where
+#### 3.15.2.2. 逻辑选择值 where
 
 `numpy.extract(condition, arr)`
 * 根据 condition 选择元素, 等同于 
@@ -1038,7 +1110,7 @@ Methods:
 
 
 
-#### 4.13.2.3. 非零选择
+#### 3.15.2.3. 非零选择
 
 * `nonzero(a)`        : Return the indices of the elements that are non-zero.
   * 返回 a tuple of arrays
@@ -1053,11 +1125,11 @@ Methods:
   * 功能上几乎等同于 `np.transpose(np.nonzero(a))`  but produces a result of the correct shape for a 0-D array.
 
 
-## 4.14. Statistics 统计
+## 3.16. Statistics 统计
 
 更加完整的统计函数定义在了这里
 
-### 4.14.1. Averages and variances 平均和方差
+### 3.16.1. Averages and variances 平均和方差
 
 较为通用的统计函数, 根据对于 NaN 的处理分为标准版和 `nan*` 版  (average 除外没有 nan 版本) 
 
@@ -1084,7 +1156,7 @@ Methods:
   * 标准差
 
 
-### 4.14.2. Histograms
+### 3.16.2. Histograms
 
 
 直方图统计, 在 Statistic 分类的函数中属于一个大类, 不止一个函数  
@@ -1092,7 +1164,7 @@ Methods:
 * numpy.histogram    : 普通一维直方图统计, 
 
 
-#### 4.14.2.1. histogram 一维数据直方图
+#### 3.16.2.1. histogram 一维数据直方图
 ```py
 numpy.histogram(a, bins=10, range=None, normed=None, weights=None, density=None)
 ```
@@ -1126,7 +1198,7 @@ numpy.histogram(a, bins=10, range=None, normed=None, weights=None, density=None)
 * bin_edges : 因为 bins 可能是整数或者别的省略的输入方法, 该返回值用于标识完整的区间序列
   * 注意 len(bin_edges) = len(hist)+1 
 
-#### 4.14.2.2. histogram2d 二维直方图
+#### 3.16.2.2. histogram2d 二维直方图
 
 Compute the bi-dimensional histogram of two data samples.   
 并不是单纯的二维数据直方图统计, 而是一种双方向上的统计.  
@@ -1153,16 +1225,16 @@ numpy.histogram2d(x, y, bins=10, range=None, normed=None, weights=None, density=
   * yedges ndarray, shape(ny+1,)
 
 
-#### 4.14.2.3. bincount 原子统计
+#### 3.16.2.3. bincount 原子统计
 
 直方图的简化版本
 
 
 
 
-## 4.15. Set 集合
+## 3.17. Set 集合
 
-### 4.15.1. unique
+### 3.17.1. unique
 
 寻找一组数据中的唯一元素, 可以用来统计元素的种类数  
 除了返回独立的元素种类, 还可以返回
@@ -1180,7 +1252,7 @@ numpy.histogram2d(x, y, bins=10, range=None, normed=None, weights=None, density=
 
 
 
-# 5. numpy.random
+# 4. numpy.random
 
 * numpy 的随机包这里独立的分一章  `numpy.random`
 * 比 Pystl 的 random 包通用性更广, 值得学习
@@ -1198,7 +1270,7 @@ numpy.histogram2d(x, y, bins=10, range=None, normed=None, weights=None, density=
 1. 定义生成器 Generators 对象, 通过调用构造函数来定义不同 BitGenerators 的随机数生成器
 2. 调用 Generator 对象的各种分布方法, 来获取具体的随机分布
 
-## 5.1. Generator
+## 4.1. Generator
 
 基本生成器
 * `default_rng(seed=None:{None, int, array_like[ints], SeedSequence, BitGenerator, Generator})`  : 
@@ -1211,12 +1283,12 @@ numpy.histogram2d(x, y, bins=10, range=None, normed=None, weights=None, density=
 * `random.Generator.bit_generator`
   * generator 的一个类属性, 可以访问到该 generator 所使用的 BitGenerator 对象
 
-## 5.2. Random Generation Function
+## 4.2. Random Generation Function
 
 
 通过使用生成器对象的方法可以产生任意区间和分布的随机数, 省略 `random.Generator.` 或者 `[TODO]`
 
-### 5.2.1. Simple Random 简单的随机生成
+### 4.2.1. Simple Random 简单的随机生成
 
 * `integers(low[, high, size, dtype, endpoint])`
   - 产生整数
@@ -1232,12 +1304,12 @@ numpy.histogram2d(x, y, bins=10, range=None, normed=None, weights=None, density=
   - 返回一个 random bytes
 
 
-### 5.2.2. Permutations 排列
+### 4.2.2. Permutations 排列
 
 * shuffle(x[, axis])
 * permutation(x[, axis])
 
-### 5.2.3. Distributions 分布函数
+### 4.2.3. Distributions 分布函数
 
 通用参数:
 * `size` : int or tuple of ints, optional
@@ -1258,7 +1330,7 @@ numpy.histogram2d(x, y, bins=10, range=None, normed=None, weights=None, density=
 * `uniform(low=0.0, high=1.0, size=None)`
   - 均一分布
 
-# 6. Universal functions (ufunc)
+# 5. Universal functions (ufunc)
 
 经常出现在各种函数的参数中, 属于高级操作
 
@@ -1266,9 +1338,9 @@ A universal function (or ufunc for short) is a function that operates on ndarray
 
 
 
-# 7. numpy 常规功能
+# 6. numpy 常规功能
 
-## 7.1. numpy 的IO
+## 6.1. numpy 的IO
 
 numpy 的数据IO可以简单分3类:
 * 二进制IO
@@ -1280,7 +1352,7 @@ numpy 的 IO 也一定程度上基于 pickle, 具有一定的不安全性
 通用参数:
 * file : file-like object, string, or pathlib.Path
   
-### 7.1.1. 类型转换
+### 6.1.1. 类型转换
 
 在 numpy 官方文档中, ndarray 相关的类型转换也被归纳为 IO 的一部分
 
@@ -1292,7 +1364,7 @@ numpy 的 IO 也一定程度上基于 pickle, 具有一定的不安全性
 * ndarray.tofile(fid[, sep, format])
 
 
-### 7.1.2. numpy binary files
+### 6.1.2. numpy binary files
 
 最基础的保存方法, 因为是二进制的, 所以最好只通过 numpy 访问, 文件后缀为 `.npy`
 
@@ -1301,7 +1373,7 @@ numpy 的 IO 也一定程度上基于 pickle, 具有一定的不安全性
 * savez
 * savez_compressed
 
-### 7.1.3. text file
+### 6.1.3. text file
 
 txt 文件保存后的访问比较便捷, 也容易在其他应用间交互
 
@@ -1330,9 +1402,9 @@ numpy.savetxt(fname, X,
 numpy.loadtxt(fname, `dtype=<class 'float'>`, comments='#', delimiter=None, converters=None, skiprows=0, usecols=None, unpack=False, ndmin=0, encoding='bytes', max_rows=None, *, like=None)
 ```
 
-# 8. config
+# 7. config
 
-## 8.1. np.set_printoptions
+## 7.1. np.set_printoptions
 
 1. 取消科学计数法显示数据 `np.set_printoptions(suppress=True)  `
 
@@ -1341,9 +1413,9 @@ numpy.loadtxt(fname, `dtype=<class 'float'>`, comments='#', delimiter=None, conv
 2. 取消省略超长数列的数据 ` np.set_printoptions(threshold=sys.maxsize)` 需要 sys 包
 
 
-### 8.1.1. numpy.shape
+### 7.1.1. numpy.shape
 
-### 8.1.2. numpy.dot()  矩阵点乘
+### 7.1.2. numpy.dot()  矩阵点乘
 
 np.diag(s)  将数组变成对角矩阵  
 使用numpy进行矩阵乘法   

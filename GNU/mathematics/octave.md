@@ -1,3 +1,6 @@
+# GNU Octave 
+
+
 # 1. octave language basic
 
 `help 指令` 调出关于命令的帮助文档  
