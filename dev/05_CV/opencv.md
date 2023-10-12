@@ -465,18 +465,47 @@ Python:
 ```
 
 参数:
-* src	: 输入图像
+* src,dst	: 输入输出图像
 * code	: 转换模式
 * dstCn	: dst图像的通道数. 一般置零用来自动判定
 
 注意:
+* 该函数是最顶端的接口, 即支持任意形式的图像转换
 * 该函数是(部分)支持输入图像是小数格式的 (0,1) , 在默写转换模式下甚至推荐使用小数格式
   * 对于 Luv 转换 e.g. COLOR_BGR2Luv , 是应该使用标准化来将图像放到 (0,1) 中的
   * 对于 Demosaic 转换, 即 Bayer 的转换只支持整数类型 `Assertion failed) depth == CV_8U || depth == CV_16U in function 'demosaicing'`
 * OpenCV 只支持32 bit 小数, 即单精度, 因此对于 numpy 来说不要使用 float64
+* 通过阅读源码, 发现尽管ColorConversionCodes 里有Bayer2RGB的模式, 但是函数的源代码并没有对应的分支, 通过阅读头文件, 发现 Bayer2RGB 的模式通过等效变换成了 2BGR 的格式来进行处理  
 
 
-### 3.3.2. ColorConversionCodes
+### 3.3.2. demosaicing
+
+专门用于 CFA 图像的去马赛克函数, 属于 cvtColor 的一部分功能独立出来的接口
+
+```c++
+void cv::demosaicing 	( 	InputArray  	src,
+		OutputArray  	dst,
+		int  	code,
+		int  	dstCn = 0 
+	) 		
+Python:
+	cv.demosaicing(	src, code[, dst[, dstCn]]	) -> 	dst
+```
+
+对比于 cvtColor , 所支持的 code 被限制为一部分, 可以分为四类
+* Demosaicing using bilinear interpolation
+  * Bayer2BGR
+  * Bayer2Gray
+* Demosaicing using Variable Number of Gradients.
+  * Bayer2BGR_VNG
+* Edge-Aware Demosaicing.
+  * Bayer2BGR_EA
+* Demosaicing with alpha channel
+  * Bayer2BGRA
+* 通过阅读源码, 确认了该函数支持直接转为 RGB 的各种 code
+
+
+### 3.3.3. ColorConversionCodes
 
 通过 `enum cv::ColorConversionCodes` 枚举类型来表示转换的模式, 以下列出所有支持的图片格式的名称, 转换模式即为 `<A>2<B>` 
 * BGR RGB LRGB LBGR
@@ -1138,7 +1167,7 @@ Python:
 
 
 
-## fisheye camera model  - 设计鱼眼相机的接口被单独定义作为子模组
+## 8.1. fisheye camera model  - 设计鱼眼相机的接口被单独定义作为子模组
 
 
 
