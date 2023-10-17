@@ -11,3 +11,6 @@ https://www.gnu.org/gnu/about-gnu.en.html
 GNU is a free and open-source software project that was launched in 1983 with the goal of creating a complete Unix-like operating system made entirely of free software. It includes a wide range of tools and utilities, such as the GNU Compiler Collection (GCC), the GNU C Library (glibc), the GNU Debugger (GDB), and many others.
 
 One of the most well-known components of GNU is the GNU `General Public License (GPL)`, which is a widely-used free software license that allows users to modify and distribute software freely.
+
+应用了 GUN GPL 协议的软件并不一定属于 GNU 软件包, GNU 软件包是由 GNU 组织来维护的 
+

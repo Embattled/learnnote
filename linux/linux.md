@@ -187,8 +187,6 @@ $ uptime
 
 # 查看磁盘和分区
 
-# 查看挂接的分区状态
-$ mount | column -t      
 
 # 查看所有分区
 $ fdisk -l               
@@ -1049,21 +1047,6 @@ List information about the FILEs. 默认查看当前位置
 | -i   | 不用硬盘容量显示, 而是以含有 inode 的数量来显示。               |
 
 
-### 7.2.4. mount 挂载
-
-Linux 下所有硬件设备都必须挂载后才能使用, 区别是硬盘分区挂载被写入了系统启动脚本, 而其他设备(例如U盘等)需要手动挂载
-
-* `mount [-l|-h|-V]`    情报打印
-  * `l`     : 同时打印挂载设备的卷标
-
-
-* `mount -a [-fFnrsvw] [-t fstype] [-O optlist]`  自动挂载
-  * 重新读取 `/etc/fstab` 检查文件中有无疏漏被挂载的设备文件
-
-
-* `mount [-fnrsvw] [-t fstype] [-o options] device dir`   标准挂载
-  * `-t`    : 想要挂载的硬件的系统类型, 可以自动检测
-  * 
 
 # 8. Linux 的用户管理
 
