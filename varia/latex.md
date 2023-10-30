@@ -278,6 +278,8 @@ p系列(中日韩)
 | 大除         | \div                 | $\div$     |
 | 点乘         | \cdot                | $\cdot$    |
 | Hadamard积   | \odot                | $\odot$    |
+| 不知道   | \oplus                | $\oplus$    |
+| 不知道   | \ominus                | $\ominus$    |
 | 合           | \cap                 | $\cap$     |
 | 并           | \cup                 | $\cup$     |
 | 大于         | \gt \ge \textgreater | $\gt \geq$ |
@@ -346,6 +348,7 @@ p系列(中日韩)
 | 名称         | 代码          | 显示             |
 | ------------ | ------------- | ---------------- |
 | 实数集空心字 | \mathbb{R}    | $\mathbb{R}$     |
+李代数 | \mathfrak | $\mathfrak{so}$
 | 粗体整体     | \mathbf       | $\mathbf{x}$     |
 | 粗体保持斜体 | \boldsymbol{} | $\boldsymbol{x}$ |
 

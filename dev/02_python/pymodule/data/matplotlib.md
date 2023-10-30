@@ -23,6 +23,7 @@
   - [4.1. Plotting](#41-plotting)
     - [4.1.1. Basic 基础图](#411-basic-基础图)
       - [4.1.1.1. plot 万物基础-折线图](#4111-plot-万物基础-折线图)
+      - [bar 条图 直方图](#bar-条图-直方图)
       - [4.1.1.2. lines](#4112-lines)
     - [4.1.2. Spans 跨度线](#412-spans-跨度线)
     - [4.1.3. Spectral](#413-spectral)
@@ -433,6 +434,28 @@ plot(x, y)
 # 无限参数
 plot(x1, y1, 'g^', x2, y2, 'g-')
 ```
+
+#### bar 条图 直方图
+
+`Axes.bar(x, height, width=0.8, bottom=None, *, align='center', data=None, **kwargs)`
+* 条状图, x 制定了条的对齐点, 由高度和 width 来指定条的大小
+* 许多参数都可以以 list 的形式传入, 用于给每一个条单独指定大小
+* x : float or array-like
+* height : float or array-like
+  * 如果 bottom 是有单位的值, 那么要注意 height 值应该是与 bottom 相同单位的 差值
+  * (不太理解, 好像是在 time 数据时候需要注意)
+* width : float or array-like, `default: 0.8`
+  * bar 的宽度, 比较重要
+  * 同样的, 如果 x 是有单位的值, width 也应该是与 x 相同单位的, 与 x 值的差值
+* bottom: float or array-like, `default: 0`
+  * 底部的坐标
+  * 用于时间轴的表示可能很有用
+* align : {'center', 'edge'}, default: 'center'
+  * x 的对齐位置
+  * 默认对其的是左边, 如果要对其右边的话 width 传入对应的负值即可
+
+
+
 
 #### 4.1.1.2. lines
 
