@@ -34,6 +34,8 @@
   - [4.2. 转义字符](#42-转义字符)
   - [4.3. 运算符](#43-运算符)
 - [5. python Built-in Types](#5-python-built-in-types)
+  - [Numeric Types — int, float, complex 数值类型](#numeric-types--int-float-complex-数值类型)
+    - [Bitwise Operations on Integer Types - 整数上的 bit 操作](#bitwise-operations-on-integer-types---整数上的-bit-操作)
   - [5.1. 序列](#51-序列)
     - [5.1.1. 序列通用](#511-序列通用)
       - [5.1.1.1. 序列内置函数](#5111-序列内置函数)
@@ -835,6 +837,22 @@ Built-in Types 代表那些包括在了 python 解释器里的变量, 不需要�
 * 转换成 string 类型, 包括
   * str()  , 作为 print() 的参数被输出时会隐式调用
   * repr()
+* 一些集合类 collection classes 是可变的, 即 对实例进行 增减重排时采用 in place 方法, 返回None
+
+## Numeric Types — int, float, complex 数值类型
+
+总体上数值可以分成三大类, 同时 Booleans 属于一个 subtype of integers
+* Python 中的 integers 拥有 unlimited precision
+* Python 中的 float 通常情况下是基于 C 的 double 实现的
+  * 具体情况可以查看 sys 里的特定标识 `sys.float_info`
+* complex 中实部虚部分别是一个 float
+  * 通过在数字后追加 `j` `J` 来定义一个只有实部的复数
+* python stl 中还定义了其他的数字类型
+
+三个构造函数 `int() float() complex()` 可以用来定义指定的 type
+
+### Bitwise Operations on Integer Types - 整数上的 bit 操作
+
 
 ## 5.1. 序列
 

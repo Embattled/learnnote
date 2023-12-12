@@ -96,7 +96,7 @@ a \times b =
   e_1 & e_2& e_3 \\
   a_1 & a_2& a_3 \\
   b_1 & b_2& b_3 
-\end{Vmatrix}
+3. \end{Vmatrix}
 = 
 \begin{bmatrix}
   a_2b_3-a_3b_2\\
@@ -138,7 +138,7 @@ $$
   a_1\\
   a_2\\
   a_3
-5. \end{bmatrix}
+4. \end{bmatrix}
 =
 [e_1',e_2',e_3']
 \begin{bmatrix}
@@ -215,7 +215,7 @@ $$
 \begin{bmatrix}
   a'\\
   1
-7. \end{bmatrix}
+5. \end{bmatrix}
 =
 \begin{bmatrix}
   R& t\\
@@ -224,7 +224,7 @@ $$
 \begin{bmatrix}
   a\\
   1
-8. \end{bmatrix}
+6. \end{bmatrix}
 =
 T
 \begin{bmatrix}
@@ -554,3 +554,233 @@ $$\dot{R}(t)=\phi(t)\hat{}R(t) =
 
 
 
+# 4. Cameras and Images
+
+了解
+* 针孔相机的模型, 内部参数, 径向畸变参数
+* 空间点到成像平面的投影过程
+* OpenCV的基础图像存储和表达方法
+* 基本的摄像头标定
+
+## 4.1. Pinhole Camera Models
+
+针孔模型和畸变是描述一个投影过程最基本的模型, 二者共同构成了相机的基本 intrinsic 参数  
+
+总结 单目相机的成像过程:
+1. 世界坐标系下的点P, 坐标为 $P_w$
+2. 相机在运动, 因此基于相机的外部参数 (R,t or $T\in \text{SE}(3)$) 将世界的点P转为相机坐标 $\tilde{P_c}=RP_w+t$
+3. 相机坐标下的点 $\tilde{P_c}=[X,Y,Z]^T$, 将其投影到归一化平面上 normalized plane, 得到归一化坐标 $P_c=[X/Z,Y/Z,1]^T$
+4. 根据畸变公式得到畸变后的归一化平面坐标
+5. 最终将归一化坐标乘以 内参, 即可得到最终的成像坐标 $P_{uv}=KP_c$
+
+### 4.1.1. Pinhole Camera Germotry
+
+通常的, 以相机光心为坐标系原点, 建立 O-x-y-z 坐标系
+* 习惯上 z 指向相机前方, x 向右, y 向下
+* 成像平面物理上在相机的后方, 通过基本的相似三角形可以得到图像的倒影
+* 实际上, 从相机输出的图像并不是倒像, 因此为了方便理解, 通常在建模时成像平面都已经对称的放到了相机前方, 这样在公式上就消去了 负号
+
+基本的成像公式
+$$\frac{Z}{f}=\frac{X}{X'}=\frac{Y}{Y'}$$  
+整理后则有 $X'=f\frac{X}{Z}, Y'=f\frac{Y}{Z}$  
+
+通常对相机进行物理描述的时候, 点的位置以及焦距的单位都是米 meter, 在量化到图像像素坐标的时候, 需要引入 缩放 zoom 和 原点平移 translation 的概念.
+
+在软件建模中, 通常图像平面 u,v轴上的缩放倍数 $\alpha, \beta$ 会与焦距结合, 称为 $f_x =f\alpha, f_y = f\beta$. f 焦距的一般单位是 米, 因此 alpha, beta 的单位为 (像素/米).  
+而 u,v 轴的原点是图像的左上角, 因此通常投影后需要对像素点进行平移, 将相机原点投影出的坐标移动到图像平面的中心, 需要对 u,v 各自加上 $[c_x,c_y]$
+
+
+在最基本的投影中:  
+$$
+\begin{equation*}
+  \begin{pmatrix}
+    u \\ 
+    v \\
+    1 \\
+  \end{pmatrix}
+
+=
+  \frac{1}{Z}
+  \begin{pmatrix}
+    f_x,0,c_x\\
+    0, f_y, c_y\\
+    0,0,1
+  \end{pmatrix}
+  \begin{pmatrix}
+    X\\ Y\\ Z
+  \end{pmatrix}
+\end{equation*}
+$$
+
+习惯性会把 Z 移动到等式的左侧  
+
+$$
+Z\begin{pmatrix}u\\v\\1 \end{pmatrix}
+
+=
+\begin{pmatrix}
+  f_x,0,c_x\\
+  0, f_y, c_y\\
+  0,0,1
+\end{pmatrix}
+\begin{pmatrix}
+  X\\ Y \\ Z \end{pmatrix}
+\underset{=}{\text{def}} KP $$
+
+该最终式子中, K 称为相机内参数矩阵 K, K 在相机的使用中不会发生改变, 出厂即确定的.  
+P 即要投影的点在相机坐标下的坐标, 它是由点在原本世界坐标系的位置 $P_w$ 利用相机本身在世界坐标系下的位置进行变换的来的.  
+相机在世界坐标系下的位置和朝向(位姿)被称为外部参数, 位姿是由旋转矩阵 $R$ 和平移向量 $t$ 来描述的
+
+综合下来, 完整的针孔相机投影过程应该描述为:   
+$$
+ZP_{uv} = Z
+\begin{bmatrix}
+  u\\v\\1
+\end{bmatrix}
+
+=
+K(RP_w+t)=KTP_w
+$$
+在上述的式子中, 隐藏了一次齐次坐标 (homogeneous) 的转换 (计算 $TP_w$ 的时候需要将坐标转换成齐次坐标, 在转为非齐次坐标与 K 相乘)
+
+此外, 在转化中需要对计算出的相机屏幕坐标进行归一化, 因此  
+$(RP_w+t) = [X,Y,Z]^T -> [X/Z, Y/Z, 1]^T$  
+并不会影响最终的投影坐标 (u,v), 即在实际计算中, 可以考虑先将世界坐标系投影到 归一化平面 `normalized plane`, 即 Z=1 的假想平面, 再直接乘以 内部内参数 K 就可直接得到成像坐标 (u,v)
+
+同时也证明了单目相机无法获取图像的深度信息
+
+### 4.1.2. Distortion
+
+通常情况下, 为了提高相机的可视角度 (get a larger FoV, Field-of-View), 通常会在相机的前方加一个 len, 即透镜.
+* 而由透镜对光线行动路线的影响
+* 透镜本身在物理组装的时候无法与成像平面保持绝对的平行
+导致最终成像效果的畸变 Distortion
+
+由透镜形状导致的畸变, 会使得真实环境中的直线在图像中变成了曲线, 越靠边缘越明显, 这种畸变通常径向对称, 称为径向畸变 radial distortion, 细分为两类
+* 桶形畸变 barrel-like distortion
+* 枕形畸变 cushion-like distortion  
+而由于物理上透镜和成像平面的非平行导致的畸变称为 切向畸变 `tangential distortion`  
+
+对于畸变的数学建模使用 归一化平面 normalized plane 上的坐 标 $p$, 其坐标为 $[x,y]^T$.  
+将其坐标转化为极坐标的形式 $[r,\theta]^T$, 这里 r 是点到 归一化平面原点的距离, 而 theta 表示该点与水平面的夹角. 有
+* 径向畸变是改变了点到原点的距离, 即 $r$
+* 切向畸变是改变了点与水平面的夹角, 即 $\theta$
+
+一般上, 通过多项式来对径向畸变进行建模. 根据畸变的复杂度, 有时候不一定需要用到 k3  
+$$
+x_{distorted} = x(1+k_1r^2+k_2r^4+k_3r^6) \\
+y_{distorted} = y(1+k_1r^2+k_2r^4+k_3r^6) 
+$$
+
+而切向畸变使用另外一组参数 $p_1, p_2$.  公式基本上是对称的
+$$
+x_{distorted} = x+2p_1xy + p_2(r^2+2x^2) \\
+y_{distorted} = y+p_1(r^2+2y^2)+2p_2xy 
+$$
+
+
+统合两个畸变的公式, 同时应用, 将 切向畸变里的 x,y 替换成径向畸变的公式即可.  
+$$
+x_{distorted} = x(1+k_1r^2+k_2r^4+k_3r^6)+2p_1xy + p_2(r^2+2x^2) \\
+y_{distorted} = y(1+k_1r^2+k_2r^4+k_3r^6)+p_1(r^2+2y^2)+2p_2xy 
+$$
+
+畸变矫正后的归一化平面上的点, 直接乘以内参矩阵就可以得到正确的投影位置.  
+
+### 4.1.3. Stereo Cameras
+
+
+# 5. Visual Odometry - 视觉里程计 Part 1
+
+基于视觉的里程计构建, 两种主要方法
+* 特征点法 feature methods: 
+  * 特征点, 提取以及匹配
+  * 根据配对的特征点估计相机运动
+  * 是主流方法, 稳定, 对光照, 动态物体不敏感
+* 光流法 direct methods
+
+关键字:
+* 对极几何, 对极几何的约束  `epipolar geometry` `epipolar constraints` : 主要用于单目相机的两组 2D 点估计运动
+* PNP 问题, 利用已知的三维结构与图像的对应关系求解相机的三位运动  : 一组为 3D, 一组为 2D. 
+* ICP 问题, 点云的匹配关系求解摄像机三位运动   : 主要用于 双目和 RGB-D, 即在某种方法得到了双目信息后, 根据两组 3D 点估计运动
+* 通过三角化获得二维图像上对应点的三维结构
+
+
+## 5.1. Feature Method - 特征点法
+
+SLAM 系统分为前端和后端, 而前端指的就是 VO visual odometry 视觉里程计, 根据相邻图像的信息估算出粗略的相机移动, 给后端提供较为友好的初始值.  
+
+从两帧之间的差异估计相机的运动和场景集合, 实现一个两帧的VO, 也成为 两视图几何 (Two-view geometry)  
+
+### 5.1.1. Feature Point
+
+在视觉 SLAM 中, 寻找多帧图像中比较有代表性的点, 这些点在相机视角发生改变后能够保持不变.  这些点在 SLAM 中称为 landmarks, 而在 CV 领域则称为 image feature.
+
+图像像素值-灰度值 本身也可以理解为一种最原始的特征, 然而:
+* 受光照, 形变, 物体材质的影响严重
+* 不同图像之间变化大, 不稳定
+
+2000年以前提出的特征大部分都是基于 角点 (corner point) 的算法, 例如 Harris, Fast, GFTT. 然而单纯的角点仍然不够稳定, 远处看上去是角点的地方离近了后就不再是角点.  
+
+经过很多年的发展, CV 领域提出了很多新的人工设计的 局部图像特征算法, 例如 `SIFT, SURF, ORB`, 这些新颖的算法的优点有
+* Repeatability 可重复性 : 能够在不同的图像中找到
+* Distinctiveness 可区别性 : 不同的特征的表达是不同的
+* Efficiency 高效性 : 特征点的数量应该远远小于像素的数量
+* Locality 本地性 : 特征仅与一小片图像区域相关  
+
+
+目前 SLAM 系统中, ORB 特征是应用最广的一种, 权衡了鲁棒性和计算速度. 特征的发展可以简述为.
+
+SIFT, Scale-Invariant Feature Transform (尺度不变特征变换)  是最经典的一种图像特征:
+* 充分考虑了图像变换中的 光照, 尺寸, 旋转等变化
+* 计算量极大
+* 截至 2016 年, 普通的计算机仍然无法实时的计算 SIFT 特征. 
+* 对于目前的 SLAM 系统设计过于奢侈
+
+ORB, Oriented FAST and Rotated BRIEF.  
+* 基于 FAST 关键点检测 (原本的 FAST 算法只有关键点检测, 没有描述子 descriptor )
+* 改进了 FAST 不具有方向性的问题
+* 使用了计算速度极快的 BRIEF (Binary Robust Independent Elementary Feature) 二进制描述子
+* 在同一幅图像中计算 1000个特征点的情况下 ORB (15.3ms) < SURF(217.3ms)  < SIFT (5228.7ms) 
+
+### 5.1.2. ORB Feature
+
+该章详细介绍了 ORB 特征的计算方法
+
+### 5.1.3. Feature Matching
+
+对于有大量相似纹理的场景, 基于局部的特征很难 真正有效的避免误匹配  
+
+
+基础的匹配方法, 针对从两个图象提取的特征点 $x_t^m, m=1,2,...,M$ 和 $x_{t+1}^n,n=1,2,...,N$  寻找这两个集合元素的对应关系
+* 最简单的方法就是暴力匹配 (Brute-Force Matcher), 所有点两两比较距离
+* 另一种方法是快速最近邻 FLANN, Fast Approximate Nearest Neighbor 算法
+* 对于距离的计算
+  * 浮点数的特征描述, 可以利用欧氏距离来度量
+  * 对于二进制的特征描述, 可以使用汉明距离 `Hamming distance`, 指的是两个二进制串之间的 不同位数的个数
+
+
+<!-- Practice: Feature Extraction and Matching 实践章节跳过 -->
+
+## 2D-2D : Epiploar Geometry - 对极几何
+
+主要针对两组 2D 点的运动估计
+
+## Triangulation - 三角测量 (三角化)
+
+通过上一讲对极几何约束估计了相机运动之后, 需要用相机的运动 来估计特征点的空间位置, 此时对于单目相机来说, 仅通过单张图像无法获取深度信息, 因此需要通过三角测量 Triangulation 的方法来估计图像点的深度.  
+
+考虑图像 I1, I2. 以左图为参考, 且右图的变换矩阵为 T, 相机光心分别为 O1, O2.  
+在 I1 中有特征点 p1, I2 中有特征点 p2.  
+
+理论上, 直线 O1p1 与 O2p2 会在实际场景中相交于点 P. 
+该点即两个特征点所对应的地图点在三维场景中的位置, 然而由于噪声的影响, 两条直线往往无法相交.   
+
+
+
+
+## 3D-2D : PnP 
+
+Perspective-n-Point  求解 3D 到 2D 的点对运动的方法
+
+## 3D-3D : ICP

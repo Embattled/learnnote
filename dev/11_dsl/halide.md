@@ -273,7 +273,7 @@ Expr 可以理解为表达式对象, 是一种轻量化的数据结构, 表达�
 
 ## 5.1. Expr routine
 
-### 5.1.1. 数值类型转换
+### 5.1.1. 数值类型转换 - cast
 
 Halide::cast 用于显式的将一个 Expr 进行内存转换
 
@@ -288,7 +288,7 @@ Expr Halide::cast 	(
 	) 		
 ```
 
-### 5.1.2. 基础数值操作
+### 5.1.2. 基础数值操作 - clamp, select
 
 函数头
 * clamp     : 相当于 min 和 max 的结合, 将一个输入的 Expr 限制在对应的区间以内  
@@ -332,6 +332,18 @@ Expr Halide::select 	(
 	) 		
 
 ```
+
+
+### 累积函数
+
+
+* sum         : 累加函数
+* product     : 累乘函数
+* maximum     : 求最大值函数
+* minimum     : 求最小值函数
+
+
+
 
 
 # 6. Func
@@ -400,24 +412,7 @@ int 返回值的情报函数
 * `const std::vector< Type > & Halide::Func::types 	( 		) 	const` : 对于 Func 含有 Tuple 时候的 Type 获取
 
 
-## 6.2. Func scheduling
-
-同实际使用的计算资源 (CPU or GPU) 无关的 scheduling 接口, 主要用于算法层面上的并行研讨
-
-* `reorder(y,x)`    : 手动指定 loop 的执行顺序, 顺序为从左到右是最内loop到外
-* `split(x,x_outer,x_inner,factor)` : 将某个坐标轴的 loop 拆分成两个, 会影响最终生成的 psedocode
-  * 具体的循环内的操作则是 `x_execute = x_outer * factor + x_inner;` 不会影响实际执行的顺序
-  * 主要配合 verctorize 来使用, 将内循环直接向量化用于加速
-* `fuse(x,y,fused_x_y)`             : 和 split 相对比, 把某两个坐标轴整合成一个, 会减少最终的 loop 数量 
-  * 具体的循环内则是 `int y = fused / 根据输入自动推算的width; int x = fused % 根据输入自动推算的width;`  不会影响结果
-* `tile(x,y,x_outer,y_outer,x_inner,y_inner,4,4);` 相当于 split 和 reorder 的结合, 相当于以下的代码:
-  * `Func.split(x, x_outer, x_inner, 4);`
-  * `Func.split(y, y_outer, y_inner, 4);`
-  * `Func.reorder(x_inner, y_inner, x_outer, y_outer);`
-  * 具体的参数意思还是要参照文档
-  * 通常情况下进行最优化并行不会显式调用 reorder 和 split , 因为他们是最为原始的设置, 通常情况下只使用 tile 就足够了
-
-### 6.2.1. bound 限制
+## 6.2. bound 限制
 
 静态的声明了一个 Func 的计算范围, 根据接口的不同有不同等级的条件
 Statically declare that the range over which a function
@@ -443,56 +438,81 @@ Expand the region computed.  The region computed always contains the region that
   *  例如  `f.align_bounds(x, 2, 1)` forces the min to be odd and the extent to be even.
 
 
-## 6.3. Func CPU scheduling 
 
-对于定义好的 Func, 可以通过调用对应的句柄来让 Halide 进行并行优化, 这是一个比较有技术含量的工作, 一般的情况下交给 Halide 来自动优化就能取得比较好的效果  
-
-
-计算优化 scheduling 接口 `Func.*`:
-
-* `parallel(y)`     : 开启在某个特定坐标轴上的并行执行
-
-* `vectorize(x);`       : 在计算的时候将某一个 loop 直接向量化加速
-  * 通常和 split 来结合使用, 即 split_factor 即为硬件所支持的最大向量长度
-  * `Func.split(x, x_outer, x_inner, 4);` 
-  * `Func.vectorize(x_inner);`
-* `unroll(x_inner);` : 把某一个轴的循环展开, 即从代码上取消 for 循环, 转而使用 `x=0,x=1,...,x=end` 的形式生成代码
-  * `Func.split(x, x_outer, x_inner, 2);`
-  * `Func.unroll(x_inner);`
-  * 通过使用第二个参数来实现的 The shorthand for this is: `Func.unroll(x, 2);`
+## 6.3. Func Var 分割重排
 
 
-一个 tutorious 中的整合了所有 scheduling 方法的高速化计算 example:
+### 6.3.1. Func.split()
+
+split() 接口没有重载
+* Split a dimension into inner and outer subdimensions with the given names, where the inner dimension iterates from 0 to factor-1. 
+* inner 会从 0 遍历到 factor -1
+* 注意, 仅针对 `old` Var, 它可以同时被作为 outer 或者 inner 来实现复用.
 
 ```cpp
-Func gradient_fast("gradient_fast");
-gradient_fast(x, y) = x + y;
-
-// 在整个图像上进行 block 化, 同时对于 横纵的block index 进行 fuse 并行
-Var x_outer, y_outer, x_inner, y_inner, tile_index;
-gradient_fast
-    .tile(x, y, x_outer, y_outer, x_inner, y_inner, 64, 64)
-    .fuse(x_outer, y_outer, tile_index)
-    .parallel(tile_index);
-
-// 在小的 block 中再次 tile, 水平方向上对 x 进行向量化计算
-// 纵方向上因为 y_paris 的 factor 只有2, 因此直接展开 loop 
-Var x_inner_outer, y_inner_outer, x_vectors, y_pairs;
-gradient_fast
-    .tile(x_inner, y_inner, x_inner_outer, y_inner_outer, x_vectors, y_pairs, 4, 2)
-    .vectorize(x_vectors)
-    .unroll(y_pairs);
+Func& Halide::Func::split 	( 	const VarOrRVar &  	old,
+		const VarOrRVar &  	outer,
+		const VarOrRVar &  	inner,
+		const Expr &  	factor,
+		TailStrategy  	tail = TailStrategy::Auto 
+	) 	
 ```
 
-### 6.3.1. Func.tile
+* `split(x,x_outer,x_inner,factor)` : 将某个坐标轴的 loop 拆分成两个, 会影响最终生成的 psedocode
+  * 具体的循环内的操作则是 `x_execute = x_outer * factor + x_inner;` 不会影响实际执行的顺序
+  * 主要配合 verctorize 来使用, 例如将内循环直接向量化用于加速
 
-tile() 是最常用的接口, 是 reorder 和 split 的整合, 完整的函数重载定义如下  
+### 6.3.2. Func.fuse()
+
+Join two dimensions into a single fused dimension.
+The fused dimension covers the product of the extents of the inner and outer dimensions given. 
+
+`fuse(x,y,fused_x_y)`             : 和 split 相对比, 把某两个坐标轴整合成一个, 会减少最终的 loop 数量 
+* 具体的循环内则是 `int y = fused / 根据输入自动推算的width; int x = fused % 根据输入自动推算的width;`  不会影响结果
+
+```cpp
+Func& Halide::Func::fuse 	( 	const VarOrRVar &  	inner,
+		const VarOrRVar &  	outer,
+		const VarOrRVar &  	fused 
+	) 	
+```
+
+
+
+### 6.3.3. Func.reorder()
+
+重排一个 var 集合, 从左开始是  innermost
+
+```cpp
+// 基础定义
+Func& Halide::Func::reorder 	( 	const std::vector< VarOrRVar > &  	vars	) 	
+
+// 超级长的返回值定义, 似乎是 args() 的内部实现
+HALIDE_NO_USER_CODE_INLINE std::enable_if<Internal::all_are_convertible<VarOrRVar, Args...>::value, Func &>::type Halide::Func::reorder 	( 	const VarOrRVar &  	x,
+		const VarOrRVar &  	y,
+		Args &&...  	args 
+	) 		
+```
+
+
+### 6.3.4. Func.tile()
+
+tile() 是最常用的接口, 是 reorder 和 split 的整合
+
+* `tile(x,y,x_outer,y_outer,x_inner,y_inner,4,4);` 相当于 split 和 reorder 的结合, 相当于以下的代码:
+  * `Func.split(x, x_outer, x_inner, 4);`
+  * `Func.split(y, y_outer, y_inner, 4);`
+  * `Func.reorder(x_inner, y_inner, x_outer, y_outer);`
+  * 具体的参数意思还是要参照文档
+  * 通常情况下进行最优化并行不会显式调用 reorder 和 split , 因为他们是最为原始的设置, 通常情况下只使用 tile 就足够了
+
+完整的函数重载定义如下  
 
 ```cpp
 /* 
 Split two dimensions at once by the given factors, and then reorder the resulting dimensions to be xi, yi, xo, yo from innermost outwards.
 This gives a tiled traversal. 
-实现的是 reorder 并且 split, reorder 的顺序是固定的, 从内到外依次是 xi, yi, xo, yo 原来如此
+实现的是 reorder , 并且 split, reorder 的顺序是固定的, 从内到外依次是 xi, yi, xo, yo 原来如此
 */
 
 Func & Halide::Func::tile 	( 	
@@ -563,7 +583,101 @@ Func & Halide::Func::tile 	(
 
 感觉很有用, 先定义好章节以后再看 TODO
 
-## 6.4. Func GPU scheduling
+## 6.4. Func CPU scheduling 
+
+同实际使用 CPU 的 scheduling 接口
+
+对于定义好的 Func, 可以通过调用对应的句柄来让 Halide 进行并行优化, 这是一个比较有技术含量的工作, 一般的情况下交给 Halide 来自动优化就能取得比较好的效果  
+
+
+一个 tutorious 中的整合了所有 scheduling 方法的高速化计算 example:
+
+```cpp
+Func gradient_fast("gradient_fast");
+gradient_fast(x, y) = x + y;
+
+// 在整个图像上进行 block 化, 同时对于 横纵的block index 进行 fuse 并行
+Var x_outer, y_outer, x_inner, y_inner, tile_index;
+gradient_fast
+    .tile(x, y, x_outer, y_outer, x_inner, y_inner, 64, 64)
+    .fuse(x_outer, y_outer, tile_index)
+    .parallel(tile_index);
+
+// 在小的 block 中再次 tile, 水平方向上对 x 进行向量化计算
+// 纵方向上因为 y_paris 的 factor 只有2, 因此直接展开 loop 
+Var x_inner_outer, y_inner_outer, x_vectors, y_pairs;
+gradient_fast
+    .tile(x_inner, y_inner, x_inner_outer, y_inner_outer, x_vectors, y_pairs, 4, 2)
+    .vectorize(x_vectors)
+    .unroll(y_pairs);
+```
+
+
+### 6.4.1. Func.parallel()
+
+简单明了, 将某一个 dimension 开启并行  
+* 通常情况下都是要先把一个 Var split, 之后将 outer 来并行
+
+
+```cpp
+// 共两个重载, 分别是简要接口和 带 size 控制的接口
+// Var 指的是 split 后的 outer, 即需要手动进行 split
+Func& Halide::Func::parallel 	( 	const VarOrRVar &  	var	) 	
+
+// Var 指的是原本的 Var
+// dimension 可以通过 task_size 来控制执行范围, 这将在内部实现 split, 因此 inner Var是不可见的版本
+Func& Halide::Func::parallel 	( 	const VarOrRVar &  	var,
+		const Expr &  	task_size,
+		TailStrategy  	tail = TailStrategy::Auto 
+	) 	
+```
+
+### 6.4.2. Func.unroll()
+
+* `unroll(x_inner);` : 把某一个轴的循环展开, 即从代码上取消 for 循环, 转而使用 `x=0,x=1,...,x=end` 的形式生成代码
+  * 开包一个 循环, 往往针对拥有较小 extent 的 Var, 例如通过 split 获得的 inner
+  * `Func.split(x, x_outer, x_inner, 2);`
+  * `Func.unroll(x_inner);`
+
+
+```cpp
+// 有两种重载
+// 简易版本, 需要手动提前 split
+Func& Halide::Func::unroll 	( 	const VarOrRVar &  	var	) 	
+
+// 自动版本, 包含了 split
+// 会在 内部将 Var 进行 split, 同时 var 本身会被自动转化成 outer
+Func& Halide::Func::unroll 	( 	const VarOrRVar &  	var,
+		const Expr &  	factor,
+		TailStrategy  	tail = TailStrategy::Auto 
+	) 		
+
+```
+
+### 6.4.3. Func.vectorize()
+
+将一个 dimension 转化成 single vector, 使得通过一次计算即可遍历完
+硬性条件是该 dimension 必须是 innermost one
+
+* `vectorize(x);`       : 在计算的时候将某一个 loop 直接向量化加速
+  * 通常和 split 来结合使用, 即 split_factor 即为硬件所支持的最大向量长度
+  * `Func.split(x, x_outer, x_inner, 4);` 
+  * `Func.vectorize(x_inner);`
+
+```cpp
+// 两种重载
+// 需要通过手动 split
+Func& Halide::Func::vectorize 	( 	const VarOrRVar &  	var	) 	
+
+// 自动, 同理 会在 内部将 Var 进行 split, 同时 var 本身会被自动转化成 outer
+Func& Halide::Func::vectorize 	( 	const VarOrRVar &  	var,
+		const Expr &  	factor,
+		TailStrategy  	tail = TailStrategy::Auto 
+	) 	
+```
+
+
+## 6.5. Func GPU scheduling
 
 使用 GPU 时候的 pipeline scheduling 接口同纯 CPU 的接口不太一致  
 
@@ -572,14 +686,85 @@ Func & Halide::Func::tile 	(
 
 
 `Func.gpu_*` 相关接口:
-* `gpu_tile(i, block, thread, 16)`  : 同 CPU 的tile 一样, 相当于把一个 var 进行分割, 但进行的优化处理是基于 GPU 的计算原理的
-  * 相当于 `gpu_blocks` 和 `gpu_threads` 和 `tile`/`(split+reorder)` 的结合, 在实际使用的时候可以进行等价替换
-  * `gpu_blocks(var block)`     : 等同于 CUDA 里的 block 
-  * `gpu_threads(var thread)`   : 等同于 CUDA 里的 thread
-* 
+* `gpu_blocks(var block)`     : 等同于 CUDA 里的 block 
+* `gpu_threads(var thread)`   : 等同于 CUDA 里的 thread
+* `gpu_tile`
+
+姑且在教程里使用的顺序是
+```cpp
+lut.gpu_blocks(block).gpu_threads(thread);
+```
+
+### 6.5.1. Func.gpu_threads()
+
+GPU 里 threads 是最小的执行单元, 多个 threads 组成一个 block
+
+该接口告诉 Halide 哪个 dimension 要利用 GPU 的 threads
+
+该接口主要用于在 block 中控制计算的时候, 详细的控制 how that function's dimensions map to GPU threads.
+如果该接口被执行, 然而 target 并没有 GPU 设备, 则会被当作普通的 cpu parallel
 
 
-## 6.5. Statical declaration 静态声明
+共同参数
+*  		DeviceAPI  	device_api = DeviceAPI::Default_GPU 
+```cpp
+// 所有参数都是 const VarOrRVar &, 一共三种, 分别对应 1~3 个 Var
+thread_x 
+thread_x, thread_y
+thread_x,thread_y,thread_z
+```
+
+### 6.5.2. Func.gpu_blocks()
+
+告诉 GPU 如何调用 block indices
+* 对于在各个 block 里串行运行的 计算 stage 很有用
+* If the selected target is not ptx, this just marks those dimensions as parallel. 
+* 什么是 ptx ?? 
+
+共同参数
+*  		DeviceAPI  	device_api = DeviceAPI::Default_GPU 
+
+```cpp
+// 所有参数都是 const VarOrRVar &, 一共三种, 分别对应 1~3 个 Var
+
+block_x
+block_x,block_y
+block_x,block_y,block_z
+```
+
+### 6.5.3. Func.gpu_tile()
+
+同 CPU 的 tile 一样, 也是一个 short-hand 函数
+* tiling a domain and mapping the tile indices to GPU block indices 
+* 这个函数相当于 tile, gpu_blocks, gpu_threads 三个函数的集合 
+* the coordinates within each tile to GPU thread indices. 
+传入该函数的 Var 会被 消耗 `consumes`, 因此文档中说要先执行其他的 scheduling 
+
+
+共同参数:
+* (TailStrategy) tail = TailStrategy::Auto
+* (DeviceAPI) device_api = DeviceAPI::Default_GPU 
+* (const Expr & ) _size
+
+```cpp
+// 6 种格式的重载, 分别是 1~3 个Var, 以及是否有 block
+// Func& Halide::Func::gpu_tile
+
+// 所有 Var 输入都是 const VarOrRVar &
+// _size 的格式都是  		const Expr & 
+x, bx, tx, x_size
+x, tx, x_size
+
+x,y,bx,by,tx,ty, x_size, y_size
+x,y,tx,ty, x_size, y_size
+
+x,y,z,bx,by,bz,tx,ty,tz,x_size,y_size,z_size
+x,y,z,tx,ty,tz,x_size,y_size,z_size
+```
+
+* 相当于 `gpu_blocks` 和 `gpu_threads` 和 `tile`/`(split+reorder)` 的结合, 在实际使用的时候可以进行等价替换
+
+## 6.6. Statical declaration 静态声明
 
 静态声明接口 (Statical declaration) `Func.*`:
 * `bound(var, Expr min, Expr extent)`     : 用于静态指定某一个 Var 的 range, 最经典的莫过于 color channel, 来方便 Halide 执行某些特殊优化
@@ -587,7 +772,7 @@ Func & Halide::Func::tile 	(
 * 
 
 
-## 6.6. loop 与 store 结构
+## 6.7. loop 与 store 结构
 
 `compute_*, store_*` 系列: 它用于调整整个 Halide pipeline 管线的循环嵌套逻辑: 该逻辑管理与 CPU 或 GPU 执行的设置相互独立   
 
@@ -599,7 +784,7 @@ Func & Halide::Func::tile 	(
 * `Func.compute_*`   : 调整某个 Func 的计算循环级
 * `Func.store_*`     : 调整某个 Func 的存储循环级, 该接口一般作为附加选项添加到 compute_ 上, 用以实现 存储和计算的分离, 达到更好的效果
 
-### 6.6.1. compute_* 系列接口
+### 6.7.1. compute_* 系列接口
 
 * `Func::compute_root 	() 	`
   * Compute all of this function once ahead of time. 
@@ -652,7 +837,7 @@ producer_2.compute_at(consumer_2, y);
 
 ```
 
-### 6.6.2. store_* 系列接口
+### 6.7.2. store_* 系列接口
 
 从 compute 系列接口有些类似, 但是指定的不是计算过程而是存储过程, 该系列结果是 optional, 只在特殊情况下用于将 存储循环级别 以及 计算循环级别分开来, 用以达成更高水平的对 locality 和 redundant work 的 trade-off
 
@@ -673,7 +858,7 @@ producer_2.compute_at(consumer_2, y);
 
 
 
-### 6.6.3. Func.update()
+### 6.7.3. Func.update()
 
 获取单个下一个 update definition 句柄 , 根据 update definition 的定义顺序依次赋予 index 
 * `Stage Halide::Func::update 	( 	int  	idx = 0	) 	`
@@ -704,11 +889,11 @@ f.update(1).split(y, yo, yi, 4).parallel(yo);
 
 
 
-## 6.7. Func realize
+## 6.8. Func realize
 
 和 Halide 函数的 JIT 实例化相关   
 
-## 6.8. Func compile_to
+## 6.9. Func compile_to   - AOT/JIT
 
 和 Halide 函数的 编译 相关, 这种编译方法比较原始, 不需要用到 Generator , 是独立出来的 AOT/JIT 编译方法  
 
@@ -754,12 +939,12 @@ brighter.compile_to_static_library("lesson_10_halide", {input, offset}, "brighte
 
 ```
 
-## 6.9. Func Debug
+## 6.10. Func Debug
 
 通过一系列的 Func 对象方法, 可以实现对多个环节的 dump 以及打印, 从而实现多种量级的 debug
 
 
-### 6.9.1. trace
+### 6.10.1. trace
 
 `Func.trace_*`
 
@@ -783,7 +968,7 @@ Store Function_lession_4_1.0(7, 7) = 14
 End pipeline Function_lession_4_1.0()
 */
 ```
-#### 6.9.1.1. HTML 输出底层编译结果代码
+#### 6.10.1.1. HTML 输出底层编译结果代码
 通过将输出以 HTML 的形式表示, 方便查看和理解 Halide 的最佳化结果
 ```cpp
 Func gradient("gradient");
@@ -794,7 +979,7 @@ gradient(x, y) = x + y;
 gradient.compile_to_lowered_stmt("gradient.html", {}, HTML);
 ```
 
-### 6.9.2. print_loop_nest();
+### 6.10.2. print_loop_nest();
 
 通过调用 `Func.print_loop_nest()` , 可以在 Halide Func 运行的时候打印其优化后的 loop 结构, 从而方便判断优化结果是否符合内存 cache 的顺序  
 
@@ -812,6 +997,20 @@ produce Function_lession_5_1:
       Function_lession_5_1(...) = ...
 */
 ```
+## Halide::BoundaryConditions - 边界条件
+
+用于自动应对超出边界的访问, 根据设定自动生成边界外的数值
+* 所有接口都接受一个 Func 并返回一个 Func
+* 根据需要设定 Boundary 的维度, 因为有些时候不需要对所有维度都设置 Boundary, 例如 RGB 图像的 Channel
+
+目前 Halide 所提供的边界种类有 5种 :
+* constant_exterior
+* repeat_edge
+* repeat_image
+* mirror_image
+* mirror_interior
+
+
 
 # 7. Buffer
 
@@ -833,7 +1032,7 @@ buffer.set_min(100,5);
 func.realize(buffer);
 ```
 
-# 8. Generator
+# 8. Generator - Halide 精髓
 
 是一种更加结构化的书写 Filter 的方法, Generator is a class used to encapsulate the building of Funcs in user pipelines. 
 * 比起将 pipeline 定义在 main() 中, 这种方法将 pipeline 实现为函数, 更加贴合实际使用
@@ -914,26 +1113,51 @@ class Tupler : Generator<Tupler> {
 };
 ```
 
-## 8.3. 定义 GeneratorParam  
+## 8.3. GeneratorParam   - 编译时候的动态参数  
 
-用于在 Halide 库编译生成时候的参数指定
+用于在 Halide 库编译生成时候的参数指定, 在 Generator 生成的时候半动态的调整程序的行为
+
+GeneratorParams 所支持的数据种类
+* any float or int type, 数字种类是支持设置最大最小值的.  
+* bool
+* enum
+* Halide::Target
+* Halide::Type
+  * 本质上仍然是一个 enum, 只不过是库内部预定义的
+  * Halide::Type is treated as though it were an enum, with the mappings:
+    * "int8" Halide::Int(8) "int16" Halide::Int(16) "int32" Halide::Int(32) "uint8" Halide::UInt(8) "uint16" Halide::UInt(16) "uint32" Halide::UInt(32) "float32" Halide::Float(32) "float64" Halide::Float(64)
+* std::string : 应该尽量避免直接使用 string , 转而 同 enum 来代替
 
 
 ```cpp
 // You can define GeneratorParams of all the basic scalar types. 
+
 // For numeric types you can optionally provide a minimum and maximum value.
-
-//  bool 类型的参数
-GeneratorParam<bool> parallel{"parallel", /* default value */ true};
-
+// [2/4]
+template<typename T >
+Halide::GeneratorParam< T >::GeneratorParam 	( 	const std::string &  	name,
+		const T &  	value,
+		const T &  	min,
+		const T &  	max 
+	) 	
 // 带有范围限定的参数
 GeneratorParam<float> scale{"scale",
                             1.0f /* default value */,
                             0.0f /* minimum value */,
                             100.0f /* maximum value */};
 
-// 甚至可以定义枚举类型的参数  
-//  To make this work you must provide a mapping from strings to your enum values.
+
+
+
+// 枚举类型的参数  [3/4]
+// To make this work you must provide a mapping from strings to your enum values.
+template<typename T >
+Halide::GeneratorParam< T >::GeneratorParam 	( 	const std::string &  	name,
+		const T &  	value,
+		const std::map< std::string, T > &  	enum_map 
+	) 	
+
+// 要使用的枚举类
 enum class Rotation { None,
                       Clockwise,
                       CounterClockwise };
@@ -944,6 +1168,28 @@ GeneratorParam<Rotation> rotation{"rotation",
                                   {{"none", Rotation::None},
                                     {"cw", Rotation::Clockwise},
                                     {"ccw", Rotation::CounterClockwise}}};
+
+
+// [1/4] 
+template<typename T >
+template<typename T2 = T, typename std::enable_if<!std::is_same< T2, std::string >::value >::type * = nullptr>
+Halide::GeneratorParam< T >::GeneratorParam 	( 	const std::string &  	name,
+		const T &  	value 
+	) 	
+// [4/4]
+template<typename T >
+Halide::GeneratorParam< T >::GeneratorParam 	( 	const std::string &  	name,
+		const std::string &  	value 
+	) 	
+//  bool 类型的参数
+GeneratorParam<bool> parallel{"parallel", /* default value */ true};
+
+
+// 对于 Buffer 在编译的时候动态指定数值类型   为  <buffer的名字>.type=<Halide::Type>
+Output<Buffer<void, 2>> output{"output"};
+output(x, y) = cast(output.type(), before_cast(x, y));
+/* ./lesson_15_generate -g my_second_generator -f my_second_generator_1 -o . \
+target=host parallel=false scale=3.0 rotation=ccw output.type=uint16 */
 
 ```
 
@@ -974,7 +1220,8 @@ HALIDE_REGISTER_GENERATOR(MyFirstGenerator, my_first_generator)
 
 ## 9.1. constructor
 
-构造函数  
+构造
+函数  
 
 ```cpp
 
@@ -1175,7 +1422,7 @@ cast 函数
 
 位于 Internal 空间下的成员都算是 Halide 的内部构造, 了解一些相关类可以快速的理解代码
 
-## Halide::Internal::Dimension
+## 11.1. Halide::Internal::Dimension
 
 
 * `Expr Halide::Internal::Dimension::min 	( 		) 	const`    : 获取一个 Expr 代表图像的该 dimension 的最小坐标

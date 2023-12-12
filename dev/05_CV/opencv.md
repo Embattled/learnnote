@@ -1171,6 +1171,27 @@ Python:
 
 
 
+# features2d - 2D Features Framework 2D图像的传统特征检测
+
+## Feature Detection and Description - 特征检测和描述
+
+基本上有名的特征检测都在 OpenCV 中实现了
+
+而且为了实现实例复用, 所有特征检测器都是以 class 来实现的, 这点和 GIF 类似
+
+
+
+
+## Descriptor Matchers - 特征匹配
+
+特征检测和匹配分开在不同的小章节来实现  
+
+## Drawing Function of Keypoints and Matches
+
+在软件开发中需要对匹配的特征点进行 Debug, 可以利用该模组来方便的实现匹配结果可视化  
+
+
+
 
 # 9. objdetect Object Detection 最常用的物体检测模型
 

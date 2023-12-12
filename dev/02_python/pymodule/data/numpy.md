@@ -969,6 +969,9 @@ numpy 的填充函数, 只有一个函数单独作为了一类, 可以对任意�
 `numpy.pad(array, pad_width, mode='constant', **kwargs)`  
 * array : array, array_like of rank N
 * pad_width: {sequence, array_like, int}
+  * `((before_1, after_1), ... (before_N, after_N))` unique pad widths for each axis. 指定每一个维度的始末填充的宽度
+  * `(before, after)` or `((before, after),)` 为所有维度指定相同的始末填充宽度
+  * `(pad,)` or `int` 等同于为所有维度指定 始末相同的填充宽度 
 * mode : str, 用于表示填充操作的种类
   * 
 
@@ -1025,7 +1028,7 @@ from .laguerre import Laguerre
   * `domain` : (2,) array_like, optional, The default value is `[-1, 1]`.
   * `window` : (2,) array_like, optional, The default value is `[-1, 1]`.
   * 区间缩放以及映射, 会根据将 `(domain[0],domain[1])` 的数值映射到 `(window[0],window[1])` 的缩放系数来决定最终输出数据的缩放和偏移
-  * `symbol` : (New in version 1.24.)str, optional. 在打印多项式的方程式的时候, 用于表示变量的字符, 默认是 `x`
+  * `symbol` : (New in version 1.24.)str, optional. 在打印多项式的方程式的时候, 用于表示变量的字符, 默认是 `x`. 该接口有点新, 不建议使用.
 
 
 Methods:

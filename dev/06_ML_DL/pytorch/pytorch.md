@@ -24,12 +24,13 @@
   - [3.2. 序列化 Serialization](#32-序列化-serialization)
     - [3.2.1. torch.save](#321-torchsave)
     - [3.2.2. torch.load](#322-torchload)
-  - [3.3. Math operations](#33-math-operations)
-    - [3.3.1. Pointwise Ops 元素为单位的操作](#331-pointwise-ops-元素为单位的操作)
-    - [3.3.2. Reduction Ops 元素之间的操作(降维)](#332-reduction-ops-元素之间的操作降维)
-      - [3.3.2.1. 极值操作](#3321-极值操作)
-    - [3.3.3. Comparison Ops](#333-comparison-ops)
-      - [3.3.3.1. topk](#3331-topk)
+  - [3.3. Locally disabling gradient computation - 局部禁用梯度计算](#33-locally-disabling-gradient-computation---局部禁用梯度计算)
+  - [3.4. Math operations](#34-math-operations)
+    - [3.4.1. Pointwise Ops 元素为单位的操作](#341-pointwise-ops-元素为单位的操作)
+    - [3.4.2. Reduction Ops 元素之间的操作(降维)](#342-reduction-ops-元素之间的操作降维)
+      - [3.4.2.1. 极值操作](#3421-极值操作)
+    - [3.4.3. Comparison Ops](#343-comparison-ops)
+      - [3.4.3.1. topk](#3431-topk)
 - [4. Tensor views](#4-tensor-views)
 - [5. torch.nn](#5-torchnn)
   - [5.1. Containers 网络容器](#51-containers-网络容器)
@@ -37,6 +38,7 @@
       - [5.1.1.1. 基础方法及应用](#5111-基础方法及应用)
       - [5.1.1.2. 网络参数以及存取](#5112-网络参数以及存取)
       - [5.1.1.3. 残差结构](#5113-残差结构)
+    - [torch.nn.Sequential 系列](#torchnnsequential-系列)
   - [5.2. Convolution Layers 卷积层](#52-convolution-layers-卷积层)
   - [5.3. Pooling layers 池化层](#53-pooling-layers-池化层)
   - [5.4. Padding Layers](#54-padding-layers)
@@ -47,19 +49,10 @@
     - [5.7.2. Linear](#572-linear)
   - [5.8. Loss Function 损失函数](#58-loss-function-损失函数)
 - [6. torch.nn.functional](#6-torchnnfunctional)
-- [7. torch.utils](#7-torchutils)
-  - [7.1. torch.utils.data](#71-torchutilsdata)
-    - [7.1.1. 数据集类型](#711-数据集类型)
-    - [7.1.2. torch.utils.data.Dataset](#712-torchutilsdatadataset)
-    - [7.1.3. torch.utils.data.DataLoader](#713-torchutilsdatadataloader)
-- [8. torch.optim](#8-torchoptim)
-  - [8.1. 预定义 Algorithm](#81-预定义-algorithm)
-  - [8.2. 动态 Learn Rate](#82-动态-learn-rate)
-    - [8.2.1. 有序调整](#821-有序调整)
-  - [8.3. 定义自己的 optim](#83-定义自己的-optim)
-    - [8.3.1. Optimizer 基类](#831-optimizer-基类)
-    - [8.3.2. optimization step](#832-optimization-step)
-    - [8.3.3. per-parameter options](#833-per-parameter-options)
+- [7. torch.autograd - 梯度计算包](#7-torchautograd---梯度计算包)
+- [8. torch.cuda - CUDA 计算   torch.cpu - 虚类实现](#8-torchcuda---cuda-计算---torchcpu---虚类实现)
+  - [8.1. General - 通用接口](#81-general---通用接口)
+  - [8.2. Memory management - CUDA 设备内存管理](#82-memory-management---cuda-设备内存管理)
 - [9. torch.jit - TorchScript](#9-torchjit---torchscript)
   - [9.1. Introduction to TorchScript](#91-introduction-to-torchscript)
     - [9.1.1. Tracing Modules](#911-tracing-modules)
@@ -67,21 +60,39 @@
     - [9.1.3. Mixing Scripting and Tracing](#913-mixing-scripting-and-tracing)
     - [9.1.4. Saving and Loading models](#914-saving-and-loading-models)
   - [9.2. API torch.jit](#92-api-torchjit)
-- [11. 例程](#11-例程)
-  - [11.1. MNIST LeNet 例程](#111-mnist-lenet-例程)
-    - [11.1.1. Network structure](#1111-network-structure)
-    - [11.1.2. dataset](#1112-dataset)
-    - [11.1.3. iteration](#1113-iteration)
-    - [11.1.4. evaluate](#1114-evaluate)
-  - [11.2. MINST GAN 例程](#112-minst-gan-例程)
-    - [11.2.1. dataset](#1121-dataset)
-    - [11.2.2. 网络](#1122-网络)
-    - [11.2.3. G 训练](#1123-g-训练)
-    - [11.2.4. D 训练](#1124-d-训练)
-    - [11.2.5. iteration](#1125-iteration)
-  - [11.3. MINST USPS adversarial examples](#113-minst-usps-adversarial-examples)
-    - [11.3.1. dataset](#1131-dataset)
-    - [11.3.2. general train and evaluate](#1132-general-train-and-evaluate)
+- [10. torch.onnx](#10-torchonnx)
+  - [10.1. TorchDynamo-based ONNX Exporter](#101-torchdynamo-based-onnx-exporter)
+  - [10.2. TorchScript-based ONNX Exporter](#102-torchscript-based-onnx-exporter)
+    - [API of TorchScript-based ONNX Exporter](#api-of-torchscript-based-onnx-exporter)
+- [11. torch.optim](#11-torchoptim)
+  - [11.1. 预定义 Algorithm](#111-预定义-algorithm)
+  - [11.2. torch.optim.lr\_scheduler - 动态 Learn Rate](#112-torchoptimlr_scheduler---动态-learn-rate)
+    - [11.2.1. 有序调整](#1121-有序调整)
+  - [11.3. 定义自己的 optim](#113-定义自己的-optim)
+    - [11.3.1. Optimizer 基类](#1131-optimizer-基类)
+    - [11.3.2. optimization step](#1132-optimization-step)
+    - [11.3.3. per-parameter options](#1133-per-parameter-options)
+- [12. torch.utils](#12-torchutils)
+  - [12.1. torch.utils.data](#121-torchutilsdata)
+    - [12.1.1. 数据集类型](#1211-数据集类型)
+    - [12.1.2. torch.utils.data.Dataset](#1212-torchutilsdatadataset)
+    - [12.1.3. torch.utils.data.DataLoader](#1213-torchutilsdatadataloader)
+  - [12.2. torch.utils.tensorboard](#122-torchutilstensorboard)
+- [13. 例程](#13-例程)
+  - [13.1. MNIST LeNet 例程](#131-mnist-lenet-例程)
+    - [13.1.1. Network structure](#1311-network-structure)
+    - [13.1.2. dataset](#1312-dataset)
+    - [13.1.3. iteration](#1313-iteration)
+    - [13.1.4. evaluate](#1314-evaluate)
+  - [13.2. MINST GAN 例程](#132-minst-gan-例程)
+    - [13.2.1. dataset](#1321-dataset)
+    - [13.2.2. 网络](#1322-网络)
+    - [13.2.3. G 训练](#1323-g-训练)
+    - [13.2.4. D 训练](#1324-d-训练)
+    - [13.2.5. iteration](#1325-iteration)
+  - [13.3. MINST USPS adversarial examples](#133-minst-usps-adversarial-examples)
+    - [13.3.1. dataset](#1331-dataset)
+    - [13.3.2. general train and evaluate](#1332-general-train-and-evaluate)
 
 # 1. Pytorch
 
@@ -453,13 +464,36 @@ map_location    : a function, torch.device, string or a dict specifying how to r
 pickle_module   :  
 pickle_load_args: (Python 3 only) optional keyword arguments passed over to pickle_module.load() and pickle_module.Unpickler()
 
-## 3.3. Math operations
+## 3.3. Locally disabling gradient computation - 局部禁用梯度计算  
+
+梯度上下文管理有三个接口, 用于在局部对梯度计算进行启用, 停用:
+* 在 `torch.autograd` 中有更详细的描述  
+* 这些接口大部分都属于 Context-manager, 所以该种类接口一般情况下需要与 `with` 语法一起使用  
+  * 该 Context-manager 影响的是线程 thread local, 即整个线程上的 torch 推论都会受到影响  
+
+
+梯度管理方法 `torch.*`
+* no_grad  :          Context-manager that disables gradient calculation.
+* enable_grad :       Context-manager that enables gradient calculation
+
+* inference_mode   :  Context-manager that enables or disables inference mode
+
+* is_grad_enabled  :  Returns True if grad mode is currently enabled.
+* is_inference_mode_enabled :  	Returns True if inference mode is currently enabled.
+
+可以作为函数使用的接口:
+* `class torch.set_grad_enabled(mode)` :  Context-manager that sets gradient calculation on or off.
+  * Context-manager that sets gradient calculation on or off.
+  * 这个接口同其他几个不同, 还可以作为函数使用用来全局的关闭梯度计算.  
+  * 参数 : mode (bool)
+
+## 3.4. Math operations
 
 提供对 tensor 的各种数学操作
 
-### 3.3.1. Pointwise Ops 元素为单位的操作
+### 3.4.1. Pointwise Ops 元素为单位的操作
 
-### 3.3.2. Reduction Ops 元素之间的操作(降维)
+### 3.4.2. Reduction Ops 元素之间的操作(降维)
 
 * 所有函数都默认对张量的全部元素进行运算
 * 提供了针对选定维度的修改运算, 参数为
@@ -475,7 +509,7 @@ pickle_load_args: (Python 3 only) optional keyword arguments passed over to pick
   * torch.mean() 均值
   * torch.sum() 求和
 
-#### 3.3.2.1. 极值操作
+#### 3.4.2.1. 极值操作
 
 * max/min : 返回最大值, 默认对全元素进行, 可以输入单个整数 dim 来对某一维度进行运算, 此时会返回两个值, 第二个返回值是索引位置
 * argmax/argmin : 返回最大值的索引, 默认对全元素进行操作, 可以输入单个整数 dim 来对某一维度进行运算, 等同于 max/min 输入 dim 的第二个返回值
@@ -483,12 +517,12 @@ pickle_load_args: (Python 3 only) optional keyword arguments passed over to pick
 
 
 
-### 3.3.3. Comparison Ops
+### 3.4.3. Comparison Ops
 
 专门用来比较的函数 
 
 
-#### 3.3.3.1. topk
+#### 3.4.3.1. topk
 
 获取指定维度的 k 个最大值, 同时还能获得对应的 索引, 用在分类任务上  
 `torch.topk(input, k, dim=None, largest=True, sorted=True, *, out=None) -> (Tensor, LongTensor)`  
@@ -619,6 +653,19 @@ NamedTuple with missing_keys and unexpected_keys fields
 
 ```
 #### 5.1.1.3. 残差结构
+
+
+### torch.nn.Sequential 系列
+
+A sequential container.
+
+`class torch.nn.Sequential(*args: Module)`
+`class torch.nn.Sequential(arg: OrderedDict[str, Module])`
+
+sequential 也是最常用的模型容器, 接受 `*args` 和 `OrderedDict` 两种构造方法, 然而从结果上并没有不同  
+
+sequential 的价值在于可以将整个容器是为单个模块
+sequential 本身与 ModuleList 相似, 然后 ModuleList 更加偏向于以 list 的形式管理 Module, sequential 更偏向于整体
 
 
 ## 5.2. Convolution Layers 卷积层 
@@ -861,290 +908,40 @@ loss_func = nn.CrossEntropyLoss()
 
 
 
-# 7. torch.utils
-## 7.1. torch.utils.data
-Pytorch 自定义数据库中最重要的部分  
-提供了对 `dataset` 的所种操作模式  
-
-### 7.1.1. 数据集类型
-
-Dataset 可以分为两种类型的数据集, 在定义的时候分别继承不同的抽象类
-
-1. map-style datasets 即 继承`Dataset` 类
-  * 必须实现 `__getitem__()` and `__len__()` protocols
-  * represents a map from (possibly non-integral) indices/keys to data samples.
-  *  when accessed with `dataset[idx]`, could read the idx-th image and its corresponding label from a folder on the disk.
-
-2. iterable-style datasets 即继承 `IterableDataset` 类
-  * 必须实现 `__iter__()` protocol 
-  * particularly suitable for cases where random reads are expensive or even improbable, and where the batch size depends on the fetched data.
-  * when called `iter(dataset)`, could return a stream of data reading from a database, a remote server, or even logs generated in real time.
+# 7. torch.autograd - 梯度计算包
 
 
-`torch.utils.data.Dataset`  和  `torch.utils.data.IterableDataset`  
+# 8. torch.cuda - CUDA 计算   torch.cpu - 虚类实现
 
-### 7.1.2. torch.utils.data.Dataset
+torch.cuda 主要实现了 CUDA 张量类型, 同 CPU 张量的各种接口都一样, 但是是以 GPU 来计算的  
 
-* Dataset 类是一个抽象类, 用于 map-key 的数据集
-* Dataset 类是 DataLoader 的最重要的构造参数  
-
-定义关键:
-1. All datasets that represent a map from keys to data samples should subclass it.
-2. 所有实现类需要重写 `__getitem__()` 用于从一个 index 来获取数据和label
-3. 可选的实现 `__len__()`  用于返回该数据库的大小, 会被用在 默认的 `Sampler` 上
+torch.cuda 可以随时导入, 并通过  `is_available()` 来判断设备的 CUDA 设备可用情况  
 
 
-```py
-from torch.utils.data import Dataset
-# 继承
-class trainset(Dataset):
-   def __init__(self):
-    #  在这里任意定义自己数据库的内容
-   
-   #  也可以更改构造函数
-   def __init__(self,loader=dafult_loader):
-     # 路径
-     self.images = file_train
-     self.target = number_train
-     self.loader = loader
-   #  定义 __getitem__ 传入 index 得到数据和label
-   #  实现了该方法即可使用 dataset[i] 下标方法获取到 i 号样本
-   def __getitem__(self, index):
-      # 获得路径
-      fn = self.images[index]
-      # 读图片
-      img = self.loader(fn)
-      # 得到labels
-      target = self.target[index]
-      return img,target
-   def __len__(self):
-      # 返回数据个数
-      return len(self.images)
-```
+## 8.1. General - 通用接口
+
+主要是对设备的管理而非计算
+
+可用性函数:
+* `torch.cuda.is_available()`     : 表示 CUDA 是否可用  
+* `torch.cuda.is_initialized()`   : Pytorch CUDA 是否初始化完成, 在交互式终端中直接闻讯该函数会得到 False
+* `torch.cuda.init()`             : 手动进行 Pytorch CUDA 初始化
+  * 需要手动调用的情况可能是, if you are interacting with PyTorch via its C API
+  * 在初始化之前, Python 与 CUDA 功能的链接不会被建立
+
+## 8.2. Memory management - CUDA 设备内存管理  
+
+更多的是用来管理监视学习进程的内存情况   
 
 
-### 7.1.3. torch.utils.data.DataLoader
+内存监视函数:
+* `torch.cuda.memory_allocated(device=None)`  : 获取当前设备的张量 GPU 使用情况, 返回 int of bytes
+* `torch.cuda.max_memory_allocated(device=None)` : 获取程序自运行开始后的峰值 GPU 使用量, int of bytes
+* `torch.cuda.reset_peak_memory_stats(device=None)` : 清空 峰值
+  * 该函数主要与上一个 max 函数配合, 可以同来测量每次学习迭代的峰值 GPU 使用情况
+* `torch.cuda.reset_max_memory_allocated(device=None)` : 重设 max 的计算起点
+  * 该函数目前是 reset_peak 的封装, 本质上是一样的
 
-Pytorch的核心数据读取器`torch.utils.data.DataLoader`   
-是一个可迭代的数据装载器  包括了功能:  
-  * map-style and iterable-style datasets,
-  * customizing data loading order,
-  * automatic batching,
-  * single- and multi-process data loading,
-  * automatic memory pinning.
-
-使用的时候预先定义好一个 dataset 然后用 DataLoader包起来  
-
-```py
-# 第一个参数是绑定的数据集  是最重要的参数  
-DataLoader(dataset, batch_size=1, shuffle=False, sampler=None,
-           batch_sampler=None, num_workers=0, collate_fn=None,
-           pin_memory=False, drop_last=False, timeout=0,
-           worker_init_fn=None, *, prefetch_factor=2,
-           persistent_workers=False)
-# Test data 不需要 shuffle 
-# batch_size 指定了一次训练多少个数据
-# num_workers 为正数时代表指定了多线程数据装载
-trainloader = utils.data.DataLoader(mnist_train, batch_size=50, shuffle=True,  num_workers=2)
-testloader  = utils.data.DataLoader(mnist_test, batch_size=100, shuffle=False, num_workers=2)
-
-train_data  = trainset()
-trainloader = DataLoader(train_data, batch_size=4,shuffle=True)
-# -----------------------------------------------------------
-# 通过装载器获得一个 可迭代数据库  使用 iter 
-iter_data = iter(trainloader)
-#iter_data = iter(testloader)
-
-# 对可迭代数据库使用 next 得到数据和label
-images, labels = next(iter_data)
-print(images.size())
-# torch.Size([100, 1, 28, 28])   100 个数据 每个数据 1 channel , 高和宽都是28
-
-# ------------------------------------------
-# 对于非迭代型数据库 即 map-key类型
-# 直接使用 for 循环即可
-for images,labels in trainLoader:
-    print(images.size())
-    # torch.Size([5, 3, 64, 64])
-```
-
-
-# 8. torch.optim
-
-是一个实现各种优化算法的包。已经支持最常用的方法，并且界面足够通用，因此将来可以轻松集成更复杂的方法。  
-
-要使用，必须构造一个优化器对象，该对象将`保持当前状态`并将`根据计算的梯度更新参数`  
-
-
-```py
-import torch.optim as optim
-
-# 如果使用 .cuda() 将模型移动到GPU, 则应该在构建优化器之前操作  因为模型参数不同
-# 构建一个优化器
-# 参数分别是  可迭代的网络模型的参数,  学习速率, 动量, 一般需要保证网络模型的参数在内存中的位置不变  
-optimizer = optim.SGD(model.parameters(), lr = 0.01, momentum=0.9)
-optimizer = optim.Adam([var1, var2], lr = 0.0001)
-
-```
-
-## 8.1. 预定义 Algorithm
-
-优化方法, (参数各不相同, 一般都有 lr )
-* Adadelta
-* Adagrad
-* Adam
-* AdamW
-* SparseAdam
-* Adamax
-* ASGD
-* LBFGS
-* RMSprop
-* Rprop
-* SGD
-
-## 8.2. 动态 Learn Rate
-
-`torch.optim.lr_scheduler` 提供了一些接口用来根据 epoch 或者其他计算来调整学习速率  
-`torch.optim.lr_scheduler.ReduceLROnPlateau` 则可以根据一些 validation measurements 来调整学习速率  
-
-pytorch提供的学习率调整器可以分成三大类:
-* 有序调整   : 等间隔(Step), 按需调整(MultiStep), 指数衰减 (Exponential), 余弦退火
-* 自适应调整 : ReduceLROnPlateau
-* 自定义调整 : LambdaLR
-
-
-调整器的使用方法:  
-```py
-# 定义优化器
-optimizer = SGD(model, 0.1)
-# 给优化器绑定动态学习速率
-scheduler = ExponentialLR(optimizer, gamma=0.9)
-
-# 使用方法: 一般学习速度的调整应该放在 optimizer 更新之后, 在 epoch 的循环里调整
-for epoch in range(100):
-    for input, target in dataset:
-      forward...
-      loss=...
-      loss.backward()
-      optimizer.step()
-  scheduler.step()
-```
-
-scheduler 的通用参数:
-* gamma : float, 乘法参数, 当前学习速率直接乘以该值 
-* last_epoch : 
-
-scheduler 的通用成员方法:
-* print_lr(is_verbose, group, lr, epoch=None)  : 打印当前的学习速率
-* get_last_lr() : 根据输入的参数计算最终的学习率
-
-
-scheduler 的种类:
-* torch.optim.lr_scheduler.StepLR : 最基础的种类, 每 `step_size` 个 epochs 时候降低一次学习速率
-* torch.optim.lr_scheduler.MultiStepLR : 同 Step, 只不过 step 变为数组
-* orch.optim.lr_scheduler.ExponentialLR : 学习率指数下降
-
-
-### 8.2.1. 有序调整
-
-
-* LambdaLr : 使用自定义函数来生成学习率
-  * 注意这里 Lambda 函数是一个单参数的函数, 传入当前 epoch 数
-  * 返回一个乘法因子, 用初始 lr 乘以该因子即更新后的学习率
-
-```py
-# 1. StepLR
-# Assuming optimizer uses lr = 0.05 for all groups
-# lr = 0.05     if epoch < 30
-# lr = 0.005    if 30 <= epoch < 60
-# lr = 0.0005   if 60 <= epoch < 90
-scheduler = StepLR(optimizer, step_size=30, gamma=0.1)
-
-
-# 定义一个线性学习率降低
-endepoch=10
-liner_func=lambda epoch: max(0,1-(epoch/endepoch))
-optim.lr_scheduler.LambdaLR(optimizer,liner_func,**kwargs)
-```
-
-
-## 8.3. 定义自己的 optim
-
-### 8.3.1. Optimizer 基类
-
-`class torch.optim.Optimizer(params, defaults)` 是所有优化器的基类, 定义了优化器的必须操作  
-* 参数
-  * params (iterable) – an iterable of torch.Tensor s or dict s. 指定了要优化的张量
-  * defaults – (dict): a dict containing default values of optimization options (used when a parameter group doesn’t specify them).
-* 方法
-  * add_param_group(param_group`(dict)`) 添加新的要进行优化的 param group 
-    一般用来对 pre-trained network 进行 fine tuning 时进行优化
-  * state_dict()
-    返回当前优化器的状态 as a `dict` 里边不仅包含优化器的状态还有 param group
-  * load_state_dict(state_dict`(dict)`)
-    和上一个方法匹配, 装载一个优化器状态
-  * step(closure) 不多说
-  * zero_grad(set_to_none: bool = False)
-    初始化所有梯度为0 
-    `set_to_none` 设置初始化梯度不是0而是 `None` 这会带来一些性能优化,但同时会有一些其他后果 *懒得看了
-
-### 8.3.2. optimization step
-
-重点: 所有 optimizers 必须实现 step 方法, 用来更新要优化的参数  
-
-1. optimizer.step()
-   * 大部分优化器都实现了的简单的版本, 在 `backward()` 方法之后调用
-```py
-for input, target in dataset:
-    # 初始化
-    optimizer.zero_grad()
-    # 前向传播
-    output = model(input)
-    # 计算误差
-    loss = loss_fn(output, target)
-    # 误差 backward
-    loss.backward()
-    # 优化器调用 step
-    optimizer.step()
-```
-
-2. optimizer.step(closure)
-   一部分优化器, 例如 ` Conjugate Gradient and LBFGS` 需要多次前向传播, 所以需要传入一个`closure`方法 来允许自己定义计算的模型.
-   `closure` 需要清空梯度, 然后计算 loss, 最后返回
-
-```py
-for input, target in dataset:
-    # 用closure 代替其他操作, 以函数的形式定义
-    def closure():
-        # 初始化
-        optimizer.zero_grad()
-        # 前向传播
-        output = model(input)
-        # 计算误差
-        loss = loss_fn(output, target)
-        # 误差 backward
-        loss.backward()
-        # 返回误差
-        return loss
-    # 将该函数传入 step 相当于在一条代码中整合了一整次更新参数的流程
-    optimizer.step(closure)
-
-```
-
-### 8.3.3. per-parameter options
-
-To do this, instead of passing an iterable of `Variable` s, pass in an iterable of `dict` s.    
-* dict 中指定了不同的 parameter group, 并且需要使用 `params` 关键字
-* 可以在 dict 中对不同 group 的参数分别指定 options ,也可以在 dict 外指定作为其他 group 的默认的 options.
-
-```py
-# classifier 的 lr 是 1e-3
-# 其他默认的 lr 是 1e-2
-optim.SGD([
-                {'params': model.base.parameters()},
-                {'params': model.classifier.parameters(), 'lr': 1e-3}
-            ], lr=1e-2, momentum=0.9)
-```
 
 # 9. torch.jit - TorchScript
 
@@ -1416,11 +1213,356 @@ print(loaded.code)
 
 
 
-# 11. 例程
+
+# 10. torch.onnx
+
+将 torch 模型转换成 ONNX graph 的 API
+
+转换后的模型支持所有能够运行 ONNX 的 runtime.  
+
+在 Pytorch 中, 定义了两种转化为 ONNX 模型的偏好
+
+## 10.1. TorchDynamo-based ONNX Exporter
+
+于 Torch 2.0 推出的最新的转换方法, 目前还是 Beta?
+* 在转换中与 Python's frame evaluation API 链接, 动态的将字节码重写为 FX 图表
+* 对FX 进行完善, 最终才将其转化为 ONNX
+* 使用字节码分析捕获 FX graph, 能够保留模型的 动态特性, 而不是传统的静态跟踪技术
+
+## 10.2. TorchScript-based ONNX Exporter
+
+于 Pytorch 1.2.0 推出的 ONNX 转换器  
+* 通过使用 TorchScript 来跟踪 模型, 并捕获静态计算图
+* 因此, 该传统方法的限制为:
+  * 不会记录任何控制流, 例如 if 语句 或者 loop 循环
+  * 不会处理 training 和 eval 模型之间的细微差距 (例如 dropoff?)
+  * 没有真正意义上处理动态输入的能力 Does not truly handle dynamic inputs
+
+### API of TorchScript-based ONNX Exporter
+
+```py
+torch.onnx.export(model, args, f, export_params=True, verbose=False, training=<TrainingMode.EVAL: 0>, input_names=None, output_names=None, operator_export_type=<OperatorExportTypes.ONNX: 0>, opset_version=None, do_constant_folding=True, dynamic_axes=None, keep_initializers_as_inputs=None, custom_opsets=None, export_modules_as_functions=False, autograd_inlining=True)
 
 
-## 11.1. MNIST LeNet 例程
-### 11.1.1. Network structure
+# args 是一个复杂的参数, 代表了模型的典型输入
+args (tuple or torch.Tensor)
+
+# 1. args can be structured either as:
+args = (x, y, z)
+# 对于模型 forward 需要多个输入内容的情况, 所有非 Tensor 的输入都会被硬编码
+
+# 2. A TENSOR: 相当于只有一个输入的时候, tuple 的解包
+args = torch.Tensor([1])
+
+# 3. A TUPLE OF ARGUMENTS ENDING WITH A DICTIONARY OF NAMED ARGUMENTS:
+args = ( x,{"y": input_y, "z": input_z} )
+# 主要用于模型需要 命名的参数的情况, 这种时候可以给模型 forward 定义输入默认值, 如果在字典中不给 named arg 提供输入值的话, 默认输入值是 None
+```
+
+# 11. torch.optim
+
+是一个实现各种优化算法的包。已经支持最常用的方法，并且界面足够通用，因此将来可以轻松集成更复杂的方法。  
+
+要使用，必须构造一个优化器对象，该对象将`保持当前状态`并将`根据计算的梯度更新参数`  
+
+
+```py
+import torch.optim as optim
+
+# 如果使用 .cuda() 将模型移动到GPU, 则应该在构建优化器之前操作  因为模型参数不同
+# 构建一个优化器
+# 参数分别是  可迭代的网络模型的参数,  学习速率, 动量, 一般需要保证网络模型的参数在内存中的位置不变  
+optimizer = optim.SGD(model.parameters(), lr = 0.01, momentum=0.9)
+optimizer = optim.Adam([var1, var2], lr = 0.0001)
+
+```
+
+## 11.1. 预定义 Algorithm
+
+优化方法, (参数各不相同, 一般都有 lr )
+* Adadelta
+* Adagrad
+* Adam
+* AdamW
+* SparseAdam
+* Adamax
+* ASGD
+* LBFGS
+* RMSprop
+* Rprop
+* SGD
+
+## 11.2. torch.optim.lr_scheduler - 动态 Learn Rate
+
+`torch.optim.lr_scheduler` 提供了一些接口用来根据 epoch 或者其他计算来调整学习速率  
+`torch.optim.lr_scheduler.ReduceLROnPlateau` 则可以根据一些 validation measurements 来调整学习速率  
+
+pytorch提供的学习率调整器可以分成三大类:
+* 有序调整   : 等间隔(Step), 按需调整(MultiStep), 指数衰减 (Exponential), 余弦退火
+* 自适应调整 : ReduceLROnPlateau
+* 自定义调整 : LambdaLR
+
+
+调整器的使用方法:  
+```py
+# 定义优化器
+optimizer = SGD(model, 0.1)
+# 给优化器绑定动态学习速率
+scheduler = ExponentialLR(optimizer, gamma=0.9)
+
+# 使用方法: 一般学习速度的调整应该放在 optimizer 更新之后, 在 epoch 的循环里调整
+for epoch in range(100):
+    for input, target in dataset:
+      forward...
+      loss=...
+      loss.backward()
+      optimizer.step()
+  scheduler.step()
+```
+
+scheduler 的通用参数:
+* gamma : float, 乘法参数, 当前学习速率直接乘以该值 
+* last_epoch : 
+
+scheduler 的通用成员方法:
+* print_lr(is_verbose, group, lr, epoch=None)  : 打印当前的学习速率
+* get_last_lr() : 根据输入的参数计算最终的学习率
+
+
+scheduler 的种类:
+* torch.optim.lr_scheduler.StepLR : 最基础的种类, 每 `step_size` 个 epochs 时候降低一次学习速率
+* torch.optim.lr_scheduler.MultiStepLR : 同 Step, 只不过 step 变为数组
+* orch.optim.lr_scheduler.ExponentialLR : 学习率指数下降
+
+
+### 11.2.1. 有序调整
+
+
+* LambdaLr : 使用自定义函数来生成学习率
+  * 注意这里 Lambda 函数是一个单参数的函数, 传入当前 epoch 数
+  * 返回一个乘法因子, 用初始 lr 乘以该因子即更新后的学习率
+
+```py
+# 1. StepLR
+# Assuming optimizer uses lr = 0.05 for all groups
+# lr = 0.05     if epoch < 30
+# lr = 0.005    if 30 <= epoch < 60
+# lr = 0.0005   if 60 <= epoch < 90
+scheduler = StepLR(optimizer, step_size=30, gamma=0.1)
+
+
+# 定义一个线性学习率降低
+endepoch=10
+liner_func=lambda epoch: max(0,1-(epoch/endepoch))
+optim.lr_scheduler.LambdaLR(optimizer,liner_func,**kwargs)
+```
+
+
+## 11.3. 定义自己的 optim
+
+### 11.3.1. Optimizer 基类
+
+`class torch.optim.Optimizer(params, defaults)` 是所有优化器的基类, 定义了优化器的必须操作  
+* 参数
+  * params (iterable) – an iterable of torch.Tensor s or dict s. 指定了要优化的张量
+  * defaults – (dict): a dict containing default values of optimization options (used when a parameter group doesn’t specify them).
+* 方法
+  * add_param_group(param_group`(dict)`) 添加新的要进行优化的 param group 
+    一般用来对 pre-trained network 进行 fine tuning 时进行优化
+  * state_dict()
+    返回当前优化器的状态 as a `dict` 里边不仅包含优化器的状态还有 param group
+  * load_state_dict(state_dict`(dict)`)
+    和上一个方法匹配, 装载一个优化器状态
+  * step(closure) 不多说
+  * zero_grad(set_to_none: bool = False)
+    初始化所有梯度为0 
+    `set_to_none` 设置初始化梯度不是0而是 `None` 这会带来一些性能优化,但同时会有一些其他后果 *懒得看了
+
+### 11.3.2. optimization step
+
+重点: 所有 optimizers 必须实现 step 方法, 用来更新要优化的参数  
+
+1. optimizer.step()
+   * 大部分优化器都实现了的简单的版本, 在 `backward()` 方法之后调用
+```py
+for input, target in dataset:
+    # 初始化
+    optimizer.zero_grad()
+    # 前向传播
+    output = model(input)
+    # 计算误差
+    loss = loss_fn(output, target)
+    # 误差 backward
+    loss.backward()
+    # 优化器调用 step
+    optimizer.step()
+```
+
+2. optimizer.step(closure)
+   一部分优化器, 例如 ` Conjugate Gradient and LBFGS` 需要多次前向传播, 所以需要传入一个`closure`方法 来允许自己定义计算的模型.
+   `closure` 需要清空梯度, 然后计算 loss, 最后返回
+
+```py
+for input, target in dataset:
+    # 用closure 代替其他操作, 以函数的形式定义
+    def closure():
+        # 初始化
+        optimizer.zero_grad()
+        # 前向传播
+        output = model(input)
+        # 计算误差
+        loss = loss_fn(output, target)
+        # 误差 backward
+        loss.backward()
+        # 返回误差
+        return loss
+    # 将该函数传入 step 相当于在一条代码中整合了一整次更新参数的流程
+    optimizer.step(closure)
+
+```
+
+### 11.3.3. per-parameter options
+
+To do this, instead of passing an iterable of `Variable` s, pass in an iterable of `dict` s.    
+* dict 中指定了不同的 parameter group, 并且需要使用 `params` 关键字
+* 可以在 dict 中对不同 group 的参数分别指定 options ,也可以在 dict 外指定作为其他 group 的默认的 options.
+
+```py
+# classifier 的 lr 是 1e-3
+# 其他默认的 lr 是 1e-2
+optim.SGD([
+                {'params': model.base.parameters()},
+                {'params': model.classifier.parameters(), 'lr': 1e-3}
+            ], lr=1e-2, momentum=0.9)
+```
+
+
+# 12. torch.utils
+
+`torch.util` 的核心主要是其下的各种细化的 util,  `torch.util` 下面没有什么函数  
+
+## 12.1. torch.utils.data
+Pytorch 自定义数据库中最重要的部分  
+提供了对 `dataset` 的所种操作模式  
+
+### 12.1.1. 数据集类型
+
+Dataset 可以分为两种类型的数据集, 在定义的时候分别继承不同的抽象类
+
+1. map-style datasets 即 继承`Dataset` 类
+  * 必须实现 `__getitem__()` and `__len__()` protocols
+  * represents a map from (possibly non-integral) indices/keys to data samples.
+  *  when accessed with `dataset[idx]`, could read the idx-th image and its corresponding label from a folder on the disk.
+
+2. iterable-style datasets 即继承 `IterableDataset` 类
+  * 必须实现 `__iter__()` protocol 
+  * particularly suitable for cases where random reads are expensive or even improbable, and where the batch size depends on the fetched data.
+  * when called `iter(dataset)`, could return a stream of data reading from a database, a remote server, or even logs generated in real time.
+
+
+`torch.utils.data.Dataset`  和  `torch.utils.data.IterableDataset`  
+
+### 12.1.2. torch.utils.data.Dataset
+
+* Dataset 类是一个抽象类, 用于 map-key 的数据集
+* Dataset 类是 DataLoader 的最重要的构造参数  
+
+定义关键:
+1. All datasets that represent a map from keys to data samples should subclass it.
+2. 所有实现类需要重写 `__getitem__()` 用于从一个 index 来获取数据和label
+3. 可选的实现 `__len__()`  用于返回该数据库的大小, 会被用在 默认的 `Sampler` 上
+
+
+```py
+from torch.utils.data import Dataset
+# 继承
+class trainset(Dataset):
+   def __init__(self):
+    #  在这里任意定义自己数据库的内容
+   
+   #  也可以更改构造函数
+   def __init__(self,loader=dafult_loader):
+     # 路径
+     self.images = file_train
+     self.target = number_train
+     self.loader = loader
+   #  定义 __getitem__ 传入 index 得到数据和label
+   #  实现了该方法即可使用 dataset[i] 下标方法获取到 i 号样本
+   def __getitem__(self, index):
+      # 获得路径
+      fn = self.images[index]
+      # 读图片
+      img = self.loader(fn)
+      # 得到labels
+      target = self.target[index]
+      return img,target
+   def __len__(self):
+      # 返回数据个数
+      return len(self.images)
+```
+
+
+### 12.1.3. torch.utils.data.DataLoader
+
+Pytorch的核心数据读取器`torch.utils.data.DataLoader`   
+是一个可迭代的数据装载器  包括了功能:  
+  * map-style and iterable-style datasets,
+  * customizing data loading order,
+  * automatic batching,
+  * single- and multi-process data loading,
+  * automatic memory pinning.
+
+使用的时候预先定义好一个 dataset 然后用 DataLoader包起来  
+
+```py
+# 第一个参数是绑定的数据集  是最重要的参数  
+DataLoader(dataset, batch_size=1, shuffle=False, sampler=None,
+           batch_sampler=None, num_workers=0, collate_fn=None,
+           pin_memory=False, drop_last=False, timeout=0,
+           worker_init_fn=None, *, prefetch_factor=2,
+           persistent_workers=False)
+# Test data 不需要 shuffle 
+# batch_size 指定了一次训练多少个数据
+# num_workers 为正数时代表指定了多线程数据装载
+trainloader = utils.data.DataLoader(mnist_train, batch_size=50, shuffle=True,  num_workers=2)
+testloader  = utils.data.DataLoader(mnist_test, batch_size=100, shuffle=False, num_workers=2)
+
+train_data  = trainset()
+trainloader = DataLoader(train_data, batch_size=4,shuffle=True)
+# -----------------------------------------------------------
+# 通过装载器获得一个 可迭代数据库  使用 iter 
+iter_data = iter(trainloader)
+#iter_data = iter(testloader)
+
+# 对可迭代数据库使用 next 得到数据和label
+images, labels = next(iter_data)
+print(images.size())
+# torch.Size([100, 1, 28, 28])   100 个数据 每个数据 1 channel , 高和宽都是28
+
+# ------------------------------------------
+# 对于非迭代型数据库 即 map-key类型
+# 直接使用 for 循环即可
+for images,labels in trainLoader:
+    print(images.size())
+    # torch.Size([5, 3, 64, 64])
+```
+
+
+## 12.2. torch.utils.tensorboard
+
+完整的说明在  
+https://www.tensorflow.org/tensorboard/
+
+只有一个类, 即 SummaryWriter
+`torch.utils.tensorboard.writer.SummaryWriter(log_dir=None, comment='', purge_step=None, max_queue=10, flush_secs=120, filename_suffix='')`
+
+
+
+# 13. 例程
+
+
+## 13.1. MNIST LeNet 例程
+### 13.1.1. Network structure
 ```py
 
 class LeNet(nn.Module):
@@ -1497,7 +1639,7 @@ print(net)
 ```
 
 
-### 11.1.2. dataset
+### 13.1.2. dataset
 
 
 ```py
@@ -1553,7 +1695,7 @@ show_imgs = torchvision.utils.make_grid(images, nrow=10).numpy().transpose((1,2,
 plt.imshow(show_imgs)
 
 ```
-### 11.1.3. iteration
+### 13.1.3. iteration
 
 ```py
 
@@ -1630,7 +1772,7 @@ for iteration, data in enumerate(trainloader):
 
 
 
-### 11.1.4. evaluate
+### 13.1.4. evaluate
 
 ```py
 
@@ -1682,9 +1824,9 @@ def evaluate_model():
 
 ```
 
-## 11.2. MINST GAN 例程
+## 13.2. MINST GAN 例程
 
-### 11.2.1. dataset
+### 13.2.1. dataset
 
 ```py
 # Define transform func.
@@ -1704,7 +1846,7 @@ train_loader  = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=bc
 test_loader   = torch.utils.data.DataLoader(dataset= test_dataset, batch_size=bch_size, shuffle=False)
 ```
 
-### 11.2.2. 网络
+### 13.2.2. 网络
 
 ```py
 # 训练 epoch
@@ -1772,7 +1914,7 @@ G_optimizer = optim.Adam(G.parameters(), lr = base_lr)
 D_optimizer = optim.Adam(D.parameters(), lr = base_lr)
 ```
 
-### 11.2.3. G 训练
+### 13.2.3. G 训练
 
 ```py
 # Code for training the generator
@@ -1797,7 +1939,7 @@ def G_train(bch_size, z_dim, G_optimizer):
 
 ```
 
-### 11.2.4. D 训练
+### 13.2.4. D 训练
 对于每次 D 训练, 先输入一组 real image 再输入一组 fake image 作为一次训练流程  
 
 ```py
@@ -1837,7 +1979,7 @@ def D_train(x, D_optimizer):
     return  D_loss.data.item()
 ```
 
-### 11.2.5. iteration
+### 13.2.5. iteration
 
 ```py
 
@@ -1903,9 +2045,9 @@ def Logging(images, G_loss, D_loss):
         
 ```
 
-## 11.3. MINST USPS adversarial examples
+## 13.3. MINST USPS adversarial examples
 
-### 11.3.1. dataset
+### 13.3.1. dataset
 
 ```py
 # Make MINIST dataloaders
@@ -1925,7 +2067,7 @@ usps_testloader  = utils.data.DataLoader(usps_test,  batch_size=1,  shuffle=Fals
 
 ```
 
-### 11.3.2. general train and evaluate
+### 13.3.2. general train and evaluate
 
 ```py
 # Script for training a network

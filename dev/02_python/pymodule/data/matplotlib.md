@@ -67,6 +67,9 @@
   - [4.11. 图的设置](#411-图的设置)
     - [4.11.1. 为折线图的线添加注解](#4111-为折线图的线添加注解)
   - [4.12. Text properties](#412-text-properties)
+- [matplotlib.animation](#matplotlibanimation)
+  - [Animation](#animation)
+  - [Helper Classes](#helper-classes)
 
 
 # 1. matplotlib包 图表制作
@@ -1230,5 +1233,29 @@ plt.legend(['1958', '1960'], loc=2,facecolor ="None")
 The matplotlib.text.Text instances have a variety of properties which can be configured via keyword arguments to the text commands   
 
 https://matplotlib.org/tutorials/text/text_props.html#sphx-glr-tutorials-text-text-props-py
+
+
+
+# matplotlib.animation
+
+使用 animation 模组来创建图的动画  
+
+## Animation
+
+提供了 Animation 类用于以最简单的方法来创建动画, 定义了3个类  
+* `Animation` : 动画的基类, 并不是主要的操作 interface
+* `FuncAnimation` : 基于重复调用一个 func 而形成的动画
+* `ArtistAnimation` : 基于 fixed set of `Artist` objects 所构成的类  
+
+
+
+
+
+
+
+## Helper Classes
+
+非用户操作接口, 而是各种功能的底层实现
+
 
 

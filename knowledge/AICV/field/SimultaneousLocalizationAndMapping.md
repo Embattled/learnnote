@@ -7,6 +7,10 @@
 * Bundle Adjustment                 (BA)
 * Pose-Graph                        (PG)
 
+
+
+* feature based method
+* direct method
 ## Introduction
 
 当前业界对于 VO/VIO 和 SLAM 的边界越来越模糊 (diffuse)
@@ -20,10 +24,6 @@
 ### Stereo SLAM
 
 * 过远的点由于立体图形的时差过小, 会导致 depth 不能可靠的测量, 需要一些 trick
-* 
-
-
-
 
 ## Algorithms 
 
@@ -81,3 +81,8 @@ Proposed:
 
 
 
+
+Significance of omnidirectional fisheye cameras for feature-based visual SLAM
+Author(s)
+Chang, Raphael,M. Eng.Massachusetts Institute of Technology. 
+* MIT 的硕士论文

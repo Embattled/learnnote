@@ -155,7 +155,7 @@ ssh -C -f -N -g -R 80:192.168.1.1:8080 user@192.168.1.1
 
 * `-f` : 
 
-## 连接配置
+## 3.3. 连接配置
 
 
 * `-n`  : Redirects stdin from /dev/null (actually, prevents reading from stdin)

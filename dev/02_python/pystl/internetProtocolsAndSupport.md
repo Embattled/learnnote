@@ -1,18 +1,8 @@
-- [1. Internet Protocols and Support](#1-internet-protocols-and-support)
-  - [1.1.](#11)
-- [2. urllib](#2-urllib)
-  - [2.1. urllib.request - Extensible library for opening URLs](#21-urllibrequest---extensible-library-for-opening-urls)
-    - [2.1.1. 函数](#211-函数)
-    - [2.1.2. class urllib.request.Request](#212-class-urllibrequestrequest)
-    - [2.1.3. 其他类](#213-其他类)
-  - [2.2. urllib.response — Response classes used by urllib](#22-urllibresponse--response-classes-used-by-urllib)
-  - [2.3. urllib.parse — Parse URLs into components](#23-urllibparse--parse-urls-into-components)
-  - [2.4. urllib.error — Exception classes raised by urllib.request](#24-urlliberror--exception-classes-raised-by-urllibrequest)
-  - [2.5. urllib.robotparser — Parser for robots.txt](#25-urllibrobotparser--parser-for-robotstxt)
-- [3. http](#3-http)
-
-
 # 1. Internet Protocols and Support
+
+在 互联网中存在的各种功能性协议的实现, 主要是一些最基本的协议包.  
+
+大部分包都是基于一个 system-dependent 包 socket 来实现的
 
 * 网络高级API, 提供了对多种协议的支持和处理
 * The modules described in this chapter implement internet protocols and support for related technology.
@@ -127,7 +117,17 @@ class urllib.request.Request(
 ## 2.5. urllib.robotparser — Parser for robots.txt
 
 
-# 3. http
+# 3. uuid - UUID objects according to RFC 4122
+
+基于 RFC 4122 规定所实现的 UUID 对象  
+
+如果想要的是一个 唯一的 ID, 则 uuid1, uuid4应该被使用, 然而 uuid1 会保存该计算机的网络地址, 因此有可能会损害隐私. uuid4 则会创建一个 random UUID  
+
+根据平台的底层实现, uuid1 可能不会返回一个 safe 的 uuid
+* 所谓的 safe 即通过 同步方法 synchronization methods 来生成的, 可以确保任意 two processes 不会获得相同的 uuid.
+* 通过模组中的一个枚举类 `class uuid.SafeUUID` 可以判断该平台的 uuid 是否 safe
+
+# 4. http
 
 和 HTTP 协议相关的低级库, 算得上 urllib 库的基础  
 

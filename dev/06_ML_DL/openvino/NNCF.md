@@ -49,7 +49,7 @@ target_device: 描述要优化的对应目标平台, 默认值 `ANY`
 
 顶层类
 
-### 3.1.1. NNCFConfig
+### 3.1.1. nncf.NNCFConfig
 
 `from nncf import NNCFConfig` 量化学习的最关键的类, 用于配置整个量化学习过程  
 Contains the configuration parameters required for NNCF to apply the selected algorithms.  
@@ -66,22 +66,88 @@ Contains the configuration parameters required for NNCF to apply the selected al
 register_extra_structs(struct_list)
 get_redefinable_global_param_value_for_algo(param_name, algo_name)
 
+
+### 3.1.2. nncf.ModelType
+
+Bases: enum.Enum  , 基于 python 的枚举类型  
+
+定义了要被特殊考虑的模型类型, 当前版本 只是用来区分 transformer
+
+也只有 TRANSFORMER  一种参数  
+
+
+### 3.1.3. nncf.TargetDevice
+
+同样也是基于 枚举的类型, 指定了目标终端的类型.  
+```py
+class TargetDevice(Enum):
+    """
+    Target device architecture for compression.
+
+    Compression will take into account the value of this parameter in order to obtain the best performance
+    for this type of device.
+    """
+
+    ANY = "ANY"
+    CPU = "CPU"
+    GPU = "GPU"
+    VPU = "VPU"
+    CPU_SPR = "CPU_SPR"
+```
+
+
+## 3.2. nncf.quantize
+
+```py
+nncf.quantize(model, calibration_dataset, preset=None, target_device=TargetDevice.ANY, subset_size=300, 
+fast_bias_correction=True, model_type=None, ignored_scope=None, advanced_parameters=None)
+```
+
+主要的 Post-training quantization 函数   
+* model : TModel, 要进行量化的 浮点模组, TModel ?
+* calibration_dataset  : `nncf.Dataset` 一个代表数据集用来进行标定
+* preset : 量化的预设模式 `nncf.QuantizationPreset`, 对称和非对称, 可选的模式有
+  * performance : symmetirc quantization of weights and activations, 对权重和激活都启用对称量化
+  * mixed   : 权重的对称量化, 激活的非对称量化
+  * 默认值  : 对于 transformer model 启用 mixed, 对于其他的启用 performance  
+* target_device : `nncf.TargetDevice` , 用于最佳化量化
+* subset_size : int, subset 的大小, 用于指定 activation 统计的大小
+* fast_bias_correction = True, 是否启用告诉 bias 校正算法
+  * 如果置 false 的话, 精度更高, 但量化更慢, 消费内存更少
+* model_type : `nncf.ModelType`  
+  * 目前只是用来区分一般模型和 transformer 模型
+* ignored_scope : `nncf.IgnoredScope` :
+  * defined the `list of model control flow graph nodes` to be ignored during quantization.
+* advanced_parameters : `nncf.quantization.advanced_parameters.AdvancedQuantizationParameters`
+  * 细微的调整参数  
+* 
+
+
 # 4. nncf.torch
 
 NNCF PyTorch functionality.
-
 
 ```py
 import torch
 import nncf  # Important - should be imported right after torch
 ```
 
-## 4.1. create_compressed_model
+
+## 4.1. Functions
+
+nncf.torch 模组下的主要函数接口
+
+### 4.1.1. create_compressed_model
 
 创建优化后的模型的核心接口 
 
 `nncf.torch.create_compressed_model(model, config, compression_state=None, dummy_forward_fn=None, wrap_inputs_fn=None, wrap_outputs_fn=None, dump_graphs=True)`
 
+参数:
+* config: `nncf.NNCFConfig` nncf的核心配置类
+* compression_state `(Optional[Dict[str, Any]])` 
+  * 压缩状态的核心 dict, 用于无差错的读取量化学习模型  
+* dump_graphs : 默认值 True, 是否 dump `.dot` 格式的模型压缩前后的内部 graph representation. 输出会保存到 log directory
 
 
 返回值:
@@ -89,3 +155,177 @@ import nncf  # Important - should be imported right after torch
 * CompressionAlgorithmController: 用于控制压缩算法的控制器
 * NNCFNetwork : 经过 NNCF 压缩封装后的模型实例 
 
+### 4.1.2. load_state
+
+`nncf.torch.load_state(model, state_dict_to_load, is_resume=False, keys_to_ignore=None)`
+* nncf 框架下的 torch 模型加载, 在某些情况下稳定性要优于使用 torch 的接口    
+
+
+参数:
+* model : torch.nn.Module,  需要进行参数加载的 模型
+* state_dict_to_load : dict, 标准的参数字典
+* is_resume : 关键参数, 默认为 False
+  * 主要用于在 state_dict 与模型中的参数网络不匹配的时候是否报错. 这个不匹配是双向的.
+  * 通常情况下, 把一个未压缩的参数 dict 加载到一个已经应用过压缩算法的模型 (网络层有变动) 的时候, 置为 False.
+  * 如果是把 压缩过的参数 dict 加载到已经应用过压缩的 模型, 则需要置 True 用于保证安全加载
+* keys_to_ignore : `(List[str])`, 在加载过程中, 需要跳过 matching 过程的参数名称.  
+* 返回值 : int, The number of state_dict_to_load entries successfully matched and loaded into model.
+
+
+### 4.1.3. register_default_init_args - 建立NNCF控制参数
+
+```py
+nncf.torch.register_default_init_args(nncf_config, train_loader, 
+    criterion=None, 
+    criterion_fn=None, train_steps_fn=None, validate_fn=None, 
+    val_loader=None, 
+    autoq_eval_fn=None, model_eval_fn=None, 
+    distributed_callbacks=None, 
+    execution_parameters=None, 
+    legr_train_optimizer=None, 
+    device=None)
+Return type:
+    nncf.NNCFConfig
+```
+
+文档中没有任何说明, 要查找只能依据各种 example
+
+
+
+
+# 5. nncf.api 
+
+非顶端接口的, 各种内部实现类  
+
+## 5.1. nncf.api.compression
+
+与整个模型压缩过程关联的各种内部控制类 , 其下没有函数只有类 
+
+Classes
+* CompressionAlgorithmController  : 用于整个压缩过程中的状态调整, 是其他几个类的总包  
+* CompressionScheduler    : 用于学习过程中的 logic of compression method control 
+* CompressionLoss         : 用于计算量化学习中的独特的 量化 loss, 在学习中通过加法添加到基本 loss 上来使用
+* CompressionStage        : 描述了模型的 compression stage 
+* CompressionAlgorithmBuilder   : 
+
+
+### 5.1.1. CompressionAlgorithmController 
+
+`class nncf.api.compression.CompressionAlgorithmController(target_model)`  
+
+`Bases: abc.ABC` 该类在定义上是一个虚基类, 因此不能用来直接创建实例, 一般都是接口的返回值来获取  
+
+用于控制整个压缩过程 : 例如 compression scheduler and compression loss.
+
+
+成员:
+* model: TModel, 获取该 controller 链接的模型, 可以用来进行模型导出
+* (abstract property) loss: `CompressionLoss`, 虚成员, 用于获取 量化学习 loss
+  * 在使用上却有点类似于接口  `ctrl.loss()` 暂不清楚原因
+* (abstract property) scheduler: `CompressionScheduler`, 获取该 Controller 链接的 scheduler 
+  * 一般都是通过 ctrl 获取 `ctrl.scheduler`
+* (abstract property) name: str : 压缩算法的名称, 是唯一的, 没有实际确认过是否包含了一些状态字符
+* (abstract property) compression_rate: float: 返回压缩比例, 0 to 1 
+  * 可能是 the sparsity level , or the ratio of filters pruned
+* (abstract property) maximal_compression_rate: 返回该 controller 所应用的算法的最大压缩比例
+  * 可能会被用于 if 语句中用于控制压缩状态
+  
+
+虚方法: 依据压缩算法的不同而有不同具体实现  
+* (abstract) **load_state**(state): 加载 ctrl 的状态, from the map of algorithm name to the dictionary with state attributes.
+  * 参数 `state (Dict[str, Dict[str, Any]])`
+  * 一个字典, 这个字典的格式看起来好像是个二重字典. 其中外层的是一个 字典的字典
+* (abstract) **get_state**() : 对应的获取 ctrl 的状态, 与 load_state 对应的使用
+  * 返回值 `Dict[str, Dict[str, Any]]`
+* (abstract) **get_compression_state**() : 另一种获取 state 的接口 Returns the compression state
+  * 包括了 builder and controller state.
+  * 这个接口主要用于 `create_compressed_model` 中的 `compression_state` 参数, 因此是另一种无偏差的恢复 ctrl 的方法 
+  * 返回值 : `Dict[str, Any]`, Compression state of the model to resume compression from it
+* (abstract) **statistics**(quickly_collected_only=False) : 返回一个 nncf 的 Statistic 类保存了 压缩的统计
+  * 参数: quickly_collected_only , true 的话可以加快统计过程, 需要在 epoch 中追踪统计的话可以置 true
+  * 返回值 : `nncf.api.statistics.Statistics`
+* (abstract) **export_model**(save_path, save_format=None, input_names=None, output_names=None, model_args=None)
+  * 导出模型, 用于部署. 默认为 onnx 格式
+  * 该操作有可能会产生 non-ONNX-standard operations and layers to leverage full compressed/low-precision potential of the OpenVINO toolkit, 因此可能无法通过 onnx runtime 来运行.  
+  * save_format `(Optional[str])` : 不指定的话会使用 默认格式
+  * input_names, output_names  `(Optional[List[str]])` : 为输入和输出赋予名字, 不知道在哪种平台能用得上
+  * model_args  ` (Optional[Tuple[Any, Ellipsis]])` : 完全特殊的内容, 不理解
+  * 无返回值
+* (abstract) **disable_scheduler**() : 一般 压缩的 scheduler 都会动态调整压缩率, 而 disable 后就不会动态调整了
+
+
+
+实方法: 不依据压缩算法的, ctrl 本身应该具有的功能
+* **compression_stage**() : 返回 `CompressionStage` 类
+  * 具体需要参考该返回值的类
+  * 文档说这个类主要用于 saving best checkpoints to distinguish between uncompressed, partially compressed, and fully compressed models. 不太理解
+* **strip_model**(model, do_copy=False) : strip , 在 nncf 中是剥离用于在压缩训练过程中辅助的 layer. 
+  * model (TModel) – The compressed model. 为啥 ctrl 类实例里的成员函数还需要输入 model... 可能该函数被实现为了 类方法?
+  * do_copy  : 是否在 copy 上进行 strip 
+  * 返回值 : Tmodel, The stripped model.
+* **strip**(do_copy=True) : 似乎是上述方法的 对象版本
+  * Returns the model object with as much custom NNCF additions as possible removed while still preserving the functioning of the model object as a compressed model.
+  * 在保留作为压缩模型的功能的前提下, 尽可能剔除 nncf 的附加. strip 后的模型可以直接用 torch 的 export 来导出  
+  * 但是发现了一个问题: `RuntimeError: Converting nncf quantizer module to torch native only supports for num_bits in [8]`
+  * 超过 8 bit 的量化学习模型无法被导出为 strip 模型
+* **prepare_for_export**() : 准备模型进行导出, exporting to a backend-specific model serialization format
+  * 无参数, 无返回值, 需要参考 sample 学习具体使用场景
+
+
+### 5.1.2. CompressionScheduler
+
+`class nncf.api.compression.CompressionScheduler`
+
+`Bases: abc.ABC` 虚基类, 该 scheduler 的功能主要是
+* logic of compression method control during the training process. 
+* 用于随着训练的 epoch 和 step 动态调整 hyperparameters 
+* For example, the sparsity method can smoothly increase the sparsity rate over several epochs.
+* 如果是稀疏方法的话, 就会动态增加稀疏率
+
+The step() and epoch_step() methods of the compression scheduler must be called at the beginning of each training step and epoch, respectively:  
+要正确的启用 scheduler 的话, 需要按照如下方法来定义学习过程   
+```py
+for epoch in range(0, num_epochs):
+    scheduler.epoch_step()
+    for i, (x, y) in enumerate(dataset):
+         scheduler.step()
+         ...
+```
+
+
+虚方法 abstract 
+* step(next_step=None) : 在每个学习 step 的开始被调用.
+  * next_step : 某些训练的代码实现可能会有 step 索引, 可以用作该方法的参数
+* epoch_step(next_epoch=None) : 在每个 epoch 的开始被调用
+  * next_epoch : 同上
+* load_state(state) ,  get_state() .  参数返回值 : `Dict[str, Any]`
+  *  the compression scheduler state, but does not update the state of the compression method.
+  *  仅针对 scheduler 的 state
+  *  不太清楚实际中的必要应用场景
+
+### 5.1.3. CompressionLoss
+
+`class nncf.api.compression.CompressionLoss`  `Bases: abc.ABC`
+
+主要用于计算量化学习的 additional loss, 具体表现为通过 model graph 来测量 variables 和 activations 的 loss.  
+For example, the $L_0$-based sparsity algorithm calculates the number of non-zero weights in convolutional and fully-connected layers to construct the loss function.
+
+
+成员函数: 
+* (abstract) calculate(*args, **kwargs) , `__call__(*args, **kwargs)`
+  * 计算 compression loss
+  * 因为实现了 `__call__` 所以实际中会用 `ctrl.loss()` 来调用
+* (abstract) load_state(state) get_state()
+  * 状态的提取和读取, 同样的, 想想不来需要单独使用 loss 的状态提取读取应用场景  
+
+## 5.2. nncf.api.statistics
+
+关于 NNCF 压缩过程中的统计信息  
+
+该模组下没有函数, 只有一个类
+
+`class nncf.api.statistics.Statistics`  Base: abc.ABC
+
+* Contains a collection of model- or compression-related data and provides a way for its human-readable representation.
+* 保存了 压缩过程中的信息, 同时提供了一个可读的接口函数
+* 应该更多的用于 经验者的 debug
