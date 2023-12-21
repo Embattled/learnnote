@@ -127,6 +127,21 @@ class urllib.request.Request(
 * 所谓的 safe 即通过 同步方法 synchronization methods 来生成的, 可以确保任意 two processes 不会获得相同的 uuid.
 * 通过模组中的一个枚举类 `class uuid.SafeUUID` 可以判断该平台的 uuid 是否 safe
 
+
+## 基本 uuid 获取接口
+
+
+`uuid.uuid1(node=None, clock_seq=None)`
+* 获取一个 uuid 基于 host ID, 序列号以及当前时间.
+* clock_seq
+  * 用于指定要用于生成uuid 的序列号, 不传入的话则使用 random 14-bit
+  * If clock_seq is given, it is used as the sequence number; otherwise a random 14-bit sequence number is chosen.
+* Generate a UUID from a host ID, sequence number, and the current time. If node is not given, getnode() is used to obtain the hardware address. 
+
+`uuid.uuid4()` : Generate a random UUID.
+
+
+
 # 4. http
 
 和 HTTP 协议相关的低级库, 算得上 urllib 库的基础  

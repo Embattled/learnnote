@@ -134,6 +134,45 @@ opencv-python 的 API 都定义在了 cv2 包中, 为了保证代码的可执行
 
 同 numpy 一样, opencv并没有特地的图片类, 而是用矩阵来表示 -> `cv::Mat`  
 
+
+### 2.1.2. cv::KeyPoint
+
+用于保存显著点的数据结构 (salient point)
+
+存储通过关键点检测器找到的点特征, 找到的点会通过 descriptor 来分析其邻域并最终生成特征    
+
+
+```cpp
+// float cv::KeyPoint::angle
+// 一些特征点本身会有方向情报, 该值存储的为 [0,360) 的角度信息. 以 image coordinate system , 即 clockwise
+float angle;
+
+// int cv::KeyPoint::class_id
+// object class (if the keypoints need to be clustered by an object they belong to)
+// 关键点本身可能有不同的种类
+int class_id;
+ 
+// octave (pyramid layer) from which the keypoint has been extracted.
+// 表示该特征点是在图像金字塔的哪一层 (哪个尺度) 下被采集到的, 表示该特征点的层数
+int octave;
+
+// Point2f cv::KeyPoint::pt
+// coordinates of the keypoints More...
+Point2f pt;
+ 
+// float cv::KeyPoint::response
+// the response by which the most strong keypoints have been selected. Can be used for the further sorting or subsampling.
+// 代表该特征点的相应强度, 可能被用来进行特征点筛选
+float response;
+
+// float cv::KeyPoint::size
+// diameter of the meaningful keypoint neighborhood.
+// 一些检测算法可能会包含特征点的邻域半径大小
+float size;
+
+
+```
+
 ## 2.2. Operations on arrays
 
 所有和 array 相关的基础处理方法
@@ -1171,31 +1210,238 @@ Python:
 
 
 
-# features2d - 2D Features Framework 2D图像的传统特征检测
+# 9. features2d - 2D Features Framework 2D图像的传统特征检测
 
-## Feature Detection and Description - 特征检测和描述
+## 9.1. Feature Detection and Description - 特征检测和描述
 
 基本上有名的特征检测都在 OpenCV 中实现了
-
 而且为了实现实例复用, 所有特征检测器都是以 class 来实现的, 这点和 GIF 类似
 
+这里包括了 Detection 和 Description  
+
+### 9.1.1. Detection 简易函数
+
+关键点检测部分包含了两个算法, 以函数形式实现 
+函数实现的接口不存在对应的 Python API
+
+```cpp
+void cv::FAST 	( 	InputArray  	image,
+		std::vector< KeyPoint > &  	keypoints,
+		int  	threshold,
+		bool  	nonmaxSuppression,
+		FastFeatureDetector::DetectorType  	type 
+	) 	
+// threshold 为关键点检测的响应阈值
+// bool  	nonmaxSuppression 代表是否对关键点采用 局部非最大值抑制
+// FastFeatureDetector::DetectorType  	type  原论文中提供了三种 邻域的定义, 这里可选
+
+void cv::FAST 	( 	InputArray  	image,
+		std::vector< KeyPoint > &  	keypoints,
+		int  	threshold,
+		bool  	nonmaxSuppression = true 
+	) 	
+// 快速调用的重载, 减少了必要参数
+
+// AGAST
+void cv::AGAST 	( 	InputArray  	image,
+		std::vector< KeyPoint > &  	keypoints,
+		int  	threshold,
+		bool  	nonmaxSuppression,
+		AgastFeatureDetector::DetectorType  	type 
+	) 	
+// 参数的意思基本相同
+
+void cv::AGAST 	( 	InputArray  	image,
+		std::vector< KeyPoint > &  	keypoints,
+		int  	threshold,
+		bool  	nonmaxSuppression = true 
+	) 	
+// 便捷的函数接口
+```
+
+### 9.1.2. Abstract base class - cv::Feature2D
+
+Feature 2D, 是其他 特征检测类 的基类, 可以作为类接口的通用参考  
+* `detect`		:
+* `compute`	:  输入图像和 keypoints 计算描述符列表
+```cpp
+
+// 特征点检测
+virtual void cv::Feature2D::detect 	( 	InputArray  	image,
+		std::vector< KeyPoint > &  	keypoints,
+		InputArray  	mask = noArray() 
+	) 	
+cv.Feature2D.detect(	image[, mask]	) -> 	keypoints
+// 输入图像计算特征点
+// mask 用于对输入图像加掩码, 必须是 8bit 非0 的整数矩阵
+
+virtual void cv::Feature2D::detect 	( 	InputArrayOfArrays  	images,
+		std::vector< std::vector< KeyPoint > > &  	keypoints,
+		InputArrayOfArrays  	masks = noArray() 
+	) 	
+cv.Feature2D.detect(	images[, masks]	) -> 	keypoints
+// 同时对系列图像计算的形式
 
 
+// 特征点描述计算  
+virtual void cv::Feature2D::compute 	( 	InputArray  	image,
+		std::vector< KeyPoint > &  	keypoints,
+		OutputArray  	descriptors 
+	) 	
+cv.Feature2D.compute(	image, keypoints[, descriptors]	) -> 	keypoints, descriptors
+// 对单张图片检测到的特征点进行描述计算
+// keypoints, 对于无法计算描述特征的关键点将会从列表被删除
 
-## Descriptor Matchers - 特征匹配
+virtual void cv::Feature2D::compute 	( 	InputArrayOfArrays  	images,
+		std::vector< std::vector< KeyPoint > > &  	keypoints,
+		OutputArrayOfArrays  	descriptors 
+	) 	
+cv.Feature2D.compute(	images, keypoints[, descriptors]	) -> 	keypoints, descriptors
+// 对一系列图像的处理, 提前了解一下 ArrayOfArrays 的构造会比较好
+
+
+// 同时进行特征点检测和特征计算的接口
+// 该接口下 mask 成为了关键参数
+// 该接口不支持多张图片作为序列输入  
+virtual void cv::Feature2D::detectAndCompute 	( 	InputArray  	image,
+		InputArray  	mask,
+		std::vector< KeyPoint > &  	keypoints,
+		OutputArray  	descriptors,
+		bool  	useProvidedKeypoints = false 
+	) 		
+Python:
+	cv.Feature2D.detectAndCompute(	image, mask[, descriptors[, useProvidedKeypoints]]	) -> 	keypoints, descriptors
+```
+
+## 9.2. Descriptor Matchers - 特征匹配
 
 特征检测和匹配分开在不同的小章节来实现  
 
-## Drawing Function of Keypoints and Matches
+OpenCV Main 里实现了 2 种 Matcher, 以及一个基类
+* cv::BFMatcher : 暴力 Brute-force
+* cv::FlannBasedMatcher : Flann-based
+Matcher 类的接口是统一的, 因此可以方便的进行切换   
 
-在软件开发中需要对匹配的特征点进行 Debug, 可以利用该模组来方便的实现匹配结果可视化  
+
+### 9.2.1. Abstract base class - cv::DescriptorMatcher
+
+cv::DescriptorMatcher 的接口
+* create() 类静态函数
+* match()  点匹配
+
+
+```cpp
+
+void cv::DescriptorMatcher::match 	( 	InputArray  	queryDescriptors,
+		InputArray  	trainDescriptors,
+		std::vector< DMatch > &  	matches,
+		InputArray  	mask = noArray() 
+	) 		const
+void cv::DescriptorMatcher::match 	( 	InputArray  	queryDescriptors,
+		std::vector< DMatch > &  	matches,
+		InputArrayOfArrays  	masks = noArray() )
+
+Python:
+	cv.DescriptorMatcher.match(	queryDescriptors, trainDescriptors[, mask]	) -> 	matches
+	cv.DescriptorMatcher.match(	queryDescriptors[, masks]	) -> 	matches
+
+```
+
+
+## 9.3. Drawing Function of Keypoints and Matches
+
+<!-- 完 -->
+在软件开发中需要对匹配的特征点进行 Debug, 可以利用该模组来方便的实现匹配结果可视化, 该部分只有 4 个函数  
+
+
+枚举 DrawMatchesFlags
+```cpp
+enum  	cv::DrawMatchesFlags {
+// 默认行为, output image 会被重新初始化. 会绘制  两个源图像, 匹配的点, 单个点(未匹配的点). 对于每一个点, 只标注中心, 不会附加圆圈和方向
+  cv::DrawMatchesFlags::DEFAULT = 0,
+// 不会创建对应的输出矩阵, 匹配将根据输出图像的现有内容进行绘制
+  cv::DrawMatchesFlags::DRAW_OVER_OUTIMG = 1,
+// 不会绘制未匹配的单个关键点
+  cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS = 2,
+// 会清晰的标注点, 绘制围绕关键点的圆以及关键点的大小和方向
+  cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS = 4
+}
+```
+
+
+四个函数, 其中一个用于 Keypoints, 四个用于 Matches
+```cpp
+void cv::drawKeypoints 	( 	InputArray  	image,
+		const std::vector< KeyPoint > &  	keypoints,
+		InputOutputArray  	outImage,
+		const Scalar &  	color = Scalar::all(-1),
+		DrawMatchesFlags  	flags = DrawMatchesFlags::DEFAULT 
+	) 		
+Python:
+	cv.drawKeypoints(	image, keypoints, outImage[, color[, flags]]	) -> 	outImage
+// 可能需要了解一下  KeyPoint 类和 Scalar 类
+// flags 也可以在此处生效
 
 
 
+void cv::drawMatches 	( 	InputArray  	img1,
+		const std::vector< KeyPoint > &  	keypoints1,
+		InputArray  	img2,
+		const std::vector< KeyPoint > &  	keypoints2,
+		const std::vector< DMatch > &  	matches1to2,
+		InputOutputArray  	outImg,
+		const Scalar &  	matchColor = Scalar::all(-1),
+		const Scalar &  	singlePointColor = Scalar::all(-1),
+		const std::vector< char > &  	matchesMask = std::vector< char >(),
+		DrawMatchesFlags  	flags = DrawMatchesFlags::DEFAULT 
+	) 	
+// 参数还是比较好理解的
+// 两张原始图像以及各自的 keypoints vector
+// 比配的结果 DMatch
+// 用于指定颜色的两个 Scalar
+// std::vector< char > Mask determining which matches are drawn. If the mask is empty, all matches are drawn. 
 
-# 9. objdetect Object Detection 最常用的物体检测模型
 
-## 9.1. Cascade 模型 Cascade Classifier for Object Detection
+void cv::drawMatches 	( 	InputArray  	img1,
+		const std::vector< KeyPoint > &  	keypoints1,
+		InputArray  	img2,
+		const std::vector< KeyPoint > &  	keypoints2,
+		const std::vector< DMatch > &  	matches1to2,
+		InputOutputArray  	outImg,
+		const int  	matchesThickness,
+		const Scalar &  	matchColor = Scalar::all(-1),
+		const Scalar &  	singlePointColor = Scalar::all(-1),
+		const std::vector< char > &  	matchesMask = std::vector< char >(),
+		DrawMatchesFlags  	flags = DrawMatchesFlags::DEFAULT 
+	) 	
+// 可以指定匹配项的线宽
+
+void cv::drawMatches 	( 	InputArray  	img1,
+		const std::vector< KeyPoint > &  	keypoints1,
+		InputArray  	img2,
+		const std::vector< KeyPoint > &  	keypoints2,
+		const std::vector< std::vector< DMatch > > &  	matches1to2,
+		InputOutputArray  	outImg,
+		const Scalar &  	matchColor = Scalar::all(-1),
+		const Scalar &  	singlePointColor = Scalar::all(-1),
+		const std::vector< std::vector< char > > &  	matchesMask = std::vector< std::vector< char > >(),
+		DrawMatchesFlags  	flags = DrawMatchesFlags::DEFAULT 
+	) 	
+// matches1to2 和 mask 多加了一维
+
+
+Python: 
+  cv.drawMatches(	img1, keypoints1, img2, keypoints2, matches1to2, outImg[, matchColor[, singlePointColor[, matchesMask[, flags]]]]	) -> 	outImg
+  cv.drawMatches(	img1, keypoints1, img2, keypoints2, matches1to2, outImg, matchesThickness[, matchColor[, singlePointColor[, matchesMask[, flags]]]]	) -> 	outImg
+  cv.drawMatchesKnn(	img1, keypoints1, img2, keypoints2, matches1to2, outImg[, matchColor[, singlePointColor[, matchesMask[, flags]]]]	) -> 	outImg
+
+
+```
+
+
+# 10. objdetect Object Detection 最常用的物体检测模型
+
+## 10.1. Cascade 模型 Cascade Classifier for Object Detection
 
 一个经典的级联传统机器学习模型
 
@@ -1207,7 +1453,7 @@ Python:
 
 
 
-# 10. photo Computational Photography 计算图像处理
+# 11. photo Computational Photography 计算图像处理
 
 包括了几个基于计算的图像处理领域的算法实现
 
@@ -1218,7 +1464,7 @@ Python:
     * Alexandru Telea. An image inpainting technique based on the fast marching method. Journal of graphics tools, 9(1):23–34, 2004.
 
 
-## 10.1. inpainting
+## 11.1. inpainting
 
 图像补全, 该分类下只有一个函数
 
@@ -1246,15 +1492,15 @@ Python:
   * `cv::INPAINT_NS`
   * `cv::INPAINT_TELEA`
 
-# 11. contrib : ximgoproc  Extended Image Processing
+# 12. contrib : ximgoproc  Extended Image Processing
 
 contrib 包, 拓展的图像处理  
 
 
-## 11.1. Filter
+## 12.1. Filter
 
 
-### 11.1.1. Guided Filter
+### 12.1.1. Guided Filter
 
 ```cpp
 void cv::ximgproc::guidedFilter 	( 	

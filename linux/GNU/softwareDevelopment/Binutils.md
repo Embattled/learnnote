@@ -2,8 +2,10 @@
 - [2. GNU binary utilities (binutils)](#2-gnu-binary-utilities-binutils)
   - [2.1. ar  (archive)](#21-ar--archive)
     - [2.1.1. operation keyletter](#211-operation-keyletter)
-- [3. GNU linker ld](#3-gnu-linker-ld)
-- [4. GNU gprof](#4-gnu-gprof)
+  - [strings - 打印文件字符](#strings---打印文件字符)
+- [3. ld - the GNU linker.](#3-ld---the-gnu-linker)
+- [4. GNU gprof - Displays profiling information.](#4-gnu-gprof---displays-profiling-information)
+- [GNU Gprofng - Next Generation Profiler](#gnu-gprofng---next-generation-profiler)
 
 # 1. GNU Binutils 
 
@@ -79,7 +81,11 @@ ar -M [ <mri-script ]
 * `s`       : 更新或者重建 一个 archive 的 `object-file index`, 即使 archive 没有发生任何改变. 可以不需要任何 operation 独立的运行 `ar s`, 这种情况下和另一个程序 `ranlib` 的功能相同
 
 
-# 3. GNU linker ld
+## strings - 打印文件字符  
+
+
+
+# 3. ld - the GNU linker.
 
 GNU linker ld (GNU Binutils) version 2.40. 
 
@@ -89,7 +95,7 @@ ld 接受链接器注释语言 (Linker Command Language) files written in a supe
 
 
 
-# 4. GNU gprof
+# 4. GNU gprof - Displays profiling information.
 
 Profiling a Program: Where Does It Spend Its Time?
 
@@ -104,5 +110,8 @@ gprof 的使用方法包括:
   * 如果使用 ld 来进行链接而非编译器的化, 需要指定 `gcrt0.o` as the first input file instead of the usual startup file `crt0.o`, 同时需要将 C library 的库文件由 `libc.a` 替换为 `libc_p.a`, 用于提供对标准库函数的调用次数统计支持
 * You must execute your program to generate a profile data file. 
 * You must run gprof to analyze the profile data. 
+
+
+# GNU Gprofng - Next Generation Profiler
 
 

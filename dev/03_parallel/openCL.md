@@ -16,6 +16,10 @@ OpenCL 是
 * OpenCL 拓展了GPU在计算方面的能力
 
 
+https://www.khronos.org/opencl/
+
+
+
 ## 1.1. OpenCL 的历史  
 
 2008 年由苹果公司于WWWDC大会上发布, 拥有商标权 , 随后提交至 Khronos Group 并成立了 GPU 通用计算开放行业标准工作组.  
@@ -27,7 +31,7 @@ OpenCL 是
 
 2020 年9月30日 OpenCL 3.0 发布
 * 3.0 在某种程度上开了历史倒车
-* 2.X 的各种新功能在 3.0 中变味了可选
+* 2.X 的各种新功能在 3.0 中变为了可选
 
 苹果于 macOS 10.14 中放弃了 OpenCL , 推行自家的 Metal API  
 NVIDIA 目前有更加成熟且社区活跃的 CUDA API  
@@ -44,7 +48,7 @@ AMD 目前只支持 OpenCL 1.2
 5. 在系统中正确的组件上按正确的顺序执行内核
 6. 收集最终结果
 
-OpenCL程序员必须显式地定义平台, 上下文, 以及在不同设备上调度工作.  具体通过 OpenCL 的一系列 API 再加上一个面向内核的变成环境来完成, 分而治之的策略来实现以上所有步骤  
+OpenCL程序员必须显式地定义平台, 上下文, 以及在不同设备上调度工作.  具体通过 OpenCL 的一系列 API 再加上一个面向内核的编程环境来完成, 分而治之的策略来实现以上所有步骤  
 * 平台模型 (platform model)  : 异构系统的高层描述
 * 执行模型 (execution model) : 指令流在异构平台上执行的抽象表示
 * 内存模型 (memory model)    : OpenCL 中内存区域以及 计算期间内存区域的交互方法
@@ -119,7 +123,7 @@ OpenCL 定义了 5 种不同的内存区域, 有不同的抽象机制
 * 局部内存 (local memory) : 对于工作组来说是局部的, 存放一个工作组中所有工作项共享的变量, 可以实现为 OpenCL 设备上的专用内存区域, 也可以映射到全局内存中的某个区段
 * 私有内存 (private memory) : 是一个工作项私有的区域, 私有内存中定义的变量对其他工作项不可见  
 
-### 编程模型
+### 1.2.4. 编程模型
 
 任务并行和数据并行
 
@@ -133,9 +137,20 @@ OpenCL 定义了 5 种不同的内存区域, 有不同的抽象机制
 * 不考虑其他内核使用的 NRRange
 
 
-## OpenCL 标准构成
+## 1.3. OpenCL 标准构成
 
 OpenCL 框架可以划分成以下组成部分
 * OpenCL 平台API : 平台 API 定义了宿主机程序发现 OpenCL 设备所用的函数以及这些函数的功能, 以及为OpenCL应用创建上下文的函数
 * OpenCL 运行时函数 : 管理上下文来创建队列以及运行时发生的其他操作, 例如, 将命令提交到命令队列
 * OpenCL 编程语言 : 基于 ISOC99 标注的一个拓展子集, 通常称为 OpenCL C
+
+
+# OpenCL 编译环境
+
+## Getting started with OpenCL on Ubuntu Linux
+
+OpenCL-SDK : To build native OpenCL applications, one will minimally need
+* C or C++ compiler
+* The OpenCL headers : The C and optionally the C++ headers
+* An Installable Client Driver (ICD) Loader : Shared objects library (`libOpenCL.so`)
+

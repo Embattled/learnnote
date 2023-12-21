@@ -32,9 +32,22 @@
 
 ## 2.1. Files and Directories
 
-os.mkdir(path, mode=0o777, *, dir_fd=None)
 
+os 模组中主要与文件和文件夹相关的 python 接口  
+https://docs.python.org/3/library/os.html#files-and-directories
+
+
+On some Unix platforms, many of these functions support one or more of these features:
+* specifying a file descriptor
+* paths relative to directory descriptors
+* not following symlinks
+* 
+
+
+os.mkdir(path, mode=0o777, *, dir_fd=None)
 os.makedirs(name, mode=0o777, exist_ok=False)
+os.access
+
 
 ### 2.1.1. os.walk
 
@@ -58,6 +71,8 @@ for root, dirs, files in os.walk('/home/eugene/workspace/learnnote/cvml'):
     print("bytes in", len(files), "non-directory files")
 
 ```
+
+### stat - 获取文件情报  
 
 ## 2.2. Process Parameters 进程参数
 

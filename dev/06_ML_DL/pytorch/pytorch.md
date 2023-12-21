@@ -12,7 +12,7 @@
   - [2.4. 创建操作 Creation Ops](#24-创建操作-creation-ops)
     - [2.4.1. 统一值 tensor](#241-统一值-tensor)
     - [2.4.2. 随机值 random](#242-随机值-random)
-    - [2.4.3. \_like 类方法](#243-_like-类方法)
+    - [2.4.3. like 类方法](#243-like-类方法)
     - [2.4.4. torch.from\_numpy](#244-torchfrom_numpy)
     - [2.4.5. tensor复制](#245-tensor复制)
     - [2.4.6. .new\_ 方法](#246-new_-方法)
@@ -38,7 +38,7 @@
       - [5.1.1.1. 基础方法及应用](#5111-基础方法及应用)
       - [5.1.1.2. 网络参数以及存取](#5112-网络参数以及存取)
       - [5.1.1.3. 残差结构](#5113-残差结构)
-    - [torch.nn.Sequential 系列](#torchnnsequential-系列)
+    - [5.1.2. torch.nn.Sequential 系列](#512-torchnnsequential-系列)
   - [5.2. Convolution Layers 卷积层](#52-convolution-layers-卷积层)
   - [5.3. Pooling layers 池化层](#53-pooling-layers-池化层)
   - [5.4. Padding Layers](#54-padding-layers)
@@ -48,6 +48,8 @@
     - [5.7.1. Identity](#571-identity)
     - [5.7.2. Linear](#572-linear)
   - [5.8. Loss Function 损失函数](#58-loss-function-损失函数)
+  - [5.9. Vision Layrers - 与图像相关的网络层](#59-vision-layrers---与图像相关的网络层)
+  - [5.10. ChannelShuffle - 重排列 Channel](#510-channelshuffle---重排列-channel)
 - [6. torch.nn.functional](#6-torchnnfunctional)
 - [7. torch.autograd - 梯度计算包](#7-torchautograd---梯度计算包)
 - [8. torch.cuda - CUDA 计算   torch.cpu - 虚类实现](#8-torchcuda---cuda-计算---torchcpu---虚类实现)
@@ -63,7 +65,7 @@
 - [10. torch.onnx](#10-torchonnx)
   - [10.1. TorchDynamo-based ONNX Exporter](#101-torchdynamo-based-onnx-exporter)
   - [10.2. TorchScript-based ONNX Exporter](#102-torchscript-based-onnx-exporter)
-    - [API of TorchScript-based ONNX Exporter](#api-of-torchscript-based-onnx-exporter)
+    - [10.2.1. API of TorchScript-based ONNX Exporter](#1021-api-of-torchscript-based-onnx-exporter)
 - [11. torch.optim](#11-torchoptim)
   - [11.1. 预定义 Algorithm](#111-预定义-algorithm)
   - [11.2. torch.optim.lr\_scheduler - 动态 Learn Rate](#112-torchoptimlr_scheduler---动态-learn-rate)
@@ -294,7 +296,7 @@ c = a.view(1, 3, 2, 4)
 * set_rng_state   :Sets the random number generator state.
 
 
-### 2.4.3. _like 类方法
+### 2.4.3. like 类方法
 
 需要获取一个不确定维度的 tensor, 即通过另一个 tensor 指定大小
 * rand_like
@@ -655,7 +657,7 @@ NamedTuple with missing_keys and unexpected_keys fields
 #### 5.1.1.3. 残差结构
 
 
-### torch.nn.Sequential 系列
+### 5.1.2. torch.nn.Sequential 系列
 
 A sequential container.
 
@@ -899,6 +901,40 @@ pytorch 的损失函数直接定义在了 torch.nn 中
 loss_func = nn.CrossEntropyLoss()
 ```
 
+
+## 5.9. Vision Layrers - 与图像相关的网络层
+
+
+`class torch.nn.PixelShuffle(upscale_factor)`
+* 等同于 depth to space, 将一部分 Channel 转换为 Space
+  * $(*, C\times r^2, H,W) \rightarrow (*,C,H\times r, W\times r)$
+  * `r` 就是参数里的 upscale_factor
+* 对于实现步幅为 1/r 的子像素卷积很有用, 可以用来降低 channel 个数
+* 主要的作用由 
+  * Real-Time Single Image and Video Super-Resolution Using an Efficient Sub-Pixel Convolutional Neural Network by Shi et. al (2016)
+  * 被提出
+
+`class torch.nn.PixelUnshuffle(downscale_factor)`  
+* 等同于 PixelShuffle 的逆运算
+* $C_{out}=C_{in}\times downscale_factor^2$
+
+
+`class torch.nn.Upsample(size=None, scale_factor=None, mode='nearest', align_corners=None, recompute_scale_factor=None)`
+* 上采样输入 Tensor, 该层支持 1,2,3D 数据, 对于输入Tensor, 会采样 `[2:]` 以后的维度, 对于 0-d (batch) 和 1-d (channel) 不执行上采用
+* 输入大小由 size 或者 scale_factor 来指定, 但是不能同时指定这两个参数 
+  * `size (int or Tuple[int] or Tuple[int, int] or Tuple[int, int, int], optional)`
+  * `scale_factor (float or Tuple[float] or Tuple[float, float] or Tuple[float, float, float], optional)`
+* `mode` : str, 用于指定上采用的算法, 可选项有 
+  * 'nearest'
+  * 'linear'
+  * 'bilinear'
+  * 'bicubic'
+  * 'trilinear'
+
+## 5.10. ChannelShuffle - 重排列 Channel
+
+`class torch.nn.ChannelShuffle(groups)`
+* 将 tensor  (batch, channel, h, w) reshape 成 (batch, channel/g, g, h,w) 再调转顺序 (batch, g, channel/g, h,w)
 
 # 6. torch.nn.functional
 
@@ -1238,7 +1274,7 @@ print(loaded.code)
   * 不会处理 training 和 eval 模型之间的细微差距 (例如 dropoff?)
   * 没有真正意义上处理动态输入的能力 Does not truly handle dynamic inputs
 
-### API of TorchScript-based ONNX Exporter
+### 10.2.1. API of TorchScript-based ONNX Exporter
 
 ```py
 torch.onnx.export(model, args, f, export_params=True, verbose=False, training=<TrainingMode.EVAL: 0>, input_names=None, output_names=None, operator_export_type=<OperatorExportTypes.ONNX: 0>, opset_version=None, do_constant_folding=True, dynamic_axes=None, keep_initializers_as_inputs=None, custom_opsets=None, export_modules_as_functions=False, autograd_inlining=True)

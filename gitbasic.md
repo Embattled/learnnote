@@ -12,7 +12,8 @@
 - [3. Basic Snapshotting - 基础的版本记录](#3-basic-snapshotting---基础的版本记录)
   - [3.1. add - Add file contents to the index](#31-add---add-file-contents-to-the-index)
   - [3.2. status](#32-status)
-  - [3.3. diff](#33-diff)
+  - [3.3. diff - Show changes between commits, commit and working tree, etc](#33-diff---show-changes-between-commits-commit-and-working-tree-etc)
+    - [diff Options](#diff-options)
   - [3.4. commit](#34-commit)
   - [3.5. restore](#35-restore)
   - [3.6. reset](#36-reset)
@@ -29,6 +30,7 @@
     - [4.4.1. merge options](#441-merge-options)
   - [4.5. log](#45-log)
   - [4.6. stash - Stash the changes in a dirty working directory away](#46-stash---stash-the-changes-in-a-dirty-working-directory-away)
+    - [stash - options](#stash---options)
   - [4.7. tag - Create, list, delete or verify a tag object signed with GPG](#47-tag---create-list-delete-or-verify-a-tag-object-signed-with-gpg)
   - [4.8. worktree](#48-worktree)
 - [5. Sharing and Updating Projects](#5-sharing-and-updating-projects)
@@ -283,7 +285,44 @@ git add [--verbose | -v] [--dry-run | -n] [--force | -f] [--interactive | -i] [-
 `status` 状态查看, 主要查看有哪些文件被修改但是还没提交
    * `git status` 
 
-## 3.3. diff
+## 3.3. diff - Show changes between commits, commit and working tree, etc
+
+在多种场景下进行改动比较
+* changes between the working tree and the index or a tree
+* changes between the index and a tree
+* changes between two trees
+* changes resulting from a merge
+* changes between two blob objects
+* changes between two files on disk
+
+
+```sh
+
+# 在不输入 commit 的时候表示输出相对于索引的改动
+git diff [<options>] [<commit>] [--] [<path>…​]
+
+# --cached 表示比较的内容是当前暂存的改动, 而不是工作区中未提交的改动
+# 不指定 commit 的话就是与  HEAD 进行比较
+git diff [<options>] --cached [--merge-base] [<commit>] [--] [<path>…​]
+
+# 比较任意两个 commit 之间的差异
+git diff [<options>] [--merge-base] <commit> [<commit>…​] <commit> [--] [<path>…​]
+
+# 两个 commit 之间是两个点, 代表比较两个 commit 之间的差异
+git diff [<options>] <commit>..​<commit> [--] [<path>…​]
+
+# 三个点表示
+# changes on the branch containing and up to the second <commit>, starting at a common ancestor of both <commit>
+git diff [<options>] <commit>…​<commit> [--] [<path>…​]
+
+# 给定两个路径, 比较之间的差异
+# 如果本身一个 path 的路径就在工作树外部的话, 可以省略 --no-index
+git diff [<options>] --no-index [--] <path> <path>
+
+# This form is to view the differences between the raw contents of two blob objects.
+git diff [<options>] <blob> <blob>
+```
+
 
 `diff` 直接在命令行里查看改动
    *  `git diff` 默认比较的是工作区和暂存区, 即如果刚刚 `git add -A` 了后是看不到改动的
@@ -291,6 +330,11 @@ git add [--verbose | -v] [--dry-run | -n] [--force | -f] [--interactive | -i] [-
       *  输入一个 commit 则是工作区和参数 commit
       *  输入两个 commit 则是参数 commit 之间的比较
       *  `--path` 用来指定文件进行改动查看
+
+### diff Options
+
+* `-p` `-u` `--patch` : 生成对应的 diff patch.  
+* `-s` `--no-patch`   : 取消所有 diff 的输出效果
 
 ## 3.4. commit
 
@@ -544,37 +588,41 @@ Git用<kbd><<<<<<<</kbd>, <kbd>=======</kbd>, <kbd>>>>>>>></kbd>标记出不同�
 `stash` 现场保存, 用于非 commit 下的工作进度保存, 拥有一整套子命令组
 
 ```sh
+# 打印目前已经生成的 stash 实体
 git stash list [<log-options>]
 git stash show [-u | --include-untracked | --only-untracked] [<diff-options>] [<stash>]
+
+# 删除 stash 
 git stash drop [-q | --quiet] [<stash>]
+
+# pop   恢复的同时也将stash的内容删除了  
 git stash pop [--index] [-q | --quiet] [<stash>]
+
+# apply 恢复,但是stash的内容不删除
 git stash apply [--index] [-q | --quiet] [<stash>]
 git stash branch <branchname> [<stash>]
+
+# 默认行为
 git stash [push [-p | --patch] [-S | --staged] [-k | --[no-]keep-index] [-q | --quiet]
 	     [-u | --include-untracked] [-a | --all] [(-m | --message) <message>]
 	     [--pathspec-from-file=<file> [--pathspec-file-nul]]
 	     [--] [<pathspec>…​]]
 git stash save [-p | --patch] [-S | --staged] [-k | --[no-]keep-index] [-q | --quiet]
 	     [-u | --include-untracked] [-a | --all] [<message>]
+
+# 删除所有 stash 实例, 这个操作可能比较危险
 git stash clear
 git stash create [<message>]
 git stash store [(-m | --message) <message>] [-q | --quiet] <commit>
 
 ```
 
-使用`git stash list`命令查看现场列表  
-在多次stash后,可以指定要恢复的`stash`  
-`git stash apply stash@{0}
-
-* `git stash [push]` : 立刻将工作区的改动存于后台, 并将工作区的文件还原到 HEAD 状态, 此时可以进行切换分支等操作
+* `git stash [push]` : 默认行为 
+  * 立刻将工作区的改动存于后台, 并将工作区的文件还原到 HEAD 状态, 此时可以进行切换分支等操作
   * `-m <message>` : 给 stash 添加描述
-* `git stash list` : 列出所有 stash 
 * `git stash show` : 打印 stash 与 commit back 的 diff
-* `git stash (pop | apply) ` :
-  * apply 恢复,但是stash的内容不删除
-  * pop   恢复的同时也将stash的内容删除了  
-* `git stash drop` : 删除 stash 
 
+### stash - options
 
 ## 4.7. tag - Create, list, delete or verify a tag object signed with GPG
 
