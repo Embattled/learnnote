@@ -12,9 +12,8 @@
   - [3.3. Options Controlling C Dialect](#33-options-controlling-c-dialect)
   - [3.4. Options Controlling C++ Dialect](#34-options-controlling-c-dialect)
   - [3.5. Options to Control Diagnostic Messages Formatting](#35-options-to-control-diagnostic-messages-formatting)
-  - [Options to Request or Suppress Warnings](#options-to-request-or-suppress-warnings)
-    - [语言独立 warning](#语言独立-warning)
-    - [warning 类型](#warning-类型)
+  - [3.6. Options to Request or Suppress Warnings](#36-options-to-request-or-suppress-warnings)
+  - [3.7. Options That Control Optimization](#37-options-that-control-optimization)
 
 # 1. GCC, the GNU Compiler Collection
 
@@ -332,12 +331,9 @@ When you compile C++ programs, you should invoke GCC as `g++` instead.
 用于去控制诊断信息的格式. 传统上, 诊断信息的格式与显示输出设备的方面无关.   
 可以通过 `-f` 命令来控制诊断信息的格式信息, 例如每行多少个字符.  多久报告一次源代码位置信息, 某些语言可能不支持一些选项.  
 
-## Options to Request or Suppress Warnings
+## 3.6. Options to Request or Suppress Warnings
 
 Warnings 属于诊断信息, 指明出来的警告在构造的本质上不是错误的, 但是存在风险, 或者可能存在错误. 
-
-
-### 语言独立 warning
 
 以下独立于语言的 warnging 命令选项不会启动特定的选项, 而是会控制 GCC 生成的诊断类型.
 
@@ -350,5 +346,44 @@ Warnings 属于诊断信息, 指明出来的警告在构造的本质上不是错
 | `-Werror`        | 让所有的警告变成 errors                                        |
 | `-Werror=`       | 让指定的 warning 变成 error, 同时会隐式的启动对应的警告        |
 
-### warning 类型
+
+
+## 3.7. Options That Control Optimization
+
+超级长的一章 (70页), 命令多到不可能读完   
+
+用于控制 GCC 在生成代码时候采取的优化措施  
+
+
+默认行为, 无任何参数的时候, 编译器会将代码以最低的代价进行编译, 同时确保 debug 可以完整的运行并得到想要的结果
+* Statements 是独立的, 可以在任何语句之间插入断点, 并更改对应变量的值   
+* 可以正常的改变程序计数器, 使程序跳转到其他函数并得到期望的结果  
+
+通过更改 optimization flags, 可以实现不同的 编译器优化策略
+* 提高执行性能
+* 编译的时间消耗
+* 是否能够进行 debug
+
+在编译的时候如果是从多个 source file 编译为 a single output, 则编译器可以理论上实现最多的算法信息利用  
+
+GCC 的优化策略很多, 并不是所有的优化策略都能够通过 flag 控制, 只有拥有 flag 的被列在了该章节  
+
+几乎所有的 flag 在单独指定的时候必须同时输入 `-O1` 以及以上 
+* `-O0` 或者没有输入 `-O` 相关指定的时候, 这些 flag 都会被抑制
+* 同理, `-Og` 也会抑制很大一部分的 flag
+* 根据编译 target和 GCC 配置 的不同, `-O` 的效果也会有细微的不同, 可以通过 `-Q --help=optimizers` 来获取当前的 flag 效果
+
+
+`-O` 系列的简要介绍 : 如果在命令中输入多个 -O 命令, 则只有最后的会生效 
+| 命令       | 效果                                                                                                                        |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `-O0`      | 降低编译时间, 同时确保 debug 可以运行, 默认选项                                                                             |
+| `-O` `-O1` | 优化性编译 降低 code size 和执行时间, 编译消耗更多时间, 对于大函数的编译会消耗更多内存, 但是不会执行极度消耗编译时间的优化. |
+| `-O2`      | 优化更多, 调用除了会产生 space-speed tradeoff 以外的, 几乎所有支持的优化策略                                                |
+| `-O3`      | 基于 O2 的基础上, 进一步优化性能                                                                                            |
+| `-Os`      | 基于 O2 的基础上, 取消了会增加 code size 的优化                                                                             |
+| `-Oz`      | 基于 O2 的基础上, 更加积极的优化 code size 而不是 speed                                                                     |
+| `-Ofast`   | 基于 O3 的基础上, 解除标准合规性, 会应用一些不是所有标准都支持的优化策略                                                    |
+| `-Og`      | 基于 O1 的基础上去除所有会影响 debug 可行性的优化. 甚至优于 某些编译器上的 `-O0`, 因为有些编译器 O0 也不会保存 debug 信息   |
+
 

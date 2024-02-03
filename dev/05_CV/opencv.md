@@ -1204,11 +1204,151 @@ Python:
 
 涉及 3D 重构和相机标定的主要模组  
 
+目前实现了普通的 pinhole 单目, 多目
+* 在 主包中的 fisheye 命名空间下实现了鱼眼相机的模型
+* 在 追加包 ccalib3d 下实现了 omnidir 相机的模型
 
 
-## 8.1. fisheye camera model  - 设计鱼眼相机的接口被单独定义作为子模组
+
+## fisheye, omnidir 相机
+
+两种独特相机的专用函数接口名称是相同的
+
+### calibrate - 相机标定
+
+```cpp
+double cv::omnidir::calibrate 	( 	
+		InputArrayOfArrays  	objectPoints,
+		InputArrayOfArrays  	imagePoints,
+		Size  	size,
+		InputOutputArray  	K,
+		InputOutputArray  	xi,
+		InputOutputArray  	D,
+		OutputArrayOfArrays  	rvecs,
+		OutputArrayOfArrays  	tvecs,
+		int  	flags,
+		TermCriteria  	criteria,
+		OutputArray  	idx = noArray() 
+	) 		
+
+double cv::fisheye::calibrate 	( 	
+		InputArrayOfArrays  	objectPoints,
+		InputArrayOfArrays  	imagePoints,
+		const Size &  	image_size,
+		InputOutputArray  	K,
+		InputOutputArray  	D,
+		OutputArrayOfArrays  	rvecs,
+		OutputArrayOfArrays  	tvecs,
+		int  	flags = 0,
+		TermCriteria  	criteria = TermCriteria(TermCriteria::COUNT+TermCriteria::EPS, 100, DBL_EPSILON) 
+	) 	
+
+Python:
+	cv.omnidir.calibrate(
+		objectPoints, imagePoints, size, K, xi, D, flags, criteria[, rvecs[, tvecs[, idx]]]	) ->
+		 	retval, K, xi, D, rvecs, tvecs, idx
+			
+	cv.fisheye.calibrate(	
+		objectPoints, imagePoints, image_size, K, D[, rvecs[, tvecs[, flags[, criteria]]]]	) ->
+		 	retval, K, D, rvecs, tvecs
+
+```
+
+执行相机标定
+
+参数:
+* InputArrayOfArrays	: objectPoints, (?) 从其他函数获取的 calibration pattern 的 points 世界坐标
+  * `Vector of vector of Vec3f`, `Mat with size 1xN/Nx1 and type CV_32FC3`
+* InputArrayOfArrays	: imagePoints, 与 objectPoints 长度一致, 对应的 calibration pattern points 的图像坐标
+* Size					: size, image_size,  calibration image 的图像大小, 仅仅用来初始化内部参数矩阵
+* InputOutputArray K	: 标准相机内部参数矩阵. fx,fy,cx,cy 等, 如果是使用 GUESS 方法来标定, 则传入的矩阵本身应该赋予了对应的 GUESS 值
+* InputOutputArray D 	: 相机扭曲参数, 对于 omnidir 是 k1,k2,p1,p2, 对于 opencv fisheye 是 k1,k2,k3,k4
+* InputOutputArray xi 	: omni 相机所独有的单位球球心和投影原点的距离
+* TermCriteria criteria	: 用于标定算法的迭代终止控制
 
 
+### undistort - 逆畸变
+
+用于反向计算相机的畸变过程, 获得畸变前的图像/点的坐标
+
+
+```cpp
+
+void cv::omnidir::undistortImage 	(
+	 	InputArray  	distorted,
+		OutputArray  	undistorted,
+		InputArray  	K,
+		InputArray  	D,
+		InputArray  	xi,
+		int  	flags,
+		InputArray  	Knew = cv::noArray(),
+		const Size &  	new_size = Size(),
+		InputArray  	R = Mat::eye(3, 3, CV_64F) 
+	) 		
+void cv::fisheye::undistortImage 	(
+		InputArray  	distorted,
+		OutputArray  	undistorted,
+		InputArray  	K,
+		InputArray  	D,
+		InputArray  	Knew = cv::noArray(),
+		const Size &  	new_size = Size() 
+	) 
+		
+Python:
+	cv.omnidir.undistortImage(
+			distorted, K, D, xi, flags[, undistorted[, Knew[, new_size[, R]]]]	) -> 	undistorted
+	cv.fisheye.undistortImage(
+			distorted, K, D[, undistorted[, Knew[, new_size]]]	) -> 	undistorted
+```
+
+将一张有畸变的图片反变换补偿为没有畸变的图片, 该函数是一个懒人函数, 就是 `initUndistorRectifyMap` 和 `remap` 的结合而已  
+
+从结果上, 如果原本的相机是鱼眼摄像的, 那么用 fisheye 下的 undistort 能有更好的效果
+
+参数:
+* K, D, xi 不再赘述  : 根据相机模型不同而内容不同, 分别是 k1,k2,p1,p2 和 k1,k2,k3,k4
+* distorted			: 即输入图像, 
+* newsize  			: 反畸变的输出图像大小, 默认和输入相同
+* Knew				: 输出的矫正的图像内部参数, 默认为 单位矩阵, 某些时候仍然需要自定义
+* 对于 omnidir 的接口, 还附加的实现了
+  * R : 输出图像和 输入图像的旋转矩阵
+  * flags : 用于调整函数行为, 在 omnidir 的接口中独有而且是必须参数  
+
+
+
+```cpp
+
+void cv::omnidir::undistortPoints 	(
+	 	InputArray  	distorted,
+		OutputArray  	undistorted,
+		InputArray  	K,
+		InputArray  	D,
+		InputArray  	xi,
+		InputArray  	R 
+	) 		
+void cv::fisheye::undistortPoints 	(
+	 	InputArray  	distorted,
+		OutputArray  	undistorted,
+		InputArray  	K,
+		InputArray  	D,
+		InputArray  	R = noArray(),
+		InputArray  	P = noArray(),
+		TermCriteria  	criteria = TermCriteria(TermCriteria::MAX_ITER+TermCriteria::EPS, 10, 1e-8) 
+	) 		
+
+Python:
+	cv.omnidir.undistortPoints(	distorted, K, D, xi, R[, undistorted]	) -> 	undistorted
+Python:
+	cv.fisheye.undistortPoints(	distorted, K, D[, undistorted[, R[, P[, criteria]]]]	) -> 	undistorted
+
+```
+
+参数
+* 输入输出格式和 image 模式相同, 都是 Array, 但不在是图像而是点的序列 `vector of Vec2f`
+  * or `1xN/Nx1 2-channel Mat of type CV_32F, 64F depth is also acceptable`
+* K, D, xi : 相机参数
+* R : 旋转矩阵, 3x3
+* P : fisheye 实现了传入新相机的内部参数 3x3 或者整个 projection matrix 3x4
 
 # 9. features2d - 2D Features Framework 2D图像的传统特征检测
 

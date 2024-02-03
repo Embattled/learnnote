@@ -44,6 +44,7 @@
     - [5.5.3. init 初始化子库](#553-init-初始化子库)
     - [5.5.4. update 子库更新核心命令](#554-update-子库更新核心命令)
     - [5.5.5. foreach 遍历所有子库](#555-foreach-遍历所有子库)
+    - [submodule 与 github/gitlab](#submodule-与-githubgitlab)
   - [5.6. subtree](#56-subtree)
     - [5.6.1. add 添加子库](#561-add-添加子库)
     - [5.6.2. pull 拉取更新](#562-pull-拉取更新)
@@ -593,6 +594,7 @@ git stash list [<log-options>]
 git stash show [-u | --include-untracked | --only-untracked] [<diff-options>] [<stash>]
 
 # 删除 stash 
+# 这里删除指定的 stash id 不需要加 --index
 git stash drop [-q | --quiet] [<stash>]
 
 # pop   恢复的同时也将stash的内容删除了  
@@ -603,10 +605,12 @@ git stash apply [--index] [-q | --quiet] [<stash>]
 git stash branch <branchname> [<stash>]
 
 # 默认行为
+# -m --message 用于为 stash 实例添加说明文字
 git stash [push [-p | --patch] [-S | --staged] [-k | --[no-]keep-index] [-q | --quiet]
 	     [-u | --include-untracked] [-a | --all] [(-m | --message) <message>]
 	     [--pathspec-from-file=<file> [--pathspec-file-nul]]
 	     [--] [<pathspec>…​]]
+
 git stash save [-p | --patch] [-S | --staged] [-k | --[no-]keep-index] [-q | --quiet]
 	     [-u | --include-untracked] [-a | --all] [<message>]
 
@@ -905,6 +909,11 @@ update [--init] [--remote] [-N|--no-fetch] [--[no-]recommend-shallow]
 
 
 ### 5.5.5. foreach 遍历所有子库
+
+### submodule 与 github/gitlab  
+
+最好使用相对 path, 这样无论是  http 格式 还是 ssh 格式, 都能够保持之前的 profile 进行子模组的 clone, 从而避免一些 权限问题
+
 
 ## 5.6. subtree 
 

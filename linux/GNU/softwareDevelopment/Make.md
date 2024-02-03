@@ -1,3 +1,64 @@
+- [1. make](#1-make)
+- [2. makefile](#2-makefile)
+  - [2.1. 基础 makefile](#21-基础-makefile)
+- [3. Writing Makefiles](#3-writing-makefiles)
+  - [3.1. Including Other Makefiles - 导入其他 makefile](#31-including-other-makefiles---导入其他-makefile)
+- [4. Writing Rules - 编写规则](#4-writing-rules---编写规则)
+  - [4.1. Rule Example](#41-rule-example)
+  - [4.2. Rule Syntax](#42-rule-syntax)
+  - [4.3. Types of Prerequisites](#43-types-of-prerequisites)
+  - [4.4. Using Wildcard Characters in File Names](#44-using-wildcard-characters-in-file-names)
+  - [4.5. Searching Directories for Prerequisites](#45-searching-directories-for-prerequisites)
+    - [4.5.1. VPATH: Search Path for All Prerequisites](#451-vpath-search-path-for-all-prerequisites)
+    - [4.5.2. The vpath Directive](#452-the-vpath-directive)
+  - [4.6. Phony Target](#46-phony-target)
+    - [4.6.1. Phony with recursive make](#461-phony-with-recursive-make)
+    - [4.6.2. Phony have prerequisites](#462-phony-have-prerequisites)
+  - [4.7. Rules without Recipes or Prerequisites](#47-rules-without-recipes-or-prerequisites)
+  - [4.8. Special Built-in Target Names](#48-special-built-in-target-names)
+  - [4.9. Multiple Targets in a Rule](#49-multiple-targets-in-a-rule)
+  - [4.10. Multiple Rules for One Target](#410-multiple-rules-for-one-target)
+  - [4.11. Static Pattern Rules - 静态 Pattern Rules](#411-static-pattern-rules---静态-pattern-rules)
+    - [4.11.1. Syntax of Static Pattern Rules - 静态 Pattern Rules 语法](#4111-syntax-of-static-pattern-rules---静态-pattern-rules-语法)
+    - [4.11.2. Static Pattern Rules versus Implicit Rules - 与 Implicit Rules 的比较](#4112-static-pattern-rules-versus-implicit-rules---与-implicit-rules-的比较)
+- [5. Writing Recipes in Rules - 在 recipes 中编写 规则](#5-writing-recipes-in-rules---在-recipes-中编写-规则)
+  - [5.1. Recipe syntax](#51-recipe-syntax)
+  - [5.2. Recipe Echoing](#52-recipe-echoing)
+- [6. How to Use Variables - makefile 的变量](#6-how-to-use-variables---makefile-的变量)
+  - [6.1. Basics of Variable References](#61-basics-of-variable-references)
+  - [6.2. The Two Flavors of Variables](#62-the-two-flavors-of-variables)
+    - [6.2.1. Recursively Expanded Variable Assignment - 递归扩张](#621-recursively-expanded-variable-assignment---递归扩张)
+    - [6.2.2. Simply Expanded Variable Assignment](#622-simply-expanded-variable-assignment)
+    - [6.2.3. Immediately Expanded Variable Assignment](#623-immediately-expanded-variable-assignment)
+    - [6.2.4. Conditional Variable Assignment](#624-conditional-variable-assignment)
+  - [6.3. Advanced Features for Reference to Variables](#63-advanced-features-for-reference-to-variables)
+    - [6.3.1. Substitution References](#631-substitution-references)
+  - [6.4. Setting Variables 设置变量](#64-setting-variables-设置变量)
+  - [6.5. Defining Multi-Line Variables - 多行变量与 define 关键字](#65-defining-multi-line-variables---多行变量与-define-关键字)
+  - [6.6. Undefining Variables - 取消一个变量的定义](#66-undefining-variables---取消一个变量的定义)
+  - [6.7. Variables from the Environment - 环境变量](#67-variables-from-the-environment---环境变量)
+- [7. Conditional Parts of Makefiles - Makefile 的分支执行](#7-conditional-parts-of-makefiles---makefile-的分支执行)
+  - [7.1. Example of a Conditional - 快速实例](#71-example-of-a-conditional---快速实例)
+  - [7.2. Syntax of Conditionals - 完整的 makefile 条件语法](#72-syntax-of-conditionals---完整的-makefile-条件语法)
+  - [7.3. Conditionals that Test Flags -](#73-conditionals-that-test-flags--)
+- [8. Functions for Transforming Text](#8-functions-for-transforming-text)
+  - [8.1. Function Call Syntax](#81-function-call-syntax)
+  - [8.2. Functions for String Substitution and Analysis](#82-functions-for-string-substitution-and-analysis)
+    - [8.2.1. 字符串替换](#821-字符串替换)
+    - [8.2.2. 字符串调整](#822-字符串调整)
+    - [8.2.3. 值列表调整](#823-值列表调整)
+  - [8.3. Functions for File Names](#83-functions-for-file-names)
+  - [8.4. Functions That Control Make - 控制 make 执行的函数](#84-functions-that-control-make---控制-make-执行的函数)
+- [9. How to Run make - make CLI 文档](#9-how-to-run-make---make-cli-文档)
+  - [9.1. Arguments to Specify the Makefile](#91-arguments-to-specify-the-makefile)
+  - [9.2. Arguments to Specify the Goals](#92-arguments-to-specify-the-goals)
+  - [9.3. Overriding Variables](#93-overriding-variables)
+- [10. Using Implicit Rules](#10-using-implicit-rules)
+  - [10.1. Defining and Redefining Pattern Rules](#101-defining-and-redefining-pattern-rules)
+    - [10.1.1. Introduction to Pattern Rules](#1011-introduction-to-pattern-rules)
+    - [10.1.2. Automatic Variables](#1012-automatic-variables)
+- [11. Using make to Update Archive Files](#11-using-make-to-update-archive-files)
+
 # 1. make
 
 对于任何编译型语言首
@@ -28,15 +89,6 @@ makefile文件最好直接命名为`makefile`或`Makefile`
 
 官方文档
 https://www.gnu.org/software/make/manual/make.html
-
-## 1.1. make CLI
-
-* `-j [N], --jobs[=N]`
-    * Allow N jobs at once; infineite jobs with no arg.
-    * 允许并行编译
-    * 不指定数字的时候自动探测最大的可用CPU
-* `-f, --file` 
-    * 当 makefile 文件不是默认的时候, 用该参数来指定要执行的 makefile 文件
 
 # 2. makefile
 
@@ -100,28 +152,13 @@ clean:
 
 
 
-## 2.2. 自动推导(简化makefile代码)
-
-Static Pattern Rule  
-`targets: target-pattern: prereq-patterns`  
-这里的targets代表一组target  例如  
-
-`OBJS = $(patsubst %.cpp, %.o, $(wildcard *.cpp))`  
 
 
-* target-pattern 代表target的特征
-* prereq-patterns 代表原本的依赖文件的特征
 
-最终通过一行可以执行全部的文件编译 
-```makefile
-$(OBJS):%.o:%.cpp
-        $(CC) $(CFLAGS) $< -o $@
+# 3. Writing Makefiles
 
-```
+## 3.1. Including Other Makefiles - 导入其他 makefile
 
-# 3. 高级操作
-
-## 3.1. 多makefile处理
 
 在Makefile使用 include 关键字可以把别的Makefile包含进来, 这很像C语言的 `#include`  
 
@@ -148,61 +185,85 @@ include foo.make a.mk b.mk c.mk e.mk f.mk
 * 如果你想让make不理那些无法读取的文件, 而继续执行, 你可以在include前加一个减号`-` 。如: `-include <filename>`
 
 
+# 4. Writing Rules - 编写规则
 
-# 4. Writing Rules
+<!-- 头部完 -->
 
+`rule` : 用于在 makefile 中指定 何时/如何 更新指定的文件( 即target ), target 一般在一条 rule 中只会有一个  , 是 makefile 中模块的单位名称  
 
-## 4.1. Recipe syntax
+rule 的编写顺序不重要.  除了所谓的 `default goal` : make 所默认要执行的首个 target. 除非显式指定, 否则为 makefile 文件中出现的第一个 rule 中的 target.  
+   The default goal is the first target of the first rule in the first makefile   
 
-makefile 的规则 是以下的形式  
+关于 default goal 的默认选定, 还有两个例外
+* 以 period `.` 开头的 rule 即使作为 首个 rule 也不会被指定为 default goal ( 因为这是 phony target)
+  * 除非 `.` 是被转义的 `/.`
+* 如果 target 是一个 pattern rule. 则也不会被作为 default goal ( pattern 会指定多个文件为 target )
+
+因此约定俗成的, makefile 的第一个规则是编译整个程序 或者最终目标, 且一般命名为 `all`  
+
+## 4.1. Rule Example
+<!-- 完 -->
+rule 是 target, prerequisites, recipe 所构成的, 更新文件的方法的集合(规则)
+
 ```makefile
-# syntax
-targets : prerequisites
-        recipe
-targets : prerequisites ; recipe
-        recipe
-        …
-
-# example
 foo.o : foo.c defs.h       # module for twiddling the frobs
         cc -c -g foo.c
 ```
-`rule` 用于描述何时重新生成一个目标文件
-* `prerequisites`中如果有一个以上的文件比`target`文件要新的话, command所定义的命令就会被执行, 否则就跳过该 command  
-* make 执行的时候, 会在 shell 打印所执行的具体的 receipe (编译/链接命令)
 
+## 4.2. Rule Syntax
+<!-- 完 -->
+rule 由 3 部分构成  , rule 的目标是 : 用于确定 target 何时/是否过时, 并且如何更新 target
 
-一个 makefile 里面会有多条 rule , 其中大部分的规则不存在前后顺序, 除了被称为 `default goal` 的 rule:
-* `default goal` 默认被定义为 makefile 中的第一条 rule
-* 在 CLI 中键入 `make` 时所执行的生成目标
-* 因为 rule 之间会有链式关联, 所以所谓 default goal 其实可以是多个 rule 的合集
-* 作为例外:
-  * 以点 `.` 开头的 target 不会成为 default goal
-  * 不被当前的主 `default goal` 所间接直接依赖的 target 不是 `default goal`
-* 作为一个通识, 编写 makefile 的时候会将 first rule 用于描述整个项目程序的生成, 该 target 经常写成 `all`
+```makefile
+targets : prerequisites
+        recipe
+        …
 
+targets : prerequisites ; recipe
+        recipe
+        …
+```
 
-## 4.2. Recipe Echoing
+target : file names, separated by spaces
+* 可以在 file name 里使用通配符
+* 可以使用 archive file 的格式,  e.g. `a(m)` 代表在名为 a 的 archive 的文件中查阅名为 m 的成员
+* 通常情况下, target 只会由一个目标, 但是也允许存在多个目标, 参考 Multiple Targets in a Rule
 
-规则回声: 对于每一条 recipe, make 默认会在执行前把要执行的具体 shell 命令打印到 shell 输出里, 这个过程被叫做 echoing  
+recipe : 以制表符开头的 可执行的 command 
+* 除了制表符外, 还可以参阅特殊变量 `.RECIPEPREFIX` 确认其他可以使用的 前缀
+* 首个 recipe 除了出现在 prerequisites 之后的行上, 还可以接在 prerequisites 正后方, 以分号作为分隔符
+* 详细的 recipe 文档在下一章学习  
 
-有时候这个特性会导致 echoing 占据了绝大部分的输出导致有用的信息无法被查看, 通过在 recipe 的起始使用 `@` , 该行 recipe 的 echoing 就会被关闭  
+prerequisites : 由空格分隔的文件名, 同样允许 通配符和 archive member
+* 决定 target 的过失标准
+* 如果 target 的文件不存在, 或者时间戳早于任何 prerequisites, 则说明目标已过时  
 
-最基本的用途是在调用 `echo` 的时候使用 `@`, 否则相关内容就会被输出两遍   
+关于行长: make 不限制一行的长度, 可以为了增加易读性而手动通过反斜杠来分隔行 
 
-与之相关的还有两个 make CLI option:
-* `-n --just-print` : 不执行所有命令, 仅仅只是打印, 这对于差错非常有帮助, 该情况下即使有 `@` 的 recipe 也会被打印
-* `-s --silent`     : 屏蔽左右 echoing, 相当于所有 recipe 都加上了 `@`, 但是是 CLI 进行控制的
-* 一个 build-in target `.SILENT` 也有和 `@` 相同的效果
-  
+关于美元符号 `$` 的转义
+* 如果希望在 target 或者 prerequisites 的文件名中使用 美元符号, 则转义非常的麻烦
+* 一般的转义需要书写两个美元符号 `$$`
+* 如何启用了所谓为的 `Secondary Expansion` 则需要书写 4 个美元符号 `$$$$`
 
 ## 4.3. Types of Prerequisites 
 <!-- 完 -->
 Prequisites 的种类 : normal prerequisites, order-only prerequisites
 
+```makefile
+targets : normal-prerequisites | order-only-prerequisites
+```
+normal prerequisites: 
+* 规定了配方的调用顺序: target 的所有 prerequisites 都会在该 target 的 recipe 调用之前被完成
+* 如果任何 prerequisites 比 target 新, 则 target 需要被更新
+
+
 这里主要特殊的地方就是 order-only prerequisites 不会影响 target 的 rebuild  
-* 即, 将某一个 reprequisites 作为 Order-only 的时候, 该文件的时间戳更新不会影响 target
-* 在官方文档中, 作为 obj 文件夹的创建 recipe 的时候似乎很有用处
+* 即, 将某一个 prerequisites 作为 Order-only 的时候, 该文件的时间戳更新不会影响 target
+* 即使该 prerequisites 是一个 .phony , 也不会影响 target 的更新
+* 在官方文档中, 用作文件夹的创建 recipe 的时候似乎很有用处
+  * 文件夹的时间戳会随着文件夹中  文件的 增删改 而随之变化
+  * 因此 文件夹的时间戳不适合作为 target 的更新依据
+
 
 ```makefile
 OBJDIR := objdir
@@ -296,9 +357,10 @@ vpath 使用的关键在于 pattern 的定义, 对于一个 pattern
 
 
 ## 4.6. Phony Target 
+<!-- 完 -->
 
 Phony Target 是一种特殊的目标, 他并不是一个真实的生成目标文件, 更像是一个 recipe 的集合的命名, 主要用于 make 执行具体的 request 的时候  
-* to avoid a conflict with a file of the same name
+* to avoid a conflict with a file of the same name, 如果不定义成 phony
 * and to improve performance
 
 ```makefile
@@ -310,33 +372,206 @@ clean :
     -rm edit $(object)
 ```
 
-对于常用的 clean rule:
-* 由于其没有 prerequisites, 且他的 recipe 不会生成名为 clean 的文件, 所以 make 会在每次调用 `make clean` 的时候都执行 `rm` 命令
+对于常用的 clean rule: 如果不定义成 phony, 那么随着同名为 clean 的有无, 会有两种极端情况  
+* 由于其没有 prerequisites, 且他的 recipe 不会生成名为 clean 的文件, 所以 make 会在每次调用 `make clean` 的时候都执行 `rm` 命令  
 * 然而若是当前目录中存在了名为 `clean` 的任意文件, 则由于没有 prerequisites, 导致 make 认为 clean 已经是最新的, 从而导致相应的 rm 命令被跳过
 * 解决办法就是, 将 clean rule 实现声明为 Phony Target
+* the phony target recipe will be executed only when the phony target is a specified goal (see Arguments to Specify the Goals). 
 
+声明为 phony 后, 执行 `make <target>` 则会无视 clean 文件的存在与否 执行对应的 recipe
 
-## 4.7. Special Built-in Target Names
+注意: 声明为 phony 后:
+* 该 rule 的 prerequisites 将始终被解释为 `literal target name`. 即 永远不会被解释为 pattern (即使包含了 `%` 字符也不会)
+* 该 rule 不会被 `implicit rule search` 搜索到, 因此定义为 phony 之后就不用再担心 名为 target 的文件存在的情况  
+* 反过来, 声明为 phony 的 target 也不应该成为别的 `非 phony rule` 的 prerequisites
+  * 因为不考虑是否存在对应文件以及时间戳, 因此会导致 phony 总是执行被执行
+  * 需要慎重考虑该用法
+* 如果要建立一个 无视 prerequisites 时间戳 始终重建的 pattern rule, 应该使用 `force target` 而非 `phony`
+  * (see Rules without Recipes or Prerequisites). 
 
-一些特殊的 name 作为 Target 的时候会有特殊的意思
+### 4.6.1. Phony with recursive make
+<!-- 完 -->
 
-像是 `clean`, 因为没有依赖文件,所以不会被自动执行,但有更稳妥的书写格式  
+除了 clean 等 target 常被定义为 phony 以外, 和 make 的递归调用相关的 rule 也适合定义为 phony
 
+```makefile
+# 定义一些 子目录, 需要递归的执行对应的子 makefile
+SUBDIRS = foo bar baz
 
-* .PHONY : prerequisites of the special target .PHONY are considered to be phony targets
+# 传统方法, 通过将循环写在 recipe 中实现
+subdirs:
+        for dir in $(SUBDIRS); do \
+          $(MAKE) -C $$dir; \
+        done
+# 缺点有
+#   1. 无法自由的判断子 makefile 的运行情况对 主 make 的影响, 例如通过 shell 命令来获取子 make 的返回值, 但这又会导致 `-k` 命令的失效
+#   2. 无法利用 make 的并行化功能, recipe 只有一条规则, 该 for 只会在单个线程上运行
+
+# phony 方法, 通过将整个 子目录变量定义为 phony, 相当于定义了每一个 子目录的 phony target
+.PHONY: subdirs $(SUBDIRS)
+# phony 成为了另一个 phony 的 prerequisites, 这是合理的
+subdirs: $(SUBDIRS)
+# 可以使用 auto variable
+$(SUBDIRS):
+        $(MAKE) -C $@
+# 定义了 foo 和 baz 的先后关系
+foo: baz
+```
+
+### 4.6.2. Phony have prerequisites
+
+一个最常用的 phony 就是 `all`, 将其写作首个 rule 的 target, 并定义为 phony, 再将构建所有子程序的 target 作为 prerequisites 传入该 rule 即可  
+如上节所说, 如果 phony 的 prerequisites 也是 phony , 则就是很普通的作为 subroutine 被执行  
+
+```makefile
+# phony 的 all 需要其他三个子程序, 这样 make 的默认 target 就是 all
+all : prog1 prog2 prog3
+.PHONY : all
+
+prog1 : prog1.o utils.o
+        cc -o prog1 prog1.o utils.o
+
+prog2 : prog2.o
+        cc -o prog2 prog2.o
+
+prog3 : prog3.o sort.o utils.o
+        cc -o prog3 prog3.o sort.o utils.o
+```
+
+## 4.7. Rules without Recipes or Prerequisites
+
+规则上: 
+* 如果一个 target 不存在 prerequisites 或者 recipes, 同时不存在名为 `<target>` 的文件, 那么 make 会认为该 target 在 make 运行的时候已经被更新
+* 从而导致 所有依赖于该 target 的其他 target 也被更新
+* 这听起来很像 `PHONY`, 事实上, 该规则的利用就是某种程度上对于不支持 PHONY 的 make 版本的兼容
+* 约定俗成的, 该 target 总是被命名为 `FORCE`
 
 
 ```makefile
-clean:
-    rm edit $(objects)
+# 定义 force rule
+clean: FORCE
+        rm $(objects)
+# 定义 FORCE
+FORCE:
+```
 
+## 4.8. Special Built-in Target Names
+
+一些特殊的 name 作为 Target 的时候会有特殊的意思, 例如作为这些 target 的 prerequisites 则会被设定为 特殊的 target, 例如 PHONY
+
+
+
+* `.PHONY`
+* `.SUFFIXES`
+* `.DEFAULT`
+* `.PRECIOUS`
+* `.INTERMEDIATE`
+* `.NOTINTERMEDIATE`
+* `.SECONDARY`
+* `.SECONDEXPANSION`
+* `.DELETE_ON_ERROR`
+* `.IGNORE`
+* `.LOW_RESOLUTION_TIME`
+* `.SILENT`
+* `.EXPORT_ALL_VARIABLES`
+* `.NOTPARALLEL`
+* `.ONESHELL`
+* `.POSIX`
+
+## 4.9. Multiple Targets in a Rule
+
+## 4.10. Multiple Rules for One Target
+
+
+## 4.11. Static Pattern Rules - 静态 Pattern Rules
+
+指定多个 target, 同时根据 target 的名称构建每个目标自己的 prerequisites
+* 对于普通的 multiple targets rule, 其 prerequisites 只能指定成相同的
+* static pattern rules 对于每个 target 都会生成根据对应 pattern 生成的 prerequisites, 这更加自由
+
+### 4.11.1. Syntax of Static Pattern Rules - 静态 Pattern Rules 语法
+
+
+```makefile
+targets …: target-pattern: prereq-patterns …
+        recipe
+        …
+```
+这里的targets代表一组target  例如  
+`OBJS = $(patsubst %.cpp, %.o, $(wildcard *.cpp))`  
+
+
+* target-pattern 代表target的特征
+* prereq-patterns 代表原本的依赖文件的特征
+
+最终通过一行可以执行全部的文件编译 
+```makefile
+$(OBJS):%.o:%.cpp
+        $(CC) $(CFLAGS) $< -o $@
 
 ```
-而在 rm 命令前面加了一个小减号的意思就是, 也许某些文件出现问题, 但不要管, 继续做后面的事  
 
-# 5. Writing Recipes in Rules
+### 4.11.2. Static Pattern Rules versus Implicit Rules - 与 Implicit Rules 的比较
 
-# 6. How to Use Variables
+
+
+# 5. Writing Recipes in Rules - 在 recipes 中编写 规则
+
+首先定义 recipe of a rule : one or more shell command lines to be executed, 一次一个按照出现的顺序执行.   
+通常情况下, 所谓 的 recipe of a rule 的目的是让 target of the rule 进行更新  
+
+要注意, 默认情况下 makefile 中的 recipes 是由 `/bin/sh` 解释的, 除非特殊指定, 因此在编写的时候要注意命令的兼容性  
+
+
+## 5.1. Recipe syntax
+
+makefile 的规则 是以下的形式  
+```makefile
+# syntax
+targets : prerequisites
+        recipe
+targets : prerequisites ; recipe
+        recipe
+        …
+
+# example
+foo.o : foo.c defs.h       # module for twiddling the frobs
+        cc -c -g foo.c
+```
+`rule` 用于描述何时重新生成一个目标文件
+* `prerequisites`中如果有一个以上的文件比`target`文件要新的话, command所定义的命令就会被执行, 否则就跳过该 command  
+* make 执行的时候, 会在 shell 打印所执行的具体的 receipe (编译/链接命令)
+
+
+一个 makefile 里面会有多条 rule , 其中大部分的规则不存在前后顺序, 除了被称为 `default goal` 的 rule:
+* `default goal` 默认被定义为 makefile 中的第一条 rule
+* 在 CLI 中键入 `make` 时所执行的生成目标
+* 因为 rule 之间会有链式关联, 所以所谓 default goal 其实可以是多个 rule 的合集
+* 作为例外:
+  * 以点 `.` 开头的 target 不会成为 default goal
+  * 不被当前的主 `default goal` 所间接直接依赖的 target 不是 `default goal`
+* 作为一个通识, 编写 makefile 的时候会将 first rule 用于描述整个项目程序的生成, 该 target 经常写成 `all`
+
+
+## 5.2. Recipe Echoing
+
+规则回声: 对于每一条 recipe, make 默认会在执行前把要执行的具体 shell 命令打印到 shell 输出里, 这个过程被叫做 echoing  
+
+有时候这个特性会导致 echoing 占据了绝大部分的输出导致有用的信息无法被查看, 通过在 recipe 的起始使用 `@` , 该行 recipe 的 echoing 就会被关闭  
+
+最基本的用途是在调用 `echo` 的时候使用 `@`, 否则相关内容就会被输出两遍   
+
+与之相关的还有两个 make CLI option:
+* `-n --just-print` : 不执行所有命令, 仅仅只是打印, 这对于差错非常有帮助, 该情况下即使有 `@` 的 recipe 也会被打印
+* `-s --silent`     : 屏蔽左右 echoing, 相当于所有 recipe 都加上了 `@`, 但是是 CLI 进行控制的
+* 一个 build-in target `.SILENT` 也有和 `@` 相同的效果
+
+
+
+
+
+
+# 6. How to Use Variables - makefile 的变量
 
 <!-- (头部完) -->
 makefile 的 variable 是一些被定义为 name 的 string or text, 这些 varable 的值可以替换在任何部分 (target, prerequisites, recipes, etc.)
@@ -413,7 +648,7 @@ ugh = Huh?
 
 all:;echo $(foo)  # Huh?
 
-# 无法引用自己来实现值的拓展, 会导致无线递归
+# 无法引用自己来实现值的拓展, 会导致无限递归
 CFLAGS = $(CFLAGS) -O
 ```
 
@@ -488,17 +723,103 @@ bar := $(foo:%.o=%.c) # bar = a.c b.c l.a c.c
 
 ## 6.4. Setting Variables 设置变量
 
-To set a variable from the makefile, write a line starting with the variable name followed by one of the assignment operators` ‘=’, ‘:=’, ‘::=’, or ‘:::=’`.  
-Whitespace around the variable name and immediately after the ‘=’ is ignored.   
-对于代码 `objects = main.o foo.o bar.o utils.o`, 则具体的值则是 `main.o foo.o bar.o utils.o`
+To set a variable from the makefile, write a line starting with the variable name followed by one of the assignment operators` ‘=’, ‘:=’, ‘::=’, or ‘:::=’`.   
+* 定义一个变量的值支持 4 种赋值运算符， 
 
-# 7. Conditional Parts of Makefiles
+Whitespace around the variable name and immediately after the ‘=’ is ignored.    
+对于代码的整洁度来说, 赋值运算符号后面的首个空格会被忽视, 然而要注意仅仅是首个会被忽视. 此外, 变量名的左右空格也会被忽视     
+对于代码 `objects = main.o foo.o bar.o utils.o`, 则具体的值则是 `main.o foo.o bar.o utils.o`   
+
+
+## 6.5. Defining Multi-Line Variables - 多行变量与 define 关键字
+<!-- 完 -->
+define 关键字是另一种完全不同的 语法 用来定义一个变量, 其特点就是支持变量内容支持 newline 字符
+
+对于:
+* canned sequences of commands  (查阅  Defining Canned Recipes )
+* sections of makefile syntax to use with `eval` (查阅 The eval Function)
+都是非常方便的一种方式  
+
+语法:
+* `define` 关键字后接 变量的名称和 (可选的赋值运算符), 并在 `下一行` 开始定义具体的值内容, 值的结束用一个仅包含 `endef` 的行结尾  
+* 除了语法的差异以外, 与通常的变量没有其他区别.  如果变量名称中包括了函数或者引用, 则实际执行的时候会拓展这些引用
+* endef 的前一行的 `换行符 newline` 不会被包括在变量值中, 因此如果需要变量结尾包括换行符则需要多插入一行空行
+* (可选的赋值运算符)
+  * 如果省略, make 会假定其为 `=` 递归扩展变量
+  * 如果使用 `+=`, 则与其他附加操作一样, 改值将附加到前一个值并以 空格分隔
+* define 的嵌套是被允许的
+  * 然而, 如果以制表符开头 `recipe prefix 字符`, 则关键字会被是做 recipe 的一部分, 要注意
+
+
+```makefile
+# 包含一个空行 (带结尾换行符) 的变量, 需要在关键字中插入两个空行
+define newline
+
+
+endef
+
+# example
+define two-lines
+echo foo
+echo $(bar)
+endef
+
+
+# 从结果上, 上面的定义内容与下面是相同的
+two-lines = echo foo; echo $(bar)
+
+# 覆盖环境变量
+override define
+
+endef
+```
+
+
+
+
+## 6.6. Undefining Variables - 取消一个变量的定义  
+
+<!-- 完 -->
+不论一个变量是 undefine 或者值为空.  对其进行 expand 都会返回一个 空字符串, 这使得很多时候要取消一个变量的值将其置空即可足够使用   
+
+然而对于两个函数 `flavor` 和 `origin` 来说, 这两种函数对于变量的处理结果会随着变量是否定义过而不同, 因此, 某些场景下 undefine variable 是需要的  
+通过结合 `override` 关键字可以覆盖取消环境变量的定义
+
+```makefile
+foo := foo
+bar = bar
+
+undefine foo
+undefine bar
+
+$(info $(origin foo))
+$(info $(flavor bar))
+# 此时 上面两个函数的输出都是 "undefined"
+
+override undefine CFLAGS
+# 通过 override 关键字来强行 undefine 一个 命令行 环境变量
+```
+
+## 6.7. Variables from the Environment - 环境变量
+<!-- 完 -->
+make 在启动的时候会读取所有的终端环境变量, 并将其转化为对应的 make 变量.  在其后对变量进行赋值则会自然的覆盖掉从环境变量中获取的值
+* 此处有一个行为改变的 option `-e`, 官方文档并不推荐使用因此不阅读
+
+通常, 开发者会在环境变量中设置 `CFLAGS`, 因为 CFLAGS 在所有 makefile 中约定俗成的只会有一种用途. 除非某些 makefile 会在内部显式的给 CFLAGS 赋值, 则会覆盖掉环境变量中的设置  
+
+对于 recipe 中的 命令的环境, 只有 make 本身的环境变量以及 make 自己设置的变量会作为环境变量传入 recipe 的环境中.  
+某些情况下 (sub-make) 可能需要使用 export 来将 make 中的变量导入到外部 环境中,  See `Communicating Variables to a Sub-make`, for full details. 
+
+甚至对于某些特殊的环境变量 , 例如 `SHELL`, make 会以特殊的方式处理, 因此在 rule 中使用某些特殊的环境变量是非常不明智的.  
+ see `Choosing the Shell`. 
+
+# 7. Conditional Parts of Makefiles - Makefile 的分支执行
 
 <!-- 头部完 -->
 
 makefile 中的条件分歧, 根据变量值来使得 makefile 中的一部分指令被执行或者忽视
 * 条件决定了 make 实际读取到的 makefile 的内容, 即可以把条件理解为 编译过程中的预处理指令
-* 因此 makefile 中的条件分歧并不能实现在 make 执行过程中产生条件分歧
+* 因此 makefile 中的条件分歧并不能实现在 make 执行过程中根据计算出来的变量产生条件分歧
 
 比较简单的一个章节
 
@@ -532,7 +853,58 @@ endif
 `endif` 意为 条件部分的终止, 是必须的, 每个 conditional 必须以 `endif` 结尾   
 
 ## 7.2. Syntax of Conditionals - 完整的 makefile 条件语法
+<!-- 完 -->
+多重 if 分支和 C 语言的构成类似, 每一个分支下的代码数量都是任意的     
+* 再次强调, makefile 的分支类似于 预编译指令, 对于一切 make 执行中的变量都是不生效的   
 
+为了防止混乱
+* make 不允许将条件的开始和中止分别写在不同的 文件中并 分别 include 他们
+* 但是允许在 分支条件表达式里使用 include
+
+关键字
+* `ifeq         表达式`    验证表达式为真, 执行接下来的代码
+* `ifneq        表达式`    验证表达式为假, 则执行接下来的代码
+* `ifdef        变量名` 
+* `ifndef       变量名`        
+
+
+表达式的写法
+* 括号  `(arg1, arg2)`
+* 单引号 `'arg1' 'arg2'`
+* 双引号 `"arg1" "arg2"`
+* 两个变量分别 单双引号 `"arg1" 'arg2'`  `'arg1' "arg2"`
+
+
+变量名 (name of a variable)  和 变量引用 ( reference to a variable)
+* 变量名仅仅是 定义一个变量时候变量的名称   `MY_VAR`
+* 变量引用则是一个表达式用于 获取某个变量的值 `$(MY_VAR)`
+* ifdef ifndef 的正确用法是用于验证某个变量是否被定义过, 因此不要传入变量引用  
+
+```makefile
+bar =
+foo = $(bar)
+# 传入的是 foo 变量名称, 因为 foo=$(bar) 已经被定义过, 因此执行 true 的语句
+ifdef foo
+# 执行的部分
+frobozz = yes
+else
+frobozz = no
+endif
+
+
+foo =
+# foo 没有被定义 (被取消定义了) , 因此会执行 false 的代码 
+ifdef foo
+frobozz = yes
+else
+frobozz = no
+endif
+
+
+
+```
+
+## 7.3. Conditionals that Test Flags - 
 
 # 8. Functions for Transforming Text
 
@@ -626,7 +998,25 @@ ${function arguments}
 * `$(realpath names…)`                   : 路径转换, 包括转换链接, 消除 `../`, 消除重复的 `/`, 验证路径是否存在, 如果转换失败则返回空字符串
 * `$(abspath names…)`                    : 有些类似于 realpath, 但不进行验证存在, 同时不进行链接转换  
 
-# 9. How to Run make - make CLI
+## 8.4. Functions That Control Make - 控制 make 执行的函数  
+
+包括了 3 个函数, 主要用于某些环境错误被检测到的时候 stop make
+
+* `$(error text...)`
+  * 用于处理严重 error, 此时 make 会被停止, 同时输出 text
+  * 注意, 报错会发生在 `error` 函数被计算的时候, 因此如果 error 函数如果被定义在 recipe 或者 variable 赋值的右边, 那么直到 error 被正式计算为止都不会报错  
+  * 函数会返回对应的 text, 但是一般没什么用处
+* `$(warning  text...)`
+  * 与 error 类似, 但是不会退出 make
+  * 函数返回值为 空
+* `$(info  text...)`
+  * 仅仅是打印信息, 不做其他任何事
+
+
+
+
+
+# 9. How to Run make - make CLI 文档
 
 
 记载了关于 make CLI 的相关使用方法  
@@ -636,7 +1026,15 @@ make 程序本身的退出代码书写在了章节开头
 * 2     : 遇到错误, 同时会打印相关的错误描述信息
 * 1     : 与 CLi 中的 `-q` 标志相关, 在 make 确认某些目标尚未更新的情况下
 
+
+* `-j [N], --jobs[=N]`
+    * Allow N jobs at once; infineite jobs with no arg.
+    * 允许并行编译
+    * 不指定数字的时候自动探测最大的可用CPU
+
+
 ## 9.1. Arguments to Specify the Makefile
+
 <!-- 完 -->
 通过 `-f` or `--file` 参数, 指定要运行的 makefile 文件.  
 
@@ -715,7 +1113,6 @@ A pattern rule contains the character ‘%’ (exactly one of them) in the targe
 让 makefile 变成天书的罪魁祸首, `automatic variables` 根据每一项 rule 来重新计算该 variable 的值  
 
 automatic variable 仅仅只在 recipe 里有效, 让 prerequisite list 里也能使用 `automatic variables` 的特性称为 `Secondary Expansion` 在之前的章节里介绍
-
 
 对于存在的一个段 `all: library.cpp main.cpp`  
 * `$@`          : 本段的`target`  即 `all`, 对于具有多个目标的 pattern rule, `$@` 也是根据 rule 来确定要运行对应 recipe 时候的 target

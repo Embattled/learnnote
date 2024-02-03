@@ -19,7 +19,6 @@ OpenCL 是
 https://www.khronos.org/opencl/
 
 
-
 ## 1.1. OpenCL 的历史  
 
 2008 年由苹果公司于WWWDC大会上发布, 拥有商标权 , 随后提交至 Khronos Group 并成立了 GPU 通用计算开放行业标准工作组.  
@@ -145,12 +144,55 @@ OpenCL 框架可以划分成以下组成部分
 * OpenCL 编程语言 : 基于 ISOC99 标注的一个拓展子集, 通常称为 OpenCL C
 
 
-# OpenCL 编译环境
+# 2. OpenCL 编译环境
 
-## Getting started with OpenCL on Ubuntu Linux
+## 2.1. Getting started with OpenCL on Ubuntu Linux
 
 OpenCL-SDK : To build native OpenCL applications, one will minimally need
 * C or C++ compiler
 * The OpenCL headers : The C and optionally the C++ headers
 * An Installable Client Driver (ICD) Loader : Shared objects library (`libOpenCL.so`)
+
+
+
+## 2.2. OpenCL Reference
+
+https://www.khronos.org/files/opencl30-reference-guide.pdf
+
+总的来说, OpenCL 3.0 的参考被分成了几个部分
+
+各个版本的文档链接
+https://registry.khronos.org/OpenCL/
+
+
+
+# 3. OpenCL API Reference 2
+# 4. OpenCL API Reference 3
+
+API 的参考 
+
+## 4.1. Kernel Objects
+
+kernel object 是 `__kernel` 函数的封装体, 提供了获取用于具体的 OpenCL 运行的参数的接口
+
+它定义了不同于设备所物理支持的最大参数, 从软件层面上来一定程度上限制程序  
+
+### 4.1.1. Create kernel objects
+
+
+### 4.1.2. Kernel arguments and queries
+
+询问 kernel 的参数  
+
+
+```cpp
+cl_int clGetKernelWorkGroupInfo (
+  cl_kernel kernel,
+  cl_device_id device,
+  cl_kernel_work_group_info param_name,
+  size_t param_value_size, void *param_value,
+  size_t *param_value_size_ret)
+
+
+```
 

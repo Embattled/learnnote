@@ -20,7 +20,7 @@ Symbols defined here are used by several library components.
 * `void* calloc( std::size_t num, std::size_t size );`
   * 分配 num 个 size 大小的空间, 并初始化所有位为0
   * 返回值同上
-* `void* realloc( void* ptr, std::size_t new_size );`
+* `oid* realloc( void* ptr, std::size_t new_size );`
   * 重分配内存, 传入的指针必须是由 `malloc calloc realloc` 创建的, 否则未定义
   * 实际实现的处理可能是以下之一
     * 若处理是收缩或者内存空间可以进行拓张, 旧内容保留

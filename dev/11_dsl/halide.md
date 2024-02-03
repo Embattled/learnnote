@@ -271,7 +271,7 @@ Expr 可以理解为表达式对象, 是一种轻量化的数据结构, 表达�
 * 对于一个 `Func`, 那么 `typeof(Func(x,y)) == Expr`, 根据库函数头的形式决定等式两边的 Func 是用 `Func` 形式还是 `Func(x,y)` 形式
 
 
-## 5.1. Expr routine
+## 5.1. Expr routine - 各种返回值为 Expr 的预定义 Func
 
 ### 5.1.1. 数值类型转换 - cast
 
@@ -288,11 +288,10 @@ Expr Halide::cast 	(
 	) 		
 ```
 
-### 5.1.2. 基础数值操作 - clamp, select
+### 5.1.2. 基础数值操作 - clamp
 
 函数头
 * clamp     : 相当于 min 和 max 的结合, 将一个输入的 Expr 限制在对应的区间以内  
-* select    : 类似于 numpy.where 或者 C 语言中的三元表达式, 根据条件从两个输入中选择一个到输出中
 
 clamp
 ```cpp
@@ -309,6 +308,13 @@ Expr Halide::clamp 	(
 
 ```
 
+
+
+
+### 5.1.3. 逻辑函数 select, mux
+
+* select    : 类似于 numpy.where 或者 C 语言中的三元表达式, 根据条件从两个输入中选择一个到输出中
+* mux       : 相当于直接把一系列 Expr 打包成由索引定位的 Expr
 
 select 详解
 ```cpp
@@ -333,8 +339,35 @@ Expr Halide::select 	(
 
 ```
 
+有时候我们会把某些拥有相同类型的 expressions 打包到某个 channel dimension.  这个时候可以用这个 mux 
+* 一些性质与 select 一样, 当输入的 c (第一个参数, 索引) 超出了范围, 则返回表达式 list 的最后一个结果
+* 该写法对比于 select 实现也有一些不方便的地方
+  * Func 会定义成无限大的区域, 因此这方便很容易产生 Bug
+  * 这个方法也同 select 一样有性能问题, 因此尽可能加上 `.bound(c, 0, <max_index>).unroll(c);`
+  * 对比 select, 该Func 输入的 Expr 必须有相同的类型
+```cpp
+// 根据通道的值选择输出, 相当于一种方便的 select 写法
+img(x, y, c) = select(c == 0, 100, c == 1, 50, 25);
+img(x, y, c) = mux(c, {100, 50, 25});
 
-### 累积函数
+
+// 直接通过花括号传入 
+Expr Halide::mux 	( 	const Expr &  	id,
+		const std::initializer_list< Expr > &  	values 
+	) 	
+
+// 通过 vector传入
+Expr Halide::mux 	( 	const Expr &  	id,
+		const std::vector< Expr > &  	values 
+	) 		
+
+// 通过 Tuple传入  
+Expr Halide::mux 	( 	const Expr &  	id,
+		const Tuple &  	values 
+	) 	
+```
+
+### 5.1.4. 累积函数 - 需要输入的Expr 有 RDom
 
 
 * sum         : 累加函数
@@ -344,9 +377,113 @@ Expr Halide::select 	(
 
 
 
+# 6. Tuple - small array of Exprs for func with multiple outputs
+
+用于定义某个拥有一系列输出的 Func, 通过该方法定义的好处就是所有计算会使用同一个 x,y loop, 但是计算的存储结果会放在较远的内存位置  
+* 定义为 Tuple 类型的 Func 不能再输入索引转为 Expr
 
 
-# 6. Func
+```cpp
+Func multi_valued;
+multi_valued(x, y) = Tuple(x + y, sin(x * y));
+
+// 使用该种方法定义的 Func 在实现后, 结果会以 vector<Buuffer<type>> 存在
+Realization r = multi_valued.realize({80, 60});
+assert(r.size() == 2);
+Buffer<int> im0 = r[0];
+Buffer<float> im1 = r[1];
+
+// 直接通过花括号也可以定义 tuple 的 func
+Func multi_valued_2;
+multi_valued_2(x, y) = {x + y, sin(x * y)};
+
+// 定义为 Tuple 类型的 Func 不能再输入索引直接转为 Expr. 需要在加上 索引后再加上 Expr 的索引
+Func consumer;
+// consumer(x, y) = multi_valued_2(x, y) + 10;  这里会报错
+Expr integer_part = multi_valued_2(x, y)[0];
+Expr floating_part = multi_valued_2(x, y)[1];
+
+```
+
+## 6.1. Tuple - 构造函数
+
+
+## 6.2. 基于 Tuple 的 reductions
+
+由于 所有计算会使用同一个 x,y loop, 因此对于需要保存状态信息的类似于 argmax 之类的运算, 使用通过 tuple 包装后的 Func 可以很快的实现计算
+* halide 的内置 reduction `argmax argmin` 就是基于这种来实现的, 返回值是一个 tuple
+  * the point in the reduction domain corresponding to that value
+  * the value itself
+
+```cpp
+// 输入值
+input_func(x) = sin(x);
+
+// Pure definition. 定义一个 Tuple, 索引都为 0 , 则默认值都为输入的首位置值
+arg_max() = {0, input(0)};
+Expr old_index = arg_max()[0];
+Expr old_max = arg_max()[1];
+Expr new_index = select(old_max < input(r), r, old_index);
+Expr new_max = max(input(r), old_max);
+arg_max() = {new_index, new_max};
+
+```
+
+## 6.3. 基于 Tuple 的 Halide type system extend
+
+通过定义自定义的结构体, 来实现对 Tuple的封装, 从而实现对特殊类型的实现  
+```cpp
+// Tuples for user-defined types.
+// Tuples can also be a convenient way to represent compound
+// objects such as complex numbers. Defining an object that
+// can be converted to and from a Tuple is one way to extend
+// Halide's type system with user-defined types.
+struct Complex {
+    Expr real, imag;
+
+    // Construct from a Tuple
+    Complex(Tuple t)
+        : real(t[0]), imag(t[1]) {
+    }
+
+    // Construct from a pair of Exprs
+    Complex(Expr r, Expr i)
+        : real(r), imag(i) {
+    }
+
+    // Construct from a call to a Func by treating it as a Tuple
+    Complex(FuncRef t)
+        : Complex(Tuple(t)) {
+    }
+
+    // Convert to a Tuple
+    operator Tuple() const {
+        return {real, imag};
+    }
+
+    // Complex addition
+    Complex operator+(const Complex &other) const {
+        return {real + other.real, imag + other.imag};
+    }
+
+    // Complex multiplication
+    Complex operator*(const Complex &other) const {
+        return {real * other.real - imag * other.imag,
+                real * other.imag + imag * other.real};
+    }
+
+    // Complex magnitude, squared for efficiency
+    Expr magnitude_squared() const {
+        return real * real + imag * imag;
+    }
+
+    // Other complex operators would go here. The above are
+    // sufficient for this example.
+};
+
+```
+
+# 7. Func
 
 This class represents `one stage` in a Halide pipeline, and is the unit by which we schedule things.  
 
@@ -393,7 +530,7 @@ Func Update definition 的写法 rule:
 * Free variables can't appear on the right-hand-side only
 * Var 不能只出现在等式右边, 例如 `f(3, 4) = x + y;`
 
-## 6.1. Func 的各种情报函数
+## 7.1. Func 的各种情报函数
 
 布尔返回值的验证函数:
 * `bool Halide::Func::defined 	( 		) 	const`              : 验证该 Func 是否 have at least a pure definition
@@ -412,7 +549,7 @@ int 返回值的情报函数
 * `const std::vector< Type > & Halide::Func::types 	( 		) 	const` : 对于 Func 含有 Tuple 时候的 Type 获取
 
 
-## 6.2. bound 限制
+## 7.2. bound 限制
 
 静态的声明了一个 Func 的计算范围, 根据接口的不同有不同等级的条件
 Statically declare that the range over which a function
@@ -439,10 +576,10 @@ Expand the region computed.  The region computed always contains the region that
 
 
 
-## 6.3. Func Var 分割重排
+## 7.3. Func Var 分割重排
 
 
-### 6.3.1. Func.split()
+### 7.3.1. Func.split()
 
 split() 接口没有重载
 * Split a dimension into inner and outer subdimensions with the given names, where the inner dimension iterates from 0 to factor-1. 
@@ -462,7 +599,7 @@ Func& Halide::Func::split 	( 	const VarOrRVar &  	old,
   * 具体的循环内的操作则是 `x_execute = x_outer * factor + x_inner;` 不会影响实际执行的顺序
   * 主要配合 verctorize 来使用, 例如将内循环直接向量化用于加速
 
-### 6.3.2. Func.fuse()
+### 7.3.2. Func.fuse()
 
 Join two dimensions into a single fused dimension.
 The fused dimension covers the product of the extents of the inner and outer dimensions given. 
@@ -479,7 +616,7 @@ Func& Halide::Func::fuse 	( 	const VarOrRVar &  	inner,
 
 
 
-### 6.3.3. Func.reorder()
+### 7.3.3. Func.reorder()
 
 重排一个 var 集合, 从左开始是  innermost
 
@@ -495,7 +632,7 @@ HALIDE_NO_USER_CODE_INLINE std::enable_if<Internal::all_are_convertible<VarOrRVa
 ```
 
 
-### 6.3.4. Func.tile()
+### 7.3.4. Func.tile()
 
 tile() 是最常用的接口, 是 reorder 和 split 的整合
 
@@ -576,14 +713,29 @@ Func & Halide::Func::tile 	(
 	) 		
 ```
 
-**TailStrategy  Halide::TailStrategy**
 
+### 7.3.5. TailStrategy  Halide::TailStrategy
+
+enum Halide::TailStrategy 枚举类型, 总共有 7 种
 
 用于在 tail 的时候, 定义如何处理尾部. 即 维度的宽并不能被 factor 整除的情况下, 如何对应. 因为有的时候可以进行重复计算, 而有些时候不可以.   
 
-感觉很有用, 先定义好章节以后再看 TODO
+我还没用过 (RVar)
+* RoundUp : 最简单, 对 extent 进行向上取整.  对于 `RVar` 来说不合法, 会导致算法的含义改变, 但是能够生成最快, 最简单的代码
+* GuardWithIf : 在 loop 中加入 if 语句用来保证不会访问超过 extent 的范围. 能够保证算法永远合法
+  * 不需要重新评估
+  * 因为在分割的末尾加入了 if, 所以当向量化计算启用的时候, 尾部的计算会被还原到标量再进行计算
+  * 不限制输入输出的大小
+* Predicate : 在 loads and stores 的地方加入 if 语句, 似乎加入的量比上一条 GuardWithIf 少, 对 RVar 来说永远合法
+* PredicateLoads, PredicateStores : 对 RVar 不合法, 只适用于最内层的情况
+* ShiftInwards : 比较权衡的效果, 不仅支持完整的向量化, 会增加内部循环的代码大小, 但不会改变外部循环. 仅对 Pure defination 合法
+* Auto : 
+  * For pure definitions use ShiftInwards. 
+  * For pure vars in update definitions use RoundUp.
+  * For RVars     in update definitions use GuardWithIf. 
 
-## 6.4. Func CPU scheduling 
+
+## 7.4. Func CPU scheduling 
 
 同实际使用 CPU 的 scheduling 接口
 
@@ -613,7 +765,7 @@ gradient_fast
 ```
 
 
-### 6.4.1. Func.parallel()
+### 7.4.1. Func.parallel()
 
 简单明了, 将某一个 dimension 开启并行  
 * 通常情况下都是要先把一个 Var split, 之后将 outer 来并行
@@ -632,7 +784,7 @@ Func& Halide::Func::parallel 	( 	const VarOrRVar &  	var,
 	) 	
 ```
 
-### 6.4.2. Func.unroll()
+### 7.4.2. Func.unroll()
 
 * `unroll(x_inner);` : 把某一个轴的循环展开, 即从代码上取消 for 循环, 转而使用 `x=0,x=1,...,x=end` 的形式生成代码
   * 开包一个 循环, 往往针对拥有较小 extent 的 Var, 例如通过 split 获得的 inner
@@ -654,7 +806,7 @@ Func& Halide::Func::unroll 	( 	const VarOrRVar &  	var,
 
 ```
 
-### 6.4.3. Func.vectorize()
+### 7.4.3. Func.vectorize()
 
 将一个 dimension 转化成 single vector, 使得通过一次计算即可遍历完
 硬性条件是该 dimension 必须是 innermost one
@@ -677,7 +829,7 @@ Func& Halide::Func::vectorize 	( 	const VarOrRVar &  	var,
 ```
 
 
-## 6.5. Func GPU scheduling
+## 7.5. Func GPU scheduling
 
 使用 GPU 时候的 pipeline scheduling 接口同纯 CPU 的接口不太一致  
 
@@ -695,7 +847,7 @@ Func& Halide::Func::vectorize 	( 	const VarOrRVar &  	var,
 lut.gpu_blocks(block).gpu_threads(thread);
 ```
 
-### 6.5.1. Func.gpu_threads()
+### 7.5.1. Func.gpu_threads()
 
 GPU 里 threads 是最小的执行单元, 多个 threads 组成一个 block
 
@@ -714,7 +866,7 @@ thread_x, thread_y
 thread_x,thread_y,thread_z
 ```
 
-### 6.5.2. Func.gpu_blocks()
+### 7.5.2. Func.gpu_blocks()
 
 告诉 GPU 如何调用 block indices
 * 对于在各个 block 里串行运行的 计算 stage 很有用
@@ -732,7 +884,7 @@ block_x,block_y
 block_x,block_y,block_z
 ```
 
-### 6.5.3. Func.gpu_tile()
+### 7.5.3. Func.gpu_tile()
 
 同 CPU 的 tile 一样, 也是一个 short-hand 函数
 * tiling a domain and mapping the tile indices to GPU block indices 
@@ -764,7 +916,7 @@ x,y,z,tx,ty,tz,x_size,y_size,z_size
 
 * 相当于 `gpu_blocks` 和 `gpu_threads` 和 `tile`/`(split+reorder)` 的结合, 在实际使用的时候可以进行等价替换
 
-## 6.6. Statical declaration 静态声明
+## 7.6. Statical declaration 静态声明
 
 静态声明接口 (Statical declaration) `Func.*`:
 * `bound(var, Expr min, Expr extent)`     : 用于静态指定某一个 Var 的 range, 最经典的莫过于 color channel, 来方便 Halide 执行某些特殊优化
@@ -772,7 +924,7 @@ x,y,z,tx,ty,tz,x_size,y_size,z_size
 * 
 
 
-## 6.7. loop 与 store 结构
+## 7.7. loop 与 store 结构, specialize
 
 `compute_*, store_*` 系列: 它用于调整整个 Halide pipeline 管线的循环嵌套逻辑: 该逻辑管理与 CPU 或 GPU 执行的设置相互独立   
 
@@ -784,9 +936,52 @@ x,y,z,tx,ty,tz,x_size,y_size,z_size
 * `Func.compute_*`   : 调整某个 Func 的计算循环级
 * `Func.store_*`     : 调整某个 Func 的存储循环级, 该接口一般作为附加选项添加到 compute_ 上, 用以实现 存储和计算的分离, 达到更好的效果
 
-### 6.7.1. compute_* 系列接口
+### 7.7.1. specialize 分支外迁
 
-* `Func::compute_root 	() 	`
+`Stage Halide::Func::specialize 	( 	const Expr &  	condition	) 	`
+
+对于 Halide 的 select 操作, 正如说明里那样, 会分别计算 True False 的状态, 并在最终才进行选择, 而 specialize 接口可以让这个 分支外迁到循环外围, 是的针对某一个 condition 从最初开始就分别执行不同的代码, 这也导致可以针对不同的 condition 来执行不同的 schedule  
+
+```cpp
+// 定义需要用 select 的 Func 
+f(x) = x + select(cond, 0, 1);
+
+// 在此基础上直接将 cond 作为该接口的参数传入即可  
+f.specialize(cond)
+
+// 每个 specialize 会有自己的 schedule, 想要重新对某个 cond 进行 scheduling, 则重新调用该 specialze 并传入对应的 cond 即可
+f.specialize(width == 1); // Creates a copy of the schedule so far.
+f.unroll(x, 2); // Only applies to the unspecialized case.
+f.specialize(width > 1).unroll(x, 2);
+
+// 每个 Func 在执行的时候会进入第一个匹配的 specialize, 因此如果涉及到多个 cond 的时候在代码的编排上要注意
+```
+
+对于 compute_at 类的 schedule, 在和 schedule 一起使用的时候更是要特别注意 
+* `The Var in the compute_at call to must exist in all paths`
+* 对 prior 函数调用 compute_at 的时候, 如果使用的是 后继函数所独有的 Var, 那么需要在代码上通过 splits, fuses, renames 进行一下创造
+
+```cpp
+// prior 函数和后继函数
+g(x, y) = 8*x;
+f(x, y) = g(x, y) + 1;
+
+// 对后继函数进行 sepcialize
+f.compute_root().specialize(cond);
+
+// 特殊 Var
+Var g_loop;
+// f 本身不存在 g_loop, 因此对 g 使用 g_loop 来优化 f 的时候, 需要让 f 在每个 path 中都出现名为 g_loop 的 var
+f.specialize(cond).rename(y, g_loop);
+f.rename(x, g_loop);
+g.compute_at(f, g_loop);
+
+```
+
+
+### 7.7.2. compute_* 系列接口
+
+* `Func::compute_root 	()`
   * Compute all of this function once ahead of time. 
   * 在执行到 Func 的时候, 会计算所有将要被用到的值, 存储到缓存里
   * 理论上会最大化降低 redundance work, 但是会占用最多的缓存空间, 同时会显而易见的降低 cache 利用率
@@ -837,7 +1032,7 @@ producer_2.compute_at(consumer_2, y);
 
 ```
 
-### 6.7.2. store_* 系列接口
+### 7.7.3. store_* 系列接口
 
 从 compute 系列接口有些类似, 但是指定的不是计算过程而是存储过程, 该系列结果是 optional, 只在特殊情况下用于将 存储循环级别 以及 计算循环级别分开来, 用以达成更高水平的对 locality 和 redundant work 的 trade-off
 
@@ -858,7 +1053,7 @@ producer_2.compute_at(consumer_2, y);
 
 
 
-### 6.7.3. Func.update()
+### 7.7.4. Func.update()
 
 获取单个下一个 update definition 句柄 , 根据 update definition 的定义顺序依次赋予 index 
 * `Stage Halide::Func::update 	( 	int  	idx = 0	) 	`
@@ -889,11 +1084,11 @@ f.update(1).split(y, yo, yi, 4).parallel(yo);
 
 
 
-## 6.8. Func realize
+## 7.8. Func realize
 
 和 Halide 函数的 JIT 实例化相关   
 
-## 6.9. Func compile_to   - AOT/JIT
+## 7.9. Func compile_to   - AOT/JIT
 
 和 Halide 函数的 编译 相关, 这种编译方法比较原始, 不需要用到 Generator , 是独立出来的 AOT/JIT 编译方法  
 
@@ -939,12 +1134,12 @@ brighter.compile_to_static_library("lesson_10_halide", {input, offset}, "brighte
 
 ```
 
-## 6.10. Func Debug
+## 7.10. Func Debug
 
 通过一系列的 Func 对象方法, 可以实现对多个环节的 dump 以及打印, 从而实现多种量级的 debug
 
 
-### 6.10.1. trace
+### 7.10.1. trace
 
 `Func.trace_*`
 
@@ -968,7 +1163,7 @@ Store Function_lession_4_1.0(7, 7) = 14
 End pipeline Function_lession_4_1.0()
 */
 ```
-#### 6.10.1.1. HTML 输出底层编译结果代码
+#### 7.10.1.1. HTML 输出底层编译结果代码
 通过将输出以 HTML 的形式表示, 方便查看和理解 Halide 的最佳化结果
 ```cpp
 Func gradient("gradient");
@@ -979,7 +1174,7 @@ gradient(x, y) = x + y;
 gradient.compile_to_lowered_stmt("gradient.html", {}, HTML);
 ```
 
-### 6.10.2. print_loop_nest();
+### 7.10.2. print_loop_nest();
 
 通过调用 `Func.print_loop_nest()` , 可以在 Halide Func 运行的时候打印其优化后的 loop 结构, 从而方便判断优化结果是否符合内存 cache 的顺序  
 
@@ -997,7 +1192,33 @@ produce Function_lession_5_1:
       Function_lession_5_1(...) = ...
 */
 ```
-## Halide::BoundaryConditions - 边界条件
+
+### 7.10.3. debug_to_file  dump图像
+
+`void Halide::Func::debug_to_file 	( 	const std::string &  	filename	) 	`
+
+会把一个 Func 当前的 值 dump 出来.
+* 如果提供的 filename 以 `.tif` `.tiff` 结尾, 则在 dump 的时候会直接存储为 TIFF 图像格式  
+* 如果提供了 `.tmp`, 则该文件可以直接被 `ImageStack`  读取
+* 否则的话 会以特定的二进制格式 `byte-order` 存储
+  * 为首的`20 byte-header` 
+    * 前 4 个 float 存储了该 Func 的前 4 个维度值
+    * 第 5 个为 32-bit int 存储了数据格式
+
+数据格式对照表  :
+* float = 0
+* double = 1
+* uint8_t = 2
+* int8_t = 3
+* uint16_t = 4
+* int16_t = 5
+* uint32_t = 6
+* int32_t = 7
+* uint64_t = 8
+* int64_t = 9
+
+
+## 7.11. Halide::BoundaryConditions - 边界条件
 
 用于自动应对超出边界的访问, 根据设定自动生成边界外的数值
 * 所有接口都接受一个 Func 并返回一个 Func
@@ -1011,13 +1232,29 @@ produce Function_lession_5_1:
 * mirror_interior
 
 
+## 7.12. Func update() 与 stage
 
-# 7. Buffer
+`Stage Halide::Func::update 	( 	int  	idx = 0	) 	`
+* 不同于 pure definition, 后继的 update 运算在 Halide 中会被记为 Stage
+* 通过 update 接口可以获取 对应 update 的 Stage 来分别进行 schedule
+
+Stage:  A single definition of a Func.  May be a pure or update definition. 
+
+### 7.12.1. rfactor
+
+属于 Halide 自动性能优化的一个功能  
+
+`Func Halide::Stage::rfactor 	( 	std::vector< std::pair< RVar, Var >>  	preserved	) 	`
+* 通过调用 rfactor, 可以在指定维度上将 原本的 update definition 分割为子定义  
+* 接口返回一个 Func, 这也就可以直接对子定义进行 schedule
+
+
+# 8. Buffer
 
 Buffer 在一定程度上也是一个虚拟的 Buffer, 在定义的时候需要指定  大小或者维度  
 
 
-## 7.1. set_min
+## 8.1. set_min
 
 是 buffer 的一个非常有意思的方法, 它可以指定该 buffer 的起点坐标, 即作为高维 array 它的起点index 可以不是 0 , 这对于只处理图像的某些部分来说非常有用
 
@@ -1032,7 +1269,7 @@ buffer.set_min(100,5);
 func.realize(buffer);
 ```
 
-# 8. Generator - Halide 精髓
+# 9. Generator - Halide 精髓
 
 是一种更加结构化的书写 Filter 的方法, Generator is a class used to encapsulate the building of Funcs in user pipelines. 
 * 比起将 pipeline 定义在 main() 中, 这种方法将 pipeline 实现为函数, 更加贴合实际使用
@@ -1040,7 +1277,7 @@ func.realize(buffer);
 * 使用 Generator 和 AOT 或 JIT 无关, 都可以使用, 但是对于 AOT 模式特别的方便
 
 
-## 8.1. 定义书写
+## 9.1. 定义书写
 
 将 pipeline 定义为一个 class  `class myGenerator : public Generator<myGenerator> `
 * 具体的处理管道需要定义在 `generate()` 函数里
@@ -1074,7 +1311,7 @@ private:
 
 ```
 
-## 8.2. 定义输入输出  
+## 9.2. 定义输入输出  
 
 定义输出的时候一般会定义为 Buffer, 但是 Halide 本质上是支持把 Func 定义为 Input 的, 以下是原话:
 
@@ -1113,7 +1350,7 @@ class Tupler : Generator<Tupler> {
 };
 ```
 
-## 8.3. GeneratorParam   - 编译时候的动态参数  
+## 9.3. GeneratorParam   - 编译时候的动态参数  
 
 用于在 Halide 库编译生成时候的参数指定, 在 Generator 生成的时候半动态的调整程序的行为
 
@@ -1193,7 +1430,7 @@ target=host parallel=false scale=3.0 rotation=ccw output.type=uint16 */
 
 ```
 
-## 8.4. 编译与库生成
+## 9.4. 编译与库生成
 
 * 在使用的时候和 halide 目录下的 `tools/GenGen.cpp` 一起编译, GenGen 里面包含了 main 函数以及对应的 CLI , 用于在后续中生成对应的库 
 * 需要在代码中告诉 Halide 要生成为 generator 的信息
@@ -1202,7 +1439,7 @@ target=host parallel=false scale=3.0 rotation=ccw output.type=uint16 */
 HALIDE_REGISTER_GENERATOR(MyFirstGenerator, my_first_generator)
 ```
 
-# 9. RDom 
+# 10. RDom 
 
 一个快速定义 reduction 的类
 
@@ -1218,7 +1455,7 @@ HALIDE_REGISTER_GENERATOR(MyFirstGenerator, my_first_generator)
   * 用于去定义一个递归函数, pure halide function 不支持递归函数
   * 用于执行 scattering operations, left-hand-side of an update definition may contain general expressions
 
-## 9.1. constructor
+## 10.1. constructor
 
 构造
 函数  
@@ -1257,11 +1494,32 @@ Halide::RDom::RDom 	( 	const Internal::ReductionDomain &  	d	)
 
 
 ```
+## 10.2. RDom where
 
-## 9.2. example
+首先 RDom 只能在指定维度上进行范围指定, 最终的效果从 2维上看只能是矩形.  通过 where 的设置即可让 RDom 实现更加复杂的范围设定  
+* `void Halide::RDom::where 	( 	Expr  	predicate	) 	`
+* 传入的 predicate 应该是一个 值为 boolean 的 Expr
+* 在 RDom 的定义里, 虽然没有硬性要求, 但对于最终的 where 范围定义尽可能小的 RDom 有助于性能优化
+* where 可以多次调用, 从而实现及其复杂的范围选定
 
 
-### 9.2.1. RDom 的 reduction function
+```cpp
+RDom r(0, 7, 0, 7);
+r.where((r.x - 3) * (r.x - 3) + (r.y - 3) * (r.y - 3) <= 10);
+
+
+// Next, let's add the three predicates to the RDom using
+// multiple calls to RDom::where
+r.where(r.x + r.y > 5);
+r.where(3 * r.y - 2 * r.x < 15);
+r.where(4 * r.x - r.y < 20);
+
+```
+
+
+## 10.3. RDom example
+
+### 10.3.1. RDom 的 reduction function
 
 使用 RDom 的 reduction function 的定义
 ```cpp
@@ -1278,7 +1536,7 @@ f(r) = f(r) * 2;
 Buffer<int> result = f.realize({10});
 ```
 
-### 9.2.2. recursive function
+### 10.3.2. recursive function
 
 使用 RDom 可以实现 Halide Pure function 无法实现的递归函数的定义, 例如 斐波那契数列
 
@@ -1295,7 +1553,7 @@ f(x) = 1;
 f(r) = f(r-1) + f(r-2);
 ```
 
-### 9.2.3. scattering operation
+### 10.3.3. scattering operation
 
 使用 Halide 来实现统计整张图片上的像素值直方图  
 ```cpp
@@ -1366,7 +1624,7 @@ sum_x.compute_at(sum_y, y);
 // 这将会导致, sum_x 不会按顺序被执行, 而是 computed only as necessary for each scanline of the sum in y
 // 只有在 sum_y 的计算需要对应的 sum_x 值的时候, 执行 sum_x 对应的部分
 ```
-# 10. Type : The Halide type system 数据类型系统
+# 11. Type : The Halide type system 数据类型系统
 
 Halide 专有的数据类型其实不多, 类型通过 `Halide::Type` 类来进行管理  
 
@@ -1404,11 +1662,11 @@ Handle() 类型
 
 
 
-## 10.1. Halide::Type 类
+## 11.1. Halide::Type 类
 
 各种 Type 的成员函数可以用于对类型进行更改或者验证, type 的类可以使得 halide 的函数能够动态的处理各种类型的输入数据, 而无需定义重载或者 template  
 
-## 10.2. Halide 空间下的类型相关函数
+## 11.2. Halide 空间下的类型相关函数
 
 * `template<typename T >  Type Halide::type_of 	( 		) 	`     : 构造等价于一个 C 类型的 halide Typle 对象
 * 
@@ -1418,11 +1676,11 @@ cast 函数
 * `Expr Halide::cast 	(Type t, Expr  	a )`                      : 不使用 template 的 cast, 将 Expr 转化为某个 Halide::Type() 类型
 * ` template<typename T > Expr Halide::cast 	( 	Expr  	a	)`  : 使用 template, 将 Expr 转化为某个 C++ 的数据类型
 
-# 11. Halide::Internal
+# 12. Halide::Internal
 
 位于 Internal 空间下的成员都算是 Halide 的内部构造, 了解一些相关类可以快速的理解代码
 
-## 11.1. Halide::Internal::Dimension
+## 12.1. Halide::Internal::Dimension
 
 
 * `Expr Halide::Internal::Dimension::min 	( 		) 	const`    : 获取一个 Expr 代表图像的该 dimension 的最小坐标
@@ -1448,14 +1706,14 @@ cast 函数
 
 
 
-# 12. Target
+# 13. Target
 
 A struct representing a target machine and os to generate code for.  
 
 用于具体的实现 Halide 的 cross-compliation
 
 
-## 12.1. Halide 空间里的 API
+## 13.1. Halide 空间里的 API
 
 获取 Target
 * `Target Halide::get_host_target()`                  : 直接获取当前环境的 Target 信息
@@ -1470,11 +1728,11 @@ A struct representing a target machine and os to generate code for.
   * 该检查函数不是线程安全的
 * 
 
-## 12.2. struct 结构体
+## 13.2. struct 结构体
 
 
 
-## 12.3. 例程
+## 13.3. 例程
 
 ```cpp
 // Let's use this to compile a 32-bit arm android version of this code:
@@ -1514,7 +1772,7 @@ target.set_features(armv7s_features);
 brighter.compile_to_file("lesson_11_arm_32_ios", args, "brighter", target);
 ```
 
-### 12.3.1. find GPU 例程
+### 13.3.1. find GPU 例程
 
 ```cpp
 // A helper function to check if OpenCL, Metal or D3D12 is present on the host machine.

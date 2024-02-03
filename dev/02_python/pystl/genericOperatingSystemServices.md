@@ -536,10 +536,6 @@ ArgumentParser.add_subparsers(
 `add_subparsers()` 方法尽管一般无参数调用, 但是还是说明下参数功能:
 * 
 
-```py
-
-
-```
 ### 5.3.4. Parser defaults
 
 `ArgumentParser.set_defaults(**kwargs)` 

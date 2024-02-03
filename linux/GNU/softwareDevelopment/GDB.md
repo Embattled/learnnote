@@ -2,6 +2,8 @@
 
 GDB, the GNU Project debugger, allows you to see what is going on inside another program while it executes -- or what another program was doing at the moment it crashed. 
 
+https://www.sourceware.org/gdb/
+
 GDB 的主要功能包括:
 * 运行程序, 显示所有可能影响程序结果的信息
 * 暂停程序在任何可能的地方
