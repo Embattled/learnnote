@@ -1,14 +1,14 @@
-# Image Noise Reduce
+# 1. Image Noise Reduce
 
 
-# Ground
+# 2. Ground
 
 
-# Paper Memo
+# 3. Paper Memo
 
 
 
-## (CVPR 2020) A Physics-Based Noise Formation Model for Extreme Low-Light Raw Denoising 
+## 3.1. (CVPR 2020) A Physics-Based Noise Formation Model for Extreme Low-Light Raw Denoising 
 
 简称 ELD (Extreme Low-Light Denoising)
 
@@ -32,7 +32,7 @@ $N_{read}=N_b+N_t+N_s \sim TL(\lambda;0,\sigma_{TL})$
 * 平场照片获取 散粒噪声参数 K
 * 暗场照片获取 行噪声,  减去行噪声后在对 $N_{read}$ 进行拟合
 
-## (ICCV2021) Rethinking Noise Synthesis and Modeling in Raw Denoising
+## 3.2. (ICCV2021) Rethinking Noise Synthesis and Modeling in Raw Denoising
 
 简称 SFRN (Sample From Real Noise)  
 

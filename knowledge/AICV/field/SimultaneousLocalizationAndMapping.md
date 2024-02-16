@@ -1,6 +1,6 @@
-# Simultaneous Localization And Mapping (SLAM)
+# 1. Simultaneous Localization And Mapping (SLAM)
 
-## Glossary
+## 1.1. Glossary
 
 * visual(-inertial) odometry        (VO/VIO)
 * Maximum a Posteriori              (MAP)
@@ -11,7 +11,7 @@
 
 * feature based method
 * direct method
-## Introduction
+## 1.2. Introduction
 
 当前业界对于 VO/VIO 和 SLAM 的边界越来越模糊 (diffuse)
 * SLAM : 根据搭载在移动设备上的传感器来试试绘制地图, 同时确定移动设备在地图中的位置
@@ -21,11 +21,11 @@
   * Mid-term data association : 匹配地图元素中 距离相机较近 同时 drift 较小的元素, 能够实现在已绘制地图的区域中实现 0 drift
   * Long-term data association : 主要用于在大型环境中保证 SLAM 的精度, 基于 place recognition, 允许重设 drift 为 0, 以及矫正既存地图
 
-### Stereo SLAM
+### 1.2.1. Stereo SLAM
 
 * 过远的点由于立体图形的时差过小, 会导致 depth 不能可靠的测量, 需要一些 trick
 
-## Algorithms 
+## 1.3. Algorithms 
 
 
 
@@ -48,13 +48,13 @@ Keyframe Selection: maintain a fixed number of keyframes in the front-end as the
 Map Management and Query : estimate the pose of newly coming frames
 
 
-# Paper Memo
+# 2. Paper Memo
 
-## Survey
+## 2.1. Survey
 
 
 
-## Single
+## 2.2. Single
 
 
 ORB-SLAM3: An Accurate Open-Source Library for Visual, Visual-Inertial and Multi-Map SLAM.  

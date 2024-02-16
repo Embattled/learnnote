@@ -271,29 +271,31 @@ p系列(中日韩)
 | omega   | \omega \Omega     | $\omega \Omega$     |
 
 特殊运算符:
-| 名称         | 代码                 | 显示       |
-| ------------ | -------------------- | ---------- |
-| 加减         | \pm                  | $\pm$      |
-| 大乘         | \times               | $\times$   |
-| 大除         | \div                 | $\div$     |
-| 点乘         | \cdot                | $\cdot$    |
-| Hadamard积   | \odot                | $\odot$    |
-| 不知道   | \oplus                | $\oplus$    |
-| 不知道   | \ominus                | $\ominus$    |
-| 合           | \cap                 | $\cap$     |
-| 并           | \cup                 | $\cup$     |
-| 大于         | \gt \ge \textgreater | $\gt \geq$ |
-| 小于         | \lt \le \textless    | $\lt \le$  |
-| 不等于       | \ne                  | $\ne$      |
-| 约等于       | \approx              | $\approx$  |
-| 波浪号, 相关 | \sim                 | $\sim$     |
-| 原型         | \propto              | $\propto$  |
-| 全等         | \equiv               | $\equiv$   |
-| 属于         | \in                  | $\in$      |
-| 存在         | \exists \exist       | $\exists$  |
-| 不存在       | \nexist \nexists     | $\nexists$ |
-| 全部         | \forall              | $\forall$  |
-逼近, 箭头|\to|$\to$
+| 名称         | 代码                 | 显示        |
+| ------------ | -------------------- | ----------- |
+| 加减         | \pm                  | $\pm$       |
+| 大乘         | \times               | $\times$    |
+| 大除         | \div                 | $\div$      |
+| 点乘         | \cdot                | $\cdot$     |
+| Hadamard积   | \odot                | $\odot$     |
+| 不知道       | \oplus               | $\oplus$    |
+| 不知道       | \ominus              | $\ominus$   |
+| 合           | \cap                 | $\cap$      |
+| 并           | \cup                 | $\cup$      |
+| 大于         | \gt \ge \textgreater | $\gt \geq$  |
+| 小于         | \lt \le \textless    | $\lt \le$   |
+| 不等于       | \ne                  | $\ne$       |
+| 约等于       | \approx              | $\approx$   |
+| 约等于等于   | \approxeq            | $\approxeq$ |
+| 波浪号, 相关 | \sim                 | $\sim$      |
+| 波浪号等于   | \simeq               | $\simeq$    |
+| 原型         | \propto              | $\propto$   |
+| 全等         | \equiv               | $\equiv$    |
+| 属于         | \in                  | $\in$       |
+| 存在         | \exists \exist       | $\exists$   |
+| 不存在       | \nexist \nexists     | $\nexists$  |
+| 全部         | \forall              | $\forall$   |
+| 逼近, 箭头   | \to                  | $\to$       |
 
 ## 2.1. 基础数学commands
 
@@ -334,12 +336,12 @@ p系列(中日韩)
 
 
 ### 2.1.3. 特殊运算
-| 名称           | 代码        | 显示                      |
-| -------------- | ----------- | ------------------------- |
-| 导数           | \nabla{f}   | $\nabla{f}$               |
-| 微分           | \partial{y} | $\partial{y}$             |
-| 求极限         | \lim        | $\lim_{x\rArr1}x^2$       |
-| 文字置于正下方 | underset{under}{upper}  | $\underset{x\to 0}{\lim}$ |
+| 名称           | 代码                   | 显示                      |
+| -------------- | ---------------------- | ------------------------- |
+| 导数           | \nabla{f}              | $\nabla{f}$               |
+| 微分           | \partial{y}            | $\partial{y}$             |
+| 求极限         | \lim                   | $\lim_{x\rArr1}x^2$       |
+| 文字置于正下方 | underset{under}{upper} | $\underset{x\to 0}{\lim}$ |
 
 
 
@@ -348,7 +350,7 @@ p系列(中日韩)
 | 名称         | 代码          | 显示             |
 | ------------ | ------------- | ---------------- |
 | 实数集空心字 | \mathbb{R}    | $\mathbb{R}$     |
-李代数 | \mathfrak | $\mathfrak{so}$
+| 李代数       | \mathfrak     | $\mathfrak{so}$  |
 | 粗体整体     | \mathbf       | $\mathbf{x}$     |
 | 粗体保持斜体 | \boldsymbol{} | $\boldsymbol{x}$ |
 

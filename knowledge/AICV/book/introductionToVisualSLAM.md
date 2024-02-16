@@ -1,3 +1,56 @@
+- [1. Introduction to Visual SLAM : From Theory to Practice](#1-introduction-to-visual-slam--from-theory-to-practice)
+  - [1.1. Classical Visual SLAM Framework](#11-classical-visual-slam-framework)
+  - [1.2. Mathematical Formulation of SLAM problems](#12-mathematical-formulation-of-slam-problems)
+- [2. 3D Rigid Body Motion](#2-3d-rigid-body-motion)
+  - [2.1. Rotation Matrix](#21-rotation-matrix)
+    - [2.1.1. Points, Vectors, and Coordinate Systems](#211-points-vectors-and-coordinate-systems)
+    - [2.1.2. Euclidean Transforms Between Coordinate Systems 坐标系之间的欧氏变换](#212-euclidean-transforms-between-coordinate-systems-坐标系之间的欧氏变换)
+    - [2.1.3. Transform Matrix and Homogeneous Coordinates 变换矩阵与齐次坐标](#213-transform-matrix-and-homogeneous-coordinates-变换矩阵与齐次坐标)
+  - [2.2. Rotation Vectors and the Euler Angles 旋转向量和欧拉角](#22-rotation-vectors-and-the-euler-angles-旋转向量和欧拉角)
+    - [2.2.1. Rotation Vectors 旋转向量](#221-rotation-vectors-旋转向量)
+    - [2.2.2. Euler Angles 欧拉角](#222-euler-angles-欧拉角)
+  - [2.3. Quaternions 四元数](#23-quaternions-四元数)
+    - [2.3.1. Definition 四元数的定义](#231-definition-四元数的定义)
+    - [2.3.2. Quaternion Operations 四元数运算](#232-quaternion-operations-四元数运算)
+    - [2.3.3. Use quaternion to Represent a Rotation 用四元数表示旋转](#233-use-quaternion-to-represent-a-rotation-用四元数表示旋转)
+    - [2.3.4. Conversion of Quaternions to Other Rotation Representations 四元数到其他表示方法的转换](#234-conversion-of-quaternions-to-other-rotation-representations-四元数到其他表示方法的转换)
+- [3. Lie Group and Lie Algebra 李群与李代数](#3-lie-group-and-lie-algebra-李群与李代数)
+  - [3.1. Basic of Lie Group and Lie Algebra 李群与李代数](#31-basic-of-lie-group-and-lie-algebra-李群与李代数)
+    - [3.1.1. Group, Lie Group - 群, 李群](#311-group-lie-group---群-李群)
+    - [3.1.2. Introduction of the Lie Algebra - 李代数的引出](#312-introduction-of-the-lie-algebra---李代数的引出)
+    - [3.1.3. The Definition of Lie Algebra - 李代数的定义](#313-the-definition-of-lie-algebra---李代数的定义)
+    - [3.1.4. Lie Algebra 李代数 $\\mathfrak{so(3)}$](#314-lie-algebra-李代数-mathfrakso3)
+    - [3.1.5. Lie Algebra 李代数 $\\mathfrak{se(3)}$](#315-lie-algebra-李代数-mathfrakse3)
+  - [3.2. Exponential and Logarithmic Mapping - 李代数的指数与对数映射](#32-exponential-and-logarithmic-mapping---李代数的指数与对数映射)
+- [4. Cameras and Images](#4-cameras-and-images)
+  - [4.1. Pinhole Camera Models](#41-pinhole-camera-models)
+    - [4.1.1. Pinhole Camera Germotry](#411-pinhole-camera-germotry)
+    - [4.1.2. Distortion](#412-distortion)
+    - [4.1.3. Stereo Cameras](#413-stereo-cameras)
+    - [4.1.4. RGB-D camera](#414-rgb-d-camera)
+  - [4.2. 图像 - Image](#42-图像---image)
+- [5. Nonlinear Optimization - 非线性优化方法](#5-nonlinear-optimization---非线性优化方法)
+- [6. Visual Odometry - 视觉里程计 Part 1](#6-visual-odometry---视觉里程计-part-1)
+  - [6.1. Feature Method - 特征点法](#61-feature-method---特征点法)
+    - [6.1.1. Feature Point](#611-feature-point)
+    - [6.1.2. ORB Feature](#612-orb-feature)
+    - [6.1.3. Feature Matching](#613-feature-matching)
+  - [6.2. 2D-2D : Epiploar Geometry - 对极几何](#62-2d-2d--epiploar-geometry---对极几何)
+    - [6.2.1. Epipolar Constraints - 对极约束](#621-epipolar-constraints---对极约束)
+    - [6.2.2. Essential Matrix - 本质矩阵](#622-essential-matrix---本质矩阵)
+    - [6.2.3. Homography Matrix - 单应矩阵](#623-homography-matrix---单应矩阵)
+  - [6.3. Triangulation - 三角测量 (三角化)](#63-triangulation---三角测量-三角化)
+  - [6.4. 3D-2D : PnP](#64-3d-2d--pnp)
+  - [6.5. 3D-3D : ICP](#65-3d-3d--icp)
+    - [SVD - Linear Algebra Method](#svd---linear-algebra-method)
+    - [Non-linear Optimization Method](#non-linear-optimization-method)
+- [7. Visual Odometry - 视觉里程计 Part 2](#7-visual-odometry---视觉里程计-part-2)
+- [Filters and Optimization Approaches - 后端 Part1](#filters-and-optimization-approaches---后端-part1)
+- [Filters and Optimization Approaches - 后端 Part2](#filters-and-optimization-approaches---后端-part2)
+- [Loop Closure - 回环检测](#loop-closure---回环检测)
+- [Dense Reconstruction - 建图](#dense-reconstruction---建图)
+- [Discussions and Outlook - SLAM 的现在与未来](#discussions-and-outlook---slam-的现在与未来)
+
 # 1. Introduction to Visual SLAM : From Theory to Practice
 Xiang Gao and Tao Zhang
 
@@ -461,23 +514,24 @@ $$
 
 ## 3.1. Basic of Lie Group and Lie Algebra 李群与李代数
 
+
+<!-- 章节完 -->
 在旋转矩阵和变换矩阵的基础说明中
 * 三维旋转矩阵构成了特殊正交群 special orthogonal group SO(3)
 * 变换矩阵构成了 特殊欧式群 special Euclidean group SE(3)
 
 完整的复习一遍定义为
+
 $$
 SO(3) = {R\in \mathbb{R}^{3\times 3} | RR^T=I, \det(R)=1}
-$$
-$$
+\\
 SE(3)={
 T=\begin{bmatrix}
   R & t \\
   0^T & 1
-\end{bmatrix}
-\in \mathbb{R}^{4\times 4} | R\in SO(3), t\in \mathbb{R}^3
-}
+\end{bmatrix} \in \mathbb{R}^{4\times 4} | R\in SO(3), t\in \mathbb{R}^3}
 $$
+
 
 对于群的解释:
 * 首先定义 **封闭**
@@ -489,7 +543,7 @@ $$
 * 对于只有 一个运算的集合 , 称之为 群
 
 
-### 3.1.1. Group
+### 3.1.1. Group, Lie Group - 群, 李群
 
 群本质上被定义为 一种集合加上一种运算的 代数结构, 令 集合记为 A, 运算记为 点 $\cdot$, 那么群可以表示为 $G=(A,\cdot)$
 
@@ -511,8 +565,8 @@ $$
 * 空间中刚体的旋转很容易想象到是连续的, 所以SO 和 SE 是李群
 * 每一个李群都会对应一个李代数, 例如 $\mathfrak{so}(3)$
 
-### 3.1.2. Introduction of the Lie Algebra
-<!-- omit from toc -->
+### 3.1.2. Introduction of the Lie Algebra - 李代数的引出
+
 
 李代数
 
@@ -539,7 +593,7 @@ $$
 
 此时有 $a\hat{}=A, A\check{}= a$
 
-结合上面的求导结果, 有 $\dot{R}(t)R(t)^T  = \phi(t)\hat{}$   
+结合上面的求导结果, 有 $\dot{R}(t)R(t)^T  = \phi(t)\hat{}$ , 这里用 $\phi(t)\hat{}$ 来标志旋转矩阵的 `一阶导乘以其转置`, 
 等式两边右乘以 $R(t)$, 由于 R(t) 是正交矩阵, 因此有  
 
 $$\dot{R}(t)=\phi(t)\hat{}R(t) = 
@@ -551,6 +605,84 @@ $$\dot{R}(t)=\phi(t)\hat{}R(t) =
 
 观察如上的结果, 可以发现, 对于旋转矩阵的求导, 只需要左乘一个 $\phi(t)\hat{}$ 矩阵即可.  
 
+基于以上结果, 考虑 $t_0=0$ 的时候, 设此时旋转矩阵为 $R(0)=I$ 按照导数定义, 可以把 $R(t)$ 在 $t=0$ 附近进行一阶泰勒展开:
+$$R(t)\approx R(t_0)+\dot{R}(t_0)(t-t_0)=I+\phi(t_0)\hat{}(t)$$
+
+从上述公式可以发现 $\phi(t)\hat{}$ 有R的导数性质
+* 在这里称 它在 SO(3) 的原点附近的正切空间 ( Tangent Space) 上
+* 在 $t_0$ 的附近, 假设 $\phi$ 保持为常数, $\phi(t_0)=\phi_0$, 
+
+可以列出微分方程 , 且有初始值 $R(0)=I$
+$$\dot{R}(t)=\phi(t_0)\hat{}R(t)=\phi_0\hat{}R(t)$$
+
+得, $R(t)=exp(\phi_0\hat{}t)$
+
+到此, 仍然意义不明, 只是知道了
+* 任意一个旋转矩阵 R 与另一个 反对称矩阵 $\phi_0\hat{}t$ 是通过指数关系联系起来的  
+* 给定了旋转矩阵 R, 即可直到对应的 $\phi$, 描述了 R 在局部的导数关系
+
+给出李代数的定义
+* 称 $\phi$ 是对应了旋转矩阵 $SO(3)$ 上的李代数 $\mathfrak{so}(3)$
+* 给定某个向量 $\phi$ , 对应的矩阵指数 $exp(\phi\hat{})$ 是如何计算的, 反之给定 R 来反计算 $\phi$, 这就是 李代数与李群之间的 指数/对数映射  
+
+
+### 3.1.3. The Definition of Lie Algebra - 李代数的定义
+
+**对于每个李群都有其对应的李代数, 李代数描述了李群的局部性质, 或者详细的说, 正切空间(tangent space)**
+
+李代数由, 集合 $\mathbb{V}$, 数域 $\mathbb{F}$, 二元运算 $[,]$ 构成, 称李代数 $\mathfrak{g}$ 为 $(\mathbb{V,F,[,]})$ , 需要的性质有
+* 封闭性 $\forall X,Y \in \mathbb{V}, [X,Y]\in \mathbb{V}$  二元运算后的结果仍然在集合内
+* 双线性 $\forall X,Y,Z \in \mathbb{V}, a,b \in \mathbb{F}$ 满足
+  * $[aX+bY,Z]=a[X,Z]+b[Y,Z]$
+  * $[Z,aX+bY]=a[Z,X]+b[Z,Y]$
+  * 有点类似于 某种乘法结合律
+* 自反性 $\forall X \in \mathbb{V}, [X,X]=0$  自己与自己运算的结果为 0 
+* 雅可比等价
+  * $\forall X,Y,Z \in \mathbb{V}, [X,[Y,Z]]+[Z,[X,Y]]+[Y,[Z,X]]=0$
+
+一个典型的例子是 三维向量 $\mathbb{R^3}$ 上定义的 叉积 $\times$ 是一个李括号, 构成了李代数 $\mathfrak{g} = (\mathbb{R^3,R,\times})$
+
+### 3.1.4. Lie Algebra 李代数 $\mathfrak{so(3)}$
+
+由上上一章提到的 $R(t)=exp(\phi_0\hat{}t)$  
+
+这里 $\phi$ 即为李代数 $\mathfrak{so(3)}$ , 由于向量与反对称矩阵一一对应, 因此也会称 $\mathfrak{so(3)}$ 的元素是 三维反对称矩阵, 不加区别  
+
+$$\mathfrak{so(3)}={\phi \in \mathbb{R^3}, \Phi=\phi\hat{} \in \mathbb{R^{3\times 3}}}$$
+
+且定义 $\mathfrak{so(3)}$ 中, 两个向量的李括号为 
+$$[\phi_1,\phi_2] = (\Phi_1\Phi_2 - \Phi_2\Phi_1)\check{}$$
+
+
+### 3.1.5. Lie Algebra 李代数 $\mathfrak{se(3)}$
+
+对于 $\mathbb{SE(3)}$ 也有对应的李代数.  其与 $\mathfrak{so(3)}$ 相似  
+
+$$
+\mathfrak{se(3)}=\begin{Bmatrix}
+\xi=\begin{bmatrix}
+  \rho \\ \phi
+\end{bmatrix}
+\in \mathbb{R^6}, \rho \in \mathbb{R^3}, \phi \in \mathfrak{se(3)}, \rho\hat{}=\begin{bmatrix}
+  \phi\hat{} & \rho \\ 0^T& 0
+\end{bmatrix}
+\in \mathbb{R^{4\times 4}} 
+\end{Bmatrix}
+$$
+
+拆分的讲:
+* 李代数 $\xi$ 是一个 六维向量
+* $\rho$ 为 $\xi$ 的前三维, 且含义与 变换矩阵的平移并不相同
+* $\phi$ 即为 $\mathfrak{so(3)}$ 的元素
+* 对于李代数 $\mathfrak{se(3)}$, 反对称矩阵的符号 $\hat{}$ 的意义也进行了拓展, 但仍然保留了 向量到矩阵的 意义, 且依旧保持一一对应
+* 简单的理解为 平移加上 $\mathfrak{so(3)}$, 要留意这里是不同意义上的平移
+
+定义对应的李括号为 
+$$[\xi_1,\xi_2] = (\xi_1\hat{}\xi_2\hat{} - \xi_2\hat{}\xi_1\hat{})\check{}$$
+
+## 3.2. Exponential and Logarithmic Mapping - 李代数的指数与对数映射
+
+111
 
 
 # 4. Cameras and Images
@@ -734,7 +866,11 @@ $$\frac{z-f}{z}= \frac{b-u_L+u_R}{b}$$
 
 在表示深度的时候一般会用16进制数据表示, 换算成 mm 的话最多可以表示 65 米
 
-# 5. Visual Odometry - 视觉里程计 Part 1
+# 5. Nonlinear Optimization - 非线性优化方法
+
+
+
+# 6. Visual Odometry - 视觉里程计 Part 1
 
 基于视觉的里程计构建, 两种主要方法
 * 特征点法 feature methods: 
@@ -750,13 +886,13 @@ $$\frac{z-f}{z}= \frac{b-u_L+u_R}{b}$$
 * 通过三角化获得二维图像上对应点的三维结构
 
 
-## 5.1. Feature Method - 特征点法
+## 6.1. Feature Method - 特征点法
 
 SLAM 系统分为前端和后端, 而前端指的就是 VO visual odometry 视觉里程计, 根据相邻图像的信息估算出粗略的相机移动, 给后端提供较为友好的初始值.  
 
 从两帧之间的差异估计相机的运动和场景集合, 实现一个两帧的VO, 也成为 两视图几何 (Two-view geometry)  
 
-### 5.1.1. Feature Point
+### 6.1.1. Feature Point
 
 在视觉 SLAM 中, 寻找多帧图像中比较有代表性的点, 这些点在相机视角发生改变后能够保持不变.  这些点在 SLAM 中称为 landmarks, 而在 CV 领域则称为 image feature.
 
@@ -787,11 +923,11 @@ ORB, Oriented FAST and Rotated BRIEF.
 * 使用了计算速度极快的 BRIEF (Binary Robust Independent Elementary Feature) 二进制描述子
 * 在同一幅图像中计算 1000个特征点的情况下 ORB (15.3ms) < SURF(217.3ms)  < SIFT (5228.7ms) 
 
-### 5.1.2. ORB Feature
+### 6.1.2. ORB Feature
 
 该章详细介绍了 ORB 特征的计算方法
 
-### 5.1.3. Feature Matching
+### 6.1.3. Feature Matching
 <!-- 完 -->
 
 对于有大量相似纹理的场景, 基于局部的特征很难 真正有效的避免误匹配  
@@ -807,13 +943,76 @@ ORB, Oriented FAST and Rotated BRIEF.
 
 <!-- Practice: Feature Extraction and Matching 实践章节跳过 -->
 
-## 5.2. 2D-2D : Epiploar Geometry - 对极几何
+## 6.2. 2D-2D : Epiploar Geometry - 对极几何
 
 主要针对两组 2D 点的运动估计
 
-## 5.3. Triangulation - 三角测量 (三角化)
+### 6.2.1. Epipolar Constraints - 对极约束
+<!-- 完 -->
+对于两张图片中完成匹配的特征点, 假设有若干个.  (具体的数目后面讨论)  
 
+首先讨论特征点的几何关系  
+
+对于两个时刻的相机影像 $I_1, I_2$, 定义相机$O_1, O_2$的位置关系 1->2 为 $R,t$  
+
+对于正确匹配的在 $I_1, I_2$ 上的一对特征点 $p_1, p_2$, 连线 $O_1p_1, O_2p_2$在空间中相交于点 $P$, 则定义对极几何:
+* Epipolar plane 极平面: $O_1,O_2,P$ 三点确定的平面 
+* Epipolar 极点 : $O_1O_2$ 连线 与两个图像平面的交点  $e_1, e_2$ 
+* Baseline 基线 : $O_1O_2$ 连线
+* Epipolar line 极线 : $p_1e_1, p_2e_2$ 极平面与两个图像平面的交线, 也定义为 $l_1, l_2$
+
+从想象上
+* 从第一帧的视角 看 $O_1p_1$ 空间连线, P 的位置为该射线上的任意一点
+* 从第二帧的视角看, P 的投影位置应该出现在 $\vec{e_2p_2}$ 射线上
+* 由于 正确的特征匹配, 得知了 $p_2$ 的像素位置, 因此确定了 P 的空间位置以及相机的运动  
+* 因此对于 对极几何来说, 正确的特征匹配的权重非常大
+
+对极约束: $x_1, x_2$ 是两个像素点的归一化平面上的坐标 (返回之前的章节确认归一化平面的定义, 是一个三维点)
+$$p_2^TK^{-T}t\hat{\space}RK^{-1}p_1 = 0$$  
+$$x_2^Tt\hat{\space} Rx_1=0$$  
+
+形式及其简洁, 对极约束本身包括了平移和旋转. 中间的部分可以分别基座两个矩阵
+* Essential Matrix    本质矩阵  : $E = t\hat{\space} R$
+* Fundamental Matrix  基础矩阵  : $F = K^{-T}EK^{-1}$
+* 带入 E,F 整理更简洁的 式子有 
+$$x_2^TEx_1= p_2^TFp_1=0$$
+
+对极约束简单的描述了匹配点的空间位置关系, 因此相机的位姿估计问题变为了以下两步
+1. 根据匹配点的像素位置算出 E 或者 F
+2. 根据 E 或者 F 求出 R,t
+由于 E 和 F 只相差了相机内参, 内参在 SLAM 任务中基本上是已知的 (在SfM任务中有可能是未知且有待估计的), 因此使用形式更加简洁的 $x_2^TEx_1=0$ 比较频繁
+
+以下是推导过程:
+* 对于空间点 $P=[X,Y,Z]^T$
+* 根据针孔模型知道两个像素点 $p_1,p_2$ 的像素位置为 $s_1p_1=P, s_2p_2=K(RP+t)$
+* s 为缩放尺度, 在使用齐次坐标的时候, 有无缩放的坐标都是等价的, 称为 equal up to a scale (尺度意义下相等) $sp\simeq p$
+* 重写投影关系 $p_1\simeq P, p_2\simeq K(RP+t)$
+* 反投影取得归一化平面坐标 $x_1=K^{-1}p_1 , x_2=K^{-1}p_2$
+* 带入有 $x_2 \simeq Rx_1+t$
+* 通过线性代数相关知识 (※需要复习)
+  * 推导关键: 两边同时左乘 $t\hat{\space}$ 回忆 \hat 的定义, 这相当于两侧同时与 t 作外积 $t\hat{\space}x_2\simeq t\hat{\space}Rx_1$
+  * 推导关键: 两边同时左乘 $x_2^T, x_2^Tt\hat{\space}x_2\simeq x_2^Tt\hat{\space}Rx_1$
+  * 计算: 由于 $t\hat{\space}x_2$ 是一个与 t 和 x2 都垂直的向量, 因此它再和 x2 做内积的话, 结果为 0
+* 等式左侧严格为 0, 则可以消去 尺度意义下相等, 记为普通等式, 就有了对极约束的式子 $x_2^Tt\hat{\space} Rx_1=0$
+
+### 6.2.2. Essential Matrix - 本质矩阵
+
+通过3X3矩阵本身的性质 : 8个自由度, 使用 8对匹配的点来算出 E
+
+### 6.2.3. Homography Matrix - 单应矩阵
+
+单目下无法对应纯旋转 (t=0 的运动), 考虑平面的 Homography 来解决
+
+<!-- Practice: Solving Camera Motion with Epipolar Constraints -->
+
+
+
+## 6.3. Triangulation - 三角测量 (三角化)
+
+<!-- 完 -->
 通过上一讲对极几何约束估计了相机运动之后, 需要用相机的运动 来估计特征点的空间位置, 此时对于单目相机来说, 仅通过单张图像无法获取深度信息, 因此需要通过三角测量 Triangulation 的方法来估计图像点的深度.  
+
+三角测量: 通过不同位置 对同一个路标点进行观察, 从观察到的位置推断路标点的距离  
 
 考虑图像 I1, I2. 以左图为参考, 且右图的变换矩阵为 T, 相机光心分别为 O1, O2.  
 在 I1 中有特征点 p1, I2 中有特征点 p2.  
@@ -821,13 +1020,84 @@ ORB, Oriented FAST and Rotated BRIEF.
 理论上, 直线 O1p1 与 O2p2 会在实际场景中相交于点 P. 
 该点即两个特征点所对应的地图点在三维场景中的位置, 然而由于噪声的影响, 两条直线往往无法相交. 因此实际求解可以转为一个最小二乘法的问题.  
 
+首先给出对极几何的定义: 
+$$x_2 \simeq Rx_1+t$$
+重新考虑尺度因子
+$$s_2x_2 = s_1Rx_1+t$$
+
+特征点的深度其实也就是 $s_1,s_2$ 那么通过对极几何约束得到了移动 $R,t$ 后求解  $s_1,s_2$, 可以:
+* 在射线 $O_1p_1$ 上寻找 3D 点, 使得其投影位置接近 $p_2$
+* 同理可以反过来寻找
+* 甚至可以在两条线的中间找
+
+以方法1, 在射线 $O_1p_1$ 上寻找 3D 点 为例, 希望计算 $s_1$, 那么对式子左乘 $x_2\hat{\space}$
+
+$$x_2\hat{\space}s_2x_2 =0= x_2\hat{\space}s_1Rx_1+t$$
+式子左侧为0, 则右侧可以看作方程, 即可直接求解 $s_2$ 并以此得到 $s_1$, 得到了两帧下的深度, 则可以确定空间坐标  
+一般的, 由于噪声的存在, 不精确的 $R,t$ 会导致上述式子 不为0 , 因此常见的作法是使用最小二乘法求解  
 
 
-
-
-
-## 5.4. 3D-2D : PnP 
+## 6.4. 3D-2D : PnP 
 
 Perspective-n-Point  求解 3D 到 2D 的点对运动的方法
 
-## 5.5. 3D-3D : ICP
+## 6.5. 3D-3D : ICP
+
+对于一组已经匹配好的 3D 点, 例如通过 RGB-D 进行匹配, 希望求得 $R,t$  
+
+设匹配点分别为 $P={p_1,\dots, p_n}, P'={p_1',\dots,p_n'}$
+使得最终的 $R,t$ 满足
+$$\forall i,P_i=Rp_i'+t$$
+
+解决这个问题的方法就是 ICP (Iterative Closest Point) 迭代最近点, 在上述公式中并没有出现相机模型, 也就是说在 3D-3D 问题中和相机是没有关系的.  
+
+PS: 在激光 Lidar 的 SLAM 问题中也会出现 ICP, 不过激光数据的特征不够丰富, 因此问题出现在匹配关系上. 而基于视觉的 SLAM 则不存在这种问题.  
+
+ICP 的求解可以分为两种
+* 基于线性代数的求解 SVD
+* 基于非线性优化的求解 (类似于 BA)
+
+### SVD - Linear Algebra Method
+
+### Non-linear Optimization Method
+
+<!-- 完 -->
+使用非线性优化, 通过迭代来寻找最优解.  该方法和上述的 PnP 方法相似, 也使用到了 李代数.  
+
+以李代数表达相机位姿的时候, 目标函数可以写成:  
+
+$$\underset{\xi}{\min}=\frac{1}{2}\sum^n_{i=1}||(p_i-\exp(\xi\hat{\space})p'_i)||^2_2$$
+
+带入 李代数扰动模型  (Lie algebra perturbation model): 
+$$\frac{\partial e}{\partial \delta\xi}= -(\exp(\xi\hat{\space})p_i')^\odot$$
+
+即通过迭代即可找到极小值
+* 存在证明 : ICP 问题是 唯一解或者无穷多解的, 因此找到了极小值解相当于找到了全局最优解
+* 因此 ICP 求解可以任意选定初始值
+
+在匹配已知的情况下, ICP 问题实际上具有 `解析解`, 即无需通过迭代 而基于优化的 ICP 的存在意义是:
+* 在某些场景, 例如 RGB-D SLAM, 一个像素的深度数据可能有, 也可能没有, 因此可以混合使用 PnP 和 ICP, 从而实现:
+* 对深度已知的点, 3D-3D 的误差建模
+* 对深度未知的特征点, 建模 3D-2D 的重投影误差
+* 将所有的误差放在同一个问题中考虑, 使得求解更加方便
+
+# 7. Visual Odometry - 视觉里程计 Part 2
+
+* 理解光流法跟踪特征点的原理
+* 直接法估计相机位姿的原理
+* 多层直接计算法的实现
+
+直接法是 视觉里程计的一个主流的分支, 与特征点法有很大的不同.  
+是未来的潜力算法
+
+
+# Filters and Optimization Approaches - 后端 Part1 
+
+# Filters and Optimization Approaches - 后端 Part2
+
+# Loop Closure - 回环检测
+
+# Dense Reconstruction - 建图
+
+# Discussions and Outlook - SLAM 的现在与未来
+

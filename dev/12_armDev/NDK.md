@@ -1,59 +1,33 @@
-# 1. Android Development
+# Android Native Development Kit (NDK)
 
-在一个标准安卓项目中:  
-Types of modules include:
-* Android app modules
-* Library modules
-* Google App Engine modules
+一个用于在 Android 项目中使用 C/C++ 代码的开发组件  
+* provides platform libraries that allow you to manage native activities
+* access physical device components, such as sensors and touch input. 
+* 用于实现平台之间可移植的应用
+* 重复使用既存的 C/C++ 库
+* 在特定情况下 对于计算密集型应用有更好的性能
 
 
-安卓项目目录结构, 根据 IDE 不同有些微的差异
+NDK 开发工作的相关组件
+* 原生共享库    : NDK 从 C/C++ 源代码构建的`.so` 库文件
+* 原生静态库    : NDK 从 C/C++ 源代码构建的 `.a` 库文件, 可以将静态库迭代关联到其他库
+* Java 原生接口(JNI)  : JNI 是 Java 和 C++ 组件互相通信的接口, 详细信息参照 Java 原生接口规范
+* 应用二进制接口(ABI)  : ABI 可以非常精确地定义应用的机器代码在运行时如何与系统交互
 
-* `app/`          : 程序文件
-  * `build/`      : 编译生成的结果目录, 类似于 bin
-  * `libs/`       : 依赖库目录 (jar包)
-  * `src/`        : 项目源文件
-    * `androidTest/` : Android Test 用例, 对项目进行自动化测试
-    * `test/`        : Unit Test 用例, 对项目进行自动化测试
-    * `main/`     : 代码
-      * `java/`   : java代码目录
-      * `jni/`    : 原生代码目录 (C/C++)
-      * `res/`    : 其他资源目录, 图像资源 布局资源, 菜单资源 
-      * `libs/`   : 如果项目内容是库的话, 编译生成的 .so 放在这里   
-    * `build.gradle` : app模块的 gradle 构建脚本
+# ndk-build
 
-# 2. Android Studio
+使用 NDK 的基于 Make 的构建系统构建一个项目, 只通过 `Android.mk` 和 `Application.mk` 两个文件配置整个项目  
 
-是 安卓官方的 IDE
-* 以 IntelliJ IDEA 为基础构建而成
+## Android.mk
 
-# 3. jni Java Native Interface 
+位于项目 `jni` 目录的子目录中 , 用于描述 源文件和共享库, 内容上是一个 `makefile` 的片段
 
-Java1.1开始, JNI标准成为java平台的一部分 
-
-通过使用 Java本地接口书写程序, 可以确保代码在不同的平台上方便移植
-* 允许JAVA程序调用C/C++写的程序
-* 书写步骤:
-  1. 编写带有native声明的方法的java类
-  2. 使用javac命令编译所编写的java类
-  3. 然后使用javah(已被舍弃) + java类名生成扩展名为h的头文件
-  4. 使用C/C++实现本地方法
-  5. 将C/C++编写的文件生成动态连接库
-
-## 3.1. JNI层的 java 源文件
-
-编写带有 `native` 声明的方法的java类
-* native 是java啥关键字不记得了 放置
-
-要注意:
-* 因为只是声明, 所以IDE报错也没关系
-
-## 3.2. javac 编译 生成 h头文件
-
-## 3.3. Android.mk
+Android.mk 用于
+* 定义 `Application.mk`
+* 构建系统和环境变量 以外的 项目层级 变量
+* Android.mk 的语法支持将源文件分组为 "模块"
 
 要掌握jni, 就必须熟练掌握Android.mk的语法规范
-* Android.mk是Android提供的一种makefile文件
 * 指定诸如编译生成so库名
 * 引用的头文件目录
 * 需要编译的`.c/.cpp`文件和`.a`静态库文件
@@ -100,3 +74,18 @@ include $(BUILD_SHARED_LIBRARY)
     * `PREBUILT_STATIC_LIBRARY` 
     * `PREBUILT_STATIC_LIBRARY`
 
+
+## Application.mk
+
+Application.mk 指定 ndk-build 的项目级设置  
+默认情况下, 它位于应用项目目录中的 jni/Application.mk 下
+
+# Address Sanitizer (asan)
+
+一种基于 编译器 的工具, 用于检测内存相关的 bug
+* 检测 stack 和 global objects 的overflows 
+* 占用内存少
+* 处理快
+* !! 不能检测内存泄漏以及访问未定义内存
+
+https://developer.android.com/ndk/guides/asan

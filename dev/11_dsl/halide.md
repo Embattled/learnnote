@@ -1249,13 +1249,71 @@ Stage:  A single definition of a Func.  May be a pure or update definition.
 * 接口返回一个 Func, 这也就可以直接对子定义进行 schedule
 
 
-# 8. Buffer
+# 8. Halide::Runtime Buffer 
+
+Halide::Runtime 命名空间下定义了一些莫名奇妙的结构体, 以及一个类 Buffer 
+
+## 8.1. Halide::Runtime::Buffer\<T\>
 
 Buffer 在一定程度上也是一个虚拟的 Buffer, 在定义的时候需要指定  大小或者维度  
+主要用来从 C++ 向 Halide 空间传递数据使用
+
+作为 类的 Buffer 主要是 
+A templated Buffer class that wraps `halide_buffer_t` and adds functionality
+具体的数据相关的信息仍然需要参照 struct halide_buffer_t
+
+在使用 C++ 的时候, 管理 Halide Buffer 的最好的形式, 在 stack 上仅仅只会额外使用 16 bytes
+
+定义
+`template<typename T = void, int Dims = AnyDims, int InClassDimStorage = (Dims == AnyDims ? 4 : std::max(Dims, 1))> `
+`class Halide::Runtime::Buffer< T, Dims, InClassDimStorage >`
+
+含义
+* typename T    : buffer 的元素类型, 如果元素类型位置或者不唯一, 则使用 void 或者 const void
+* int Dims      : 维度数, 如果维度 位置, 或者可能会变化, 则使用默认值 AnyDim
+* int InClassDimStorage : 在类的内部的数据存储维度数, 设置成期望该缓冲区的最大维度. 如果超过, 则会分配堆存储来动态跟踪缓冲区的形状  
+* 该类可以通过提供的分配器分配的共享指针来构建, 如果不提供指针则通过 malloc 和 free 来单独管理内存. 且只有 host 端分配了内存后, 主机端才会被视为拥有内存.  
+
+### 8.1.1. 构造函数
+
+目前 Doc 上显式 Buffer 有 22 个构造函数重载, 进行一下分类  
+
+默认系列
+* 默认构造 `Buffer 	( 		)`
+* 拷贝构造, 只拷贝对象, 不拷贝数据  `Buffer 	( 	const Buffer< T, Dims, InClassDimStorage > &  	other	) `
+* 移动构造  `Buffer 	( 	Buffer< T, Dims, InClassDimStorage > &&  	other	) 	`
+
+共享指针
 
 
-## 8.1. set_min
+简单自定维度, 分配内存并填入数据 0
+* 一维                  `Buffer 	( 	int  	first	)`
+* 二维                  `Buffer 	( 	int  	first, int  	second, Args...  	rest )`
+* 多维                  `Buffer 	( 	const std::vector< int > &  	sizes	) 	`
+* 未知类型, 多维        `Buffer 	( 	halide_type_t  	t, const std::vector< int > &  	sizes )`
 
+
+### 8.1.2. 内存管理方法
+
+* device_dirty()      获取device内存是否 dirty 的 flag
+* host_dirty()        获取 host 内存是否 ditry
+* set_host_dirty(bool  	v = true	)  Methods for managing any GPU allocation.  管理任何 GPU 分配? 没懂
+* set_device_dirty(bool  	v = true	)  
+* copy_to_host(void *  	ctx = nullptr)      拷贝到 主内存 
+
+
+```cpp
+bool Halide::Runtime::Buffer< T, Dims, InClassDimStorage >::host_dirty 	( 		) 	const
+HALIDE_ALWAYS_INLINE bool Halide::Runtime::Buffer< T, Dims, InClassDimStorage >::device_dirty 	( 		) 	const
+
+HALIDE_ALWAYS_INLINE void Halide::Runtime::Buffer< T, Dims, InClassDimStorage >::set_host_dirty 	( 	bool  	v = true	)
+void Halide::Runtime::Buffer< T, Dims, InClassDimStorage >::set_device_dirty 	( 	bool  	v = true	) 	
+
+int Halide::Runtime::Buffer< T, Dims, InClassDimStorage >::copy_to_host 	( 	void *  	ctx = nullptr	) 	
+```
+### 8.1.3. 杂
+
+set_min
 是 buffer 的一个非常有意思的方法, 它可以指定该 buffer 的起点坐标, 即作为高维 array 它的起点index 可以不是 0 , 这对于只处理图像的某些部分来说非常有用
 
 ```cpp
@@ -1268,6 +1326,13 @@ buffer.set_min(100,5);
 // 在实例化 func 的时候, x(维度1) 从 100 开始,  y(维度2) 从 5 开始
 func.realize(buffer);
 ```
+
+## 8.2. halide_buffer_t Struct Reference
+
+The raw representation of an image passed around by generated Halide code.
+
+包括了一些 stuff 用于追踪 image 是否在主内存上. 如果要使用更加方便的 C++ 封装, 就使用上一章的 `Halide::Buffer<T>`
+
 
 # 9. Generator - Halide 精髓
 
@@ -1669,8 +1734,6 @@ Handle() 类型
 ## 11.2. Halide 空间下的类型相关函数
 
 * `template<typename T >  Type Halide::type_of 	( 		) 	`     : 构造等价于一个 C 类型的 halide Typle 对象
-* 
-
 
 cast 函数
 * `Expr Halide::cast 	(Type t, Expr  	a )`                      : 不使用 template 的 cast, 将 Expr 转化为某个 Halide::Type() 类型

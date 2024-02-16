@@ -1080,6 +1080,7 @@ git rebase (--continue | --skip | --abort | --quit | --edit-todo | --show-curren
 * 
 
 ## 6.5. revert
+
 `revert` Revert some existing commits.
    * 同 reset 最大的不同是, reset 是真正意义上的版本穿梭, revert 则是礼貌的回退
      * revert是用一次新的commit来回滚之前的commit, 此次提交之后的commit都会被保留

@@ -1,19 +1,19 @@
-# Data Layout
+# 1. Data Layout
 
-## NHWC Layout
+## 1.1. NHWC Layout
 
-## HCHW Layout
-
-
-# Optimize Algorithm
-
-## Img2Col - 卷积加速算法
+## 1.2. HCHW Layout
 
 
+# 2. Optimize Algorithm
+
+## 2.1. Img2Col - 卷积加速算法
 
 
 
-## winograd - 卷积加速算法
+
+
+## 2.2. winograd - 卷积加速算法
 
 由 Shmuel Winograd 于 1980 年提出, 在当时没有引起太大的轰动
 
