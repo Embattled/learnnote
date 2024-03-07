@@ -5,6 +5,7 @@
 - [5. Output of parts of files](#5-output-of-parts-of-files)
 - [6. Summarizing files](#6-summarizing-files)
 - [7. Operating on sorted files](#7-operating-on-sorted-files)
+  - [7.1. sort: Sort text files](#71-sort-sort-text-files)
 - [8. Operating on fields](#8-operating-on-fields)
 - [9. Operating on characters](#9-operating-on-characters)
 - [10. Directory listing](#10-directory-listing)
@@ -37,8 +38,8 @@
   - [20.6. who : Print who is currently logged in](#206-who--print-who-is-currently-logged-in)
 - [21. System context](#21-system-context)
   - [21.1. date: Print or set system date and time](#211-date-print-or-set-system-date-and-time)
-    - [Time conversion specifiers - 时间转义符](#time-conversion-specifiers---时间转义符)
-    - [Date conversion specifiers - 日期转义符](#date-conversion-specifiers---日期转义符)
+    - [21.1.1. Time conversion specifiers - 时间转义符](#2111-time-conversion-specifiers---时间转义符)
+    - [21.1.2. Date conversion specifiers - 日期转义符](#2112-date-conversion-specifiers---日期转义符)
   - [21.2. arch: Print machine hardware name](#212-arch-print-machine-hardware-name)
   - [21.3. nproc: Print the number of available processors](#213-nproc-print-the-number-of-available-processors)
   - [21.4. uname: Print system information](#214-uname-print-system-information)
@@ -130,7 +131,6 @@ GNU Coreutils 的工具绝大多数都与 POSIX 标准相兼容, 遵循了 POSIX
 
 # 7. Operating on sorted files
 
-
     7.1 sort: Sort text files
     7.2 shuf: Shuffling text
     7.3 uniq: Uniquify files
@@ -143,6 +143,26 @@ GNU Coreutils 的工具绝大多数都与 POSIX 标准相兼容, 遵循了 POSIX
         7.5.5 The GNU extensions to ptx
     7.6 tsort: Topological sort
         7.6.1 tsort: Background
+
+These commands work with (or produce) sorted files. 
+与有序的文件工作, 或者生成有序的文件
+
+## 7.1. sort: Sort text files
+
+`sort` 命令, 排序, 合并, 比较 给定的文本文件的所有行.  如果没有 文件输入, 则读取标准输入流的输入, 因此可以和 管道命令配合使用.  
+
+`sort [option]… [file]…`
+
+参数: 排序方法
+* `-n --numeric-sort` : 按照数字排序, 数字以行为分隔, 任意个空格开始, 带有可选的 `-` 负号符
+  * 支持小数点, 千分符
+* `-h --human-numeric-sort` : 人类易读的单位下, 按照数字排序, 从小到大
+  * 先符号 sign, 后按照 SI suffix, 即 `KMGTPEZYRQ`, 最后按照 数字数值. 该排序无视具体的幂, 因为默认所有输入都是在统一的幂下置换的单位.
+  * 主要用来对 `df du ls` 命令的输出进行排序, 且可以接受对应的 `-h` or `-si` 版本的输出
+  * 由于 `-h` 的输出通常比较粗略, 因此可以在非 `-h` 的输出下进行排序, 再通过另一个命令 `numfmt` 重新转换为 人类易读的表达  
+* `--sort=**`
+  * `numeric` : 同 `-n`
+  * `human-numeric` : 等同于 `-h`
 
 
 # 8. Operating on fields
@@ -239,11 +259,13 @@ Unix-like 操作系统的特殊文件类型要少于其他操作系统, 但并�
 # 14. File space usage
 
 
-    14.1 df: Report file system space usage
-    14.2 du: Estimate file space usage
-    14.3 stat: Report file or file system status
-    14.4 sync: Synchronize cached writes to persistent storage
-    14.5 truncate: Shrink or extend the size of a file
+14.1 df: Report file system space usage - 打印磁盘的使用率
+
+14.2 du: Estimate file space usage - 打印文件的空间占用
+
+14.3 stat: Report file or file system status
+14.4 sync: Synchronize cached writes to persistent storage
+14.5 truncate: Shrink or extend the size of a file
 
 用于文件容量的管理, 可以查看系统容量的空间状态, 文件的容量信息, 缓冲区信息等
 
@@ -253,9 +275,39 @@ df 命令打印的是文件系统的空间, 即整个电脑的空间使用率
 
 `df [option]… [file]…`  
 没有 `file` 参数的话, 会打印所有 mount 挂载的容量信息 (all currently mounted file systems)   
+如果有 file 参数的话, 则会打印 file 所在的 mount 挂载的容量信息, 即 file 仅仅只是用来指定 挂载点的
+
+信息的默认单位是 1k-byte (1kb), 不足的部分会被 round up
+
+
+参数列表:
+* `-a --all` : 是否打印全部的挂载点
+  * 对于没有 -a 的 df 无参数默认调用, 仅输出文件系统列表中具有最短挂载点的设备, 即 device with the shortest mount point name in the `mtab`, 同时隐藏重复的条目
+  * 如果输入该参数, 则会打印: 重复, 虚拟, 无法访问 的文件系统
+    * 所谓虚拟文件系统 (dummy file systems) 即用于特殊目的的伪文件系统, 例如 `/proc`, 其没有对应的存储
+    * 重复的文件系统 (duplicate file systems) , 即通过 mount 将某个文件系统挂载在了不同的位置, 或者将本地的系统挂载到本地的另一个位置, 通过 `mount --bind`
+    * 无法访问的文件系统是那些过期的, 或者访问权限失效的挂载点
+* `-h --human-readable` : 以人类易读的方式打印, 自动以 1024为幂进行单位转换, kb -> mb ->gb ...
+* `-H --si` : 以 SI-style 的缩写方式打印, 即以 1000 为幂进行单位转换, 而不是 `-h` 那样的 1024
+
 
 ## 14.2. du: Estimate file space usage
 
+打印某个 a set of files 的空间占用
+
+`du [option]… [file]… `
+对于无参数调用, du 打印当前目录以及 当前目录下的递归目录所需要的空间, 默认以 1kb 为单位.
+
+du 对于 hard link 会跳过. du 的参数的顺序也会影响 du 输出的数字和条目
+
+参数
+* `-a --all` : 同时输出 文件的占用空间, 不仅仅是 目录
+* `-s --summarize` : 只输出该目录整个的占用空间 
+* `-d depth` `--max-depth=depth` : 只输出深度在 depth 以内的目录空间, root 为0, 因此 `-d 0` 相当于 `-s`
+* `-h --human-readable`  `--si` : 作用同上面的 `df`, 要注意 du 的 `-H` 有不同的含义
+* `-H -D --dereference-args` : 取消作为 命令行参数的 符号链接, 但是不影响其他的符号连接, 这对于统计某些存在符号链接目录的路径有帮助, 例如 `/usr/tmp`
+
+ 
 
 ## 14.3. sync: Synchronize cached writes to persistent storage
 <!-- 完, 但不太理解 -->
@@ -523,7 +575,7 @@ date [-u|--utc|--universal] [ MMDDhhmm[[CC]YY][.ss] ]
 ```
 
 
-### Time conversion specifiers - 时间转义符
+### 21.1.1. Time conversion specifiers - 时间转义符
 
 | 转义符(省略前置的 `%` ) | 意思                                                                      |
 | ----------------------- | ------------------------------------------------------------------------- |
@@ -546,7 +598,7 @@ date [-u|--utc|--universal] [ MMDDhhmm[[CC]YY][.ss] ]
 | :::z                    | 用最小的准确精度表示的 time zone, e.g. `-06   +05:30`                     |
 | Z                       | 用 alphabetic 表示的 time zone                                            |
 
-### Date conversion specifiers - 日期转义符
+### 21.1.2. Date conversion specifiers - 日期转义符
 
 | 转义符(省略前置的 `%` ) | 意思     
 
@@ -748,6 +800,7 @@ env
 - [5. Output of parts of files](#5-output-of-parts-of-files)
 - [6. Summarizing files](#6-summarizing-files)
 - [7. Operating on sorted files](#7-operating-on-sorted-files)
+  - [7.1. sort: Sort text files](#71-sort-sort-text-files)
 - [8. Operating on fields](#8-operating-on-fields)
 - [9. Operating on characters](#9-operating-on-characters)
 - [10. Directory listing](#10-directory-listing)
@@ -780,8 +833,8 @@ env
   - [20.6. who : Print who is currently logged in](#206-who--print-who-is-currently-logged-in)
 - [21. System context](#21-system-context)
   - [21.1. date: Print or set system date and time](#211-date-print-or-set-system-date-and-time)
-    - [Time conversion specifiers - 时间转义符](#time-conversion-specifiers---时间转义符)
-    - [Date conversion specifiers - 日期转义符](#date-conversion-specifiers---日期转义符)
+    - [21.1.1. Time conversion specifiers - 时间转义符](#2111-time-conversion-specifiers---时间转义符)
+    - [21.1.2. Date conversion specifiers - 日期转义符](#2112-date-conversion-specifiers---日期转义符)
   - [21.2. arch: Print machine hardware name](#212-arch-print-machine-hardware-name)
   - [21.3. nproc: Print the number of available processors](#213-nproc-print-the-number-of-available-processors)
   - [21.4. uname: Print system information](#214-uname-print-system-information)

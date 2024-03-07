@@ -1,30 +1,22 @@
-- [1. 在vscode上配置C++开发环境](#1-在vscode上配置c开发环境)
-  - [1.1. 在Windows上安装 C++ (MinGW-x64)](#11-在windows上安装-c-mingw-x64)
-  - [1.2. 配置编译环境](#12-配置编译环境)
-  - [1.3. 配置调试环境](#13-配置调试环境)
-  - [1.4. 更详细的配置](#14-更详细的配置)
+# Visual Studio Code
+
+vscode 完整文档:
+https://code.visualstudio.com/docs
 
 
-# 1. 在vscode上配置C++开发环境
+# User Guide
 
-* The VsCode C/C++ extension does not include a C++ compiler or debugger.
-* You will need to install these tools or use those already installed on your computer.
+VScode 内建了一套完整的变量系统, 通过 JSON 即可对 vscode 的各种动作模式进行配置和指定
 
-## 1.1. 在Windows上安装 C++ (MinGW-x64)
+# C++
 
-`MinGW`,是`Minimalist GNUfor Windows`的缩写  
+在 Vscode 中配置 C++ IntelliSense, 并进行 debug, 需要的 microsoft 官方插件包括  
+* C/C++
 
-* 安装完成后需要将 `/bin` 目录添加到 windows 的 path
-* 例 `c:\mingw-w64\x86_64-8.1.0-win32-seh-rt_v6-rev0\mingw64\bin.`
-
-在命令行输入代码检查, 确认编译器可以从命令行调用
-```
-g++ --version
-gdb --version
-```
+Vscode 本身是不包括 compiler 和 debugger 的
 
 
-## 1.2. 配置编译环境
+
 
 在vscode的命令行输入 `Configure Default Build Task` 选择`g++` 配置  
 这将会在工作区的 `.vscode` 下生成 `tasks.json` 文件  
@@ -44,7 +36,7 @@ json属性的说明：
 * 查看更多vscode配置文件中可以使用的[变量](https://code.visualstudio.com/docs/editor/variables-reference)
 
 
-## 1.3. 配置调试环境
+## 1.3. Configure debugging
 
 同编译的 `task.json` 文件一样  
 第一次会弹窗选择要运行的调试器,选择`gbd/lldb`,之后会在工作区的`.vscode`下新建一个 `launch.json`文件  
@@ -59,11 +51,24 @@ json属性的说明：
 使用变量和监视窗口可以方便的在程序暂停时查看变量  
 
 
-## 1.4. 更详细的配置
+## 1.4. Settings
 
 * 在控制台输入 `C++ edit config` 可以调出专门对 vscode C++ extension 的配置
 * 会创建一个 `c_cpp_properties.json` 的文件, 用于指定该工作区对于 C++拓展的配置
 * such as the path to the compiler, include paths, C++ standard (default is C++17), and more
 
 在自定义项目的时候, 如果 header 不在工作路径或者 STL, 只需要修改该配置文件的 `Include path` 即可  
+
+## Configure IntelliSense
+
+
+
+# Remote 
+
+
+## 在CODE中使用WSL
+
+要用CODE打开WSL中的文件夹:  
+`code --remote wsl+<distro name> <path in WSL>`  
+for example: `code --remote wsl+Ubuntu /home/jim/projects/c`  
 

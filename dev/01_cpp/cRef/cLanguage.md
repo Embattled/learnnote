@@ -1,6 +1,8 @@
 - [1. C 语言](#1-c-语言)
   - [1.1. C语言的版本](#11-c语言的版本)
   - [1.2. C 语言的构成](#12-c-语言的构成)
+- [Basic Concepts](#basic-concepts)
+- [Keywords](#keywords)
 - [2. Declaration 声明](#2-declaration-声明)
   - [2.1. 声明的根本构成](#21-声明的根本构成)
     - [2.1.1. specifiers-and-qualifiers 说明符和限定符](#211-specifiers-and-qualifiers-说明符和限定符)
@@ -128,7 +130,6 @@ C11 标准主要增加了以下内容：
 
 ## 1.2. C 语言的构成
 
-
 * Basic concepts
 * Keywords
 * Preprocessor
@@ -137,6 +138,12 @@ C11 标准主要增加了以下内容：
 * Initialization
 * Functions
 * Statements
+
+# Basic Concepts
+
+# Keywords
+
+
 
 # 2. Declaration 声明
 

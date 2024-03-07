@@ -1349,7 +1349,20 @@ The raw representation of an image passed around by generated Halide code.
 * 对于管道中的各种 `Func` 可以在一开始全部定义在 `private` 里
   * 保留的函数名 `generate()` 只关注算法, 如果不定义 `schedule()` 的话将 schedule 写在 generate() 里面也没问题
   * 保留的函数名 `schedule()`, which (if present) should contain all scheduling code.
+  * 保留的函数名 `configure()`, 会在 `generator()` 之前被调用, 用于动态地将输入和输出添加到生成器, 可以用该函数来实现 GeneratorParams 的验证
+    * 该函数中应该书写的是
+    * `add_input` 和 `add_output`  来添加输入和输出, 在代码生成的时候会附在 预先声明的成员之后  (输入总是在输入之前)
+    * `set_type` `set_dimensions` `set_array_size` 用于在未指定类型的输入输出上 动态的设置
 
+对于 public 中的成员, 需要按照如下顺序进行定义, 所有的成员都应该一起定义一个与变量名相同的 显式名称    
+```cpp
+GeneratorParam(s)
+Input<Func>(s)
+Input<non-Func>(s)
+Output<Func>(s)
+```
+
+完整的示例代码  
 ```cpp
 // 需要公有继承 Halide::Generator
 class Blur : public Generator<Blur> {
@@ -1379,6 +1392,8 @@ private:
 ## 9.2. 定义输入输出  
 
 定义输出的时候一般会定义为 Buffer, 但是 Halide 本质上是支持把 Func 定义为 Input 的, 以下是原话:
+
+在这种情况下 编译好的 C 函数声明的输入类型是 halide_buffer_t, 而其他类型则是 适当的 C++ 标量类型 
 
 * An `Input<Func>` is (essentially) like an ImageParam, except that it may (or may not) not be backed by an actual buffer, and thus has no defined extents.
 * 除了 Buffer 以外, Func 可以直接被定义为 Input 
@@ -1423,12 +1438,16 @@ GeneratorParams 所支持的数据种类
 * any float or int type, 数字种类是支持设置最大最小值的.  
 * bool
 * enum
-* Halide::Target
 * Halide::Type
   * 本质上仍然是一个 enum, 只不过是库内部预定义的
   * Halide::Type is treated as though it were an enum, with the mappings:
     * "int8" Halide::Int(8) "int16" Halide::Int(16) "int32" Halide::Int(32) "uint8" Halide::UInt(8) "uint16" Halide::UInt(16) "uint32" Halide::UInt(32) "float32" Halide::Float(32) "float64" Halide::Float(64)
+* Halide::Target
 * std::string : 应该尽量避免直接使用 string , 转而 同 enum 来代替
+
+预定义的两个 GeneratorParams : 
+* `GeneratorParam<Target> target{"target", Target()};`  用于实现 Generator 的 cross-compile, 在Generator输出的时候该参数是必须指定的 
+* `GeneratorParam<AutoschedulerParams> autoscheduler{"autoscheduler", {}}` 用于指定 是否/如何 使用 autoscheduler 来生成代码
 
 
 ```cpp

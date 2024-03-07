@@ -1,5 +1,7 @@
 # 1. Open Graphics Library OpenGL
 
+wiki : https://www.khronos.org/opengl/wiki/Main_Page
+
 开放图形库: 用于渲染2D, 3D矢量图形的跨语言, 跨平台的 API
 * 由近350个不同的函数调用组成, 绘制从简单的图形比特到复杂的三维景象
 * 另一种与 OpenGL 平行的API库 是仅用于Microsoft Windows上的Direct3D
@@ -42,7 +44,7 @@ OpenGL 上下文 (OpenGL context) 的创建过程相当复杂, 在不同的操�
 * freeglut : 基于 GLUT 的更新维护版本, 目前仍然在更新
 * GLFW  : 目前仍然在更新
 * GLEW  : OpenGL Extension Wrangler Library
-* GLEE
+* GLEE  :
 * OpenGL Performer  : 
 
 ## 1.2. OpenGL ES OpenGL for Embedded Systems
@@ -53,7 +55,7 @@ OpenGL 三维图形 API 的子集, 针对手机, PDA和游戏主机等嵌入式�
   * OpenGL ES 1.x 针对固定管线硬件
   * OpenGL ES 2.x 针对可编程管线硬件
 * OpenGL ES Shading Language 3.00 Specification (January 29, 2016)
-* OpenGL ES Shading Language 3.20 Specification (July 10, 2019) (HTML) (PDF) 
+* OpenGL ES Shading Language 3.20 Specification (July 10, 2019)
 
 
 
@@ -62,4 +64,11 @@ OpenGL 三维图形 API 的子集, 针对手机, PDA和游戏主机等嵌入式�
 Mesa 3D是一个在MIT许可证下开放源代码的三维计算机图形库, 以开源形式实现了OpenGL的应用程序接口
 * 由于标准的 OpenGL 是由厂商提供的基于各家硬件的, 所以可以说是有硬件加速
 * Mesa 是纯软件实现 OpenGL 的各种接口, 因此速度理论上较慢
+
+## Getting Started - 环境配置
+
+要使用基于OpenGL开发的软件或者游戏, 需要 按章正确的设备驱动.   
+而如果要进行基于 OpenGL 的开发, 需要
+* 安装正确的设备驱动
+* 开发套件  development package (depends on platform and programming language).
 

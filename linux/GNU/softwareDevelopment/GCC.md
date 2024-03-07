@@ -14,6 +14,11 @@
   - [3.5. Options to Control Diagnostic Messages Formatting](#35-options-to-control-diagnostic-messages-formatting)
   - [3.6. Options to Request or Suppress Warnings](#36-options-to-request-or-suppress-warnings)
   - [3.7. Options That Control Optimization](#37-options-that-control-optimization)
+  - [Machine-Dependent Options - 平台相关的参数](#machine-dependent-options---平台相关的参数)
+    - [ARM Options - 手机端常用的 ARM 架构的选项](#arm-options---手机端常用的-arm-架构的选项)
+      - [ARM march=](#arm-march)
+    - [GNU/Linux Options - GNU Linux 系统命令](#gnulinux-options---gnu-linux-系统命令)
+    - [x86 Options - x86 平台选项](#x86-options---x86-平台选项)
 
 # 1. GCC, the GNU Compiler Collection
 
@@ -385,5 +390,48 @@ GCC 的优化策略很多, 并不是所有的优化策略都能够通过 flag �
 | `-Oz`      | 基于 O2 的基础上, 更加积极的优化 code size 而不是 speed                                                                     |
 | `-Ofast`   | 基于 O3 的基础上, 解除标准合规性, 会应用一些不是所有标准都支持的优化策略                                                    |
 | `-Og`      | 基于 O1 的基础上去除所有会影响 debug 可行性的优化. 甚至优于 某些编译器上的 `-O0`, 因为有些编译器 O0 也不会保存 debug 信息   |
+
+## Machine-Dependent Options - 平台相关的参数
+
+所有支持 GCC 的机器 (Architecture, operating system)  都可以拥有其独有的 option.  
+
+该部分的 GCC 编译命令固定以 `-m` 开头  
+
+以下是几十种不同平台的命令小章节, 只学习重要的
+
+通用命令:
+* `-march=[]`  似乎是指定架构的通用命令, 在多种平台存在
+
+### ARM Options - 手机端常用的 ARM 架构的选项
+
+
+#### ARM march=
+
+`-march=name[+extension...]`   : 指定了 target ARM architecture, 确定编译后可以生成的 指令种类, 可以与 `-mcpu=` 结合或者代替使用
+
+在通过 `name` 指定了 架构后, 还可以通过 `+extension` 的形式为该架构启用多种扩展, 拓展之间可能会有依赖. 存在 `+no**` 类型的拓展, 会以高优先级主动禁用某些功能, 而依赖于这些被禁用功能的扩展则会自动被一起禁用
+
+```
+Permissible names are: ‘armv4t’, ‘armv5t’, ‘armv5te’, ‘armv6’, ‘armv6j’,
+‘armv6k’, ‘armv6kz’, ‘armv6t2’, ‘armv6z’, ‘armv6zk’, ‘armv7’, ‘armv7-a’,
+‘armv7ve’, ‘armv8-a’, ‘armv8.1-a’, ‘armv8.2-a’, ‘armv8.3-a’, ‘armv8.4-a’,
+‘armv8.5-a’, ‘armv8.6-a’, ‘armv9-a’, ‘armv7-r’, ‘armv8-r’, ‘armv6-m’,
+‘armv6s-m’, ‘armv7-m’, ‘armv7e-m’, ‘armv8-m.base’, ‘armv8-m.main’,
+‘armv8.1-m.main’, ‘armv9-a’, ‘iwmmxt’ and ‘iwmmxt2’.
+```
+
+以下是支持的架构对应的支持的拓展, 在上述中存在但在下列条框中不出现的架构则不支持任何拓展, 书写中省略 `+` 号  
+
+* `armv8.2-a armv8.3-a`
+  * `simd` : ARMv8.1-A Advanced SIMD and floating-point instructions.
+  * `fp16` : 半精度浮点支持, 会同时启用 `Advanced SIMD` 和 `floating-point instructions`
+  * `crypto` : 密码学指令, 会同时启用 `Advanced SIMD` 和 `floating-point instructions`
+  * `dotprod` : 启用点乘 `Dot Product` 指令, 会同时启用 `Advanced SIMD`
+
+
+### GNU/Linux Options - GNU Linux 系统命令
+
+### x86 Options - x86 平台选项 
+
 
 

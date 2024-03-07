@@ -1,8 +1,6 @@
 # 1. Computer Network
 
 
-
-
 ## 1.1. 计算机网络结构
 
 
@@ -55,9 +53,14 @@ Ethernet 的规格: 10BASE-T
 * 802.11ac  
 * 802.11g
 
+## Point-to-Point Protocol - PPP 协议
+
+在计算机网络中, PPP 协议是一个 数据链路层 Data link layer (layer2) 的通信协议.  
+主要用于 2个路由器直接进行的通讯 (无 host 或者中间网络 ), PPP 协议可以提供 环路检测, 身份验证, 传输加密, 数据压缩等任务.  
 
 
-# 3. 网络层协议
+
+# 3. Internet Layer - 网络层协议 IPv4/6
 
 ## 3.1. IPv4
 
@@ -79,7 +82,7 @@ Ethernet 的规格: 10BASE-T
   * B 类私有地址 , 网络地址: `172.0001****.`
   * C 类私有地址 , 网络地址: 192.168
 
-## WAN (Wide Area Network)
+## 3.2. WAN (Wide Area Network)
 
 外部网的服务提供, 根据原理区分方式
 1. 专用线: 和据点搭建专线连接, 费用高, 连接稳定
@@ -100,7 +103,7 @@ WAN网络的接入设备:
 * TA (Terminal Adapter)
   * ISDN线路和非ISDN终端(模拟信号电话等)进行连接时的信号转换机器
 
-## 3.2. NAT 地址转换
+## 3.3. NAT 地址转换
 
 * 将私有地址转换成共有地址的方法
 * NAT (Network Address Translation) : 私有地址和共有地址 1:1 转换
@@ -108,18 +111,16 @@ WAN网络的接入设备:
 
 
 
-## 3.3. ARP (Address Resolution Protocol)
+## 3.4. ARP (Address Resolution Protocol)
 
 IP地址 -> MAC地址
 
 
-
-
-## 3.4. ICMP (Internet Control Message Protocol)
+## 3.5. ICMP (Internet Control Message Protocol)
 
 网络控制协议, 定义了多种报文
 
-# 4. TCP/UDP 协议
+# 4. Transport Layer - TCP/UDP 协议
 
 传输层的两个协议
 
@@ -133,7 +134,7 @@ Well Know Port:
 
 # 5. Application Protocol 位于应用层的协议
 
-TCP/IP 4层网络结构的应用层定义了许多协议
+TCP/IP 4层网络结构的应用层定义了许多常用的协议
 
 
 ## 5.1. DNS (Domain Name System/Server)
@@ -141,7 +142,7 @@ TCP/IP 4层网络结构的应用层定义了许多协议
 域名解析服务: 域名 -> IP 地址
 * 端口 : 53
  
-### mDNS  多播DNS
+### 5.1.1. mDNS  多播DNS
 
 一种独立的域名解析服务, 被编入 RFC6762
 * 和标准 DNS 相比
@@ -369,3 +370,10 @@ HTTP Status Code, 即在服务器响应消息的状态行中, 对应响应信息
 ## 5.8. DHCP (Dynamic Host Configuration Protocol)
 
 动态IP配置协议
+
+
+# Network access
+
+
+## PPPoE ( Point-to-Pint Procotol over Ethernet )
+

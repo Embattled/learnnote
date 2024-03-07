@@ -45,6 +45,9 @@
     - [SVD - Linear Algebra Method](#svd---linear-algebra-method)
     - [Non-linear Optimization Method](#non-linear-optimization-method)
 - [7. Visual Odometry - 视觉里程计 Part 2](#7-visual-odometry---视觉里程计-part-2)
+  - [The Motivation of the Direct Method - 直接法的引出](#the-motivation-of-the-direct-method---直接法的引出)
+  - [2D Optical Flow - 2D 光流](#2d-optical-flow---2d-光流)
+  - [Practice Direct Method - 实践中的直接法](#practice-direct-method---实践中的直接法)
 - [Filters and Optimization Approaches - 后端 Part1](#filters-and-optimization-approaches---后端-part1)
 - [Filters and Optimization Approaches - 后端 Part2](#filters-and-optimization-approaches---后端-part2)
 - [Loop Closure - 回环检测](#loop-closure---回环检测)
@@ -1083,15 +1086,68 @@ $$\frac{\partial e}{\partial \delta\xi}= -(\exp(\xi\hat{\space})p_i')^\odot$$
 
 # 7. Visual Odometry - 视觉里程计 Part 2
 
-* 理解光流法跟踪特征点的原理
-* 直接法估计相机位姿的原理
+* 理解 `光流法` 跟踪特征点的原理
+* `直接法` 估计相机位姿的原理
 * 多层直接计算法的实现
 
 直接法是 视觉里程计的一个主流的分支, 与特征点法有很大的不同.  
 是未来的潜力算法
 
+## The Motivation of the Direct Method - 直接法的引出
+<!-- 完 -->
+在 VO 的第一部分介绍了基于特征点来估计相机移动的方法, 尽管占据主流, 但研究者仍然认识到基于特征点算法的缺点:
+* 关键点的提取以及关键点描述子的计算非常耗时, 截至书中截稿 SIFT 在CPU上无法实时计算, ORB 则需要 20ms. 如果整个系统是运行在 30ms/帧 约 30fps上, 则大部分时间都消耗在了计算特征点上
+* 使用特征点时, 很可能会忽视掉其他有用的信息, 因为一幅图有上百万个像素, 然而特征点主流的只有几百个
+* 当相机运行到特征缺失的地方时, 基于特征点的算法会因为特征点数量不足导致计算本深无法进行
+
+从克服关键点的缺点的角度上考虑, 引出了两种思路
+* Optical Flow (光流法) : 保留特征点, 但仅仅计算点的位置, 不进行特征描述. 使用光流法来跟踪特征点的运动, 这样可以跳过对描述子的计算和匹配的过程, 光流的计算复杂度本身要小于描述子的计算与匹配
+  * 相当于把匹配描述子替换成了光流跟踪, 在计算相机运动的时候仍然使用 对极几何, PnP, ICP 算法
+  * 仍然需要特区到的关键点具有可区别性, 需要角点
+* Direct Method (直接法) : 但是使用直接法来计算特征点在下一时刻的运动, 连光流的计算都省去了
+  * 根据图像的像素信息同时估计相机运动和点的投影
+
+在特征法中, 主要根据特征点在三维中的不动性, 通过最小化 **重投影误差** (Reprojection error) 来优化相机运动.  
+在直接法中, 不需要知道点与点之间的对应关系, 而是通过最小化 **光度误差** (Photometric error) 来求得  
+
+该大章节关注 直接法, 根据像素的亮度信息直接求出相机运动, 只要场景中存在明暗变化. 根据使用的像素数量, 可以分为
+* 稀疏
+* 稠密
+* 半稠密
+与特征点法只能重构系数特征点 (稀疏地图) 相比, 直接法拥有构建稠密图的能力
+
+使用直接法的近期的主流方法有 : SVO, LSD-SLAM, DSO 等
+
+## 2D Optical Flow - 2D 光流
+
+直接法是从光流法演变而来的, 因此很相似, 在直接法之前先学习 光流法  
+* 光流法描述了像素在图像中的运动
+* 直接法在运动的基础上附带着相机运动模型  
+
+光流 用于描述 pixels 在图像之间的运动, 即追踪像素点.
+* 计算部分像素运动称为 Sparse Optical Flow (稀疏光流)
+  * 在实际中, 主要用来追踪 特征点
+  * 以 Lucas-Kanade (LK flow, LK光流) 为代表
+* 计算全部像素则为 Dense Optical Flow (稠密光流)
+  * 以 Horn-Schunck 光流 为代表
+
+## Practice Direct Method - 实践中的直接法
+
+
+优缺点总结:
+* 优点:
+  * 省去了计算特征点, 描述子的时间
+  * 只需要图像本身有像素梯度即可, 不需要特征点, 因此可以在特征缺失的场合下使用, 例如不存在角点, 只有渐变的场景
+* 缺点
+  * Non-convexity 非凸性 : 由于直接法完全依赖于梯度搜索, 降低目标函数来计算位姿. 因此优化算法很容易进入极小值, 只有在运动很小时直接法才能成功. 相对的, 引入 Pyramids 金字塔计算可以减少非凸性的影响
+  * 单个像素很难有区分度 : 单个像素的区分度十分差, 因此往往以图像块为单位进行计算, 或者计算更加复杂的相关性. 直接法在选点较小的时候精度很差, 经验上使用 500+ 个点优先
+  * Constant brightness is a strong assumption : 灰度不变是很强的假设, 在实际中由于相机自动曝光导致照度的改变, 图像整体的明暗度往往有很大差别导致算法失败, 实用中的直接法会同时估计相机的曝光参数.  
+
+
 
 # Filters and Optimization Approaches - 后端 Part1 
+
+
 
 # Filters and Optimization Approaches - 后端 Part2
 

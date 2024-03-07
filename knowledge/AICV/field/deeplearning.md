@@ -47,12 +47,6 @@
 - [8. Transfer Learning](#8-transfer-learning)
   - [8.1. Domain Adaptation (DA)](#81-domain-adaptation-da)
   - [8.2. Domain Generalization](#82-domain-generalization)
-- [9. View Synthesis](#9-view-synthesis)
-  - [9.1. Neural Rendering  的各种渲染方法](#91-neural-rendering--的各种渲染方法)
-    - [9.1.1. Volume 体数据  体渲染](#911-volume-体数据--体渲染)
-  - [9.2. NeRF Neural Radiance Fields](#92-nerf-neural-radiance-fields)
-    - [9.2.1. Vanilla NeRF](#921-vanilla-nerf)
-  - [Neural 3D shape representations](#neural-3d-shape-representations)
 - [10. Dataset](#10-dataset)
   - [10.1. Text spot](#101-text-spot)
     - [10.1.1. Scene Text](#1011-scene-text)
@@ -60,6 +54,8 @@
 
 
 # 1. Deep Learning 概念
+
+从各种地方收集的 DL 最初的笔记, 最终的目标是将该笔记重新整合到别的文本中  
 
 ## 1.1. 卷积
 
@@ -1053,85 +1049,6 @@ MOT 的评价方法:
 
 对比 域适应 (Domain Adaptation) 更加泛化的域适应的研究方向  
 
-
-# 9. View Synthesis
-
-视角合成任务, 通过输入对一系列对物体不同角度的图像, 来生成新的角度下的图像
-* 对于一个训练好的模型
-* 通常输入的数据是一系列图像, 并且带有对应的角度数据, e.g. 空间坐标 (x,y,z) 视角 (theta, phi)
-* 输出是
-  * the volume density 
-  * and view-dependent emitted radiance at that spatial location, 可以直接理解成新视角下的图像
-
-
-
-通常的手法使用一个中间的 3D 场景表征来作为中介, 并以此生成高质量的虚拟视角, 根据该中间表征的形式, 可分为:
-* 显式 Explicit representation : 例如 Mesh, Point Cloud, Voxel, Volume 等等, 对场景进行显式建模, 但是这些显式类型一般都是离散的, 有精度问题
-* 隐式 Implicit representation : 用一个函数来描述几何场景, 一般是一个不可解释的 MLP 模型, 输入 3D 空间坐标, 输出对应的几何信息, 是一种连续的表示 (Neural Fields, 神经场)   
-
-
-Neural Fields  神经场:
-* 场 Fields   : 是一个物理概念, 对所有 (连续)时间 或 空间 定义的量, 如电磁场, 重力场, 对 场的讨论一定是建立在目标是连续概念的前提上
-* 神经场表示用神经网络来 全部或者部分参数化的场
-* 在视觉领域, 场即空间, 视觉任务的神经场即 以 `空间或者其他维度 时间, 相机角度等` 作为输入, 通过一个神经网络, 获取目标的一个标量 (颜色, 深度 等) 的过程   
-
-## 9.1. Neural Rendering  的各种渲染方法
-
-即中间层的显式表达方法 Mesh, Point Cloud, Voxel, Volume 等
-
-### 9.1.1. Volume 体数据  体渲染
-
-从体数据渲染得到想要的 2D 图片  
-
-体数据是一种数据存储格式, 例如 医疗中的 CT 和 MRI, 地址信息, 气象信息
-* 是通过 : 追踪光线进入场景并对光线长度进行某种积分来生成图像或者视频   Ray Casting Ray Marching Ray Tracing
-* 这种数据需要额外的渲染过程才能显示成 2D 图像并被人类理解  
-* 对比于传统的 Mesh, Point 等方法, 更加适合模拟光照, 烟雾, 火焰等非刚体, 在图形学中也有应用   
-* 体渲染是一种可微渲染  
-
-
-
-## 9.2. NeRF Neural Radiance Fields
-
-2019年开始兴起, 在 2020 年 ECCV 中得到 Best Paper Candidate  
-
-NeRF 是一种隐式的 3D 中间表示, 但是却使用了 Voluem 的规则, 即一个 隐式的 Volume, 实现了 神经场 Neural Field 与图形学组件 Volume Rendering 的有效结合  
-* 本身的方法非常简洁, 且有效, 说明是合理的
-* 对于启发 计算机视觉和图形学的交叉领域 有很大的功劳
-
-
-### 9.2.1. Vanilla NeRF
-
-将一个 scene 表示成一个 5D vector-valued function.
-* 输入 3D location X=(x,y,z) 和 viewing direction d=(theta, phi)
-* 输出 emitted color $c=(r,g,b)$ 和 volume density $\sigma$
-* volume density sigma(x) 可以解释为一个 ray 在空间中的无限微小点 X 终止的微分概率  
-
-
-基于 NeRF 的 Volume Rendering
-* 对于一个 camera ray  $r(t)=o+td$  t 是 camera ray 的远近距离 t_n t_f
-* camera ray 得到的颜色 C(r)可以写作  
-$$C(r)=\int_{t_n}^{t_f}T(t)\sigma(r(t))c(r(t),d)dt$$
-* $T(t)=exp(-\int_{t_n}^t\sigma(r(s))ds)$
-  * 该公式代表了一个 accumulated transmittance, 
-  * 对于一个距离 t 从 t_n 到 t, 光线最终没有被遮蔽的概率  
-* 从一个 NeRF 模型中渲染出一个 view 需要
-  * estimating this integral C(r) for a camera ray traced through each pixel of the desired virtual camera.
-  * 从虚拟摄像头中, 对穿越每一个像素的 camera cay 计算 C(r)
-
-
-NeRF 本身的问题, 有如下:
-* 速度慢  : 对于每个输出像素分别进行前向预测, 因此计算量很大  
-* 只能应用于静态场景
-* 泛化性差
-* 需要大量的视角  : 需要数百张不同视角的图片来训练  
-
-## Neural 3D shape representations
-
-在 NeRF 提出之前的主流方案, 对于一个连续的 3D shape
-* map xyz coordinates to signed distance functions or occupancy fields
-* 这种方案最早的时候需要 GT 3D geomerty, 因此在研究中经常使用 synthetic 3d shape
-* 后来有直接输出每个坐标对应的 feature vector 和 RGB function, 在通过复杂的 rendering function 得到2D img 再计算 Loss
 
 # 10. Dataset
 

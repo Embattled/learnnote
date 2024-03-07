@@ -1,4 +1,4 @@
-# util-linux
+# 1. util-linux
 
 https://en.wikipedia.org/wiki/Util-linux
 
@@ -8,12 +8,12 @@ util-linux is a standard package distributed by the Linux Kernel Organization fo
 大部分 linux 基础命令属于该软件包
 
 
-# mount umount - 挂载
+# 2. mount umount - 挂载
 
 * mount - mount a filesystem
 * umount - unmount file systems
 
-## mount 命令
+## 2.1. mount 命令
 
 
 ```sh
@@ -44,7 +44,7 @@ Linux 下所有硬件设备都必须挂载后才能使用, 区别是硬盘分区
 
 
 
-### options
+### 2.1.1. options
 
 更加细节的选项参数, 需要参照文档中的  
 *  FILESYSTEM-INDEPENDENT MOUNT OPTIONS

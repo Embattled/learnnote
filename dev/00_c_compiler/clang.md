@@ -1,7 +1,12 @@
 # 1. What is clang?
 
+https://clang.llvm.org/
+
 * A language front-end and tooling infrastructure for languages in the C language family (C, C++, Objective C/C++, OpenCL, CUDA, and RenderScript) for the LLVM project. 
+* 提供了前端到后端以及各种工具基础设施 面向 C 家族的编程语言, 将其导入 LLVM Compiler Infrastructure 
+
 * Both a GCC-compatible compiler driver (clang) and an MSVC-compatible compiler driver (clang-cl.exe) are provided.
+
 
 ## 1.1. Introduction to Clang
 
