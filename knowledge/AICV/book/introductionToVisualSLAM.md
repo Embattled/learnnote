@@ -42,17 +42,29 @@
   - [6.3. Triangulation - 三角测量 (三角化)](#63-triangulation---三角测量-三角化)
   - [6.4. 3D-2D : PnP](#64-3d-2d--pnp)
   - [6.5. 3D-3D : ICP](#65-3d-3d--icp)
-    - [SVD - Linear Algebra Method](#svd---linear-algebra-method)
-    - [Non-linear Optimization Method](#non-linear-optimization-method)
+    - [6.5.1. SVD - Linear Algebra Method](#651-svd---linear-algebra-method)
+    - [6.5.2. Non-linear Optimization Method](#652-non-linear-optimization-method)
 - [7. Visual Odometry - 视觉里程计 Part 2](#7-visual-odometry---视觉里程计-part-2)
-  - [The Motivation of the Direct Method - 直接法的引出](#the-motivation-of-the-direct-method---直接法的引出)
-  - [2D Optical Flow - 2D 光流](#2d-optical-flow---2d-光流)
-  - [Practice Direct Method - 实践中的直接法](#practice-direct-method---实践中的直接法)
-- [Filters and Optimization Approaches - 后端 Part1](#filters-and-optimization-approaches---后端-part1)
-- [Filters and Optimization Approaches - 后端 Part2](#filters-and-optimization-approaches---后端-part2)
-- [Loop Closure - 回环检测](#loop-closure---回环检测)
-- [Dense Reconstruction - 建图](#dense-reconstruction---建图)
-- [Discussions and Outlook - SLAM 的现在与未来](#discussions-and-outlook---slam-的现在与未来)
+  - [7.1. The Motivation of the Direct Method - 直接法的引出](#71-the-motivation-of-the-direct-method---直接法的引出)
+  - [7.2. 2D Optical Flow - 2D 光流](#72-2d-optical-flow---2d-光流)
+  - [7.3. Practice Direct Method - 实践中的直接法](#73-practice-direct-method---实践中的直接法)
+- [8. Filters and Optimization Approaches - 后端 Part1](#8-filters-and-optimization-approaches---后端-part1)
+  - [8.1. Introduction of backend](#81-introduction-of-backend)
+    - [8.1.1. State Estimation from Probabilistic Perspective - 状态估计的概率解释](#811-state-estimation-from-probabilistic-perspective---状态估计的概率解释)
+    - [8.1.2. Linear Systems and the Kalman Filter - 线性系统与卡尔曼滤波KF](#812-linear-systems-and-the-kalman-filter---线性系统与卡尔曼滤波kf)
+    - [8.1.3. Nonlinear Systems and the EKF - 非线性系统和EKF](#813-nonlinear-systems-and-the-ekf---非线性系统和ekf)
+    - [8.1.4. Discussion About KF and EKF](#814-discussion-about-kf-and-ekf)
+  - [8.2. Bundle Adjustment and Graph Optimization - BA 与图优化](#82-bundle-adjustment-and-graph-optimization---ba-与图优化)
+    - [8.2.1. The Projection Model and COst Function - 投影模型和 BA 代价函数](#821-the-projection-model-and-cost-function---投影模型和-ba-代价函数)
+    - [8.2.2. Solving Bundle Adjustment - BA的求解](#822-solving-bundle-adjustment---ba的求解)
+    - [8.2.3. Sparsity - 稀疏性](#823-sparsity---稀疏性)
+    - [8.2.4. Robust Kernels - 鲁棒核函数](#824-robust-kernels---鲁棒核函数)
+- [9. Filters and Optimization Approaches - 后端 Part2](#9-filters-and-optimization-approaches---后端-part2)
+  - [9.1. Sliding Window Filter and Optimization - 滑动窗口滤波和优化](#91-sliding-window-filter-and-optimization---滑动窗口滤波和优化)
+    - [9.1.1. Controlling the Structure of BA - BA 的结构在实际环境下的控制](#911-controlling-the-structure-of-ba---ba-的结构在实际环境下的控制)
+- [10. Loop Closure - 回环检测](#10-loop-closure---回环检测)
+- [11. Dense Reconstruction - 建图](#11-dense-reconstruction---建图)
+- [12. Discussions and Outlook - SLAM 的现在与未来](#12-discussions-and-outlook---slam-的现在与未来)
 
 # 1. Introduction to Visual SLAM : From Theory to Practice
 Xiang Gao and Tao Zhang
@@ -1060,9 +1072,9 @@ ICP 的求解可以分为两种
 * 基于线性代数的求解 SVD
 * 基于非线性优化的求解 (类似于 BA)
 
-### SVD - Linear Algebra Method
+### 6.5.1. SVD - Linear Algebra Method
 
-### Non-linear Optimization Method
+### 6.5.2. Non-linear Optimization Method
 
 <!-- 完 -->
 使用非线性优化, 通过迭代来寻找最优解.  该方法和上述的 PnP 方法相似, 也使用到了 李代数.  
@@ -1093,7 +1105,7 @@ $$\frac{\partial e}{\partial \delta\xi}= -(\exp(\xi\hat{\space})p_i')^\odot$$
 直接法是 视觉里程计的一个主流的分支, 与特征点法有很大的不同.  
 是未来的潜力算法
 
-## The Motivation of the Direct Method - 直接法的引出
+## 7.1. The Motivation of the Direct Method - 直接法的引出
 <!-- 完 -->
 在 VO 的第一部分介绍了基于特征点来估计相机移动的方法, 尽管占据主流, 但研究者仍然认识到基于特征点算法的缺点:
 * 关键点的提取以及关键点描述子的计算非常耗时, 截至书中截稿 SIFT 在CPU上无法实时计算, ORB 则需要 20ms. 如果整个系统是运行在 30ms/帧 约 30fps上, 则大部分时间都消耗在了计算特征点上
@@ -1118,7 +1130,7 @@ $$\frac{\partial e}{\partial \delta\xi}= -(\exp(\xi\hat{\space})p_i')^\odot$$
 
 使用直接法的近期的主流方法有 : SVO, LSD-SLAM, DSO 等
 
-## 2D Optical Flow - 2D 光流
+## 7.2. 2D Optical Flow - 2D 光流
 
 直接法是从光流法演变而来的, 因此很相似, 在直接法之前先学习 光流法  
 * 光流法描述了像素在图像中的运动
@@ -1131,7 +1143,7 @@ $$\frac{\partial e}{\partial \delta\xi}= -(\exp(\xi\hat{\space})p_i')^\odot$$
 * 计算全部像素则为 Dense Optical Flow (稠密光流)
   * 以 Horn-Schunck 光流 为代表
 
-## Practice Direct Method - 实践中的直接法
+## 7.3. Practice Direct Method - 实践中的直接法
 
 
 优缺点总结:
@@ -1145,15 +1157,146 @@ $$\frac{\partial e}{\partial \delta\xi}= -(\exp(\xi\hat{\space})p_i')^\odot$$
 
 
 
-# Filters and Optimization Approaches - 后端 Part1 
+# 8. Filters and Optimization Approaches - 后端 Part1 
+
+本章目标
+* 理解够短的概念, 理解 后端优化的非线性性 
+* 理解 use sparse structure in the bundle adjustment problem, 理解稀疏性是如何利用的
+* 通过 g2o 和 ceres 来实际操作后端优化
+
+通过建立一个 尺度 规模更大的优化问题, 解决 长时间内的最优轨迹和地图  
+
+## 8.1. Introduction of backend
+### 8.1.1. State Estimation from Probabilistic Perspective - 状态估计的概率解释  
+
+<!-- 完 -->
+SLAM 中通过最新的信息来更新较早以前的位置信息, 也可以理解为 当前的位置不仅仅由当前决定 还由未来决定  
+* 当前的状态不仅仅由过去的信息更新, 也由未来的信息更新, 这成为 批量的 (Batch)
+* 如果状态更新只由过去的时刻的信息决定, 则这称为 渐进的 (Incremental)
+
+重新考虑运动和观测方程, 令 位姿为 $x$, 路标为 $y$, $N,M$ 分别为时间数和路标数    
+$$
+\begin{cases}
+  x_k=f(x_{k-1},u_k)+w_k \\
+  z_{k,j}=h(y_j,x_k)+v_{k,j}
+\end{cases}
+k=1,...,N,j=1,...,M
+$$
+
+$v,w$ 的意思是啥忘记了:
+* $u,z$ 分别表示运动数据(VO得到的运动差分量)和观测数据(路标观测到的在图像中的图像坐标)  
+* $f$ 是运动方程
+* $h$ 是观测方程, 即路标的三维点到图像像素坐标的投影过程
+
+在SLAM问题中:
+* 观测方程, 只有在位置 $x_k$ 看到了 路标 $y_j$ 的时候, 才会产生观测数据, 因此在一个位置上总是会只能看到一小部分路标. 且 SLAM 系统采集的特征点往往比较多, 因此特征方程的数量很巨大.  
+* SfM 和 SLAM 问题的区别主要在对 图像和运动 的关系上
+  * 假设在方程中没有运动方程, 则可以假设 相机不动或者匀速运动, 此时整个优化问题则只剩观测方程, 此时就很类似于 SfM 问题
+  * SfM 即通过一组图像来恢复运动和结构, SfM 允许完全无时间关系的图像
+  * SLAM 的图像有时间上的先后顺序  
+
+概率解释: 实际中每个方程都受噪声影响, 一个普世的思想就是将所有噪声都考虑成高斯分布.  则在优化中只需要存储 均值和协方差矩阵即可, 均值可看作对变量最优值的估计, 协方差矩阵度量了变量的不确定性.  
+
+在非线性优化的章节中介绍了 最大似然估计 (Maximum likelihood estimation), 提到了 基于批量的状态估计问题可以转化为最大似然估计问题, 并使用最小二乘法求解 (least-square method). 在SLAM的后端中, 将会讨论:
+* 通过最小二乘法求解最大似然问题如何应用于 渐进式问题
+* 在视觉 SLAM 中 最小二乘法的特殊结构
+
+为了方便讨论, 在这里更改 运动观测方程的书写方法, 首先, 将 $x_k$ 的意义扩充, 表示 k 时刻的所有未知量, 包括 相机位置以及 m 个路标点(的位置?)
+$$x_k \triangleq {x_k, y_1,...,y_m}$$
+
+同时, 把 k 时刻的所有观测则记为 $z_k$, 则 运动与观测方程可以写成, 即消去了符号 $y$ .  
+
+$$
+\begin{cases}
+  x_k=f(x_{k-1},u_k)+w_k \\
+  z_k=h(x_k)+v_{k,j}
+\end{cases}
+k=1,...,N,j=1,...,M
+$$
+
+在最新的 k 时刻, 希望通过过去的数据来估计现在的状态分布: 
+$$P(x_k|x_0,u_{1:k}, z_{1:k})$$  
+
+此时按照贝叶斯法则, 交换 $z_k,x_k$ 的位置, 则有  
+$$P(x_k|x_0, u_{1:k},z_{1:k})\propto P(z_k|x_k)P(x_k|x_0, u_{1:k},z_{1:k-1})$$
+
+第一项为 似然 likelihood, 第二项为先验 prior 
+* 似然可以由观测方程直接给定  
+* 先验部分 则代表了 $x_k$ 会受过去所有的状态而影响. 而最起码, 会受到 $x_{k-1}$ 的影响  
+
+则可以对先验部分 按照 $x_{k-1}$ 时刻为条件概率进行展开   
+$$P(x_k|x_0, u_{1:k},z_{1:k-1})= \int  P(x_k|x_{k-1},x_0,u_{1:k},z_{1:k-1})P(x_{k-1}|x_0, u_{1:k},z_{1:k-1})dx_{k-1}$$
+
+以上就是贝叶斯的估计的一次展开, 如果持续考虑更久之前的状态, 则持续对上式进行展开即可  
+
+针对后续是否持续展开, 在 SLAM 问题中 分成了两个流派
+* SLAM 的主流为 非线性优化方法, 考虑 k 时刻状态与之前所有状态的关系  
+* 假设了马尔可夫性, 一阶马氏性认为, k时刻状态只与 k-1 时刻状态有关, 以 扩展卡尔曼滤波 (EKF) 为代表的滤波器方法, 只考虑 k-1 时刻的状态  
+
+### 8.1.2. Linear Systems and the Kalman Filter - 线性系统与卡尔曼滤波KF
+
+### 8.1.3. Nonlinear Systems and the EKF - 非线性系统和EKF
+
+### 8.1.4. Discussion About KF and EKF
+
+## 8.2. Bundle Adjustment and Graph Optimization - BA 与图优化   
+
+在 3D 视觉重建 (visual 3D reconstruction) 任务中, BA 与图优化都是常见概念.
+* Bundle Adjustment : 从视觉图像中提炼出最优的 3D 模型和相机参数 (内外参数). 
+  * 考虑从任意特征点发出的几束光线(`bundles` of light rays), 会在几个相机的成像平面上变成像素或者检测到的特征点.  
+  * `Adjustment` 调整相机位姿和各个特征点的空间位置, 使得这些光束最终能够收束到相机的光心.  
+
+BA 本身在第 4, 6 章节有学习.  在该章节主要研究 BA 对应的图模型结构的特点, 以及在图模型上的通用快速求解的方法.  
+
+### 8.2.1. The Projection Model and COst Function - 投影模型和 BA 代价函数  
+<!-- 完 -->
+复习投影模型:
+1. 拥有 相机外参数$(R,t)$, 将已知的 地标 的世界坐标转换到相机坐标
+  * $P'=Rp+t = [X',Y',Z']^T$
+2. 投影到 归一化平面, 得到 归一化坐标
+  * $P_c=[u_c,v_c,1]^T=[X'/Z',Y'/Z',1]$
+3. 附加畸变, 公式略, 得到 $u_c',v_c'$
+4. 计算在图像上的坐标
+  * $u_s=f_xu_c'+c_x, v_s=f_yv_c'+c_y$
+
+在 SLAM 中, 其实投影过程就是 观测方程. 在之前的学习中将它抽象的记为 $z=h(x,y)$  
+* $x$ 指代 相机的当前位姿, 即外参数 $R,t$. 对应的李群为 $T$, 李代数为 $\xi$
+* $y$ 指代路标 的三维点, 观测得到的数据就是像素坐标 $z\triangleq [u_s,v_s]^T$
+
+则, 可以列出此次观测的误差为 相机位姿和 路标空间坐标 的关系式, 即 $z$ 看到的和 $h(T,p)$ 算出来的差分  
+$$e=z-h(T,p)$$
+
+整合其他时刻, 其他路标, 给误差添上坐标, 就有了整体系统 overall 的代价函数  
+
+$$ \frac{1}{2}\sum_{i=1}^m\sum_{j=1}^n ||e_{i,j}||^2=\frac{1}{2}\sum_{i=1}^m\sum_{j=1}^n ||z_{i,j}-h(T_i,p_j)||^2= $$
+对该方程进行最小二乘求解, 即所谓的 BA, 对位姿和路标进行同时调整.  
+
+### 8.2.2. Solving Bundle Adjustment - BA的求解  
+
+### 8.2.3. Sparsity - 稀疏性
+
+### 8.2.4. Robust Kernels - 鲁棒核函数  
+
+# 9. Filters and Optimization Approaches - 后端 Part2
+
+* 理解滑动窗口优化
+* 理解 pose graph optimization 位姿图优化
+* 理解带 IMU 紧耦合的优化
+* 掌握 g2o 的位姿图优化方法  
+
+上一张介绍了以 BA 为主的图优化, 尽管 BA 能够精确地优化每个相机位姿与特征点的位置, 然而在更大的场景中, 大量的特征点的存在会严重降低计算效率, 导致计算量随着时间持续增长 从而无法实现 SLAM 的实时性
+
+本章节介绍一种简化的 BA : 位姿图 pose graph  
+
+## 9.1. Sliding Window Filter and Optimization - 滑动窗口滤波和优化
+
+### 9.1.1. Controlling the Structure of BA - BA 的结构在实际环境下的控制  
 
 
 
-# Filters and Optimization Approaches - 后端 Part2
+# 10. Loop Closure - 回环检测
 
-# Loop Closure - 回环检测
+# 11. Dense Reconstruction - 建图
 
-# Dense Reconstruction - 建图
-
-# Discussions and Outlook - SLAM 的现在与未来
+# 12. Discussions and Outlook - SLAM 的现在与未来
 

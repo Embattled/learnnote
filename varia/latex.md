@@ -458,6 +458,7 @@ amsmath 中有一些很方便的矩阵环境, 用于便捷的书写矩阵
 * Bmatrix : Braces, curly brackets. 花括号
 * vmatrix : Pipes, 直线, 即用于表示行列式的情况
 * Vmatrix : Double pipes, 双直线
+* cases : 单边花括号
 
 $$
  	\begin{matrix}

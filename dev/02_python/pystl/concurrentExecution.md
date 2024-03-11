@@ -9,6 +9,12 @@ The appropriate choice of tool will depend on the:
 
 同时, 关于嵌套调用的新模组也放在该章节 (subprocess)
 
+# threading - Thread-based parallelism
+
+基于多线程的程序并行执行
+
+
+
 # 2. subprocess - Subprocess management 子进程
 
 `subprocess` 模组允许程序创建一个新的 子进程, 并同时链接其 input/output/error 流, 获取其返回代码

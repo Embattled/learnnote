@@ -860,8 +860,22 @@ Evaluates the Einstein summation convention on the operands.
 ## 3.11. Mathematical function 数学操作
 
 绝大多数常用的数学基础函数都属于该分类
-
 ### 3.11.1. Trigonometric functions 三角函数
+
+
+基础三角函数 : 输入 radians 的角度
+* sin
+* cos
+* tan
+* arcsin
+* arccos
+* arctan
+
+
+角度数和弧度的转换:
+* radians, deg2rad  : degrees to radians   `deg2rad(x)=  x*pi / 180`
+* degrees, rad2deg  : radians to degrees   `rad2deg(x)=  180 * x / pi`
+
 
 ### 3.11.2. Hyperbolic functions 双曲线函数
 

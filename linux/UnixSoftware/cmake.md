@@ -5,6 +5,8 @@ CMake 是一个跨平台的工具, 用于 `描述安装和编译过程`
 * CMake 并不直接建构出最终的软件(不进行代码编译本身), 而是产生标准的建构档
 
 
+https://cmake.org/cmake/help/latest/
+
 CMake的使用流程
 1. 编写CMake编译描述文件 `CMakeLists.txt`
 2. `cmake <CMakeLists.txt的目录>` 会在当前目录下生成 CMake 的工程文件
@@ -18,6 +20,7 @@ CMake工具包: CMake 作为一个组件, 除了用于编译项目的 CMake 以�
 * cmake
 * ctest
 * cpack
+
 
 # 2. Tutorial
 
@@ -54,6 +57,67 @@ target_include_directories(Tutorial PUBLIC
 
 
 # 3. Command-Line Tools
+
+命令行工具
+
+## cmake 
+
+cmake 可执行文件就是 cmake 整个工具的 启动 CLI
+
+对于要使用 gui 的用户, 查验 ccmake 和 cmake-gui, 对于 cmake testing 和 packaging facilities 查验 ctest 和 cpack
+
+快速导览:
+```sh
+# Generate a Project Buildsystem, 构建项目编译系统, 用的最多的
+ cmake [<options>] -B <path-to-build> [-S <path-to-source>]
+ cmake [<options>] <path-to-source | path-to-existing-build>
+
+# Build a Project, 直接通过 cmake 编译?
+ cmake --build <dir> [<options>] [-- <build-tool-options>]
+
+# Install a Project, 通过 cmake 来执行安装
+ cmake --install <dir> [<options>]
+
+# Open a Project, 打开项目
+ cmake --open <dir>
+
+# Run a Script 运行脚本
+ cmake [-D <var>=<value>]... -P <cmake-script-file>
+
+# Run a Command-Line Tool, 执行 CLI
+ cmake -E <command> [<options>]
+
+# Run the Find-Package Tool, 执行包查找工具
+ cmake --find-package [<options>]
+
+# Run a Workflow Preset, 执行工作流预设
+ cmake --workflow [<options>]
+
+# View Help 查看 help
+ cmake --help[-<topic>]
+
+```
+
+### Introduction to CMake Buildsystems
+
+Cmake Buildsystems : 所谓的 buildsystem 即用来描述如何来编译项目的 可执行文件, 以及 库文件如何链接.  
+
+例如, 典型的 buildsystem 可以是
+* Makefile, 用于通过 Make 来执行编译
+* project file for IDE, 通过 IDE 来编译  
+根据环境不同, 除了编译本身, 编译系统也是不同的, 因此为了避免上述 复杂的管理, 通过 CMake language 来书写抽象的编译方法.  
+CMake 再根据对应的抽象文件根据编译环境来生成对应的本地 buildsystem 文件, 实际执行编译的工具在 CMake 文档中称为 `generator`
+
+三个部分是 CMake 生成  buildsystem 所需要的
+* Source Tree:
+  * 即 project 文件目录的根, 保存了所有项目源代码.
+* Build Tree:
+  * 即 项目通过编译 所输出的文件目录. 根据输出的目录的位置不同, 分为 out-of-source 和 in-source 两种
+* Generator:
+  * 即 要编译的 local buildsystem 系统类型, 有关 generator 的内容查看对应的生成器篇章, 可以使用 `-G` 选项来实时的指定生成器. 
+
+
+### Generate a Project Buildsystem
 
 
 # 4. cmake-commands
@@ -284,6 +348,11 @@ set(<variable> <value>... [PARENT_SCOPE])
 ```
 设置对应的变量, 可以用于配置项目参数
 
+# cmake-generators
+
+CMake generator 负责为本地的构建编译系统指定选项和写入文件, CMake 必须要指定一个 生成器. 
+
+CMake Generators 是平台依存的, 通过 `--help` 可以查看当前平台下所支持的所有 Generators.  通过 `-G` 选项可以手动指定要用的 Generator.  
 
 # 5. cmake-language
 
