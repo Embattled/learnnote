@@ -418,9 +418,30 @@ Python:
 * 凡是需要意识到图像的, 都放在这里, 例如 resize 需要进行插值所以
 
 
-### 3.2.1. InterpolationFlags
+### 3.2.1. Flags
 
-插值方法标志 
+插值方法标志 - InterpolationFlags
+
+```cpp
+enum  	cv::InterpolationFlags {
+  cv::INTER_NEAREST = 0,
+  cv::INTER_LINEAR = 1,
+  cv::INTER_CUBIC = 2,
+  cv::INTER_AREA = 3,
+  cv::INTER_LANCZOS4 = 4,
+  cv::INTER_LINEAR_EXACT = 5,
+  cv::INTER_NEAREST_EXACT = 6,
+  cv::INTER_MAX = 7,
+  cv::WARP_FILL_OUTLIERS = 8,
+  cv::WARP_INVERSE_MAP = 16
+}
+
+
+```
+
+
+
+
 
 
 ### 3.2.2. resize
@@ -485,6 +506,31 @@ Python:
 	cv.getPerspectiveTransform(	src, dst[, solveMethod]	) -> 	retval
 
 ```
+
+
+### remap - 畸变矫正的基础
+
+```cpp
+void cv::remap 	( 	
+		InputArray  	src,
+		OutputArray  	dst,
+		InputArray  	map1,
+		InputArray  	map2,
+		int  	interpolation,
+		int  	borderMode = BORDER_CONSTANT,
+		const Scalar &  	borderValue = Scalar() 
+	) 		
+Python:
+	cv.remap(	src, map1, map2, interpolation[, dst[, borderMode[, borderValue]]]	) -> 	dst
+```
+
+对图像应用通用几何变换, 用两个 map 来表示两个图像之间的坐标对应
+$$dst(x,y) = src(map_x(x,y), map_y(x,y))$$
+
+dst 的大小取决于 map 的大小, 对应的想获取多大的 dst 就要提供多大的 map
+
+
+
 
 
 ## 3.3. 色彩空间转换 Color Space Conversions
@@ -565,12 +611,16 @@ Python:
 * Bayer
 * 太多了算了
 
-## 3.4. 杂项 Miscellaneous Image Transformations 
+## 3.4. 色彩图 - ColorMaps in OpenCV
 
-### 3.4.1. 二值化 threshold
+专门用于对 灰度图 进行可视化增强的灰度图映射函数
+
+## 3.5. 杂项 Miscellaneous Image Transformations 
+
+### 3.5.1. 二值化 threshold
 
 
-#### 3.4.1.1. 阈值类型
+#### 3.5.1.1. 阈值类型
 
 ```cpp
 enum  	cv::ThresholdTypes {
@@ -595,7 +645,7 @@ enum  	cv::AdaptiveThresholdTypes {
 }
 
 ```
-#### 3.4.1.2. threshold 和 自适应 adaptive
+#### 3.5.1.2. threshold 和 自适应 adaptive
 
 
 `double cv::threshold`
@@ -1210,11 +1260,11 @@ Python:
 
 
 
-## fisheye, omnidir 相机
+## 8.1. camera, fisheye, omnidir 相机标定相关
 
 两种独特相机的专用函数接口名称是相同的
 
-### calibrate - 相机标定
+### 8.1.1. calibrate - 相机标定
 
 ```cpp
 double cv::omnidir::calibrate 	( 	
@@ -1267,7 +1317,7 @@ Python:
 * TermCriteria criteria	: 用于标定算法的迭代终止控制
 
 
-### undistort - 逆畸变
+### 8.1.2. undistort - 逆畸变
 
 用于反向计算相机的畸变过程, 获得畸变前的图像/点的坐标
 
@@ -1349,6 +1399,14 @@ Python:
 * K, D, xi : 相机参数
 * R : 旋转矩阵, 3x3
 * P : fisheye 实现了传入新相机的内部参数 3x3 或者整个 projection matrix 3x4
+
+
+## Rodrigues - 旋转矩阵
+
+将旋转矩阵转为旋转向量, 或者执行相反操作.  
+
+
+
 
 # 9. features2d - 2D Features Framework 2D图像的传统特征检测
 
@@ -1595,13 +1653,17 @@ Python:
 
 # 11. photo Computational Photography 计算图像处理
 
-包括了几个基于计算的图像处理领域的算法实现
+包括了几个基于计算的图像处理领域的算法实现, 主要应用于影像
+
 
 该模组下实现的算法列表, 方便后续单独查找学习:
 * inpainting
   * Navier-Stokes based method
   * Alexandru Telea
     * Alexandru Telea. An image inpainting technique based on the fast marching method. Journal of graphics tools, 9(1):23–34, 2004.
+
+* HDR imaging
+  * 高动态 成像
 
 
 ## 11.1. inpainting
@@ -1631,6 +1693,141 @@ Python:
 * flags			: 补全算法选择
   * `cv::INPAINT_NS`
   * `cv::INPAINT_TELEA`
+
+## 11.2. HDR imaging
+
+该分类下实现了多个 class, 用 class 来进行图像的管理  
+
+实现了一个枚举类型, 但只有一个值  `enum  	{ cv::LDR_SIZE = 256 }`  
+
+
+### Merge
+
+将多个曝光的图片合成到 single image
+
+OpenCV 中实现了一个基类和 3 个派生方法  
+
+
+
+
+
+### Tone Mapping
+
+High Dynamic Range (HDR), Low Dynamic Range (LDR), 通过相机设备采集到较高位宽的内容, 映射到 LDR 的显示设备的时候, 使用一些算法来提高显示效果, 称为 Tone mapping
+
+从2002 年 Reinhard 的论文开始, 基于计算的 Tone Mapping 有了一系列的发展
+* 2002 : Reinhard tone mapping
+* 2003 : Adaptive logarithmic mapping (ALM), Frédéric Drago, Karol Myszkowski, Thomas Annen, and Norishige Chiba.
+  * 根据局部对比度和亮度分布自适应的调整映射函数的参数  
+  * 在 OpenCV 里实现为 TonemapDrago 
+* 2006 : 带感知的 HDR 框架, Rafal Mantiuk, Karol Myszkowski, and Hans-Peter Seidel.
+  * 通过计算 高斯金字塔, 将各级的梯度转化为对比度, 再转化为 HVS 并缩放, 最后根据新的对比度重建图像.  
+* 2007 : CE tone mapping
+* 2010 : Uncharted, Flimic tone mapping
+  * 通过专家人肉进行 Tone mapping, 再将结果进行拟合
+* 美国电影艺术与科学学会  : Academy Color Encoding System (ACES) : 一套颜色编码系统
+  * 也是拟合后的曲线, 但是效果更好
+
+```cpp
+// Reinhard tone mapping
+/* 
+	adapted_lum 是根据整个图像计算出来的图像亮度
+	MIDDLE_GREY 表示把什么颜色定义成 "灰", 是一个 Magic Number
+	整体图像灰暗
+ */
+float3 ReinhardToneMapping(float3 color, float adapted_lum) 
+{
+    const float MIDDLE_GREY = 1;
+    color *= MIDDLE_GREY / adapted_lum;
+    return color / (1.0f + color);
+}
+
+// CryEngine : CEToneMapping
+/* 
+	直接粗暴的搞一个 S 曲线, 没有 Magic Number
+	对比度更大, 颜色更鲜艳, 但仍然有些灰
+ */
+float3 CEToneMapping(float3 color, float adapted_lum) 
+{
+    return 1 - exp(-adapted_lum * color);
+}
+
+
+// Uncharted2ToneMapping
+/* 
+	通过应用 专家的拟合曲线实现
+ */
+float3 F(float3 x)
+{
+	const float A = 0.22f;
+	const float B = 0.30f;
+	const float C = 0.10f;
+	const float D = 0.20f;
+	const float E = 0.01f;
+	const float F = 0.30f;
+ 
+	return ((x * (A * x + C * B) + D * E) / (x * (A * x + B) + D * F)) - E / F;
+}
+float3 Uncharted2ToneMapping(float3 color, float adapted_lum)
+{
+	const float WHITE = 11.2f;
+	return F(1.6f * adapted_lum * color) / F(WHITE);
+}
+
+// ACES 编码的 Tone Mapping
+float3 ACESToneMapping(float3 color, float adapted_lum)
+{
+	const float A = 2.51f;
+	const float B = 0.03f;
+	const float C = 2.43f;
+	const float D = 0.59f;
+	const float E = 0.14f;
+
+	color *= adapted_lum;
+	return (color * (A * color + B)) / (color * (C * color + D) + E);
+}
+```
+
+OpenCV 中实现的 ToneMapping 里则有
+* Tonemap 基类
+  * TonemapDrago
+  * TonemapMantiuk
+  * TonemapReinhard
+* 通过函数创建 Tonemap 的类 相关参数通过函数参数给出
+  * createTonemap_*
+
+
+```cpp
+// gamma : 最基本的 gamma 矫正, 默认值是 1.0 即不启用矫正. 2.2f 是最常用的矫正数值, 是所有 tone mapping 的通用数值 
+Ptr<Tonemap> cv::createTonemap 	( 	float  	gamma = 1.0f	) 	
+
+// 
+Ptr<TonemapDrago> cv::createTonemapDrago 	( 	float  	gamma = 1.0f,
+		float  	saturation = 1.0f,
+		float  	bias = 0.85f 
+	) 		
+Ptr<TonemapMantiuk> cv::createTonemapMantiuk 	( 	float  	gamma = 1.0f,
+		float  	scale = 0.7f,
+		float  	saturation = 1.0f 
+	) 		
+Ptr<TonemapReinhard> cv::createTonemapReinhard 	( 	float  	gamma = 1.0f,
+		float  	intensity = 0.0f,
+		float  	light_adapt = 1.0f,
+		float  	color_adapt = 0.0f 
+	) 		
+// 类的实现较为简单, 除了根据类的属性不同而分别设置的 get set 函数以外, 就是基类中的 set get gamma, 以及处理 method process()
+virtual void cv::Tonemap::process 	( 	InputArray  	src,
+		OutputArray  	dst 
+	) 		
+
+Python:
+	cv.createTonemap(	[, gamma]	)  return retval ;
+	cv.createTonemapDrago(	[, gamma[, saturation[, bias]]]	)  return retval;
+	cv.createTonemapMantiuk(	[, gamma[, scale[, saturation]]]	)  return retval;
+	cv.createTonemapReinhard(	[, gamma[, intensity[, light_adapt[, color_adapt]]]]	)  return retval;
+
+	cv.Tonemap.process(	src[, dst]	)  return dst;
+```
 
 # 12. contrib : ximgoproc  Extended Image Processing
 

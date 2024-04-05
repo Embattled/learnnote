@@ -1,4 +1,4 @@
-# GNU Bash
+# 1. GNU Bash
 
 Bash is the GNU Project's shell—the Bourne Again SHell.
 
@@ -17,7 +17,7 @@ Bash 的改进主要有:
 
 
 
-## What is Bash? 
+## 1.1. What is Bash? 
 <!-- 完 -->
 Bash 是一个 shell 或者可以说是 command language interpreter, 用于 GNUoperating system. 名称是 Bourne-Again SHell 的缩写.  Stephen Bourne 是当前 Unix shell `sh` 的直接祖先的作者, sh 出现在 Unix 的第七版贝尔实验室研究版本中.  
 
@@ -28,11 +28,11 @@ Bash 旨在提供一个 IEEE POSIX Shell and Tools 规范的实现 (IEEE Standar
 
 通常 GNU 操作系统可能会提供其他的 shell 包括 `csh`, 但普遍的 Bash 会是默认的 shell.  同其他的 GNU 软件一样, Bash 也拥有很强大的可移植性, 因此在 Unix 的每个版本以及其他的操作系统运行.  对于 MS-DOS, OS/2, Windows 等平台都存在独立支持的端口.  
 
-## What is shell?
+## 1.2. What is shell?
 
 
 
-# Shell Builtin Commands
+# 2. Shell Builtin Commands
 
 所谓的 builtin commands 即不是由来于其他任何软件包, 而是 shell 本身所提供的 commands. 对于那些用单独的程序来实现几乎不可能或者不方便的功能来说, 内置 commands 是必须的. 
 
@@ -47,13 +47,167 @@ Bash 旨在提供一个 IEEE POSIX Shell and Tools 规范的实现 (IEEE Standar
 * command history
 * programmable completion facilities
 
+## Bourne Shell Builtins
 
-# Job Control
+## Bash Builtin Commands
+
+## Modifying Shell Behavior
+
+自定义 Shell 的行为
+
+### The Set Builtin
+
+# 3. Job Control
 
 介绍 Bash 提供的 任务管理功能
 
+工作管理指的是在单个登录终端 也就是登录的 Shell 界面 同时管理多个工作的行为.  
+把命令放入后台,然后把命令恢复到前台,或者让命令恢复到后台执行, 这些管理操作就是工作管理
 
-# Using History Interactively
+后台管理有几个事项:
+1. 前台是指当前可以操控和执行命令的这个操作环境, 后台是指工作可以自行运行, 但是不能直接用 `Ctrl+C` 快捷键来中止它, 只能使用 `fg/bg` 来调用工作
+2. 当前的登录终端只能管理当前终端的工作,而不能管理其他登录终端的工作比如 tty1 登录的终端是不能管理 tty2 终端中的工作的
+3. 放入后台的命令必须可以持续运行一段时间, 这样我们才能捕捉和操作它
+4. 放入后台执行的命令不能和前台用户有交互或需要前台输入, 否则只能放入后台暂停, 而不能执行
+   1. 比如 vi 命令只能放入后台暂停, 而不能执行, 因为 vi 命令需要前台输入信息, 
+   2. top 命令也不能放入后台执行, 而只能放入后台暂停, 因为 top 命令需要和前台交互
+
+
+常用的 nohup 命令不属于 Bash 的 job control 内置功能.  
+
+## 3.1. Job Control Basics
+
+
+工作控制即 用户可以有选择性的 停止/挂起/(suspend) 某一个 进程, 并在之后恢复其运行. 实现该功能主要依靠系统内核的驱动以及 Bash
+
+shell 会把每一个 job 关联到每一个 pipeline. shell 会保存一个 job 表, 通过命令 `jobs` 可以输出在当前终端运行的工作表.  
+当通过异步的方式启动一个 job 的时候, 会输出 一个数字以及一个 PID
+* 数字是对于 shell 的该 job 的作业序号
+* pid 则针对与该 job 关联的 pipeline 中, 多个进程中的最后一个进程, 即单个 pipeline 中的所有进程都属于同一个 job, bash 使用 job 的抽象概念作为 job control 的基础
+
+
+如果操作系统支持 job control, 则 Bash 支持通过组合键来进行 Job 控制
+* `Ctrl+Z ` : 挂起 进程, 并将控制权返还给 Bash
+* `Ctrl+y ` : 当进程需要从终端读取字符输入的时候挂起, 并立即将 控制权返还给 Bash
+
+有多种方法 能够在 shell 中引用一个 job, 关键字符为 `%` , % 会引出一个 jobspec
+* `%n`  : 通过一个数字指代 Job number
+* `%%` `%+` `%` : 指代 current job, 即最后一个在前台执行过的 job, 或者最后一个在后台启动的 job
+* `%-`  : 前一个 job, 即 current job 的上一个
+* 在和 job 相关的输出时, 会通过 `+-` 符号标记 对应的 current previous
+* `%其他字符` `%?其他字符`: 进行起始字符匹配, 带问号的则是包含匹配
+
+
+## 3.2. Job Control Builtins
+
+介绍具体的 Bash 内置的 job control 机能  
+* `bg [jobspec...] ` : 恢复在后台挂起的进程 使其在后台 继续工作, 就类似于该 job 是以 `&` 启动的那样
+  * 如果 未提供 jobspec, 则针对当前 job
+  * 正常情况下返回 0, 除非
+    * job control is not enabled
+    * job control enabled, jobspec was not found
+    * specifies a job that was started without job control
+
+* `fg [jobspec...]` : 恢复在后台挂起的进程, 并使其作为当前 job 工作在前台
+  * 如果 未提供 jobspec, 则针对当前 job
+  * 非 0 返回值的情况和上述相同
+
+* `jobs [-lnprs] [jobspec]`  `jobs -x command [arguments]`
+  * 打印所有活动的 jobs, 可以用来查看**当前终端**放入后台的工作
+  * 基础 options
+    * -l 列出进程的 PID 号
+    * -n 只列出上次发出通知后改变了状态的进程
+    * -p 只列出进程的 group leader 的 PID 号
+    * -r 只列出运行中的进程
+    * -s 只列出已停止的进程
+
+* `kill`
+* `wait`
+* `disown`
+* `suspend`
+
+
+## 3.3. Job Control Variables
+
+bash 提供了一个全局变量 `auto_resume`
+
+该变量用于控制 shell 如何与 user 以及 job control 交互
+
+
+# 4. Command Line Editing
+<!-- 头部完 -->
+本章介绍 GNU command line editing interface.  是 GUN readline 库的上层实现。 
+
+默认情况下启动 Bash 的时候会启动 Command line editing.  除非带上 `--noediting` 启动 Bash
+
+同理 Bash 的内置命令 read 也支持在 `-e` 参属下使用 command line editing 功能  
+
+## Introduction to Line Editing
+<!-- 完 -->
+介绍了在 Line Editing 中的键盘绑定
+* C- 代表 Control 组合键
+* M- 代表 Meta组合键, 在键盘中一般标记为 Alt
+  * 对于没有 Alt 的键盘可以使用 Esc 作为代替, 先键入 ESC 松开后再键入对应字符, 即可被识别成 Alt 组合键
+* M-C-k 即三个按键的组合键
+
+其他特殊按键
+* `RET` : Return or Enter
+* `LFD` : 没有改键的话, 使用 C-j 代替
+* `DEL ESC SPC TAB`  常见按键
+
+## Readline Interaction
+<!-- 头部完 -->
+主要用于修正命令, 例如在交互式命令行中, 注意到长命令的靠前字符错误, Readline 提供了快速移动光标的功能  
+对于光标位置, 无论在哪, 键入 RET 都会让 Bash 接收到整行命令, 即无需将光标移动到末尾再键入
+
+### Readline Bare Essentials - Readline 按键绑定基础
+<!-- 完 -->
+
+* C-b C-f 向左向右移动光标, 目前主要被方向键代替 
+* Backspace    删除光标左侧字符               
+* DEL C-d      删除光标当前位置的字符
+* C-_ C-x C-u  删除一段, Undo last editing command, 但是实测效果不统一
+
+### Readline Movement Commands
+<!-- 完 -->
+* C-a   : 移动到行首, 比 Home 键方便很多
+* C-e   : 移动到行尾, 比 End 键快
+* M-f   : 向前移动一个 word
+* M-b   : 向后移动一个 word
+* C-l   : clear 的快捷键, 方便
+
+### Readline Killing Commands
+<!-- 完 -->
+Killing test 意思是从行中删除文本, 但是会将其保存到剪贴板中, 以供以后使用, 通常是用于快速更改命令再行中的位置.
+
+kill-yank 是较古老的叫法, 目前是称为 cut-paste
+
+当 kill 文本多次, 每次的文本都会被追加的保存到同一个 `kill-ring`, 在之后单次的 yank 时会拉取最近的单词内容
+
+* C-k   : kill 从当前位置到行尾的所有文本
+* C-w   : kill 从当前位置到单词的起始, 或者是上一个单词的起始, 可以跨越多个空格
+* M-d   : kill 从当前位置 word 结尾, 或者是下一个 word 的结尾
+* M-DEL : kill 从当前位置 word 开头, 或者是下一个 word 的开头
+
+* C-y   : 拉回最近被 kill 的一个 text 到光标位置
+* M-y   : Rotate the kill-ring, 即在当前光标位置循环滚动 kill-ring , 知道找到想要插入的内容
+
+
+### Readline Arguments
+
+### Searching for Commands in the History
+
+两种模式用于在历史命令记录中进行搜索  
+* incremental       : 在每次键入搜索字符的时候都启动搜索
+  * C-r 启动向后搜索
+  * C-s 启动向前搜索, 但是实测用不了
+  * ESC和 C-j 终止搜索, 并将当前历史条目应用到当前行
+  * C-g 结束搜索, 并不应用搜索结果
+  * RET 直接执行搜索到的结果
+  * 移动命令 终止搜索并应用搜索结果, 开始编辑
+
+
+# 5. Using History Interactively
 
 介绍如何在 Bash 中使用 GNU History Library interactively, 本章主要作为一个 user's guide.  对于更多关于 GNU History Library 的信息, 则需要参考对应的专门文档.  
 

@@ -759,6 +759,13 @@ env
 
 ## 23.4. nohup: Run a command immune to hangups
 
+运行一个不受 hangups 影响的命令  
+
+在执行命令时, 在命令前加上 `nohup` 让后台工作在离开操作终端时, 也能够正确地在后台执行  
+
+`nohup [命令] &`  
+`&` 表示此命令会立即终端后台工作 如果没有 `&` 则执行后此命令会在终端前台执行  
+
 ## 23.5. stdbuf: Run a command with modified I/O stream buffering
 
 ## 23.6. timeout: Run a command with a time limit

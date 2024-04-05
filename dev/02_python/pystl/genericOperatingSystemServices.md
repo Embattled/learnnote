@@ -72,7 +72,7 @@ for root, dirs, files in os.walk('/home/eugene/workspace/learnnote/cvml'):
 
 ```
 
-### stat - 获取文件情报  
+### 2.1.2. stat - 获取文件情报  
 
 ## 2.2. Process Parameters 进程参数
 
@@ -110,10 +110,15 @@ Unix. Windows:
 
 These functions may be used to create and manage processes. 可以用来通过Python解释器进程再创建各种子进程
 
+注意, 各种 `exec*` 的函数会采用 list 作为加载新进程的参数列表.  此时 第一个参数会作为 程序的名称被忽略, 类似于 main 的 `argv[0]`. 因此要注意
+
+类似于 `os.execv('/bin/echo', ['foo', 'bar'])` 的调用只会在屏幕上输出 `bar`  
 
 ### 2.3.1. os.system
 
 是 python3 STL 的 subprocess 重点想要代替的基础函数
+
+`os.system(command)`
 
 Execute the command (a string) in a subshell:
 * 是基于 C 语言的系统 API `system()` 实现的, 所以有相同的限制
@@ -123,8 +128,45 @@ Execute the command (a string) in a subshell:
   * On Unix, the return value is the exit status of the process encoded in the format specified for wait().
   * On Windows, the return value is that returned by the system shell after running command. 
 
-`os.system(command)`
+## Interface to the scheduler - 控制操作系统如何为进程分配 CPU 时间 
 
+该功能只在 某些 Unix 平台上可用
+
+调度模式  `os.SCHED_*`
+* `OTHER`         : 默认的 scheduling policy
+* `BATCH`         : CPU-intensive processes (CPU 密集型进程), 会试图保持计算器剩余部分的交互性  
+* `IDLE`          : 极低优先级, 用户后台任务的调度策略  background tasks
+* `SPORADIC`      : for sporadic server programs, 用于 零星服务器程序. 即对于实时系统对不规律任务到达的动态适应性调度策略  
+* `FIFO`          : First In First Out 调度策略
+* `RR`            : round-robin 调度策略, 循环调度策略, 即公平分配处理器时间   
+* `RESET_ON_FORK` : 与其他的策略进行 or运算 来使用, 当进程进行分支时, 子进程的策略不继承, 而是重置为 default
+
+
+策略设置, priority  scheduler  :
+* 用于获取某个策略的 内部优先级取值范围
+  * `os.sched_get_priority_min(policy)`
+  * `os.sched_get_priority_max(policy)`
+  * 实操下来 OTHER,BATCH,IDLE = 0~0   RR,FIFO= 1~99
+* 针对某个 PID 的策略的设置与获取
+  * `os.sched_getscheduler(pid, /)`
+  * `os.sched_setscheduler(pid, policy, param, /)`
+  * `os.sched_setparam(pid, param, /)`
+  * `os.sched_getparam(pid, /)`
+  * `class os.sched_param(sched_priority)`
+* 关于 param , 代表了 某个 pid 的调度参数, 目前该 class 只有一个 参数且不可更改 `sched_priority`
+  * 实操下来, sched_getparam 的返回值为 `posix.sched_param(sched_priority=0)`
+
+
+
+affinity : 指代一个 进程或者线程与特定的 CPU 核心或处理器的关联性, 会影响CPU任务的调度策略, 确保特定的任务只在指定的 CPU 上执行.  
+* 如果 pid 为 0 , 则代表对当前进程进行操作
+* `os.sched_getaffinity(pid, /)`  : 获取指定 pid 被限制到的 CPUs 集合
+  * 默认情况下调用后, 返回可用的所有 CPU 索引, 例如  `{0, 1, 2, 3, 4}`
+* `os.sched_setaffinity(pid, mask, /)`  : 限制对应的 pid 进程到指定 CPUs
+  * mask 是一个可迭代的 整数集合, 代表了要绑定的 CPU 索引
+
+yield :
+* `os.sched_yield()`   :     Voluntarily relinquish the CPU.  自愿地放弃 CPU, 类似于快速结束当前 CPU 时间
 
 # 3. time
 
@@ -294,6 +336,7 @@ Clock ID Constants : used as parameters for `clock_getres()` and `clock_gettime(
 
 argparse组件可以很方便的写一个命令行界面, 可以很容易的定义程序的参数, 并从`sys.argv`中提取出来, 同时还会自动提供错误信息  
 
+
 ```py
 import argparse
 # 建立命令行翻译器, 可以同时设置该程序的主要目的
@@ -301,9 +344,8 @@ parser = argparse.ArgumentParser(description="calculate X to the power of Y")
 args = parser.parse_args() # 翻译传入的命令行参数
 ```
 
-* `parser.parse_args()` 一般就是直接无参数调用, 会直接翻译传入的命令行参数, 返回一个 `Namespace` object
-  * `Namespace` 就是定义在 argparse 包中的一个简单的类, 和字典类似, 但是 print()更加可读, 可以使用 `vars()` 方法进行转换成字典
-  * `args.*` 用点号进行对应的参数访问
+
+
 
 ## 5.1. class argparse.ArgumentParser
 
@@ -337,7 +379,7 @@ class argparse.ArgumentParser(
 * 
 
 
-## 5.2. add_argument()
+## 5.2. add_argument() - 添加一个命令
 
 作为 ArgumentParser 的最关键的方法, 重要程度是相同的, 这里详细解释该方法的各个参数  
 
@@ -462,6 +504,18 @@ parser.parse_args(['"The Tale of Two Cities"'])
 # Namespace(short_title='"the-tale-of-two-citi')
 ```
 
+## parse_args() - 解析 CLI 命令
+
+* `parser.parse_args()` 一般就是直接无参数调用, 会直接翻译传入的命令行参数, 返回一个 `Namespace` object
+
+### Namespace - 存储命令解析结果
+
+* `Namespace` 就是定义在 argparse 包中的一个简单的类, 和字典类似, 但是 print()更加可读 
+* 可以使用 `vars()` 方法进行转换成字典
+* `args.*` 用点号进行对应的参数访问
+
+通过在 parse_args 中添加 namespace 参数可以在某个已经存在的基础上再次进行 CLI 解析
+`parser.parse_args(args=['--foo', 'BAR'], namespace=c)`
 
 
 ## 5.3. 高级 args

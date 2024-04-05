@@ -317,6 +317,7 @@ p系列(中日韩)
 | 点   | \dot{}      | $\dot{a}$      |
 | 多点 | \ddot{}     | $\ddot{a}$     |
 | 帽子 | \hat{}      | $\hat{a}$      |
+| 反帽子 | \check{}      | $\check{a}$      |
 | 波浪 | \tilde      | $\tilde{a}$    |
 | 箭头 | \vec{}      | $\vec{x}$      |
 | 小圆 | \mathring{} | $\mathring{a}$ |

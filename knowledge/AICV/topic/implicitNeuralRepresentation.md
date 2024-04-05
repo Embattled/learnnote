@@ -35,7 +35,7 @@ Volume 体数据  体渲染
 
 2019年开始兴起, 在 2020 年 ECCV 中得到 Best Paper Candidate  
 
-NeRF 是一种隐式的 3D 中间表示, 但是却使用了 Voluem 的规则, 即一个 隐式的 Volume, 实现了 神经场 Neural Field 与图形学组件 Volume Rendering 的有效结合  
+NeRF 是一种隐式的 3D 中间表示, 但是却使用了 Volume 的规则, 即一个 隐式的 Volume, 实现了 神经场 Neural Field 与图形学组件 Volume Rendering 的有效结合  
 * 本身的方法非常简洁, 且有效, 说明是合理的
 * 对于启发 计算机视觉和图形学的交叉领域 有很大的功劳
 
@@ -54,7 +54,8 @@ Neural Fields  神经场:
 
 
 基于 NeRF 的 Volume Rendering
-* 对于一个 camera ray  $r(t)=o+td$  t 是 camera ray 的远近距离 t_n t_f
+* 对于一个 camera ray  $r(t)=o+td$
+* $t$ 是 camera ray 的远近距离 $t_n,t_f$
 * camera ray 得到的颜色 C(r)可以写作  
 $$C(r)=\int_{t_n}^{t_f}T(t)\sigma(r(t))c(r(t),d)dt$$
 * $T(t)=exp(-\int_{t_n}^t\sigma(r(s))ds)$

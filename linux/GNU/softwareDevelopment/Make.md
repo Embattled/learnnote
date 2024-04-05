@@ -943,7 +943,6 @@ ${function arguments}
 * `$(subst from,to,text)`
 * `$(patsubst pattern,replacement,text)`
   
-
 ### 8.2.2. 字符串调整
 
 * `$(strip string)`

@@ -16,7 +16,7 @@ The most fundamental support consists of the types `Any, Union, Tuple, Callable,
 
 ### 2.1.1. Special types 特殊类型
 
-两个非常常用的类型, 不支持放在方括号中
+两个非常常用的类型, 不支持放在方括号中 `[]`
 
 * `typing.Any`
   * Any 作为 annotation 的时候可以匹配任何类型
@@ -52,7 +52,11 @@ def stop(
   * `def foo(arg: int = 0)` 直接带有非None 默认值的参数不能用 Optional
   * `def foo(arg: Optional[int] = None)` 合理
 
-以下的类型已经不推荐使用
+
+
+
+
+以下的类型已经不推荐使用, 已经从原本章节中被移动到弃用章节
 * `typing.Tuple (Deprecated) `
   * 用于指定一个元组类型, 元组中的每个元素类型都可以单独指定
   * 3.9 版本后不需要加 Tuple, 直接用 `[int,...]` 就可以

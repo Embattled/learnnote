@@ -860,6 +860,10 @@ Evaluates the Einstein summation convention on the operands.
 ## 3.11. Mathematical function 数学操作
 
 绝大多数常用的数学基础函数都属于该分类
+* Trigonometric functions 三角函数
+* Hyperbolic functions 双曲线函数
+* Sums, products, differences 求和, 求积
+
 ### 3.11.1. Trigonometric functions 三角函数
 
 
@@ -885,8 +889,43 @@ Evaluates the Einstein summation convention on the operands.
 
 ### 3.11.4. Sums, products, differences 求和求积求差
 
-* sum()
-* cumsum(a) 累加求和
+`a, axis=None, dtype=None, out=None, keepdims=<no value>, initial=<no value>, where=<no value>` : 
+* numpy.prod      : 求所有元素的乘积
+* numpy.sum       : 求所有元素的加法和
+* numpy.nansum    : 带有 Nan 考虑的加法和, 将 Nan视为 0 
+* numpy.nanprod   : Nan视为 1
+
+`a, axis=None, dtype=None, out=None`  : 累计求解 返回的 array 和输入是相同的, axis 只能指定整数
+* numpy.cumprod   : 累乘
+* numpy.cumsum    : 累加
+* numpy.nancumsum : 带有 Nan 考虑的加法和, 将 Nan视为 0, 结果中 Nan 会被替换为前导的累计和
+* numpy.nancumprod   : Nan视为 1, 同理
+
+
+`numpy.diff(a, n=1, axis=-1, prepend=<no value>, append=<no value>)`
+* 沿着对应 axis (默认是最后一维) 计算元素差, 即 `out[i]=a[i+1]-a[i]`
+* diff 的 `n` 就是在结果上重复做 n 次 diff, 最终的输出会在 输入的基础上, axis 维度的 shape 减少 n
+
+`numpy.ediff1d(ary, to_end=None, to_begin=None)`
+* 本身计算上同 diff 相同, 但是只能是 `n=1`
+* 提供了两个 to_end to_begin 两个参数, 在结果的基础上附加上参数的 array
+
+
+`numpy.gradient(f, *varargs, axis=None, edge_order=1)`
+* 计算梯度, 输出的 shape 和输入相同, 有点复杂
+
+
+`numpy.cross(a, b, axisa=-1, axisb=-1, axisc=-1, axis=None)`
+* 计算两个向量的 叉乘, 当 a,b 都是 R3 的时候, 叉乘的结果向量与 a,b 都垂直
+* 如果 a,b 都是向量的 array, 则默认情况下 最后一维代表了向量本身
+* 返回值称为 c
+* axis(a,b,c), axis 是统一的设定, 会覆盖对 a,b,c 的单独参数
+* 如果对应向量的维度的某一个只有 2, 则会对输入填充 0
+* 如果两个输入的维度都只有 2, 则会返回  the z-component of the cross product is returned.
+
+利用 cross 和 eye 可以不利用 Scipy 就可计算矩阵的反对称矩阵  
+有 `skew_symmetric = np.cross(np.eye(3), a)`
+
 
 ### 3.11.5. Exponents and logarithms 指数
 ### 3.11.6. Rational routines 最大公因数 最小公倍数
