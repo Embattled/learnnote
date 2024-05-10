@@ -366,7 +366,14 @@ This can include (but is not limited to) modified superblocks, modified inodes, 
 
 # 17. Redirection
 
-17.1 tee: Redirect output to multiple files or processes
+17.1 tee: Redirect output to multiple files or processes 
+
+只有一个命令 `tee`  用于根据命令来重定向 输出输出流, 而不是根据 shell
+`tee [option]… [file]…`
+
+tee 会把标准输入流的内容 复制到 标准输出流, 并同时复制的输出到其他文件, 这对于保存命令副本非常拥有.  
+
+如果文件不存在, 则创建.  如果文件已存在, 则在带有 `-a` 的时候会进行追加, 否则覆盖.  
 
 # 18. File name manipulation
 

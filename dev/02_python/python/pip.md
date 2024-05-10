@@ -3,7 +3,7 @@
 用于从 PyPI ( Python Package Index ) 以及其他 package indexes 下载并管理包
 
 check out the following resources:
-* [Getting Started](https://pip.pypa.io/en/stable/getting-started/)
+* [Getting Started](https://pip.pypa.io/en/latest/getting-started/)
 * [Python Packaging User Guide](https://packaging.python.org/)
 
 
@@ -14,7 +14,9 @@ pip是目前最流行的Python包管理工具
 - Python 2.7.9及后续版本: 默认安装, 命令为pip
 - Python 3.4及后续版本: 默认安装, 命令为pip3
 
-pip的使用非常简单, 并支持从任意能够通过 VCS 或浏览器访问到的地址安装 Python 包  
+pip的使用非常简单, 并支持从任意能够通过 VCS 或浏览器访问到的地址安装 Python 包   
+
+和 Python 本体 保持独立状态  
 
 ## 1.1. Requirements File
 
@@ -26,10 +28,43 @@ requirements.txt 的基础语法轻量的, 被其他包管理器所兼容, 但�
 
 
 
-# 2. pip command
+# 2. pip Commands
 
 
-## 2.1. pip install - Installing Packages
+
+Environment Management and Introspection: 
+* pip install
+* pip uninstall
+* pip inspect
+* pip list
+* pip show
+* pip freeze
+* pip check
+
+Handling Distribution Files:
+* pip download
+* pip wheel
+* pip hash
+
+Package Index information:
+* pip search
+
+Managing pip itself:
+* pip cache
+* pip config
+* pip debug
+
+
+
+## 2.1. General Options - 通用选项
+
+可以适用于其他所有选项的通用命令  
+https://pip.pypa.io/en/latest/cli/pip/#general-options
+
+
+
+
+## 2.2. pip install - Installing Packages
 
 ```sh
 python -m pip install [options] <requirement specifier> [package-index-options] ...
@@ -40,22 +75,41 @@ python -m pip install [options] <archive url/path> ...
 ```
 
 Install packages from: 安装的包的来源
-* PyPI (and other indexes) using requirement specifiers.
+* PyPI (and other indexes) using reuirement specifiers.
 * VCS project urls.
 * Local project directories.
 * Local or remote source archives.
 * 以及便捷的 requirements files  
 
 
-
-
 - 安装:  pip install SomePackage
   - 加上 `==` 来指定安装版本 `pip install scipy==0.15.1`
-- 卸载:  pip uninstall SomePackage
 
-- pip list 查看已安装包的列表
+### 2.2.1. install options
 
-## pip freeze - Output pkgs list
+
+安装选项
+* `-U, --upgrade`                   : 即使包满足了条件, 也升级到最新的版本
+* `--force-reinstall`               : 即使包的版本满足了条件且是最新, 也重新安装
+* `--pre`                           : 在查找包索引的時候索引开发版本, 否则只会索引 stable versions
+* `--user`                          : 安装到平台上的用户目录, 即 `~/.local/` 等等 (在 conda 下似乎没必要)
+
+便捷
+* `-r, --requirement <file>`        : 指定參考文件安裝, 可以多次使用
+
+开发
+* `-e, --editable <path/url>`       : 以 editable 模式從本地或者 `VCS url` 安裝一個包
+
+
+
+
+## 2.3. pip uninstall
+
+## 2.4. pip list
+
+
+
+## 2.5. pip freeze - Output pkgs list
 
 
 - pip freeze 另一种查看方法

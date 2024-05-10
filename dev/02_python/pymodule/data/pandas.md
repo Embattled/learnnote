@@ -4,7 +4,7 @@
     - [2.1.1. read\_csv](#211-read_csv)
   - [2.2. Excel](#22-excel)
     - [2.2.1. 读取](#221-读取)
-    - [DataFrame.to\_excel()   -  类方法](#dataframeto_excel------类方法)
+    - [2.2.2. DataFrame.to\_excel() - 类方法](#222-dataframeto_excel---类方法)
   - [2.3. others](#23-others)
   - [2.4. csv写入](#24-csv写入)
 - [3. Series](#3-series)
@@ -135,11 +135,10 @@ pandas 中的主要数据结构被实现为以下两类：
 `pandas.read_excel(**args 参数太多了)`
 
 
-### DataFrame.to_excel()   -  类方法
+### 2.2.2. DataFrame.to_excel() - 类方法
 
 `DataFrame.to_excel(excel_writer, **args 超多参数)`
 * `excel_writer` : path-like, file-like, or `ExcelWriter` object, File path or existing ExcelWriter.
-* 
 
 示例:
 ```py

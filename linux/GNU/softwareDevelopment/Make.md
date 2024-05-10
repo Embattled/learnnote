@@ -49,6 +49,8 @@
     - [8.2.3. 值列表调整](#823-值列表调整)
   - [8.3. Functions for File Names](#83-functions-for-file-names)
   - [8.4. Functions That Control Make - 控制 make 执行的函数](#84-functions-that-control-make---控制-make-执行的函数)
+  - [The eval Function](#the-eval-function)
+  - [The origin Function](#the-origin-function)
 - [9. How to Run make - make CLI 文档](#9-how-to-run-make---make-cli-文档)
   - [9.1. Arguments to Specify the Makefile](#91-arguments-to-specify-the-makefile)
   - [9.2. Arguments to Specify the Goals](#92-arguments-to-specify-the-goals)
@@ -1013,6 +1015,16 @@ ${function arguments}
 
 
 
+## The eval Function
+
+## The origin Function
+
+不对变量的值进行操作, 告诉程序 `something about a variable`, 告诉程序 `where it came from`
+
+`$(origin variable)`
+
+这里的 variable 是要查询的变量的 `name`, 而不是变量的 `reference`. 
+这里的因此这里的 variable 一般不需要使用 `$`  
 
 
 # 9. How to Run make - make CLI 文档

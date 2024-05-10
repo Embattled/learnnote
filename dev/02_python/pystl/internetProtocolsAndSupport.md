@@ -7,6 +7,8 @@
 * 网络高级API, 提供了对多种协议的支持和处理
 * The modules described in this chapter implement internet protocols and support for related technology.
 
+常见的网络实现主要还是以第三方的库 Websocket 为主
+
 
 ## 1.1. 
 

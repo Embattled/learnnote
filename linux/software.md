@@ -47,44 +47,8 @@ RPM 二进制包命名的一般格式如下：
 | i686   | 表示此包使用的硬件平台                                                                                                                                                                                                                              |
 
 
-# 2. Debian系列 DPKG APT
 
-## 2.1. 基础关系  
-
-apt会解决和安装模块的依赖问题,并会咨询软件仓库, 但不会安装本地的deb文件, apt是建立在dpkg之上的软件管理工具  
-
-dpkg是用来安装.deb文件,但不会解决模块的依赖关系,且不会关心ubuntu的软件仓库内的软件,可以用于安装本地的deb文件  
-
-dpkg绕过apt包管理数据库对软件包进行操作，所以你用dpkg安装过的软件包用apt可以再安装一遍，系统不知道之前安装过了，将会覆盖之前dpkg的安装。
-
-## 2.2. DPKG
-
-dpkg 是Debian package的简写，为”Debian“ 操作系统 专门开发的套件管理系统，用于软件的安装，更新和移除。
-
-所有源自"Debian"的Linux的发行版都使用 dpkg,   例如"Ubuntu"
-
-| 命令                | 实例                           | 说明                                                        |
-| ------------------- | ------------------------------ | ----------------------------------------------------------- |
-| -i <.deb file name> | dpkg -i  ~/mozybackup_i386.deb | 安装手动下载下来的包                                        |
-| -I                  | dpkg -I                        | 查看当前系统中已经安装的软件包的信息                        |
-| -l package          | dpkg -l mozybackup             | 显示包的版本以及在系统中的状态                              |
-| -L package          | dpkg -L mozybackup             | 安装完包后，可以用此命令查看软件安装到什么地方.**重要命令** |
-| -r package          | dpkg -r mozybackup             | 删除软件但是保留配置                                        |
-| -P package          | dpkg -P mozybackup             | 删除软件且删除配置                                          |
-| -s package          | dpkg -s mozybackup             | 查看已经安装的软件的详细信息                                |
-| -S                  | dpkg -S                        | 查看某个文件属于哪一个软件包                                |
-| -c pac.deb          | dpkg -c mozybac.deb            | 查看一个安装包的内容                                        |
-| -A pac.deb          | dpkg -A package_file           | 查看一个安装包的软件信息                                    |
-
----
-`#dpkg --get-selections isc-dhcp-server`  确认软件已经成功安装  
-`#dpkg -s isc-dhcp-server`  用另一种方式确认成功安装]  
-
-dpkg –unpack package.deb     解开 deb 包的内容  
-dpkg -S keyword     搜索所属的包内容  
-dpkg –configure package     配置包   
-
-## 2.3. APT
+## 1.3. APT
 
 APT由几个名字以“apt-”打头的程序组成。apt-get、apt-cache 和apt-cdrom是处理软件包的命令行工具。  
 Debian 使用一套名为 Advanced Packaging Tool（APT）的工具来管理这种包系统,就是最常用的 Linux 包管理命令都被分散在了 apt-get、apt-cache 和 apt-config 这三条命令当中
@@ -96,7 +60,7 @@ Debian 使用一套名为 Advanced Packaging Tool（APT）的工具来管理这�
 
 在 apt  中, 软件的各个文件的安装位置在 `.deb` 文件中都写死了, 很难修改安装位置
 
-### 2.3.1. 基础被替换的命令
+### 1.3.1. 基础被替换的命令
 
 | apt 命令         | 取代的命令           | 命令的功能                     |
 | ---------------- | -------------------- | ------------------------------ |
@@ -110,7 +74,7 @@ Debian 使用一套名为 Advanced Packaging Tool（APT）的工具来管理这�
 | apt search       | apt-cache search     | 搜索应用程序                   |
 | apt show         | apt-cache show       | 显示安装细节                   |
 
-### 2.3.2. 软件列表
+### 1.3.2. 软件列表
 
 | 新的apt命令      | 命令的功能                        |
 | ---------------- | --------------------------------- |
@@ -128,7 +92,7 @@ apt list --upgradeable
 apt list --installed
 
 ```
-### 2.3.3. 软件降级
+### 1.3.3. 软件降级
 
 ```shell
 # 本质上都是通过指定版本号来指定版本安装实现降级
@@ -144,7 +108,7 @@ apt-cache policy <packagename>
 ```
 
 
-# 3. update-alternatives 版本控制
+# 2. update-alternatives 版本控制
 
 用于处理linux系统中软件版本的切换，在各个linux发行版中均提供了该命令，命令参数略有区别，但大致是一样的  
 

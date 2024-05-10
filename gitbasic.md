@@ -15,6 +15,7 @@
   - [3.3. diff - Show changes between commits, commit and working tree, etc](#33-diff---show-changes-between-commits-commit-and-working-tree-etc)
     - [diff Options](#diff-options)
   - [3.4. commit](#34-commit)
+    - [commit option](#commit-option)
   - [3.5. restore](#35-restore)
   - [3.6. reset](#36-reset)
   - [3.7. rm](#37-rm)
@@ -30,6 +31,7 @@
     - [4.4.1. merge options](#441-merge-options)
   - [4.5. log](#45-log)
   - [4.6. stash - Stash the changes in a dirty working directory away](#46-stash---stash-the-changes-in-a-dirty-working-directory-away)
+    - [git stash push : 默认行为](#git-stash-push--默认行为)
     - [stash - options](#stash---options)
   - [4.7. tag - Create, list, delete or verify a tag object signed with GPG](#47-tag---create-list-delete-or-verify-a-tag-object-signed-with-gpg)
   - [4.8. worktree](#48-worktree)
@@ -55,6 +57,7 @@
   - [6.2. apply - Apply a patch to files and/or to the index](#62-apply---apply-a-patch-to-files-andor-to-the-index)
   - [6.3. cherry-pick - Apply the changes introduced by some existing commits](#63-cherry-pick---apply-the-changes-introduced-by-some-existing-commits)
   - [6.4. rebase](#64-rebase)
+    - [options](#options)
   - [6.5. revert](#65-revert)
 - [7. git-lfs Large File Storage (LFS)](#7-git-lfs-large-file-storage-lfs)
 - [8. Administration](#8-administration)
@@ -339,7 +342,19 @@ git diff [<options>] <blob> <blob>
 
 ## 3.4. commit
 
-1. `commit` 将暂存区的内容提交到版本库, 每一次commit都是一个保存点,可以从这里还原版本库  
+
+```sh
+git commit [-a | --interactive | --patch] [-s] [-v] [-u<mode>] [--amend]
+	   [--dry-run] [(-c | -C | --squash) <commit> | --fixup [(amend|reword):]<commit>)]
+	   [-F <file> | -m <msg>] [--reset-author] [--allow-empty]
+	   [--allow-empty-message] [--no-verify] [-e] [--author=<author>]
+	   [--date=<date>] [--cleanup=<mode>] [--[no-]status]
+	   [-i | -o] [--pathspec-from-file=<file> [--pathspec-file-nul]]
+	   [(--trailer <token>[(=|:)<value>])…​] [-S[<keyid>]]
+	   [--] [<pathspec>…​]
+```
+
+`commit` 将暂存区的内容提交到版本库, 每一次commit都是一个保存点,可以从这里还原版本库  
    * `git commit -c <commit>` 懒人代码, 直接复制参数 commit 的 log msg
    * `git commit -C <commit>` 复制参数 commit 的 log msg 并进入编辑界面
    * ` git commit -m "wrote a readme file"`  
@@ -352,6 +367,12 @@ $ git commit -m 'initial commit'
 $ git add forgotten_file
 $ git commit --amend
 ```
+
+
+### commit option
+
+
+* 
 
 ## 3.5. restore
 
@@ -591,6 +612,8 @@ Git用<kbd><<<<<<<</kbd>, <kbd>=======</kbd>, <kbd>>>>>>>></kbd>标记出不同�
 ```sh
 # 打印目前已经生成的 stash 实体
 git stash list [<log-options>]
+
+# 打印 stash 中的条目与 基 commit 之间的差异
 git stash show [-u | --include-untracked | --only-untracked] [<diff-options>] [<stash>]
 
 # 删除 stash 
@@ -602,15 +625,12 @@ git stash pop [--index] [-q | --quiet] [<stash>]
 
 # apply 恢复,但是stash的内容不删除
 git stash apply [--index] [-q | --quiet] [<stash>]
+
+# 直接把 stash 的内容存储为 新的 branch, 如果成功, 则删除对应 stash 条目
 git stash branch <branchname> [<stash>]
 
-# 默认行为
-# -m --message 用于为 stash 实例添加说明文字
-git stash [push [-p | --patch] [-S | --staged] [-k | --[no-]keep-index] [-q | --quiet]
-	     [-u | --include-untracked] [-a | --all] [(-m | --message) <message>]
-	     [--pathspec-from-file=<file> [--pathspec-file-nul]]
-	     [--] [<pathspec>…​]]
 
+# 已经被启用的命令, 推荐使用 push
 git stash save [-p | --patch] [-S | --staged] [-k | --[no-]keep-index] [-q | --quiet]
 	     [-u | --include-untracked] [-a | --all] [<message>]
 
@@ -624,9 +644,22 @@ git stash store [(-m | --message) <message>] [-q | --quiet] <commit>
 * `git stash [push]` : 默认行为 
   * 立刻将工作区的改动存于后台, 并将工作区的文件还原到 HEAD 状态, 此时可以进行切换分支等操作
   * `-m <message>` : 给 stash 添加描述
-* `git stash show` : 打印 stash 与 commit back 的 diff
 
+### git stash push : 默认行为
+
+```sh
+# 默认行为
+# -m --message 用于为 stash 实例添加说明文字
+git stash [push [-p | --patch] [-S | --staged] [-k | --[no-]keep-index] [-q | --quiet]
+	     [-u | --include-untracked] [-a | --all] [(-m | --message) <message>]
+	     [--pathspec-from-file=<file> [--pathspec-file-nul]]
+	     [--] [<pathspec>…​]]
+
+
+```
 ### stash - options
+
+
 
 ## 4.7. tag - Create, list, delete or verify a tag object signed with GPG
 
@@ -1077,7 +1110,15 @@ git rebase (--continue | --skip | --abort | --quit | --edit-todo | --show-curren
 
 参数:
 * `git rebase [-i | --interactive]`   交互式进行 rebash
-* 
+
+### options
+
+
+* `--no-ff --force-rebase -f`  : 强制进行 rebase
+  * Individually replay all rebased commits instead of fast-forwarding over the unchanged ones. This ensures that the entire history of the rebased branch is composed of new commits.
+  * You may find this helpful after reverting a topic branch merge, as this option recreates the topic branch with fresh commits so it can be remerged successfully without needing to "revert the reversion" (see the revert-a-faulty-merge How-To for details).
+
+
 
 ## 6.5. revert
 

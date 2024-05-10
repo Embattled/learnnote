@@ -2,10 +2,16 @@
 - [2. GNU binary utilities (binutils)](#2-gnu-binary-utilities-binutils)
   - [2.1. ar  (archive)](#21-ar--archive)
     - [2.1.1. operation keyletter](#211-operation-keyletter)
-  - [strings - 打印文件字符](#strings---打印文件字符)
+  - [2.2. strings - 打印文件字符](#22-strings---打印文件字符)
 - [3. ld - the GNU linker.](#3-ld---the-gnu-linker)
+  - [3.1. Invocation - 命令行工具使用说明](#31-invocation---命令行工具使用说明)
+    - [3.1.1. 通用链接命令](#311-通用链接命令)
+      - [3.1.1.1. 路径搜索配置](#3111-路径搜索配置)
+    - [3.1.2. Options Specific to i386 PE Targets - 主要的 PC 环境](#312-options-specific-to-i386-pe-targets---主要的-pc-环境)
+    - [3.1.3. Environment Variables - ld 参照的环境变量](#313-environment-variables---ld-参照的环境变量)
+  - [3.2. BFD 库](#32-bfd-库)
 - [4. GNU gprof - Displays profiling information.](#4-gnu-gprof---displays-profiling-information)
-- [GNU Gprofng - Next Generation Profiler](#gnu-gprofng---next-generation-profiler)
+- [5. GNU Gprofng - Next Generation Profiler](#5-gnu-gprofng---next-generation-profiler)
 
 # 1. GNU Binutils 
 
@@ -81,7 +87,7 @@ ar -M [ <mri-script ]
 * `s`       : 更新或者重建 一个 archive 的 `object-file index`, 即使 archive 没有发生任何改变. 可以不需要任何 operation 独立的运行 `ar s`, 这种情况下和另一个程序 `ranlib` 的功能相同
 
 
-## strings - 打印文件字符  
+## 2.2. strings - 打印文件字符  
 
 
 
@@ -92,8 +98,82 @@ GNU linker ld (GNU Binutils) version 2.40.
 ld 用于组合多个目标文件和 archive 文件, 重新定位它们的数据并绑定符号引用, 通常一个编译的最后一步过程就是 ld
 
 ld 接受链接器注释语言 (Linker Command Language) files written in a superset of AT&T’s Link Editor Command Language syntax, 用于提供精细的以及完全的链接过程控制  
+* 接受 基于 AT&T 链接编辑器命令 的超集 的链接器命令语言文件, 实现对链接过程的完全控制
+* 使用通用库 `BFD libraries` 来操作目标文件, 这使得 ld 可以读取, 组合, 写入多种不同格式的目标文件, 例如 `COFF`? 和 a.out, 不同的格式可以链接在一起生成任何可用类型的目标文件
+* ld 有高级报错信息 (作者吹了一波功能)
 
 
+## 3.1. Invocation - 命令行工具使用说明
+
+Command-line Options 除了全局的以外,  每一个平台似乎都有自己专有的命令. 不过看起来除了 i386 以外其他的都没多少内容
+* Options Specific to i386 PE Targets
+* Options specific to C6X uClinux targets
+* Options specific to C-SKY targets
+* Options specific to Motorola 68HC11 and 68HC12 targets
+* Options specific to Motorola 68K target
+* Options specific to MIPS targets
+* Options specific to PDP11 targets
+
+
+### 3.1.1. 通用链接命令
+
+
+
+
+#### 3.1.1.1. 路径搜索配置
+
+`--sysroot=director` : 指定某个路径为 `sysroot`
+* 在其他命令中会代替 `$SYSROOT` 为前缀的路径
+* 只有在 `--with-sysroot` 命令也出现的时候才会生效
+* (文档里没有 `--with-sysroot` 的单独说明, 似乎只是一个开关 flag)
+
+
+`-L searchdir` `--library-path=searchdir` : 指定一个目录作为库的搜索目录, 
+* 该命令可以使用任意次, 按照顺序进行搜索, 且优先于所有默认内置的目录.  
+* 所有 `-L` 指定的目录都会应用到 `-l` 命令上
+* `-L` 不会影响到 ld 搜索链接描述文件的方式 (除非使用了`-T`选项)
+* 路径可以使用 `=` 符号 或者 `$SYSROOT` 作为开头, 会替换为 `--sysroot` 选项指定的前缀
+* 此外还可以使用 linker 脚本的 `SEARCH_DIR` 命令 
+
+
+`-rpath-link=dir`   : 当链接的库本身依赖于其他的没有显式指定的库时, 用于操纵 ld 的行为. 在文档中该部分该详细解释了 ld 寻找共享库的顺序.
+* `rpath-link=dir` 用于修改最高优先级的搜索路径, 该指令可以使用一些 tokens `${ORIGIN} ${LIB}`, 详细的优先级为
+  * `-rpath-link` 指定的目录有最高优先级
+  * (似乎不常见)`-rpath` 会在其后被参照, 差别在于 `-rpath-link` 仅在链接时使用, 而 `-rpath` 则似乎会被编译到可执行文件中, 因此会在运行时使用. 似乎只有应用了 `--with-sysroot` 选项的链接器才支持该搜索.
+  * 在 ELF 系统中, 如果上述两个都未指定, 则查找环境变量 `LD_RUN_PATH`
+  * 在 SunOS (Unix家族), 查找 `-L` 命令指定的路径
+  * 查找环境变量 `LD_LIBRARY_PATH` 的目录
+  * 在 ELF 系统中 查找环境变量 `DT_RUNPATH` or `DT_RPATH`, 前者的存在的话, 会阻止后者生效
+  * 在 Linux 中, 查找 `/etc/ld.so.conf` 中定义的目录条目
+  * 在 FreeBSD 系统上, 有 `elf-hints.h` 头文件定义的 `_PATH_ELF_HINTS` 宏指定的路径 (好复杂)
+  * 参照 "linker script given on the command line", 命令中写的脚本中, 指定的 `SEARCH_DIR`, 不包括 `-dT` 的脚本
+  * 默认链接目录, 通常为 `/lib` `/usr/lib`,  (没有 `/usr/local/lib`)
+  * 由 Plugin 指定的路径 `LDPT_SET_EXTRA_LIBRARY_PATH`
+  * 在 "default linker script" 中指定的 SEARCH_DIR
+
+Note however on Linux based systems there is an additional caveat: If the --as-needed option is active and a shared library is located which would normally satisfy the search and this library does not have DT_NEEDED tag for libc.so and there is a shared library later on in the set of search directories which also satisfies the search and this second shared library does have a DT_NEEDED tag for libc.so then the second library will be selected instead of the first. 
+* 啥意思, 对于系统上存在的多个 `libc.so` 会根据 `DT_NEEDED` 和 `--as-needed` flag 来优先选择有标志的 libc
+
+总体看下来 `-L` 和 `/etc/ld.so.conf` 比较便于使用, LD_LIBRARY_PATH 写入到 `.bashrc` 也不错
+
+
+### 3.1.2. Options Specific to i386 PE Targets - 主要的 PC 环境
+
+i386 指代 32位x86架构的处理器, 即 Intel 80386 以及其后的32位处理器   
+PE 指的是 Windows(为啥??), 全称为 Portable Executable.  
+
+### 3.1.3. Environment Variables - ld 参照的环境变量
+
+该章节指的环境变量是 ld 程序全局行为的环境变量, 而不是链接过程中的变量  
+看起来都不常用  
+* `GNUTARGET`
+* `LDEMULATION`
+* `COLLECT_NO_DEMANGLE`
+
+
+## 3.2. BFD 库
+
+ld linker 使用 BFD 库来访问以及打包目标文件.
 
 # 4. GNU gprof - Displays profiling information.
 
@@ -112,6 +192,6 @@ gprof 的使用方法包括:
 * You must run gprof to analyze the profile data. 
 
 
-# GNU Gprofng - Next Generation Profiler
+# 5. GNU Gprofng - Next Generation Profiler
 
 

@@ -273,7 +273,8 @@ pickle_load_args: (Python 3 only) optional keyword arguments passed over to pick
 ### 2.5.5. Other Operations - 无法分类的其他函数
 
 
-
+cum 累计系类:
+* `torch.cumsum(input, dim, *, dtype=None, out=None) → Tensor`    : 将输入沿着某一维度 累加
 
 broadcast 家族:
 * `torch.broadcast_to(input, shape) → Tensor` : 手动 broadcast 
@@ -282,7 +283,9 @@ broadcast 家族:
 
 
 `torch.searchsorted(sorted_sequence, values, *, out_int32=False, right=False, side='left', out=None, sorter=None) → Tensor`
-* 寻找
+* 寻找有序插入位置
+* 常被用来实现基于 torch 的线性插值, 因为 torch 似乎没有直接提供类似于 `numpy.interp` 用于非自然数索引的插值方法
+* `right=False` 返回的插入位置是达成有序的最左边, 即会插入到相同值的元素的前面, 如果至 True, 则代表右边
 
 # 3. torch.nn
 
@@ -945,8 +948,18 @@ torch.cuda 可以随时导入, 并通过  `is_available()` 来判断设备的 CU
 
 # 8. torch.linalg - pytorch 的线性代数子库
 
+`torch.linalg.*`
 
 ## Matrix Properties
+
+* `vector_norm`          Computes a vector norm.
+  * `torch.linalg.vector_norm(x, ord=2, dim=None, keepdim=False, *, dtype=None, out=None)`
+  * 默认是 2 即计算一个向量在欧氏空间中的距离
+* `matrix_norm`          Computes a matrix norm.
+  * `torch.linalg.matrix_norm(A, ord='fro', dim=(-2, -1), keepdim=False, *, dtype=None, out=None)`
+* `norm`                 Computes a vector or matrix norm.  
+  * `torch.linalg.norm(A, ord=None, dim=None, keepdim=False, *, out=None, dtype=None)`  
+  * 属于上面两个函数的结合体, 根据输入的 shape 和 dim 来判断要执行的计算
 
 
 ## Decompositions

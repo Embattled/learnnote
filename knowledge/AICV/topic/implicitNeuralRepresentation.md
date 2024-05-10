@@ -29,6 +29,16 @@ Volume 体数据  体渲染
 * 体渲染是一种可微渲染  
 
 
+Neural 3D shape representations
+* 早期的基于深度学习的: 需要 3D model 的 GT
+  * SDF-base : Local Implicit Grid Representations for 3D Scenes
+  * occupancy field base: Local Deep Implicit Functions for 3D Shape
+* 改进了渲染方法: 2D 图像即可学习
+  * Differentiable volumetric rendering: Learning implicit 3D representations without 3D supervision.
+  * Scene representation networks: Continuous 3D-structure-aware neural scene representations.
+
+
+
 ## 2.1. Neural Radiance Fields (NeRF)
 
 通过 神经网络表示 Radiance Fields
@@ -38,6 +48,7 @@ Volume 体数据  体渲染
 NeRF 是一种隐式的 3D 中间表示, 但是却使用了 Volume 的规则, 即一个 隐式的 Volume, 实现了 神经场 Neural Field 与图形学组件 Volume Rendering 的有效结合  
 * 本身的方法非常简洁, 且有效, 说明是合理的
 * 对于启发 计算机视觉和图形学的交叉领域 有很大的功劳
+
 
 
 Neural Fields  神经场:
@@ -65,12 +76,27 @@ $$C(r)=\int_{t_n}^{t_f}T(t)\sigma(r(t))c(r(t),d)dt$$
   * estimating this integral C(r) for a camera ray traced through each pixel of the desired virtual camera.
   * 从虚拟摄像头中, 对穿越每一个像素的 camera cay 计算 C(r)
 
+NeRF 的新颖点:
+* 将3D场景存储在神经网络中, 对比传统的存储 离散的 voxel grids, 节省了存储空间
+* 体渲染用于场景重构, 同时相机的方向也作为网络输入, 提高了准确度
+* 两个优化方法进一步一高精度
+  * 高频位置编码
+  * 分层空间位置采样
+
 
 NeRF 本身的问题, 有如下:
 * 速度慢  : 对于每个输出像素分别进行前向预测, 因此计算量很大  
 * 只能应用于静态场景
 * 泛化性差
 * 需要大量的视角  : 需要数百张不同视角的图片来训练  
+
+NeRF的训练:
+* batch_size : 4096
+* Nc=64, Nf=128
+* Adam : 5e-4 -> 5e-5
+* 100k~300k 收敛
+* 1~2 day on V100
+
 
 ### 2.1.2. Topics
 
@@ -105,6 +131,11 @@ Google Blog
 Reconstructing indoor spaces with NeRF
 Wednesday, June 14, 2023
 https://ai.googleblog.com/2023/06/reconstructing-indoor-spaces-with-nerf.html
+
+
+Mildenhall, Ben, et al. “NeRF: Representing Scenes as Neural Radiance Fields for View Synthesis.” Computer Vision – ECCV 2020,Lecture Notes in Computer Science, 2020, pp. 405–21, https://doi.org/10.1007/978-3-030-58452-8_24.
+
+
 
 
 # 3. 2D - Implicit Image Function
