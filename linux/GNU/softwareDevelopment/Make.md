@@ -49,8 +49,9 @@
     - [8.2.3. 值列表调整](#823-值列表调整)
   - [8.3. Functions for File Names](#83-functions-for-file-names)
   - [8.4. Functions That Control Make - 控制 make 执行的函数](#84-functions-that-control-make---控制-make-执行的函数)
-  - [The eval Function](#the-eval-function)
-  - [The origin Function](#the-origin-function)
+  - [8.5. The foreach Function](#85-the-foreach-function)
+  - [8.6. The eval Function](#86-the-eval-function)
+  - [8.7. The origin Function](#87-the-origin-function)
 - [9. How to Run make - make CLI 文档](#9-how-to-run-make---make-cli-文档)
   - [9.1. Arguments to Specify the Makefile](#91-arguments-to-specify-the-makefile)
   - [9.2. Arguments to Specify the Goals](#92-arguments-to-specify-the-goals)
@@ -1014,10 +1015,44 @@ ${function arguments}
   * 仅仅是打印信息, 不做其他任何事
 
 
+## 8.5. The foreach Function
 
-## The eval Function
+同 shell 里的 for 代码有些类似  
 
-## The origin Function
+`$(foreach var,list,text)`  
+
+对于 list 的每个元素, 提取其值并赋值给 var 定义的名称, 然后在 text 里展开
+
+对于每个 list 的元素进行展开, 然后最终的结果是每个展开的结果以空格为分割  
+
+```makefile
+dirs := a b c d
+files := $(foreach dir,$(dirs),$(wildcard $(dir)/*))
+
+# same as 
+files := $(wildcard a/* b/* c/* d/*)
+```
+* 对于 dirs 里的每个元素, 赋值给 dir, 在第三个参数里展开
+* var 的定义不需要带转义符, 但是在 text 里使用的时候需要用转义符
+
+通过使用递归的赋值符号 `=` 可以把最后的部分 test 定义为类似于函数的形式
+```makefile
+# 这里不能用 := 
+find_files = $(wildcard $(dir)/*)
+dirs := a b c d
+files := $(foreach dir,$(dirs),$(find_files))
+```
+
+注意, foreach 中的 var 是完全干净的, 不影响上下文的
+* 不会影响上文中 var 的值
+* 如果上文中 var 没有定义, 则 foreach 之后也保持未定义
+* foreach 中 var 的赋值属于 简单赋值 `:=`
+
+
+
+## 8.6. The eval Function
+
+## 8.7. The origin Function
 
 不对变量的值进行操作, 告诉程序 `something about a variable`, 告诉程序 `where it came from`
 

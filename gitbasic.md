@@ -37,7 +37,8 @@
   - [4.8. worktree](#48-worktree)
 - [5. Sharing and Updating Projects](#5-sharing-and-updating-projects)
   - [5.1. fetch - Download objects and refs from another repository](#51-fetch---download-objects-and-refs-from-another-repository)
-  - [5.2. pull](#52-pull)
+    - [refspec](#refspec)
+  - [5.2. pull - Fetch from and integrate with another repository or a local branch](#52-pull---fetch-from-and-integrate-with-another-repository-or-a-local-branch)
   - [5.3. push](#53-push)
   - [5.4. remote - Manage set of tracked repositories](#54-remote---manage-set-of-tracked-repositories)
   - [5.5. submodule 子模块](#55-submodule-子模块)
@@ -720,44 +721,61 @@ git fetch [<options>] [<repository> [<refspec>…​]]
 git fetch [<options>] <group>
 git fetch --multiple [<options>] [(<repository> | <group>)…​]
 git fetch --all [<options>]
-```
-git-fetch - Download objects and refs from another repository  
-
-```sh
-git fetch [<options>] [<repository> [<refspec>…​]]
-git fetch [<options>] <group>
-git fetch --multiple [<options>] [(<repository> | <group>)…​]
 
 # 从当前 repo 的所有 remote 中进行 fetch
 git fetch --all [<options>]
 ```
 
 
-`fetch` 用于从一个或者多个仓库中拉取代码, 并完成其历史记录 (with the objects necessary to complete their histories)
+`fetch` 用于从一个或者多个仓库中拉取代码, 并完成其历史记录 (with the objects necessary to complete their histories). 概念: branches and/or tags 统称为 引用 (refs).
+Remote-tracking branches 会同时进行更新.
 
-概念: branches and/or tags 统称为 引用 (refs)
+`fetch` 可以作用于单个命名的 repo 或者直接是 URL. 如果在配置文件中定义了 group 则通过指定 group 名称可以直接从多个远端获取. 默认情况下使用 `origin`.
+
+默认对于分支相关的 tags, 会在 fetch 目标分支的时候一起获取. 通过指定 options 可以影响对于 tags 信息的行为.
+通过 fetch 获取的 ref names 和 object name 会写入 `.git/FETCH_HEAD`, 这份信息则可以用于其他 git 命令.
 
 `<group>` 和 `<repository>`
 * git fetch 可以从单个仓库或者 url 中 fetch
 * `<group>` : 是定义在配置文件中的 `remotes.<group>` 条码中的多个仓库, 可以实现一次从多个仓库中 fetch
 * 在不指定 remote 的时候, fetch 默认会从 default remote 即 origin 来获取代码, 如果为当前 branch 配置了 upstream 的话则会对应的从 upstream 来获取
   * 即默认操作是 `git fetch origin master` 
-  * `git fetch origin master:tmp` 用 冒号来指定下载的目标分支, 默认是 `远端名/分支名`
+
+### refspec
+
+fetch 的最常用的使用方法　`git fetch [<options>] [<repository> [<refspec>…​]]`  中, refspec 是 git 定义的一个 概念：
+* 定义 which refs to fetch and which local refs to update. repository 定义存储库, 而 refspec 同时定义远端的分支和本地的分支.
+* 通常默认值会采取配置文件中 `remote.<repo>.fetch` 的引用
+
+refspec 的格式是 :   `[+]<src>[:<dst>]`
+* 当 dst 为空的时候, 引号可以省略
+* src 通常是一个 refs, 但也可以是 object, 例如 commit id
+* refspec 可以带通配符 `*`, 这样可以同时对多个来源进行操作, 此时 dst 也必须给定并且也带有 通配符
+
+## 5.2. pull - Fetch from and integrate with another repository or a local branch
 
 
-参数
+快速的将远程存储的更改合并到 `当前分支` 中, 如果当前分支位于远程分支之后, 则默认情况下它将快进当前分支以匹配远程分支.  
+如果当前分支和远程分支出现分歧, 则会进入 `--rebase` 模式进行分支协调
 
-## 5.2. pull
+具体的来说, git pull 的行为是
+* Fetch from and integrate with another repository or a local branch, 先使用给定的参数运行 `git fetch`
+* 再根据 参数 运行 `git rebase` or `git merge`
 
-`pull` 用于懒人的拉取代码, 会自动merge到本地工作区上
-   * Fetch from and integrate with another repository or a local branch.
+`git pull [<options>] [<repository> [<refspec>…​]]`
+* repository : 是传递给 git-fetch 的远程 repo 的名称
+* refspec   : 是给远程 ref 的命名, 例如 `refs/heads/*:refs/remotes/origin/*`, 通常情况下这会选取远程 repo 的分支名称. 
+* 默认行为会采用 `remote` 的 curret branch 并进行 merge
+* 在旧版本中, 在工作区存有 uncommit 的改动的情况下 随意的使用 git pull 可能会导致冲突发生, 并且难以回退
    * 相当于先 fetch 再 `git merge origin/master`
-     * 先从远程的origin的master主分支下载最新的版本到origin/master分支上
-     * 然后比较本地的master分支和origin/master分支的差别并合并
-   * 实际使用中, 用 fetch 更加安全, 因为在中间可以更精细化的比较什么改动被 fetch 下来了
-     * `git fetch origin master:tmp`
-     * `git diff tmp `
-     * `git merge tmp`
+   * 先从远程的origin的master主分支下载最新的版本到origin/master分支上
+   * 然后比较本地的master分支和origin/master分支的差别并合并
+* git `1.7.0` 以后, 退出一个 merge 还可以使用 reset 中的参数 `git reset --merge`
+
+* 实际使用中, 用 fetch 更加安全, 因为在中间可以更精细化的比较什么改动被 fetch 下来了
+ * `git fetch origin master:tmp`
+ * `git diff tmp `
+ * `git merge tmp`
 
 ## 5.3. push 
 

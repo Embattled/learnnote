@@ -8,10 +8,12 @@ The modules described in this chapter provide functions and classes that support
 # 2. itertools — Functions creating iterators for efficient looping¶
 
 
-该模组实现了一些 迭代器构建模块, 许多都是根据 `Haskell` `SML` 启发的
+该模组实现了一些 迭代器构建模块, 许多都是根据 函数式编程语言 `APL` `Haskell` `SML` 启发的
 * 主要是实现了 fast, memory efficient tools
 * 这些工具可以被单独或者组合使用
-* 所构成的概念称为 `iterator algebra`, 使得可以方便的通过 python 构建高效的专用工具
+
+该模组标准化了一个 核心工具 (core set), 提供 fast, memory efficient tools 用于构成
+* 称为 `iterator algebra`, 使得可以方便的通过 pure python 构建高效的专用工具
 
 ## 2.1. Itertool functions
 
@@ -44,7 +46,7 @@ itertools 下的函数都是用来构建一个 iterators.
 * 在运行 product 的时候, 会先消耗所有的输入并存储在内存中, 因此不能输入长度可变的iterable, 必须是 finite
   
 
-
+## 2.2. Itertools Recipes
 
 # 3. functools — Higher-order functions and operations on callable objects
 

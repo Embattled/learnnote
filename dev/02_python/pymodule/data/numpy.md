@@ -48,10 +48,11 @@
   - [3.8. Linear algebra 线性代数计算](#38-linear-algebra-线性代数计算)
     - [3.8.1. Matrix and vector products 向量矩阵乘法](#381-matrix-and-vector-products-向量矩阵乘法)
       - [3.8.1.1. 矩阵乘法](#3811-矩阵乘法)
-      - [3.8.1.2. einsum](#3812-einsum)
+      - [3.8.1.2. einsum - Einstein summation convention](#3812-einsum---einstein-summation-convention)
     - [3.8.2. Solving equations and inverting matrices 计算矩阵方程或者逆](#382-solving-equations-and-inverting-matrices-计算矩阵方程或者逆)
   - [3.9. Logic functions 逻辑计算](#39-logic-functions-逻辑计算)
     - [3.9.1. Truth value testing](#391-truth-value-testing)
+    - [Comparison - 对比两个 array](#comparison---对比两个-array)
   - [3.10. Masked array operations](#310-masked-array-operations)
   - [3.11. Mathematical function 数学操作](#311-mathematical-function-数学操作)
     - [3.11.1. Trigonometric functions 三角函数](#3111-trigonometric-functions-三角函数)
@@ -779,8 +780,11 @@ numpy 对于各种类型的输出支持的很好, 要注意对于 pandas 的 Dat
 
 ### 3.8.1. Matrix and vector products 向量矩阵乘法
 
+向量和矩阵的乘法  
+
 
 #### 3.8.1.1. 矩阵乘法
+
 * `numpy.dot(a, b, out=None)`  矩阵点乘, 可以理解为尽可能执行矩阵乘法, 对于高维是有一定拓展性的, 但是不适用于 Tensor
   * 因为是函数, 所以不存在手动加 T 之类的, 只根据 a,b 的维度来决定操作
   * a,b 都是 1D, 执行 向量内积
@@ -820,7 +824,7 @@ np.matmul(a, c).shape :(9, 5, 7, 3)
   * 该函数比较基础, 只接受 a,b 都是向量
   * 生成外积矩阵, 矩阵形状为 (a.len, b.len)
 
-#### 3.8.1.2. einsum  
+#### 3.8.1.2. einsum - Einstein summation convention
 
 评估操作数的爱因斯坦求和约定
 Evaluates the Einstein summation convention on the operands.
@@ -829,9 +833,32 @@ Evaluates the Einstein summation convention on the operands.
 在 numpy 中
 * 隐式implicit模式下, 直接计算对应的值
 * 显式explicit模式下, provides further flexibility to compute other array operations that might not be considered classical Einstein summation operations.
-
+  * 通过禁用或者强制 对指定下标的标签进行求和, 进一步提高了运算的灵活性
 
 `numpy.einsum(subscripts, *operands, out=None, dtype=None, order='K', casting='safe', optimize=False)`
+* `subscripts` : str, 用字符串来表示求和的格式.
+  * 包含显示指示符 `->` 以及精确输出形式的下标标签的情况下执行显示运算
+  * 否则执行隐式计算
+* `operands` : list of array_like, 输入的操作数
+
+subscripts 是一个以逗号分割的下标标签列表, 每个标签指的是响应操作数的一个维度, 每当一个标签重复时 代表指定维度的值会被相乘并求和
+* ` ("i,i",a,b) `  = np.inner(a,b)
+* ` ("i", a) `  = a.view()
+* ` ("ij,jk", a,b) ` = np.matmul(a,b) 相当于传统矩阵乘法
+* ` ("ii" , a) ` = np.trace(a) 同一个操作数取相同的标签, 代表提取对角线 
+
+在隐式模式下, 输出的轴的顺序会按照字母顺序重新排序, 因此标签的选取很重要
+* ` ("ij", a) ` 不会对 2D 数组进行更改
+* ` ("ji", a) ` 对 2D 数组进行转置
+* ` ("ij,jh, a,b) ` 返回矩阵乘法的转置
+
+显示模式下, `->` 直接控制输出下标标签列表, 可以实现禁用或者强制求和
+* ` ("i->", a) ` = np.sum(a, axis=-1)  
+* ` ("ii->i", a) ` = np.diag(a) 
+* ` ("ij,jh->ih", a,b) ` 同显式模式不同, 可以正确获取矩阵乘法
+* 显式模式下对操作符默认不进行 broadcasting
+
+当 operand 只有一个, 且不进行任何求和类型的操作的时候, 返回的是 view 
 
 ### 3.8.2. Solving equations and inverting matrices 计算矩阵方程或者逆
 
@@ -851,9 +878,18 @@ Evaluates the Einstein summation convention on the operands.
 * `numpy.all(a, axis=None, out=None, keepdims=<no value>, *, where=<no value>)` 是否全部为 True
 * `numpy.any(a, axis=None, out=None, keepdims=<no value>, *, where=<no value>)` 是否有 True
 
+
+### Comparison - 对比两个 array
+
+这个分组的函数很有意思
+
+* `numpy.array_equiv(a1, a2)` : 比较两个array是否相同, 允许 broadcast
+* `numpy.array_equal(a1, a2, equal_nan=False)` : 比较值和 shape 是否都相同, 即不允许 broadcast
+  * equal_nan 主要用于负数, 如果实部或者虚部为 nan, 则直接判断该元素相同
+
 ## 3.10. Masked array operations 
 
-同 Logic 操作非常相似, 主要是通过各种逻辑判断来生成 mask 数据  
+同 Logic functions 操作非常相似, 主要是通过各种逻辑判断来生成 mask 数据  
 
 
 

@@ -14,7 +14,7 @@
     - [2.5.1. Voting Classifier](#251-voting-classifier)
     - [2.5.2. Voting Regressor](#252-voting-regressor)
   - [2.6. 监督学习的 Neural Network models](#26-监督学习的-neural-network-models)
-- [3. Unsupervised learning 模型](#3-unsupervised-learning-模型)
+- [3. Unsupervised learning](#3-unsupervised-learning)
   - [3.1. cluster](#31-cluster)
     - [3.1.1. DBSCAN](#311-dbscan)
     - [3.1.2. KMeans](#312-kmeans)
@@ -257,9 +257,15 @@ class sklearn.ensemble.VotingClassifier(
 ## 2.6. 监督学习的 Neural Network models
 
 
-# 3. Unsupervised learning 模型
+# 3. Unsupervised learning 
+
+无监督学习, 即在没有 label 的情况下产出结果
 
 ## 3.1. cluster
+
+聚类算法是无监督机器学习的代表, sklearn.cluster 下实现了各种常用的聚类算法
+
+在 sklearn 中的 cluster 算法都实现了 函数/类 两种变体
 
 ### 3.1.1. DBSCAN
 

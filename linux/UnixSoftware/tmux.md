@@ -1,4 +1,4 @@
-# 1. tmux
+# 1. tmux Getting start
 
 * 一个终端复用器 terminal multiplexer  
 * 类似的还有 GNU Screen, Tmux与之功能类似, 但是普遍认为 Tmux 更强大
@@ -29,9 +29,10 @@ tmux 	[-2CDlNuVv] [-c shell-command] [-f file] [-L socket-name] [-S socket-path]
 * 每一个 session 都可以拥有多个 window
 * 每一个 window 可以单独显示在整面屏幕, 也可以分割成矩形的多个 panes
 
-## 1.2. Summary of terms - 名词总结
+## 1.2. Using tmux interactively
 
 
+### Copy and paste
 
 
 # 2. Default Key bindings - 默认的快捷键绑定
