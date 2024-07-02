@@ -13,9 +13,9 @@
   - [3.1. add - Add file contents to the index](#31-add---add-file-contents-to-the-index)
   - [3.2. status](#32-status)
   - [3.3. diff - Show changes between commits, commit and working tree, etc](#33-diff---show-changes-between-commits-commit-and-working-tree-etc)
-    - [diff Options](#diff-options)
+    - [3.3.1. diff Options](#331-diff-options)
   - [3.4. commit](#34-commit)
-    - [commit option](#commit-option)
+    - [3.4.1. commit option](#341-commit-option)
   - [3.5. restore](#35-restore)
   - [3.6. reset](#36-reset)
   - [3.7. rm](#37-rm)
@@ -31,13 +31,13 @@
     - [4.4.1. merge options](#441-merge-options)
   - [4.5. log](#45-log)
   - [4.6. stash - Stash the changes in a dirty working directory away](#46-stash---stash-the-changes-in-a-dirty-working-directory-away)
-    - [git stash push : 默认行为](#git-stash-push--默认行为)
-    - [stash - options](#stash---options)
+    - [4.6.1. git stash push : 默认行为](#461-git-stash-push--默认行为)
+    - [4.6.2. stash - options](#462-stash---options)
   - [4.7. tag - Create, list, delete or verify a tag object signed with GPG](#47-tag---create-list-delete-or-verify-a-tag-object-signed-with-gpg)
   - [4.8. worktree](#48-worktree)
 - [5. Sharing and Updating Projects](#5-sharing-and-updating-projects)
   - [5.1. fetch - Download objects and refs from another repository](#51-fetch---download-objects-and-refs-from-another-repository)
-    - [refspec](#refspec)
+    - [5.1.1. refspec](#511-refspec)
   - [5.2. pull - Fetch from and integrate with another repository or a local branch](#52-pull---fetch-from-and-integrate-with-another-repository-or-a-local-branch)
   - [5.3. push](#53-push)
   - [5.4. remote - Manage set of tracked repositories](#54-remote---manage-set-of-tracked-repositories)
@@ -47,7 +47,7 @@
     - [5.5.3. init 初始化子库](#553-init-初始化子库)
     - [5.5.4. update 子库更新核心命令](#554-update-子库更新核心命令)
     - [5.5.5. foreach 遍历所有子库](#555-foreach-遍历所有子库)
-    - [submodule 与 github/gitlab](#submodule-与-githubgitlab)
+    - [5.5.6. submodule 与 github/gitlab](#556-submodule-与-githubgitlab)
   - [5.6. subtree](#56-subtree)
     - [5.6.1. add 添加子库](#561-add-添加子库)
     - [5.6.2. pull 拉取更新](#562-pull-拉取更新)
@@ -58,7 +58,7 @@
   - [6.2. apply - Apply a patch to files and/or to the index](#62-apply---apply-a-patch-to-files-andor-to-the-index)
   - [6.3. cherry-pick - Apply the changes introduced by some existing commits](#63-cherry-pick---apply-the-changes-introduced-by-some-existing-commits)
   - [6.4. rebase](#64-rebase)
-    - [options](#options)
+    - [6.4.1. options](#641-options)
   - [6.5. revert](#65-revert)
 - [7. git-lfs Large File Storage (LFS)](#7-git-lfs-large-file-storage-lfs)
 - [8. Administration](#8-administration)
@@ -336,7 +336,7 @@ git diff [<options>] <blob> <blob>
       *  输入两个 commit 则是参数 commit 之间的比较
       *  `--path` 用来指定文件进行改动查看
 
-### diff Options
+### 3.3.1. diff Options
 
 * `-p` `-u` `--patch` : 生成对应的 diff patch.  
 * `-s` `--no-patch`   : 取消所有 diff 的输出效果
@@ -370,7 +370,7 @@ $ git commit --amend
 ```
 
 
-### commit option
+### 3.4.1. commit option
 
 
 * 
@@ -646,7 +646,7 @@ git stash store [(-m | --message) <message>] [-q | --quiet] <commit>
   * 立刻将工作区的改动存于后台, 并将工作区的文件还原到 HEAD 状态, 此时可以进行切换分支等操作
   * `-m <message>` : 给 stash 添加描述
 
-### git stash push : 默认行为
+### 4.6.1. git stash push : 默认行为
 
 ```sh
 # 默认行为
@@ -658,7 +658,7 @@ git stash [push [-p | --patch] [-S | --staged] [-k | --[no-]keep-index] [-q | --
 
 
 ```
-### stash - options
+### 4.6.2. stash - options
 
 
 
@@ -741,7 +741,7 @@ Remote-tracking branches 会同时进行更新.
 * 在不指定 remote 的时候, fetch 默认会从 default remote 即 origin 来获取代码, 如果为当前 branch 配置了 upstream 的话则会对应的从 upstream 来获取
   * 即默认操作是 `git fetch origin master` 
 
-### refspec
+### 5.1.1. refspec
 
 fetch 的最常用的使用方法　`git fetch [<options>] [<repository> [<refspec>…​]]`  中, refspec 是 git 定义的一个 概念：
 * 定义 which refs to fetch and which local refs to update. repository 定义存储库, 而 refspec 同时定义远端的分支和本地的分支.
@@ -961,7 +961,7 @@ update [--init] [--remote] [-N|--no-fetch] [--[no-]recommend-shallow]
 
 ### 5.5.5. foreach 遍历所有子库
 
-### submodule 与 github/gitlab  
+### 5.5.6. submodule 与 github/gitlab  
 
 最好使用相对 path, 这样无论是  http 格式 还是 ssh 格式, 都能够保持之前的 profile 进行子模组的 clone, 从而避免一些 权限问题
 
@@ -1129,7 +1129,7 @@ git rebase (--continue | --skip | --abort | --quit | --edit-todo | --show-curren
 参数:
 * `git rebase [-i | --interactive]`   交互式进行 rebash
 
-### options
+### 6.4.1. options
 
 
 * `--no-ff --force-rebase -f`  : 强制进行 rebase

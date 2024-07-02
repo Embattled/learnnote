@@ -10,7 +10,7 @@
 专用目的库:
 * argparse  : 专门用来处理 python 命令行参数的
 * getpass   : 专门用来处理密码输入的
-* ctypes    :
+* ctypes    : 用于在 Python 中调用 C 库
 
 # 2. os
 
@@ -128,7 +128,7 @@ Execute the command (a string) in a subshell:
   * On Unix, the return value is the exit status of the process encoded in the format specified for wait().
   * On Windows, the return value is that returned by the system shell after running command. 
 
-## Interface to the scheduler - 控制操作系统如何为进程分配 CPU 时间 
+## 2.4. Interface to the scheduler - 控制操作系统如何为进程分配 CPU 时间 
 
 该功能只在 某些 Unix 平台上可用
 
@@ -504,11 +504,11 @@ parser.parse_args(['"The Tale of Two Cities"'])
 # Namespace(short_title='"the-tale-of-two-citi')
 ```
 
-## parse_args() - 解析 CLI 命令
+## 5.3. parse_args() - 解析 CLI 命令
 
 * `parser.parse_args()` 一般就是直接无参数调用, 会直接翻译传入的命令行参数, 返回一个 `Namespace` object
 
-### Namespace - 存储命令解析结果
+### 5.3.1. Namespace - 存储命令解析结果
 
 * `Namespace` 就是定义在 argparse 包中的一个简单的类, 和字典类似, 但是 print()更加可读 
 * 可以使用 `vars()` 方法进行转换成字典
@@ -518,7 +518,7 @@ parser.parse_args(['"The Tale of Two Cities"'])
 `parser.parse_args(args=['--foo', 'BAR'], namespace=c)`
 
 
-## 5.3. 高级 args
+## 5.4. 高级 args
 
 除了基础的直接对 parser 里添加参数外, 还有其他特殊的参数类别  
 
@@ -527,7 +527,7 @@ parser.parse_args(['"The Tale of Two Cities"'])
 * ArgumentParser.add_subparsers
 * ArgumentParser.set_defaults
 
-### 5.3.1. Argument groups 参数分组
+### 5.4.1. Argument groups 参数分组
 
 * 可以将不同的参数归到一组里,
 * 这个组在参数调用的时候没有任何卵用
@@ -545,7 +545,7 @@ group.add_argument('--bar', action='store_false')
 # 添加至这个组的参数在打印参数说明的时候会单独分隔开, 方便区分
 ```
 
-### 5.3.2. mutual exclusion 矛盾参数
+### 5.4.2. mutual exclusion 矛盾参数
 
 * 可以将不同的参数归到一组里, 这个组的参数只能出现一种
 * 每次调用该参数会返回一个类似于`ArgumentParser` 的对象, 通过调用该对象的 add_argument来实现矛盾参数
@@ -561,7 +561,7 @@ group.add_argument('--foo', action='store_true')
 group.add_argument('--bar', action='store_false')
 ```
 
-### 5.3.3. subparsers 子解释器
+### 5.4.3. subparsers 子解释器
 
 ```py
 ArgumentParser.add_subparsers(
@@ -590,7 +590,7 @@ ArgumentParser.add_subparsers(
 `add_subparsers()` 方法尽管一般无参数调用, 但是还是说明下参数功能:
 * 
 
-### 5.3.4. Parser defaults
+### 5.4.4. Parser defaults
 
 `ArgumentParser.set_defaults(**kwargs)` 
 
@@ -616,7 +616,7 @@ args=parser.parse_args()
 args.default_func()
 ```
 
-## 5.4. Parser defaults
+## 5.5. Parser defaults
 
 
 
@@ -639,32 +639,40 @@ foreign function library for Python, 外部函数库
 * 用于将库函数应用在纯 Python 中
 
 
-## 7.1. 使用指南
-
+## 7.1. ctypes tutorial
+使用指南:
 1. 建立动态库示例
 2. 获取动态库函数
 
-### 7.1.1. 获取动态库实例
+### 7.1.1. Loading dynamic link libraries
 
 
+ctypes 会导出一个 `cdll` 的对象, 其是一个 LibraryLoader. 在 Windows 上体现为 `windll` `oledll` 对象, 用于加载动态链接库.
 动态库默认实例, You load libraries by accessing them as attributes of these objects
 * cdll      : standard cdecl calling convention
 * windll    : stdcall calling convention
 * oledll    : stdcall calling convention, and assumes the functions return a Windows `HRESULT` error code.
   * The error code is used to automatically raise an `OSError` exception when the function call fails.
-* 可以按照访问成员的方式来访问动态库
+* 可以按照访问成员的方式来访问动态库 (在 windows 上)
+  * cdll 使用标准 cdecl 调用约定来导出函数的库
+* 在 linux 中, 需要在参数中指定 库的后缀名, Windows 上通过访问成员的方式在 Linux 上可能不可用
+  * 调用 `cdll.LoadLibrary("lib.so")` 获取库的实例
+  * 调用 CDLL 的构造函数获取实例 `CDLL("lib.so")`
+
+Windows 上的示例
+* 对于 Windows, Python 实现会自动给末尾添加 `.dll` 后缀, 因此只要输入动态库名称即可
+
 ```py
 from ctypes import *
 print(windll.kernel32)  
+# 访问 windows 的 C 库实例
 print(cdll.msvcrt)      
+
+# 获取动态库的实例
 libc = cdll.msvcrt    
 ```
 
-* 对于 Windows, Python 实现会自动给末尾添加 `.dll` 后缀, 因此只要输入动态库名称即可
-* 对于 Linux, 则需要精确的输入具体的动态库名称, e.g. `libc.so.6`, 因此不适用于 成员元素 的方式来获取动态库
-  * 通过 成员函数 的方式来访问 `.LoadLibrary(动态库名称)`
-  * 通过动态库类的构造函数来重新定义实例
-
+Linux 上的示例, 对于 Linux, 则需要精确的输入具体的动态库名称, e.g. `libc.so.6`, 因此不适用于 成员元素 的方式来获取动态库
 ```py
 cdll.LoadLibrary("libc.so.6")  
 # <CDLL 'libc.so.6', handle ... at ...>
@@ -673,18 +681,185 @@ libc
 # <CDLL 'libc.so.6', handle ... at ...>  
 ```
 
-### 7.1.2. 获取动态库函数  
+### 7.1.2. Accessing functions from loaded dlls - 获取动态库函数  
+
+通过直接访问 dll objects 的成员即可使用函数
+
+```python
+libc.printf
+# <_FuncPtr object at 0x...>
+```
+
+要注意, Windows 的原生库常常包含了同一个函数的两个版本, ANSI 和 UNICODE 版本.
+* UNICODE 在函数的末尾为 `W`
+* ANSI 在函数的末尾追加了 `A`
+* windll 不会自动根据环境调用对应的版本, 因此在使用中需要手动选择对应的版本, 并传入对的参数
+* 有的时候,  dlls 获取的函数名称不是 Pyton 的有效标识符, 这种时候需要将字符完整的传入 `getattr()`  函数来获取正确的函数地址
+
+```py
+getattr(cdll.msvcrt, "??2@YAPAXI@Z")  
+# <_FuncPtr object at 0x...>
+```
+
+还是在 Windows, 一些 dlls 导出的函数并不是按照名称, 而是按照标号顺序排序的, 这种时候可以通过直接访问库的ojbect的下标来访问函数, 但是感觉用处不大
+
+### 7.1.3. Calling functions - 调用动态库函数  
+
+获取了库文件的标号后, 即可按照 Python 的标准来调用对应的库函数
+
+在 Python 中是没有办法获取到 C 库中的函数参数信息的, 必须直接查看对应库的头文件或者文档.  
+
+此外, 错误的调用很容易导致 Python 崩溃, 特别是 C 中的段错误.  
 
 
-### 7.1.3. 调用动态库函数  
+### 7.1.4. Fundamental data types
 
-## 7.2. 文档
+对于参数:
+* None    :  C NULL 指针
+* 整数    : 默认的 C int
+* btypes  : 作为指针的内存地址
+* unicode string : 
+是可以直接传递给 C 函数的类型
 
-### 7.2.1. 动态库查找
+对于其他类型, ctypes 库定义了以 `c_*` 开头的各类 type, 用于对应 C 中的各种类型
+* 具体的, 覆盖了 python 中的 float, int, string, None 几类
 
+
+这几种类型是作为特殊的兼容类存在的, 访问值和更改值通过不同的方法
+```py
+i = c_int(42)
+# 通过 print 可以直接打印类型和值
+print(i)
+# c_long(42)
+
+print(i.value) # 正确的访问值的方法
+# 42
+
+i.value = -99
+print(i.value)
+# 99 可以修改值
+```
+
+此外, 由于 Python 中的一些原生类型是不可变的, 因此给 char, w_char 等类型进行重新赋值会更改目标的地址. 同时, 直接把这种类型传递给 C 参数也很危险. 因为是不可修改的内存块.
+这种情况下, 可以通过特定函数 `create_string_buffer()` 来创建可变内存块, 并通过特定的 `.raw` 属性来访问原本的内存值
+如果要创建 unicode 的内存空间, 对应 `wchar_t`, 使用 `create_unicode_buffer()`
+
+此外, 正如之前所说的, 除了4中特殊类型, 所有的参数都需要转为 ctype 的对象才能传入 C 函数
+
+```python
+printf = libc.printf
+
+printf(b"Hello, %s\n", b"World!")
+# Hello, World!
+# 14
+
+printf(b"%f bottles of beer\n", 42.5)
+# Traceback (most recent call last):
+#   File "<stdin>", line 1, in <module>
+# ArgumentError: argument 2: TypeError: Don't know how to convert parameter 2
+
+printf(b"An int %d, a double %f\n", 1234, c_double(3.14))
+# An int 1234, a double 3.140000
+# 31
+```
+
+### 7.1.5. Specifying the required argument types (function prototypes)
+
+通过指定一个 C 函数实例的 `.argtypes` 属性, 可以让传入的参数非 ctypes 标准类型的时候进行自动转换  
+除此之外, 在特定平台 (Apple 的 ARM64) 上可以用于指定特定的 可变参数的函数
+
+```py
+printf.argtypes = [c_char_p, c_char_p, c_int, c_double]
+
+printf(b"String '%s', Int %d, Double %f\n", b"Hi", 10, 2.2)
+# String 'Hi', Int 10, Double 2.200000
+# 37
+
+printf(b"%d %d %d", 1, 2, 3)  # 会由 Python 来进行报错
+# Traceback (most recent call last):
+#   File "<stdin>", line 1, in <module>
+# ArgumentError: argument 2: TypeError: wrong type
+```
+
+对于自定义的类型, 有两点需要注意
+* 实现 `_as_parameter_` 属性 : 其值等于最终传入  C 函数的内容
+* 实现 `from_param()` 方法 : 用于将 Python 类型转为 C 头文件可以接受的类型
+  * 该函数接受 Python 类型, 返回该类的对象 (_as_parameter 被正确设置的对象)
+这样该函数就可以作为 argtypes 被指定为 库函数的属性
+
+### 7.1.6. Return types - 定义函数的返回值
+
+通过设置函数的 restype 属性来定义函数的返回值类型, 在一定程度上自动化函数的调用
+
+对于返回值代表函数是否正常结束的时候, 也可以将返回值设定为结果检查的类型
+
+### 7.1.7. Passing pointers (or: passing parameters by reference)
+
+如果 C 的函数需要传入的是数据的指针
+* 函数可能需要修改数据的内容 , 例如  `scanf`
+* 数据太大无法直接传递
+此时需要通过引用来传递
+
+通过 ctypes 的工具函数
+* byref()  获取一个变量的地址
+* pointer() 把一个变量构建成完整的 Python 指针对象 (相对来说功能丰富但是较慢)
+
+### 7.1.8. Arrays
+
+
+
+## 7.2. ctypes 文档
+
+
+### 7.2.1. Finding shared libraries 动态库查找
+
+在某一个平台上, 同一个库可能有不同的版本, 一般情况下最新的版本应该被使用, ctypes 提供了一个工具函数用于定位库
 `ctypes.util.find_library(name)`:
 * `name` : 动态库的名称, 不需要带任何前缀 `lib` 和后缀 `.so` 以及版本 `.6` 
 * return : pathname, 如果在当前平台找不到该库则返回 `None`
 * 用和 C 编译器相同的方法去查找并定位一个 动态库
 * can help to determine the library to load.
 
+自 3.6 起: Changed in version 3.6: On Linux, the value of the environment variable LD_LIBRARY_PATH is used when searching for libraries, if a library cannot be found by any other means.
+
+### 7.2.2. Loading shared libraries
+
+共享库可以通过 预制的对象来加载, 预制对象是 LibraryLoader 的实例
+* 通过对象的 LoadLibrary() 方法
+* 或者将库作为加载器的属性进行检索
+
+预制的加载器有: These prefabricated library loaders are available
+* ctypes.cdll     CDLL 的实例
+* ctypes.windll   WinDLL 的实例 (Windows限定)
+* oledll          OleDLL 的实例 (Windows限定)
+* ctypes.pydll    PyDLL 的实例
+* ctypes.pythonapi    专门用于操作 C Python API 的实例 (基于 PyDLL  )
+
+### 7.2.3. Utility functions - 库的工具函数
+
+
+### 7.2.4. Structured data types
+
+定义依了一系列虚基类用于 C - Python 的结构体交互
+
+* class ctypes.Union(*args, **kw)
+* class ctypes.BigEndianStructure(*args, **kw)
+* class ctypes.LittleEndianStructure(*args, **kw)
+* Python 3.11 新内容
+  * class ctypes.BigEndianUnion(*args, **kw)
+  * class ctypes.LittleEndianUnion(*args, **kw)
+* 要注意, 当结构和 Unions 的字节顺序和当前平台的顺序不同时, 该结构体不能包含指针类型, 以及任何包含指针类型的数据类型
+
+
+`class ctypes.Structure(*args, **kw)`   : Abstract base class for structures in native byte order.
+
+
+
+### 7.2.5. Arrays and pointers
+
+定义了数组和指针的虚基类, 具体使用方法还是需要参照 Guide
+
+* `class ctypes.Array(*args)`
+* `class ctypes._Pointer`
+  * 会在函数 `pointer()` 函数被调用的时候自动执行
+  * 该类型可以通过索引访问, 但是没有长度, 因此负数索引和超出长度的访问都有可能导致程序崩溃

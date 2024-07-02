@@ -4,7 +4,7 @@
 
 在 图像方面有很高的成果
 
-# 2. Nural Surface Reconstruction
+# 2. Nural 3D Representation
 
 通过 coordinate-based multi-layer perceptrons (MLPs) 来将一个场景表示为一个隐式的函数  
 
@@ -98,7 +98,17 @@ NeRF的训练:
 * 1~2 day on V100
 
 
-### 2.1.2. Topics
+
+
+### NeRF Conclusion 
+
+
+#### 2.1.2. Topics
+
+
+* 动态场景, Time-Space 的 NeRF 学习, 使之能够表示一段连续时间下的动态场景
+* 预训练 MLP, 减少实际学习中的图片数量需求和学习时间
+* 泛化 NeRF, 减少对学习数据的相机位姿依赖 (低精度位姿, 无位姿)
 
 * mip-NeRF 360 consistently produces fewer artifacts and higher reconstruction quality. 
 * low-dimensional generative latent optimization (GLO) vectors introduced in NeRF in the Wild, learned real-valued latent vectors that embed appearance information for each image. the model can capture phenomena such as lighting changes without resorting to cloudy geometry, a common artifact in casual NeRF captures. 
@@ -108,7 +118,7 @@ NeRF的训练:
 * NeRF's baked representations
 
 
-### 2.1.3. Practical Concerns
+#### 2.1.3. Practical Concerns
 
 
 * 输入数据 : a dense collection of photos from which 3D geometry and color can be derived, every surface should be observed from multiple different directions.
@@ -117,14 +127,14 @@ NeRF的训练:
 * As photos may inadvertently contain sensitive information, we automatically scan and blur personally identifiable content.
 
 
-### 2.1.4. Rest questions
+#### 2.1.4. Rest questions
 
 
 * with scene segmentation, adding semantic information to the scenes
 * Adapting NeRF to outdoor photo collections
 * Real time render
 
-### 2.1.5. Referance
+#### 2.1.5. Referance
 
 
 Google Blog
@@ -136,7 +146,51 @@ https://ai.googleblog.com/2023/06/reconstructing-indoor-spaces-with-nerf.html
 Mildenhall, Ben, et al. “NeRF: Representing Scenes as Neural Radiance Fields for View Synthesis.” Computer Vision – ECCV 2020,Lecture Notes in Computer Science, 2020, pp. 405–21, https://doi.org/10.1007/978-3-030-58452-8_24.
 
 
+## Neural Surface Reconstruction
 
+基于 NeRF 的思想, 修改隐含表达的公式, 实现更容易对 3D 场景进行表面建模 (Surface Reconstruction)
+
+
+### NeuS 
+
+该方向的开山作 : SDF 表达 (?), 基于 Radiance Fields 的思想进行魔改.
+* 好像 SDF 的提出并不是 NeuS?  
+  * 2020: Multiview Neural Surface Reconstruction by Disentangling Geometry and Appearance
+  * NeuS 的主要理论工作是提出了基于 SDF 的 Render 方法, 使得 NeRF 的学习 pipeline 可以直接应用到 Surface Reconstruction 上
+* 隐式表达的 MLP
+  * 输入空间坐标 x, 输出到对应物体表面的 (最近?) 距离 distance
+  * 输入 空间坐标 x 和 观看方向 v, 输出观察颜色
+* surface 建模
+  * 读取 MLP 网络内所有的 f(x) = 0 即可
+* 基于 NeRF 学习方法
+  * 定义了 probability density function $\phi_s(f(x))$ , 简称  S-density
+  * $\phi(x)=se^{-sx}/1+e^{-sx}$ 的定义其实是 sigmoid 函数 $\Phi_s(x)=(1+e^{-sx})^-1$的导数
+  * 从概念上, $\phi_s(x)$ 可以定义为任意 以0 为中心的单峰密度分布 (bell-shape)
+    * bell-shape 钟形函数, 连续的数学曲线, 在 0 处取得最大值, 沿y轴对称
+    * bell shape 函数的积分通常是 S 形函数
+  * 作者在这里使用 该函数因为计算方便
+  * $\phi_s(x)$ 可以理解为 logistic density distribution, 该分布的标准差为 1/s, s 也是一个可以学习的参数, 1/s 越接近于0, 即 s 越大, 代表训练越接近拟合
+    * 该函数值代表了此处空间接近附近表面的程度
+* 渲染方法 用以生成 RGB 和训练数据做 loss
+  * 同 NeRF 类似, 也是定义从相机中心 emit 的 ray, 采样路径上的点, 获得最终图像的颜色
+    * $C(o,v)=\int_0^{+\infin}w(t)c(p(t),v)dt$
+  * 不同于体渲染, 基于SDF的渲染是本论文新提出来的, 因此渲染的时候采样点的权重计算方法也进行了一些讨论. 为了满足可学习性, 权重的计算函数应当满足
+    * 无偏性: 在与表面相交的空间点, 理应取得最大的权重
+    * 遮挡 aware : 如果ray方向的空间射线经过多次表面, 则理应返回最近的表面的颜色, 即最近的点取得尽可能大的权重
+  * 推导过程
+    * 使用 S-density 作为 NeRF 的体密度, 采用相同的积分方法计算权重 剩余光线量乘以当前位置的密度 -> occlusion-aware , 但是有偏差
+    * 使用标准化的 S-density 直接作为权重, 分母为 0到无穷的S-density积分, 分子为当前位置的 S-density -> 无偏, 但是无法 occlusion-aware
+  * NeuS方法 : 定义不透明度 opaque 函数 $\rho(t)$
+    * 通过推导的出来, 首先将距离函数添加了角度项
+      * $f(p(t))=-|cos(\theta)|(t-t^*)$
+    * 通过推导, 得出 opaque 函数 如下可以同时满足两个要求
+      * $\rho(t)=\frac{-\frac{d\Phi_s}{dt}(f(p(t)))}{\Phi_s(f(p(t)))}$
+    * 此时权重计算的方法
+      * $T(t)\rho(t)=|cos(\theta)|\phi_s(f(p(t)))$
+
+## occupancy grids
+
+在 2020 年之前比较多  
 
 # 3. 2D - Implicit Image Function
 

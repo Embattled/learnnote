@@ -1,15 +1,18 @@
 # 1. Text Processing Services
 
 字符串操作处理的模组
+a wide range of string manipulation operations and other text processing services.
 
 * `Binary Data Services` 下面的 `codecs` 与该模组集合高度关联
 * built-in 类型 str 与 string 包高度关联
 
 # 2. string — Common string operations
 
-
+定义了一些用于辅助 内置类 str 的方法的函数, 还有一些用于快速书写正则表达式的常量 
 
 # 3. re — Regular expression operations
+
+标准 python STL 正则表达式库, 一般足够使用. 在此基础之上还有外部库 `regex`, 提供了与 `re` 的完整兼容以及对 Unicode 的更好的支持
 
 要在python中使用正则表达式, 需要导入`re`包  
 `import  re`  
@@ -104,3 +107,5 @@ re.search('x-{2,4}?x', 'x--xx----x')
 re.search('(bar)+', 'foo barbarbar baz')
 
 ```
+
+# difflib — Helpers for computing deltas

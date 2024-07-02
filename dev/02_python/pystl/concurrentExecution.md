@@ -9,13 +9,37 @@ The appropriate choice of tool will depend on the:
 
 同时, 关于嵌套调用的新模组也放在该章节 (subprocess)
 
-# threading - Thread-based parallelism
 
-基于多线程的程序并行执行
+编程思路: 通过 多线程/多进程 实现高速化处理的可能性取决于该任务是 IO-bound / CPU-bound (IO密集型还是CPU密集型)
+* 多线程适合 IO-bound 任务, 更加容易扩展, 多线程的上线取决于 CPU (各个线程轮询, 分别等待 IO, 某一个线程等待 IO 的适合其他线程执行计算) 需要线程锁
+* 多进程 适合 CPU-oound, 多个进程在单独的和核心上运行, 有自己的内存空间, 因此不需要线程锁, 但是需要手动设置进程之间的必要数据复制以及对应的锁
+
+# 2. threading — Thread-based parallelism 基于线程的并行
+
+基于多线程的程序并行执行, 对于计算密集型的任务可能不会有本质上的提速  
 
 
 
-# 2. subprocess - Subprocess management 子进程
+
+# 3. multiprocessing — Process-based parallelism 基于进程的并行
+
+API的构造上和 threading 相似
+* 支持  both local and remote concurrency
+* Effectively side-stepping the Global Interpreter Lock by using subprocesses instead of threads.
+* Fully leverage multiple processors on a given machine.
+
+属于性能强大的多进程, 一个缺点就是启动时间很长, 因此需要比较重的任务才能体现出优点
+(Python 3.12 以后提出的一个新的 sub-interpreters 相当于轻量化的 multiprocessing, 启动时间较短)
+
+
+# concurrent.futures — Launching parallel tasks
+
+截止 python 3.12, The concurrent package 里面只有一个 concurrent.futures 一个子包
+
+里面包含了并行执行程序的最高级的接口, 看起来使用非常方便
+
+
+# 4. subprocess - Subprocess management 子进程
 
 `subprocess` 模组允许程序创建一个新的 子进程, 并同时链接其 input/output/error 流, 获取其返回代码
 
@@ -27,7 +51,7 @@ The appropriate choice of tool will depend on the:
 * subprocess.run : 阻塞调用子进程
 
 
-## 2.1. subprocess.run
+## 4.1. subprocess.run
 
 尽管是最关键的函数,  run 其实是 python3.5 才加入的功能
 
@@ -60,7 +84,7 @@ The appropriate choice of tool will depend on the:
 * 如果进程的返回的值不为 0 , 则会触发异常 ` CalledProcessError`
 * 此时由于函数没有正常结束, 所以 exit code 可以从异常对象获取, 同理  stdout and stderr if they were captured.
 
-### 2.1.1. CompletedProcess
+### 4.1.1. CompletedProcess
 
 <!-- 完 -->
 run 函数的返回值 `class subprocess.CompletedProcess` , 代表了一个子进程的结束, 可以从该类里获取一些信息  
@@ -72,7 +96,7 @@ run 函数的返回值 `class subprocess.CompletedProcess` , 代表了一个子�
 * stderr : 错误信息捕捉
 * `check_returncode()` : 主动查验并报错
 
-### 2.1.2. Other Constant
+### 4.1.2. Other Constant
 <!-- over -->
 模组里的一些实用常量
 
@@ -81,7 +105,7 @@ run 函数的返回值 `class subprocess.CompletedProcess` , 代表了一个子�
 * `subprocess.STDOUT`   : can be used as the stderr argument to `Popen`. indicates that standard error should go into the same handle as standard output.
 
 
-## 2.2. class subprocess.Popen
+## 4.2. class subprocess.Popen
 
 整个 subprocess 模组最终要的类, 作为其他类和函数 `subprocess.run` 的底层实现, 用于实际上的创建和管理子线程  
 * 模组的其他子进程相关函数, 大部分传入该类的构造函数中
@@ -140,7 +164,7 @@ umask=- 1, encoding=None, errors=None, text=None, pipesize=- 1, process_group=No
 
 
 
-## 2.3. Older high-level API
+## 4.3. Older high-level API
 
 由于 run 是3.5 才被加入的, 所以 older api 也很重要, 用来保持与旧版本的兼容性
 
@@ -150,14 +174,4 @@ umask=- 1, encoding=None, errors=None, text=None, pipesize=- 1, process_group=No
 
 `subprocess.check_call(args, *, stdin=None, stdout=None, stderr=None, 参数省略)` 
 
-
-# 3. threading — Thread-based parallelism 基于线程的并行
-
-
-# 4. multiprocessing — Process-based parallelism 基于进程的并行
-
-API的构造上和 threading 相似
-* 支持  both local and remote concurrency
-* Effectively side-stepping the Global Interpreter Lock by using subprocesses instead of threads.
-* Fully leverage multiple processors on a given machine.
 

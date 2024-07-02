@@ -96,8 +96,6 @@
 - [6. numpy 常规功能](#6-numpy-常规功能)
   - [6.1. numpy 的IO](#61-numpy-的io)
     - [6.1.1. 类型转换](#611-类型转换)
-    - [6.1.2. numpy binary files](#612-numpy-binary-files)
-    - [6.1.3. text file](#613-text-file)
 - [7. config](#7-config)
   - [7.1. np.set\_printoptions](#71-npset_printoptions)
     - [7.1.1. numpy.shape](#711-numpyshape)
@@ -515,7 +513,7 @@ numpy.concatenate((a1, a2, ...), axis=0, out=None, dtype=None, casting="same_kin
 
 ### 3.2.6. Tiling arrays
 
-平铺一个 array 
+平铺一个 array, 沿着某一个维度复制整个 array
 
 * `numpy.tile(A, reps)` : Construct an array by repeating A the number of times given by reps.
   * reps : array_like. The number of repetitions of A along each axis.
@@ -704,12 +702,16 @@ numpy 对于各种类型的输出支持的很好, 要注意对于 pandas 的 Dat
 
 ### 3.7.1. NumPy binary files (NPY, NPZ) - 标准Numpy格式的二进制的 io
 
-* load
+最基础的保存方法, 因为是二进制的, 所以最好只通过 numpy 访问, 文件后缀为 `.npy` or `.npz`
+
+* load(file, mmap_mode=None, allow_pickle=False, fix_imports=True, encoding='ASCII')
   * 对于 npy 文件,  a single array is returned.
   * 对于 npz 文件 dictionary-like object is returned, containing {filename: array} key-value pairs, one for each file in the archive.
-* save 
-* 特殊格式 .npz 的存储 savez
-* 带压缩的 .npz 的存储 savez_compressed
+
+* save((file, arr, allow_pickle=True, fix_imports=True))
+* savez   : 特殊格式 .npz 的存储
+* savez_compressed  : 带压缩的 .npz 的存储
+
 
 
 * `numpy.load(file, mmap_mode=None, allow_pickle=False, fix_imports=True, encoding='ASCII', *, max_header_size=10000)`
@@ -728,22 +730,44 @@ numpy 对于各种类型的输出支持的很好, 要注意对于 pandas 的 Dat
   * `file`, file, str, or pathlib.Path. 注意, 这个保存路径可以不包括 `.npy` 的后缀, 如果没有该后缀的话会被自动加上
   *  arr :要保存的 array
 
-
+* `numpy.savez(file, *args, **kwds)`  : 将多个array作为 dict 存入 .npz 文件中
+  * 如果要手动指定 array 在访问时候的名称, 则使用关键字参数传入 `savez(fn, x=x, y=y)`
+  * 如果作为位置参数传入 array, 则会自动命名为 `arr_0, arr_1, etc.`
 
 
 ### 3.7.2. Text files
 
 以可以直接读取的 txt 文件来存储数据  
+txt 文件保存后的访问比较便捷, 也容易在其他应用间交互
 
 保存 save :
 * `numpy.savetxt(fname, X, fmt='%.18e', delimiter=' ', newline='\n', header='', footer='', comments='# ', encoding=None)`
-  * 将一个 array 保存到 txt
-  * X : array , 只支持 1D 或者 2D
+  * 将一个 1D or 2D array_like 保存到 txt, 该函数支持非 numpy 的 array (python 自带的数组也可以用)
+  * X : array , 注意只能作用在 1/2 维数组, 只支持 1D 或者 2D
   * delimiter : 2D 数据的时候分割列的符号
   * newline : 1D 数据或者 2D数据分割行 的符号
   * header  : 很方便, 在参数里就能直接传入数据的首列标识符, 还会贴心的加上 `#`
   * footer  : 同理, 添加到文件末尾  
   * comments: 会被添加到 header 和 footer 
+
+* `numpy.loadtxt(fname, `dtype=<class 'float'>`, comments='#', delimiter=None, converters=None, skiprows=0, usecols=None, unpack=False, ndmin=0, encoding='bytes', max_rows=None, *, like=None)`
+
+```py
+numpy.savetxt(fname, X, 
+  fmt='%.18e', delimiter=' ', newline='\n', 
+  header='', footer='', comments='# ', 
+  encoding=None)
+# fmt : str or [str..] : 用于指定数据的记录格式, 小数点等
+
+# delimiter : str, 列之间的分隔符
+# newline   : str, 行之间的分隔符
+
+# header    : str, 写在文件最开头的地方
+# footer    : str, 写在文件的末尾
+# comments  : str, 对于 header 和 footer 的注释符号, 主要用于 numpy.loadtxt 的识别
+
+# encoding : {None, str
+```
 
 
 ### 3.7.3. Raw binary files
@@ -1456,43 +1480,9 @@ numpy 的 IO 也一定程度上基于 pickle, 具有一定的不安全性
 * ndarray.tofile(fid[, sep, format])
 
 
-### 6.1.2. numpy binary files
-
-最基础的保存方法, 因为是二进制的, 所以最好只通过 numpy 访问, 文件后缀为 `.npy`
-
-* load(file, mmap_mode=None, allow_pickle=False, fix_imports=True, encoding='ASCII')
-* save((file, arr, allow_pickle=True, fix_imports=True))
-* savez
-* savez_compressed
-
-### 6.1.3. text file
-
-txt 文件保存后的访问比较便捷, 也容易在其他应用间交互
-
-* numpy.savetxt 将一个 1D or 2D array_like 保存到 txt
-  * 注意只能作用在 1/2 维数组
-  * 该函数支持非 numpy 的 array (python 自带的数组也可以用)
-* numpy.loadtxt(fname, `dtype=<class 'float'>`, comments='#', delimiter=None, converters=None, skiprows=0, usecols=None, unpack=False, ndmin=0, encoding='bytes', max_rows=None, *, like=None)
-
-```py
-numpy.savetxt(fname, X, 
-  fmt='%.18e', delimiter=' ', newline='\n', 
-  header='', footer='', comments='# ', 
-  encoding=None)
-# fmt : str or [str..] : 用于指定数据的记录格式, 小数点等
-
-# delimiter : str, 列之间的分隔符
-# newline   : str, 行之间的分隔符
-
-# header    : str, 写在文件最开头的地方
-# footer    : str, 写在文件的末尾
-# comments  : str, 对于 header 和 footer 的注释符号, 主要用于 numpy.loadtxt 的识别
-
-# encoding : {None, str
 
 
-numpy.loadtxt(fname, `dtype=<class 'float'>`, comments='#', delimiter=None, converters=None, skiprows=0, usecols=None, unpack=False, ndmin=0, encoding='bytes', max_rows=None, *, like=None)
-```
+
 
 # 7. config
 

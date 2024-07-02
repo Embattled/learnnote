@@ -19,6 +19,8 @@
       - [ARM march=](#arm-march)
     - [GNU/Linux Options - GNU Linux 系统命令](#gnulinux-options---gnu-linux-系统命令)
     - [x86 Options - x86 平台选项](#x86-options---x86-平台选项)
+  - [Options for Linking - 链接选项](#options-for-linking---链接选项)
+  - [Options for Code Generation Conventions](#options-for-code-generation-conventions)
 
 # 1. GCC, the GNU Compiler Collection
 
@@ -433,5 +435,30 @@ Permissible names are: ‘armv4t’, ‘armv5t’, ‘armv5te’, ‘armv6’, �
 
 ### x86 Options - x86 平台选项 
 
+
+## Options for Linking - 链接选项
+
+
+## Options for Code Generation Conventions
+
+Code Generation COnventions 与机器无关, 文档给出的都是非默认的那一方
+
+
+* `-fpic`  : 生成 position-independent code (PIC) 用于 shared library.
+  * 会把代码中的 constant addresses 打包成一个 global offset table (GOT).
+  * 加载动态链接库的 dynamic loader 在执行程序的时候会解析该 GOT.
+  * dynamic loader 不是 GCC 的一部分, 而是操作系统. 针对不同操作系统, GOT 表的上限都不同. 如果超过限制了, 使用 `-fPIC` 选项.
+    * SPARC 8k
+    * AArch64 28k
+    * m68k, RS/6000 32k
+    * x86  无限制
+  * PIC 代码需要机器支持. 
+    * x86 机器上, GCC 支持 System V, 不支持 Sun 386i
+    * IBM RS/6000 机器的代码总是 PIC 的
+  * 当该 flag 生效时 宏 `__pic__` 和 `__PIC__` 被设置成 1
+* `-fPIC` : 生成 PIC 代码, 备用模式
+  * 只在  AArch64, m68k, PowerPC and SPARC 机器上与 `fpic` 不同
+  * 当该 flag 生效时 宏 `__pic__` 和 `__PIC__` 被设置成 2
+  * 为了稳健, 应该总是使用 `fPIC` (Chatgpt 提供的示例)
 
 
