@@ -1,4 +1,4 @@
-# Netplan 设置网络
+# 1. Netplan 设置网络
 
 新出的Ubuntu服务器18.04版本修改了IP地址配置程序, Ubuntu和Debian的软件架构师删除了以前的ifup/ifdown命令和/etc/network/interfaces配置文件, 改为使用/etc/netplan/01-netcfg.yaml和sudo netplay apply命令管理IP地址.
 
@@ -6,7 +6,7 @@
 https://netplan.io/examples
 
 
-## 1.  Netplan configuration files
+## 1.1.  Netplan configuration files
 
 目录
 /etc/netplan  下的  
@@ -14,7 +14,7 @@ The configuration file might have a name such as` 01-network-manager-all.yaml `o
 
 通过目录可以对网卡进行初始化的配置  
 
-## 2. 启用以及开启DHCP
+## 1.2. 启用以及开启DHCP
 
 ```shell
 network:

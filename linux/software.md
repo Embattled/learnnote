@@ -48,7 +48,7 @@ RPM 二进制包命名的一般格式如下：
 
 
 
-## 1.3. APT
+# 1.3. APT
 
 APT由几个名字以“apt-”打头的程序组成。apt-get、apt-cache 和apt-cdrom是处理软件包的命令行工具。  
 Debian 使用一套名为 Advanced Packaging Tool（APT）的工具来管理这种包系统,就是最常用的 Linux 包管理命令都被分散在了 apt-get、apt-cache 和 apt-config 这三条命令当中
@@ -60,7 +60,7 @@ Debian 使用一套名为 Advanced Packaging Tool（APT）的工具来管理这�
 
 在 apt  中, 软件的各个文件的安装位置在 `.deb` 文件中都写死了, 很难修改安装位置
 
-### 1.3.1. 基础被替换的命令
+## 1.3.1. 基础被替换的命令
 
 | apt 命令         | 取代的命令           | 命令的功能                     |
 | ---------------- | -------------------- | ------------------------------ |
@@ -74,7 +74,7 @@ Debian 使用一套名为 Advanced Packaging Tool（APT）的工具来管理这�
 | apt search       | apt-cache search     | 搜索应用程序                   |
 | apt show         | apt-cache show       | 显示安装细节                   |
 
-### 1.3.2. 软件列表
+## 1.3.2. 软件列表
 
 | 新的apt命令      | 命令的功能                        |
 | ---------------- | --------------------------------- |
@@ -153,3 +153,15 @@ update-alternatives --set java /opt/jdk1.8.0_91/bin/java
 
 
 ```
+
+# Snap
+
+snap 是由 ubuntu 的母公司 Canonical 所推出的包管理引擎 
+
+Snaps are Linux app packages for desktop, cloud and IoT that are self-contained, simple to install, secure, cross-platform, and dependency-free.
+https://snapcraft.io/docs
+
+snap 的特点是 支持索引的自动更新, 并且软件包会裕兴在 confined and transaction-based environment 
+
+snap 能够帮助桌面用户轻松的安装和运行 spotify 或 slack 等 应用程序. 提供了 snap store 应用商店作为应用平台  
+

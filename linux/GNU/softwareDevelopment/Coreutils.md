@@ -8,6 +8,7 @@
   - [7.1. sort: Sort text files](#71-sort-sort-text-files)
 - [8. Operating on fields](#8-operating-on-fields)
 - [9. Operating on characters](#9-operating-on-characters)
+  - [tr: Translate, squeeze, and/or delete characters](#tr-translate-squeeze-andor-delete-characters)
 - [10. Directory listing](#10-directory-listing)
 - [11. Basic operations](#11-basic-operations)
 - [12. Special file types](#12-special-file-types)
@@ -188,6 +189,21 @@ These commands work with (or produce) sorted files.
         9.1.3 Squeezing repeats and deleting
     9.2 expand: Convert tabs to spaces
     9.3 unexpand: Convert spaces to tabs
+
+## tr: Translate, squeeze, and/or delete characters
+
+转换, 压缩, 删除字符
+
+`tr [option]… string1 [string2]`
+
+从标准输入源输入字符, 处理后输出到标准输出, 因此主要的使用方法就是用 管道 `|`连接
+* translate 字符, 可选的删除重复的字符
+* 删除重复字符
+* 删除字符
+* 删除字符, 然后删除重复字符
+总之就是三个功能组合出的 4 种工作模式  
+
+
 
 # 10. Directory listing
 
@@ -817,6 +833,7 @@ env
   - [7.1. sort: Sort text files](#71-sort-sort-text-files)
 - [8. Operating on fields](#8-operating-on-fields)
 - [9. Operating on characters](#9-operating-on-characters)
+  - [tr: Translate, squeeze, and/or delete characters](#tr-translate-squeeze-andor-delete-characters)
 - [10. Directory listing](#10-directory-listing)
 - [11. Basic operations](#11-basic-operations)
 - [12. Special file types](#12-special-file-types)

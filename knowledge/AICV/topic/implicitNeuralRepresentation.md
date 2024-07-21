@@ -4,7 +4,7 @@
 
 在 图像方面有很高的成果
 
-# 2. Nural 3D Representation
+# 2. Nural 3D Representation 
 
 通过 coordinate-based multi-layer perceptrons (MLPs) 来将一个场景表示为一个隐式的函数  
 
@@ -39,7 +39,7 @@ Neural 3D shape representations
 
 
 
-## 2.1. Neural Radiance Fields (NeRF)
+## 2.1. Neural Radiance Fields (NeRF) 基于(MLP)神经网络的 Radiance Fields
 
 通过 神经网络表示 Radiance Fields
 
@@ -50,11 +50,11 @@ NeRF 是一种隐式的 3D 中间表示, 但是却使用了 Volume 的规则, �
 * 对于启发 计算机视觉和图形学的交叉领域 有很大的功劳
 
 
-
 Neural Fields  神经场:
 * 场 Fields   : 是一个物理概念, 对所有 (连续)时间 或 空间 定义的量, 如电磁场, 重力场, 对 场的讨论一定是建立在目标是连续概念的前提上
 * 神经场表示用神经网络来 全部或者部分参数化的场
 * 在视觉领域, 场即空间, 视觉任务的神经场即 以 `空间或者其他维度 时间, 相机角度等` 作为输入, 通过一个神经网络, 获取目标的一个标量 (颜色, 深度 等) 的过程   
+
 
 ### 2.1.1. Vanilla NeRF
 
@@ -98,12 +98,26 @@ NeRF的训练:
 * 1~2 day on V100
 
 
+### 2.1.2. NeRF Conclusion 
 
 
-### NeRF Conclusion 
+优化训练和渲染的 3个研究方向
+* 改进空间表达的存储方法: 连续的 MLP -> 离散的空间表示 -> 在渲染的时候直接插值特征
+  * 比较有名的就是 instant-ngp 的 hash , 以及 Plenoxels 的 sparse voxel grid
+  * FastNeRF 之类的
+* different encodings
+* MLP capacity
 
 
-#### 2.1.2. Topics
+
+既存问题
+* with scene segmentation, adding semantic information to the scenes
+* Adapting NeRF to outdoor photo collections
+* Real time render, 每一个光线 (对应一个像素点) 都需要采样一系列的空间点, 对于高分辨率图像的渲染简直恐怖
+* 缺少对 empty space 的根源性 高效适应能力 (NeRF 通过学习到对应区域的不透明度为0 来实现)
+
+
+#### 2.1.2.1. Topics
 
 
 * 动态场景, Time-Space 的 NeRF 学习, 使之能够表示一段连续时间下的动态场景
@@ -118,7 +132,7 @@ NeRF的训练:
 * NeRF's baked representations
 
 
-#### 2.1.3. Practical Concerns
+#### 2.1.2.2. Practical Concerns
 
 
 * 输入数据 : a dense collection of photos from which 3D geometry and color can be derived, every surface should be observed from multiple different directions.
@@ -127,14 +141,11 @@ NeRF的训练:
 * As photos may inadvertently contain sensitive information, we automatically scan and blur personally identifiable content.
 
 
-#### 2.1.4. Rest questions
 
 
-* with scene segmentation, adding semantic information to the scenes
-* Adapting NeRF to outdoor photo collections
-* Real time render
 
-#### 2.1.5. Referance
+
+#### 2.1.2.3. Referance
 
 
 Google Blog
@@ -145,13 +156,26 @@ https://ai.googleblog.com/2023/06/reconstructing-indoor-spaces-with-nerf.html
 
 Mildenhall, Ben, et al. “NeRF: Representing Scenes as Neural Radiance Fields for View Synthesis.” Computer Vision – ECCV 2020,Lecture Notes in Computer Science, 2020, pp. 405–21, https://doi.org/10.1007/978-3-030-58452-8_24.
 
+## 2.2. Point-Based Radiance Fields
 
-## Neural Surface Reconstruction
+基于 points 的 volumetric representation 的方法 (传统方法)
+* 极度不连续的缺点
+  * 容易导致 over or under reconstruction
+* 基于 CNN 的算法, 求解空间中的 points 的特征之类的
+
+待看
+
+Differentiable Point-Based Radiance Fields for Efficient View Synthesis
+
+Point‐Based Neural Rendering with Per‐View Optimization
+
+
+## 2.3. Neural Surface Reconstruction
 
 基于 NeRF 的思想, 修改隐含表达的公式, 实现更容易对 3D 场景进行表面建模 (Surface Reconstruction)
 
 
-### NeuS 
+### 2.3.1. NeuS 
 
 该方向的开山作 : SDF 表达 (?), 基于 Radiance Fields 的思想进行魔改.
 * 好像 SDF 的提出并不是 NeuS?  
@@ -188,10 +212,13 @@ Mildenhall, Ben, et al. “NeRF: Representing Scenes as Neural Radiance Fields f
     * 此时权重计算的方法
       * $T(t)\rho(t)=|cos(\theta)|\phi_s(f(p(t)))$
 
-## occupancy grids
+## 2.4. occupancy grids
 
 在 2020 年之前比较多  
+
+
 
 # 3. 2D - Implicit Image Function
 
 通过 神经网络表达 2D 图像
+

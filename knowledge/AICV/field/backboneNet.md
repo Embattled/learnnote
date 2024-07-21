@@ -1,9 +1,9 @@
-# Backbone Network in DeepLearning
+# 1. Backbone Network in DeepLearning
 
 
-# Transformer
+# 2. Transformer
 
-## RNN 的缺点
+## 2.1. RNN 的缺点
 Recurrent模型通常会根据符号的输入顺序来分解计算, 根据t-1时刻的状态和t时刻的输入来决定t时刻的输出和新状态。这从原理上使得并行变得不可能, 同时导致内存开销极大.  
 一些基于Block的并行化方法同时输入并计算各个位置上的特征, 但导致学习远距离关联变得很难.  
 Transformer网络的提出彻底并行化了相关问题, 将远距离的计算降到了常数项.  
@@ -63,11 +63,13 @@ Self-Attention: 将单个序列中, 不同位置的信息关联起来, 最终计
 
 
 
-# U-Net
+# 3. U-Net
 
-## NAFNet  - Simple Baselines for Image Restoration
+## 3.1. NAFNet
 
-2022/04/10  
+
+2022/04/10  Simple Baselines for Image Restoration
+
 旷视科技的文章, 化繁为简, 设计了一个及其简单的网络并达成了 NR 和 Deblur 任务的 SOTA
 
 Inter-block Complixity : 块间复杂度, 设计多了级联的 U-Net 来提高性能

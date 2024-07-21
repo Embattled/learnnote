@@ -280,6 +280,7 @@ p系列(中日韩)
 | Hadamard积   | \odot                | $\odot$     |
 | 不知道       | \oplus               | $\oplus$    |
 | 不知道       | \ominus              | $\ominus$   |
+| 不知道       | \otimes              | $\otimes$   |
 | 合           | \cap                 | $\cap$      |
 | 并           | \cup                 | $\cup$      |
 | 大于         | \gt \ge \textgreater | $\gt \geq$  |

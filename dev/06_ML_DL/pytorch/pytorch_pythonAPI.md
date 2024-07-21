@@ -1,3 +1,92 @@
+- [1. Python API](#1-python-api)
+- [2. torch](#2-torch)
+  - [2.1. Tensors](#21-tensors)
+    - [2.1.1. Creation Ops](#211-creation-ops)
+    - [2.1.2. Indexing, Slicing, Joining, Mutating Ops 拼接与截取等](#212-indexing-slicing-joining-mutating-ops-拼接与截取等)
+      - [2.1.2.1. Indexing](#2121-indexing)
+      - [2.1.2.2. Joining 函数](#2122-joining-函数)
+      - [2.1.2.3. Dimension - 维度操作函数](#2123-dimension---维度操作函数)
+      - [2.1.2.4. Slicing - 切片函数](#2124-slicing---切片函数)
+  - [2.2. Generators, Random Sampling - 随机采样](#22-generators-random-sampling---随机采样)
+    - [2.2.1. Generator 相关](#221-generator-相关)
+    - [2.2.2. Random Sampling - 默认使用全局 rng](#222-random-sampling---默认使用全局-rng)
+  - [2.3. 序列化 Serialization](#23-序列化-serialization)
+    - [2.3.1. torch.save](#231-torchsave)
+    - [2.3.2. torch.load](#232-torchload)
+  - [2.4. Locally disabling gradient computation - 局部禁用梯度计算](#24-locally-disabling-gradient-computation---局部禁用梯度计算)
+  - [2.5. Math operations](#25-math-operations)
+    - [2.5.1. Pointwise Ops 元素为单位的操作](#251-pointwise-ops-元素为单位的操作)
+    - [2.5.2. Reduction Ops 元素之间的操作(降维)](#252-reduction-ops-元素之间的操作降维)
+      - [2.5.2.1. 极值操作](#2521-极值操作)
+    - [2.5.3. Comparison Ops](#253-comparison-ops)
+    - [2.5.4. Spectral Ops - 光谱函数 在频域上操作信号](#254-spectral-ops---光谱函数-在频域上操作信号)
+    - [2.5.5. Other Operations - 无法分类的其他函数](#255-other-operations---无法分类的其他函数)
+- [3. torch.nn](#3-torchnn)
+  - [3.1. Containers 网络容器](#31-containers-网络容器)
+    - [3.1.1. torch.nn.Module 类](#311-torchnnmodule-类)
+      - [3.1.1.1. 基础方法及应用](#3111-基础方法及应用)
+      - [3.1.1.2. 网络参数以及存取](#3112-网络参数以及存取)
+      - [3.1.1.3. 残差结构](#3113-残差结构)
+    - [3.1.2. torch.nn.Sequential 系列](#312-torchnnsequential-系列)
+  - [3.2. Convolution Layers 卷积层](#32-convolution-layers-卷积层)
+  - [3.3. Pooling layers 池化层](#33-pooling-layers-池化层)
+  - [3.4. Padding Layers](#34-padding-layers)
+  - [3.5. Non-linear Activations (weighted sum, nonlinearity) 非线性激活函数](#35-non-linear-activations-weighted-sum-nonlinearity-非线性激活函数)
+    - [GELU](#gelu)
+  - [3.6. Normalization Layers 归一化层](#36-normalization-layers-归一化层)
+  - [3.7. Linear Layers  线性层](#37-linear-layers--线性层)
+    - [3.7.1. Identity](#371-identity)
+    - [3.7.2. Linear](#372-linear)
+  - [3.8. Loss Function 损失函数](#38-loss-function-损失函数)
+  - [3.9. Vision Layrers - 与图像相关的网络层](#39-vision-layrers---与图像相关的网络层)
+  - [3.10. ChannelShuffle - 重排列 Channel](#310-channelshuffle---重排列-channel)
+- [4. torch.nn.functional](#4-torchnnfunctional)
+  - [4.1. Convolution functions](#41-convolution-functions)
+  - [4.2. Non-linear Activations](#42-non-linear-activations)
+    - [4.2.1. F.glu](#421-fglu)
+    - [4.2.2. F.gelu](#422-fgelu)
+    - [4.2.3. F.sigmoid](#423-fsigmoid)
+    - [4.2.4. F.batch\_norm](#424-fbatch_norm)
+    - [4.2.5. F.instance\_norm](#425-finstance_norm)
+    - [4.2.6. F.layer\_norm](#426-flayer_norm)
+    - [4.2.7. F.normalize](#427-fnormalize)
+- [5. torch.Tensor 张量类](#5-torchtensor-张量类)
+  - [5.1. torch.Tensor 的格式](#51-torchtensor-的格式)
+  - [5.2. 类属性](#52-类属性)
+  - [5.3. 类方法](#53-类方法)
+    - [5.3.1. 类型转换](#531-类型转换)
+    - [5.3.2. view 变形](#532-view-变形)
+    - [5.3.3. transpose](#533-transpose)
+  - [5.4. 创建操作 Creation Ops](#54-创建操作-creation-ops)
+    - [5.4.1. 统一值 tensor](#541-统一值-tensor)
+    - [5.4.2. 随机值 random](#542-随机值-random)
+    - [5.4.3. like 类方法](#543-like-类方法)
+    - [5.4.4. torch.from\_numpy](#544-torchfrom_numpy)
+    - [5.4.5. tensor复制](#545-tensor复制)
+    - [5.4.6. .new\_ 方法](#546-new_-方法)
+- [6. torch.autograd - 梯度计算包](#6-torchautograd---梯度计算包)
+- [7. Torch Devices](#7-torch-devices)
+  - [7.1. torch.cpu - 虚类实现](#71-torchcpu---虚类实现)
+  - [7.2. torch.cuda - CUDA 计算](#72-torchcuda---cuda-计算)
+    - [7.2.1. General - 通用接口](#721-general---通用接口)
+    - [7.2.2. Memory management - CUDA 设备内存管理](#722-memory-management---cuda-设备内存管理)
+- [8. torch.linalg - pytorch 的线性代数子库](#8-torchlinalg---pytorch-的线性代数子库)
+  - [8.1. Matrix Properties](#81-matrix-properties)
+  - [8.2. Decompositions](#82-decompositions)
+- [9. torch.onnx](#9-torchonnx)
+  - [9.1. TorchDynamo-based ONNX Exporter](#91-torchdynamo-based-onnx-exporter)
+  - [9.2. TorchScript-based ONNX Exporter](#92-torchscript-based-onnx-exporter)
+    - [9.2.1. API of TorchScript-based ONNX Exporter](#921-api-of-torchscript-based-onnx-exporter)
+- [10. torch.optim](#10-torchoptim)
+  - [10.1. 预定义 Algorithm](#101-预定义-algorithm)
+  - [10.2. torch.optim.lr\_scheduler - 动态 Learn Rate](#102-torchoptimlr_scheduler---动态-learn-rate)
+    - [10.2.1. 有序调整](#1021-有序调整)
+  - [10.3. 定义自己的 optim](#103-定义自己的-optim)
+    - [10.3.1. Optimizer 基类](#1031-optimizer-基类)
+    - [10.3.2. optimization step](#1032-optimization-step)
+    - [10.3.3. per-parameter options](#1033-per-parameter-options)
+
+
 # 1. Python API
 
 官方对于 分类感觉做的不是很好, 没办法细分成子文档
@@ -108,7 +197,7 @@ tensor([[ 1,  1],
 
 ## 2.2. Generators, Random Sampling - 随机采样
 
-### Generator 相关
+### 2.2.1. Generator 相关
 
 常识  `rng` 是 `Random Number Generator` 的缩写
 
@@ -127,7 +216,7 @@ torch. 下的针对全局 Generator 有同样名称的一组接口
 * `torch.set_rng_state(new_state)`
 
 
-### Random Sampling - 默认使用全局 rng
+### 2.2.2. Random Sampling - 默认使用全局 rng
 
 一些和 numpy 重名的函数反而效果不同, 需要多留意
 
@@ -371,6 +460,13 @@ net.eval()
 # 进入 training mode
 net.train()
 
+# 定义好网络后, 可以直接通过成员网络层输出当前网络的参数
+net = Model().cuda()
+
+print(net.conv1.weight.size()) 
+print(net.conv1.weight)
+print(net.conv1.bias)
+
 ```
 
 #### 3.1.1.2. 网络参数以及存取
@@ -436,31 +532,22 @@ sequential 本身与 ModuleList 相似, 然后 ModuleList 更加偏向于以 lis
 
 * nn.Unfold
   * Extracts sliding local blocks from a batched input tensor.
+  * 将滑动窗口提出出来并扁平化
+  * 对于输入为 `N,C, H,W` 的情况, 输出为 `N, C*k, L`
+    * k 是滑动窗口的元素个数
+    * L 是滑动窗口的采样次数
+  * 采样次数的维度反而放在最后一维, 同时滑窗元素本身的维度和 C 合并了, 这一点要注意
+  * `torch.nn.Fold(output_size, kernel_size, dilation=1, padding=0, stride=1)`
+    * kernel_size, dilation, padding or stride 都会在输入的维度只有 1 的时候进行全`空间维度`扩张
+    * 若要自定义的话可以使用 F.functional.unfold
 
 * nn.Fold
   * Combines an array of sliding local blocks into a large containing tensor.
 
 
-```py
-class LeNet(nn.Module):
-  def __init__(self, input_dim=1, num_class=10):
-    super(LeNet, self).__init__()
 
-    # Convolutional layers
-    # 参数分别是  输入channel 输出channel 和三个卷积参数
-    self.conv1 = nn.Conv2d(input_dim, 20,  kernel_size=5, stride=1, padding=0) 
-    self.bn1 = nn.BatchNorm2d(20)
-    self.conv2 = nn.Conv2d(20,    50,  kernel_size=5, stride=1, padding=0) 
-    self.bn2 = nn.BatchNorm2d(50)
 
-# 定义好网络后, 可以直接通过成员网络层输出当前网络的参数
-net = Model().cuda()
 
-print(net.conv1.weight.size()) 
-print(net.conv1.weight)
-print(net.conv1.bias)
-
-```
 ## 3.3. Pooling layers 池化层
 
 * 最大化池
@@ -478,12 +565,20 @@ print(net.conv1.bias)
   * nn.FractionalMaxPool2d
   * nn.LPPool1d
   * nn.LPPool2d
+* 自适应池化层
   * nn.AdaptiveMaxPool1d
   * nn.AdaptiveMaxPool2d
   * nn.AdaptiveMaxPool3d
   * nn.AdaptiveAvgPool1d
   * nn.AdaptiveAvgPool2d
   * nn.AdaptiveAvgPool3d
+
+
+
+1,2,3 D 都支持传入一个 Output_size 的参数, 用于指定输出的特征平面的大小
+* 可以输入单个整数, 对于 2D 和 3D 等同于直接指定输出为 `H*H H*H*H`
+* 1,2,3 D 的含义是指定最后的 n 维度为执行池化的对象
+* 其他的维度都作为 输入的平面, 其输出会维持原本的 shape
 
 ## 3.4. Padding Layers
 
@@ -547,6 +642,10 @@ print(net.conv1.bias)
 # Activation func.
     self.relu = nn.ReLU()
 ```
+
+### GELU 
+
+
 
 
 ## 3.6. Normalization Layers 归一化层
@@ -691,15 +790,87 @@ loss_func = nn.CrossEntropyLoss()
 使用较为基础的运算进行网络定制化的时候需要用到, 和外部的接口的动作有些许不同
 
 
-## Convolution functions
+## 4.1. Convolution functions
 
-## Non-linear activation functions
+## 4.2. Non-linear Activations 
+
+直接阅读 functional 部分的激活函数定义会有比较详细的说明
+
+### 4.2.1. F.glu
+
+`torch.nn.functional.glu(input, dim=-1) → Tensor`
+
+在语言模型中目前被大量的使用  (论文: GLU Variants Improve Transformer)
+
+$$GLU(a,b)= a \otimes \sigma(b)$$
+
+这里激活函数的输入 input 本身只有一个, 然后将其 split in half 形成 a,b, 其中的 b 进行标准的激活函数 (在 pytorch 的这里 F.glu 里为 sigmoid), 最终的结果于 a 再进行点乘
+
+在 NAFNet 中, 作者议论了 glu 本身可以被重构为两个 linear transformation layer 的点乘结果
+* 此外, 计算量较轻的 channel-attention 也可以被解释为一种 GLU 的变体因为其类似 $$x * \Phi(x)$$
+
+### 4.2.2. F.gelu
+
+ Gaussian Error Linear Units (GELUs)
+ 基于论文 : Gaussian Error Linear Units (GELUs)
+
+`torch.nn.functional.gelu(input, approximate='none')`
+文档中没有指向源码的链接
+* approximate 似乎是一个 string
+
+对于 approximate 为 `'none'` 的时候
+$$GELU(x) = x* \Phi(x)$$
+$\Phi(x)$ 是高斯分布的累计分布函数, 所谓 none 就是不进行近似, 计算量很大
+
+对于 approximate 为 `'tanh'` 的时候
+$$GELU(x) =  0.5*x*(1+\tanh(\sqrt{2/\Pi}*(x+0.044615*x^3)))$$
+即这是一个 GELU 的近似实现
 
 
+整理来看, GELU 是一个特殊形式的 GLU
+尽管他们的字符相近, 各自全称的单词并不相同, 但结果上却仍然是相似的
+
+### 4.2.3. F.sigmoid
+
+`torch.nn.functional.sigmoid(input) → Tensor`
+最经典的激活函数, 对于输入的每一个值执行  
+$$sigmoid(x) = \frac{1}{1+\exp(-x)}$$
+
+### 4.2.4. F.batch_norm
+
+`torch.nn.functional.batch_norm(input, running_mean, running_var, weight=None, bias=None, training=False, momentum=0.1, eps=1e-05)`
+
+最经典的归一化: Apply Batch Normalization for each channel across a batch of data.
+
+在整个 mini-batch 上计算均值和标准差, 对于输入为 B C H W 的 3通道 RGB 图像, 均值和标准差的 shape 都为 C.
+即在整个 mini-batch 上按照通道进行归一化  
+
+主要用于 CNN 和 FC
+
+### 4.2.5. F.instance_norm
+
+`torch.nn.functional.instance_norm(input, running_mean=None, running_var=None, weight=None, bias=None, use_input_stats=True, momentum=0.1, eps=1e-05)`
+
+Apply Instance Normalization independently for each channel in every data sample within a batch.
+
+之所以叫 instance 即不再是整个 Batch 进行归一化, 而是每一个输入实例本身内部进行归一化.
+即 均值和标准差的 shape 为 B C, 在每个通道的每个实例上进行.
+
+在风格迁移等图像生成任务上用的比较多  
 
 
+### 4.2.6. F.layer_norm
 
-### F.normalize
+`torch.nn.functional.layer_norm(input, normalized_shape, weight=None, bias=None, eps=1e-05)`
+
+Apply Layer Normalization for last certain number of dimensions.
+
+直接对最后几个维度进行归一化, 均值和标准差的 shape 为 (B,1,1,1)
+即主要是在 instance 的基础上, 对通道维度也进行归一化
+
+主要用于  RNN 和 FC
+
+### 4.2.7. F.normalize
 
 在指定维度上指定 $L_p$ 标准化, 
 
@@ -709,6 +880,9 @@ loss_func = nn.CrossEntropyLoss()
   * 然而 Tensor 的 norm 方法已经被 deprecated, 未来会怎么样还是谜团
   * 
 ```py
+# 源码的定义
+def normalize(input: Tensor, p: float = 2.0, dim: int = 1, eps: float = 1e-12, out: Optional[Tensor] = None) -> Tensor:
+  # 此处省略 if 语句
         denom = input.norm(p, dim, keepdim=True).clamp_min(eps).expand_as(input)
         return input / denom
 ```
@@ -950,7 +1124,7 @@ torch.cuda 可以随时导入, 并通过  `is_available()` 来判断设备的 CU
 
 `torch.linalg.*`
 
-## Matrix Properties
+## 8.1. Matrix Properties
 
 * `vector_norm`          Computes a vector norm.
   * `torch.linalg.vector_norm(x, ord=2, dim=None, keepdim=False, *, dtype=None, out=None)`
@@ -962,7 +1136,7 @@ torch.cuda 可以随时导入, 并通过  `is_available()` 来判断设备的 CU
   * 属于上面两个函数的结合体, 根据输入的 shape 和 dim 来判断要执行的计算
 
 
-## Decompositions
+## 8.2. Decompositions
 
 
 

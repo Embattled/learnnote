@@ -10,7 +10,7 @@
 - [2. NumPy fundamentals](#2-numpy-fundamentals)
   - [2.1. Broadcasting](#21-broadcasting)
     - [2.1.1. General Broadcasting Rules](#211-general-broadcasting-rules)
-- [3. Routines  array常规操作 API](#3-routines--array常规操作-api)
+- [3. Routines array常规操作 API](#3-routines-array常规操作-api)
   - [3.1. Array creation](#31-array-creation)
     - [3.1.1. From shape or value](#311-from-shape-or-value)
     - [3.1.2. From existing data](#312-from-existing-data)
@@ -93,9 +93,9 @@
     - [4.2.2. Permutations 排列](#422-permutations-排列)
     - [4.2.3. Distributions 分布函数](#423-distributions-分布函数)
 - [5. Universal functions (ufunc)](#5-universal-functions-ufunc)
-- [6. numpy 常规功能](#6-numpy-常规功能)
-  - [6.1. numpy 的IO](#61-numpy-的io)
-    - [6.1.1. 类型转换](#611-类型转换)
+- [NumPy's Module Structure](#numpys-module-structure)
+  - [numpy.lib](#numpylib)
+    - [numpy.lib.stride\_tricks](#numpylibstride_tricks)
 - [7. config](#7-config)
   - [7.1. np.set\_printoptions](#71-npset_printoptions)
     - [7.1.1. numpy.shape](#711-numpyshape)
@@ -124,6 +124,10 @@ NumPy’s array class is called `ndarray`. It is also known by the alias `array`
 * dtype     : 元素类型
 * itemsize  : 元素大小 bytes
 * data      : 指向实际数据的 `array` 一般不需要使用
+
+
+* strides: 每个维度访问下一个索引的时候, 内存移动的步幅
+  * 是基于 C 的底层 bytes 的步幅, 操纵的时候要非常小心
 
 ## 1.2. scalars 
 
@@ -239,7 +243,7 @@ Result (4d array):  8 x 7 x 6 x 5
 
 
 
-# 3. Routines  array常规操作 API
+# 3. Routines array常规操作 API
 
 对 Array 数据的各种常规操作
 
@@ -354,14 +358,16 @@ numpy.array 的各种创建函数能够创建各种各样的预设 array
 
  
 * `numpy.meshgrid(*xi, copy=True, sparse=False, indexing='xy')`
-  * 从坐标向量生成坐标 mesh, 该函数主要用于作图等其他函数的输入数据生成  
-  * *xi, 可以是任意维度的输入, 代表 N-D 的坐标
+  * 从坐标向量生成坐标 mesh, 该函数主要用于作图等其他函数的输入数据, 具体为索引的生成  
+  * *xi, 每一个值代表对应维度的最终值, 代表 N-D 的坐标
   * `indexing` : {‘xy’, ‘ij’}, optional. 用于指定坐标的先后顺序
     * xy 代表了图像领域的坐标, x 是横坐标, y 是纵坐标, 但是在数据索引上 y 纵坐标是行数因此靠前, 即坐标顺序是颠倒的
     * ij 代表了普通数列的索引方式, 靠前的维度坐标也靠前
+  * 
   * return : X1, X2, ...,XN  根据 len(xi) 和 indexing
     * 代表了该空间下每个点的具体坐标数列  
     * 点的坐标依次是 `( x1[0],x2[0],...,xn[0]  ) , (x1[1],x2[1],..,xn[1])`
+    * 每一个返回值的 shape 都是所有输入的 1-D shape 的总和, 可以通过指定 sparse 来实现稀疏的输出
 
 ## 3.2. Array manipulation 操纵更改 Array
 
@@ -1453,36 +1459,37 @@ numpy.histogram2d(x, y, bins=10, range=None, normed=None, weights=None, density=
 A universal function (or ufunc for short) is a function that operates on ndarrays in an element-by-element fashion, supporting array broadcasting, type casting, and several other standard features. 
 
 
+# NumPy's Module Structure
 
-# 6. numpy 常规功能
+## numpy.lib
 
-## 6.1. numpy 的IO
+独立于 array routine 的一系列模组化的函数
 
-numpy 的数据IO可以简单分3类:
-* 二进制IO
-* txt IO
-* 与python 内置 string 的转换
 
-numpy 的 IO 也一定程度上基于 pickle, 具有一定的不安全性
+### numpy.lib.stride_tricks
 
-通用参数:
-* file : file-like object, string, or pathlib.Path
-  
-### 6.1.1. 类型转换
+通过操作 strides 来实现类似于 sliding window 的效果
 
-在 numpy 官方文档中, ndarray 相关的类型转换也被归纳为 IO 的一部分
-
-* ndarray.tolist()
-  * 将 np array 转换成python自带的列表, 该函数是拷贝的
-  * 会把元素的类型也转成 python 自带的数字类型
-  * 对于 0-dim 的 array `np.array(1)`, 直接使用 list(a) 会报异常, 只能用 tolist()
-  * 相比与 list(a), a.tolist() 更加安全, 且附带了类型转换
-* ndarray.tofile(fid[, sep, format])
+* as_strided : 原始函数, 需要谨慎操纵内存
+* sliding_window_view : 滑动窗口生成, 不能指定步长
 
 
 
+`lib.stride_tricks.sliding_window_view(x, window_shape, axis=None, *, subok=False, writeable=False)`
+* 对于给定的 window 生成滑动窗口视图 `rolling or moving window`
+* 参数 : 
+  * x : array_like, 原始数据
+  * window_shape: int or tuple of int. 滑动窗口的 shape, 如果不指定 axis 的话则长度必须 x.ndim 一致. int 输入等同于 `(i,)` 即不会进行扩张
+  * axis : int or tuple of int, 如果指定的话需要于 window_shape 一样长
+  * subok : bool, sub ok. 默认为 flase, 如果为 True 则子类将被传递? passed-through 不太懂 TODO
+  * writeable : bool, 为 true 的时候才允许写入, 因为 view 本身有很多元素指向了相同的内存地址, 应当谨慎使用 
 
 
+`lib.stride_tricks.as_strided(x, shape=None, strides=None, subok=False, writeable=True)`
+* 更加低级的实现, 相当于直接操纵 array 的属性, 可以参照 ndarray.strides
+* 不正确的计算会直接导致指向无效的内存引起程序崩溃
+* shape : new array 的 shape, 默认与 x 相同
+* strides : new array 的 strides, 默认与 x 相同
 
 # 7. config
 
