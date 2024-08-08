@@ -24,6 +24,9 @@
 
 # 1. GCC, the GNU Compiler Collection
 
+https://gcc.gnu.org/
+
+
 GCC 全名: GNU C Complier, 即在 GNU 计划中诞生的 C 语言编译器.
 * 早期的 GCC 确实只用于编译 C 代码, 但是随着版本更替, 现在的 GCC 已经能支持 C++, GO, Objective-C 等多语言
 * 目前最新的 GCC 全名的定义被更改为 `GNU Complier Collection`

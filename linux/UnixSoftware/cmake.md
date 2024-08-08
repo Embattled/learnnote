@@ -60,7 +60,7 @@ target_include_directories(Tutorial PUBLIC
 
 命令行工具
 
-## cmake 
+## 3.1. cmake 
 
 cmake 可执行文件就是 cmake 整个工具的 启动 CLI
 
@@ -98,7 +98,7 @@ cmake 可执行文件就是 cmake 整个工具的 启动 CLI
 
 ```
 
-### Introduction to CMake Buildsystems
+### 3.1.1. Introduction to CMake Buildsystems
 
 Cmake Buildsystems : 所谓的 buildsystem 即用来描述如何来编译项目的 可执行文件, 以及 库文件如何链接.  
 
@@ -117,7 +117,7 @@ CMake 再根据对应的抽象文件根据编译环境来生成对应的本地 b
   * 即 要编译的 local buildsystem 系统类型, 有关 generator 的内容查看对应的生成器篇章, 可以使用 `-G` 选项来实时的指定生成器. 
 
 
-### Generate a Project Buildsystem
+### 3.1.2. Generate a Project Buildsystem
 
 
 # 4. cmake-commands
@@ -348,17 +348,17 @@ set(<variable> <value>... [PARENT_SCOPE])
 ```
 设置对应的变量, 可以用于配置项目参数
 
-# cmake-generators
+# 5. cmake-generators
 
 CMake generator 负责为本地的构建编译系统指定选项和写入文件, CMake 必须要指定一个 生成器. 
 
 CMake Generators 是平台依存的, 通过 `--help` 可以查看当前平台下所支持的所有 Generators.  通过 `-G` 选项可以手动指定要用的 Generator.  
 
-# 5. cmake-language
+# 6. cmake-language
 
 CMake 文档中用于书写语法的方式很有意思, 使用正则表达式的方式来书写一个语法  
 
-## 5.1. Syntax
+## 6.1. Syntax
 
 CMake 语言的编码 (Encoding): 一个 CMake Language source file 应该以 7-bit ASCII 字符来书写用以实现最大的兼容性. 换行符可以以 `\n` 或者 `\r\n` 来书写  
 
@@ -368,7 +368,7 @@ CMake 的源文件的构成:
   * optionally spaces
   * Comments
 
-### 5.1.1. Command Invocations 命令调用
+### 6.1.1. Command Invocations 命令调用
 
 命令调用是一种语法, 表现为 一个名称, 后接一个括号, 括号里面是用空格分割的参数
 
@@ -384,7 +384,7 @@ separation          ::=  space | line_ending
 
 CMake 中的 Command names 不区分大小写, 同时 `未加引号的括号` 必须平衡
 
-### 5.1.2. Command Arguments
+### 6.1.2. Command Arguments
 
 即 Command Invocations 语法中的 arguments   
 
@@ -396,7 +396,7 @@ CMake 对于 Arguments 细分了3种类型
 
 
 
-### 5.1.3. Comments 注释
+### 6.1.3. Comments 注释
 
 注释以 `#` 开头
 * 并且 not inside a 
@@ -409,7 +409,7 @@ CMake 源文件支持两种注释
 * Line Comment
 
 
-## 5.2. lists
+## 6.2. lists
 
 从概念上, 所有的数值在 CMake 语言中都以 strings 来保存, 但是一个 string 也可能作为一个 list 来处理.
 
@@ -424,7 +424,7 @@ set(x a "b;c")            # sets "x" to "a;b;c", not "a;b\;c"
 
 ```
 
-# 6. cmake-variables
+# 7. cmake-variables
 
 variables that are provided by CMake or have meaning to CMake when set by project code.
 

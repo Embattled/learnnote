@@ -32,7 +32,7 @@
   - [3.3. Pooling layers 池化层](#33-pooling-layers-池化层)
   - [3.4. Padding Layers](#34-padding-layers)
   - [3.5. Non-linear Activations (weighted sum, nonlinearity) 非线性激活函数](#35-non-linear-activations-weighted-sum-nonlinearity-非线性激活函数)
-    - [GELU](#gelu)
+    - [3.5.1. GELU](#351-gelu)
   - [3.6. Normalization Layers 归一化层](#36-normalization-layers-归一化层)
   - [3.7. Linear Layers  线性层](#37-linear-layers--线性层)
     - [3.7.1. Identity](#371-identity)
@@ -50,6 +50,7 @@
     - [4.2.5. F.instance\_norm](#425-finstance_norm)
     - [4.2.6. F.layer\_norm](#426-flayer_norm)
     - [4.2.7. F.normalize](#427-fnormalize)
+  - [4.3. Vision functions](#43-vision-functions)
 - [5. torch.Tensor 张量类](#5-torchtensor-张量类)
   - [5.1. torch.Tensor 的格式](#51-torchtensor-的格式)
   - [5.2. 类属性](#52-类属性)
@@ -537,15 +538,20 @@ sequential 本身与 ModuleList 相似, 然后 ModuleList 更加偏向于以 lis
     * k 是滑动窗口的元素个数
     * L 是滑动窗口的采样次数
   * 采样次数的维度反而放在最后一维, 同时滑窗元素本身的维度和 C 合并了, 这一点要注意
-  * `torch.nn.Fold(output_size, kernel_size, dilation=1, padding=0, stride=1)`
+  * `torch.nn.Unfold(kernel_size, dilation=1, padding=0, stride=1)`
+    * dilation: 是一个很难描述的一个算法的一部分, 定义了 spacing between the kernel points, 可以参照 [URL](https://github.com/vdumoulin/conv_arithmetic/blob/master/README.md), 默认为1
     * kernel_size, dilation, padding or stride 都会在输入的维度只有 1 的时候进行全`空间维度`扩张
     * 若要自定义的话可以使用 F.functional.unfold
 
 * nn.Fold
   * Combines an array of sliding local blocks into a large containing tensor.
-
-
-
+  * 将一系列滑动窗口的各个值返回到原本的张量, 对于重叠的位置, 简单的将他们相加. 因此 unfold 和 fold 并不是完全相反的操作
+  * `torch.nn.Fold(output_size, kernel_size, dilation=1, padding=0, stride=1)`
+    * 参数基本上等同于 Unfold
+    * output_size : 主要用于窗口个数的歧义情况, 通过给定输出的空间 shape 来消除歧义, 注意该参数仅仅输入空间shape. i.e., `output.sizes()[2:]`
+  * only unbatched (3D) or batched (4D) image-like output tensors are supported.
+    * Input: (N,C×∏(kernel_size),L)(N,C×∏(kernel_size),L) - > Output: (N,C,output_size[0],output_size[1],… )(N,C,output_size[0],output_size[1],…)
+    * (C×∏(kernel_size),L) -> (C,output_size[0],output_size[1],…) 
 
 
 ## 3.3. Pooling layers 池化层
@@ -643,7 +649,7 @@ sequential 本身与 ModuleList 相似, 然后 ModuleList 更加偏向于以 lis
     self.relu = nn.ReLU()
 ```
 
-### GELU 
+### 3.5.1. GELU 
 
 
 
@@ -792,6 +798,17 @@ loss_func = nn.CrossEntropyLoss()
 
 ## 4.1. Convolution functions
 
+
+
+` torch.nn.functional.unfold(input, kernel_size, dilation=1, padding=0, stride=1)`
+* 滑窗提取函数, 参照 nn.Unfold
+* 该函数本身目前只支持 4-D 输入 only 4-D input tensors (batched image-like tensors) are supported.
+* 由于该函数是 view 方式, 因此元素本身会引用相同的地址, 因此在操作前需要克隆
+
+` torch.nn.functional.fold(input, output_size, kernel_size, dilation=1, padding=0, stride=1)`
+* 滑窗合并函数, 参照 nn.fold
+* Currently, only unbatched (3D) or batched (4D) image-like output tensors are supported.
+
 ## 4.2. Non-linear Activations 
 
 直接阅读 functional 部分的激活函数定义会有比较详细的说明
@@ -887,6 +904,17 @@ def normalize(input: Tensor, p: float = 2.0, dim: int = 1, eps: float = 1e-12, o
         return input / denom
 ```
 
+## 4.3. Vision functions
+
+`torch.nn.functional.pad(input, pad, mode='constant', value=None) → Tensor`
+* 填充函数
+* 输入的 pad 会按照从对输入 x 后往前的顺序对每一个维度进行, 前后分别指定宽度的 pad
+  * 即输入的顺序是按照 x 意思的从后往前
+* 参数:
+  * input (Tensor) – N-dimensional tensor
+  * pad (tuple) – m-elements tuple, where `m/2 ≤ input dimensions` and m is even.
+  * mode (str) – 'constant', 'reflect', 'replicate' or 'circular'. Default: 'constant'
+  * `value (Optional[float])` – fill value for 'constant' padding. Default: 0
 
 
 

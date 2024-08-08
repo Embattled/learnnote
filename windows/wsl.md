@@ -110,7 +110,7 @@ usbipd wsl detach --busid 4-4
 
 
  
-## 3.1. Advanced settings configuration in WSL
+## 3.1. Advanced settings configuration: in WSL
 
 两个文件 `wsl.conf` `.wslconfig` 用于为每个 wsl 系统和 所有 wsl 系统进行个性化配置  
 
@@ -171,6 +171,90 @@ command = service docker start
 ### 3.1.2. .wslconfig
 
 
+## 3.2. File access and permissions: for WSL
 
+在该篇章中说明 如何通过 Windows 来解释 WSL 的Linux 文件权限  
+
+从 wsl 访问windows 的时候, 文件权限是根据 Windows 的当前用户确定的
+* 另一方面 WSL 可以向文件添加元数据, 用于确定权限. 元数据默认不启用
+
+## 3.3. Networking considerations: Accessing network applications with WSL - WSL 的网络配置 
+
+
+WSL 同外界通信的规则
+* NAT based architecture (默认)
+* Mirrored Networking mode (最新)
+
+
+确定 IP 地址 : 在使用 wsl 的时候, IP 地址的时候需要考虑 2 种场景
+1. 从 Windows host, 你可能需要获取 WSL 的ip 地址, 用来从 windows 端直接访问在 wsl 运行的服务器程序
+    wsl 端运行 `hostname -I` 即, 从windows 端运行 `wsl [-d <DistributionName>] hostname -I`
+    典型的 ip `172.30.98.229`
+2. 从 wsl 端 获取 windows 的 ip 地址, 用来访问运行在 windows 的服务器程序
+    wsl 运行 `ip route show | grep -i default | awk '{ print $3}'`
+    同理 典型的 ip 为 `172.30.96.1`
+
+上述操作发生在 NAT based 网络模式中, 需要执行地址查询. 而镜像模式下, 则不需要查询, 直接通过 `127.0.0.1` 来访问
+
+
+### 3.3.1. NAT mode (default)
+
+默认, wsl 通过 NAT(Network Address Translation) 来访问网络.
+
+
+* 从 Windows 访问 Linux: e.g. 在 WSL 上建立 SQL 服务器, 则可以直接用 local
+* 从 Linux 访问 Windows: e.g. 在 Windows 上建立的 SQL 服务器, 从 Linux 访问, 这不是一个常见的场景, 但仍然是可实现的 , 参考上述实现方法  
+
+
+**从外部网络访问** 应用程序, 此时程序需要绑定监听 `0.0.0.0`, 即允许任意地址的访问.  
+
+**从 LAN (Local area network) 访问 WSL**
+* 尽管 WSL1 允许直接通过 LAN 访问 WSL, 但 WSL2 默认的 NAT 不允许
+* WSL2 下需要按照标准虚拟机的方式配置转发规则(wsl团队正在尝试进行改善)
+```powershell
+netsh interface portproxy add v4tov4 listenport=<yourPortToForward> listenaddress=0.0.0.0 connectport=<yourPortToConnectToInWSL> connectaddress=(wsl hostname -I)
+```
+  * 获取 wsl2 的 ip 地址
+  * `wsl hostname -I` wsl 的 ip 地址
+    * (ps. 小写的 i 会返回本地计算机看自己的地址, 通常是 127.0.0.1)
+  * `cat /etc/resolv.conf` 从 wsl 看 windows 的地址
+
+
+### 3.3.2. IPv6 访问
+
+
+
+
+
+### 3.3.3. Mirrored mode networking
+
+Windows11 所支持的全新的网络结构, 可以通过在 `.wslconfig` 中指定
+* `networkingMode=mirrored` 来启用, 其目的是提高网络的兼容性
+* 完全将 Windows 的网络接口镜像到 WSL 上
+
+
+根据官方说明, 该模式下的优点有以下
+* IPv6 support                  
+* Connect to Windows servers from within Linux using the localhost address 127.0.0.1. IPv6 localhost address ::1 is not supported
+* 提高网络和 VPN 的兼容性, Improved networking compatibility for VPNs
+* Multicast support 
+* Connect to WSL directly from your local area network (LAN)
+
+针对 LAN 链接到 WSL, 需要使用管理员权限在 PowerShell 中开启防火墙端口来允许 入境 链接
+(配置 Hyper-V firewall)
+
+```powershell
+Set-NetFirewallHyperVVMSetting -Name '{40E0AC32-46A5-438A-A0B2-2B479E8F2E90}' -DefaultInboundAction Allow
+# OR
+New-NetFirewallHyperVRule -Name "MyWebServer" -DisplayName "My Web Server" -Direction Inbound -VMCreatorId '{40E0AC32-46A5-438A-A0B2-2B479E8F2E90}' -Protocol TCP -LocalPorts 80
+```
+
+### 3.3.4. DNS Tunneling
+* 在 Windows11 以后, 通过在 wslconfig 里设置 `dnsTunneling=true` 默认值
+* 使得  WSL 使用虚拟化的功能来应答 wsl内部的DNS请求, 可以提高网络和 VPN 的兼容性
+
+**Auto Proxy**
+* 设置 `autoProxy=true (默认值) ` 可以使得 WSL 强制使用 Windows 的 HTTP proxy 代理
+* 开启该功能可以使得 wsl 无需进行 代理配置
 
 

@@ -150,6 +150,8 @@ conda create --name <new_env_name> --clone <copied_env_name>
 # [--file FILE] 从 requirement.txt 来创建, 可以传入多个
 conda create --name <new_env_name> --file=file1 --file=file2
 
+# 直接从 conda 独有的 .yml 文件创建环境
+conda env create -f environment.yml
 
 # -c, --channel            : Additional channel to search for packages.
 # -C, --use-index-cache    : Use cache of channel index files, even if it has expired. 直接使用未更新的 index 来安装

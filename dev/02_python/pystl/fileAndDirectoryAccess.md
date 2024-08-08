@@ -433,7 +433,17 @@ https://docs.python.org/3/library/pathlib.html?highlight=pathlib#correspondence-
 ## 5.1. fnmatch - Unix filename pattern matching
 
 该模组支持 Unix-shell 的通配符: `* ? [seq] [!seq]`, 但不支持完整正则表达式
-* 作为 glob 的底层函数, 用于验证一个路径是否满足 pattern
+* 作为 pathlib glob 的底层函数, 用于验证一个路径是否满足 pattern
+
+| Pattern  | Meaning                          |
+| -------- | -------------------------------- |
+| *        | matches everything               |
+| ?        | matches any single character     |
+| `[seq]`  | matches any character in seq     |
+| `[!seq]` | matches any character not in seq |
+
+如果要匹配 `?` 本身, 则将 `?` 放在方括号里 -> `[?]`
+
 
 `fnmatch.fnmatch(filename, pattern)`
 * Test whether the filename string matches the pattern string.
@@ -463,7 +473,6 @@ for file in os.listdir('.'):
 * `*.txt` -> `'(?s:.*\\.txt)\\Z'` (这块复制的没看懂, 可能是 windows 下的正则路径)
 
 ## 5.2. glob - Unix style pathname pattern expansion
-
 
 glob 模组提供查找对应 pattern 的路径的功能， 该模组顺从 Unix shell 的规则
 * results are returned in arbitrary order

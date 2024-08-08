@@ -1,4 +1,4 @@
-- [1. Python 的背景](#1-python-的背景)
+- [1. The Python Language Reference](#1-the-python-language-reference)
   - [1.1. 版本区别  2和3](#11-版本区别--2和3)
   - [1.2. Python PEP文档](#12-python-pep文档)
   - [1.3. 底层语言](#13-底层语言)
@@ -43,11 +43,6 @@
   - [7.7. 类的继承和多态](#77-类的继承和多态)
     - [7.7.1. super](#771-super)
     - [7.7.2. MRO Method Resolution Order](#772-mro-method-resolution-order)
-- [8. python 的模块和包](#8-python-的模块和包)
-  - [8.1. 导入模块或包](#81-导入模块或包)
-  - [8.2. 自定义模块](#82-自定义模块)
-  - [8.3. 包](#83-包)
-  - [8.4. 包信息调取](#84-包信息调取)
 - [9. Python 的文件操作](#9-python-的文件操作)
   - [9.1. open 打开文件](#91-open-打开文件)
   - [9.2. 读取文件](#92-读取文件)
@@ -58,15 +53,26 @@
     - [10.1.1. -m module-name](#1011--m-module-name)
     - [10.1.2. 杂项选项](#1012-杂项选项)
   - [10.2. python Environment variables](#102-python-environment-variables)
+- [Lexical analysis - 词法分析](#lexical-analysis---词法分析)
+  - [Identifiers and keywords - 标识符和关键字](#identifiers-and-keywords---标识符和关键字)
+    - [Keywords](#keywords)
+    - [Soft Keywords](#soft-keywords)
+    - [Reserved classes of identifiers - 保留的类](#reserved-classes-of-identifiers---保留的类)
+- [Execution model](#execution-model)
 - [11. The import system - 模组导入系统](#11-the-import-system---模组导入系统)
+  - [8.1. 导入模块或包](#81-导入模块或包)
+  - [8.2. 自定义模块](#82-自定义模块)
+  - [8.3. 包](#83-包)
+  - [8.4. 包信息调取](#84-包信息调取)
 - [12. Expressions 表达式](#12-expressions-表达式)
 - [13. Simple statements - 简单语句](#13-simple-statements---简单语句)
 - [14. Compound Statements - 复合语句](#14-compound-statements---复合语句)
   - [14.1. The if statement](#141-the-if-statement)
   - [14.2. The while statement](#142-the-while-statement)
+  - [The match statement - python3.10 加入](#the-match-statement---python310-加入)
 - [15. Top-level components - 顶层复合语句](#15-top-level-components---顶层复合语句)
 
-# 1. Python 的背景
+# 1. The Python Language Reference
 
 **优点**:
 
@@ -1136,105 +1142,6 @@ print("删除后的area值为：",rect.area)
 
 ### 7.7.2. MRO Method Resolution Order
 
-# 8. python 的模块和包
-
-Python 的核心封装功能
-
-## 8.1. 导入模块或包
-
-导入语句有多种写法
-
-1. `import <name1> [as <别名>], <name2> [as <别名>]`
-   - 来导入一个包,可以使用其中的函数  
-   - 在使用的时候要加上包名或者别名 `name.function()`  
-2. `from <name> import fun1[as <别名>], fun2[as <别名>]`
-   - 只导入指定函数,这时包中函数不再需要包名
-   - 直接使用成员名（或别名）即可
-
-模块导入的查找顺序
-
-- 在当前目录, 即当前执行的程序文件所在目录下查找；
-- 到 PYTHONPATH（环境变量）下的每个目录中查找；
-- 到 Python 默认的安装目录下查找。
-
-以上所有涉及到的目录, 都保存在标准模块 `sys` 的 `sys.path` 变量  
-因此在自定义包中的 `__init__` 文件中, 都会通过该变量进行路径添加  
-
-```py
-import sys, os
-import warnings
-if(not(os.path.dirname(os.path.realpath(__file__)) in sys.path)):
-    sys.path.append(os.path.dirname(os.path.realpath(__file__)))
-```
-
-## 8.2. 自定义模块
-
-- 只要是 Python 程序, 都可以作为模块导入
-- 模块名就是文件名, 不带`.py`
-
-自定义模块的文档  
-
-- 同理, 在模块开头的位置用多行字符串定义
-- 会自动赋值给该模块的 `__doc__` 变量
-
-模块的自定义导入
-
-1. 名称以下划线（单下划线“_”或者双下划线“__”）开头的变量、函数和类不会被导入, 属于本地
-2. 该模块设有 `__all__` 变量时, `from 模块名 import *` 只能导入该变量指定的成员, 用其他方式导入则不受影响
-
-**自定义模块的运行**
-
-导入后, 默认会执行包中的全部代码
-
-- 通常情况下, 为了检验模块中代码的正确性, 往往需要在模块中为其设计一段测试代码
-- 为让导入该模块的代码不自动执行测试代码, 借助`内置变量   __name__`
-
-1. 当直接运行一个模块时, name 变量的值为 `__main__`
-2. 将模块被导入其他程序中并运行该程序时, 处于模块中的 `__name__` 变量的值就变成了模块名
-
-```py
-# __name__  变量
-if __name__ == '__main__':
-  say() # 执行测试代码
-```
-
-## 8.3. 包
-
-包就是文件夹, 只不过在该文件夹下必须存在一个名为 `__init__.py` 的文件
-
-- 每个包的目录下都必须建立一个 `__init__.py` 的模块, 可以是一个空模块, 也可以是初始化代码
-  - `__init__.py` 不同于其他模块文件, 此模块的模块名不是 `__init__` , 而是它所在的包名, 即文件夹名
-- 文件夹的名称就是包名
-
-包导入的语法和导入模块相同, 只不过多了 `.` 点号, 用指定导入层级
-
-**__init__ 的编写**
-
-1. 导入包就等同于导入该包中的 `__init__.py` 文件
-2. 该文件的主要作用是导入该包内的其他模块
-
-```py
-# 在多文件编程中, 通过编写 __init__ 快速导入自定义包
-
-# 导入当前文件夹下的模块
-# 不同的书写方法会导致导入包后函数的调用
-
-# 需要用 包名.模块名.
-from . import module1
-
-# 虽然功能定义在模块2里, 但是调用时只用 包名.函数名
-from .module2 import * 
-```
-
-## 8.4. 包信息调取
-
-任何模块或者包作为一段python代码, 有自己内部定义的变量和类
-
-- help() 函数可以获取传入的对象的信息
-- `__doc__` 变量可以获取用户自己书写的文档
-- `__file__` 变量可以获取当前模块的源文件系统位置
-  - 包的话就是 `__init__.py` 文件的路径
-  - 模块就是源文件的路径
 
 # 9. Python 的文件操作
 
@@ -1354,7 +1261,145 @@ Search `sys.path` for the named module and execute its contents as the __main__ 
 
 会对 python 解释器起作用的环境变量  
 
+# Lexical analysis - 词法分析
+
+就是编译原理的那个词法分析: 由于 python 是解释性语言, 所以代码会直接经过词法分析生成 token 传入执行设备
+python 默认使用 Unicode utf-8 来解码代码, 可以通过 encoding declaration 来更改
+
+
+## Identifiers and keywords - 标识符和关键字
+
+
+### Keywords
+
+以下的字符完全作为 python 语言的关键字 (与内置函数的含义不同), 是构成语法的关键, 使用时要完全正确拼写
+
+```
+False      await      else       import     pass
+None       break      except     in         raise
+True       class      finally    is         return
+and        continue   for        lambda     try
+as         def        from       nonlocal   while
+assert     del        global     not        with
+async      elif       if         or         yield
+```
+### Soft Keywords 
+
+仅在特定的上下文 context 下被解释为关键字, 是 3.10 后加入的新的语法的功能  包括 
+
+`match, case, type, _`  4 种, soft keyward 的区分是发生在 parser level 
+* match, case, and _ are used in the `match` statement
+* type is used in the `type` statement.
+
+
+### Reserved classes of identifiers - 保留的类
+
+某些 identifiers 会带有特殊含义, 通过特殊的前缀来实现区别
+
+
+# Execution model
+
 # 11. The import system - 模组导入系统
+
+
+
+Python 的核心封装功能
+
+## 8.1. 导入模块或包
+
+导入语句有多种写法
+
+1. `import <name1> [as <别名>], <name2> [as <别名>]`
+   - 来导入一个包,可以使用其中的函数  
+   - 在使用的时候要加上包名或者别名 `name.function()`  
+2. `from <name> import fun1[as <别名>], fun2[as <别名>]`
+   - 只导入指定函数,这时包中函数不再需要包名
+   - 直接使用成员名（或别名）即可
+
+模块导入的查找顺序
+
+- 在当前目录, 即当前执行的程序文件所在目录下查找；
+- 到 PYTHONPATH（环境变量）下的每个目录中查找；
+- 到 Python 默认的安装目录下查找。
+
+以上所有涉及到的目录, 都保存在标准模块 `sys` 的 `sys.path` 变量  
+因此在自定义包中的 `__init__` 文件中, 都会通过该变量进行路径添加  
+
+```py
+import sys, os
+import warnings
+if(not(os.path.dirname(os.path.realpath(__file__)) in sys.path)):
+    sys.path.append(os.path.dirname(os.path.realpath(__file__)))
+```
+
+## 8.2. 自定义模块
+
+- 只要是 Python 程序, 都可以作为模块导入
+- 模块名就是文件名, 不带`.py`
+
+自定义模块的文档  
+
+- 同理, 在模块开头的位置用多行字符串定义
+- 会自动赋值给该模块的 `__doc__` 变量
+
+模块的自定义导入
+
+1. 名称以下划线（单下划线“_”或者双下划线“__”）开头的变量、函数和类不会被导入, 属于本地
+2. 该模块设有 `__all__` 变量时, `from 模块名 import *` 只能导入该变量指定的成员, 用其他方式导入则不受影响
+
+**自定义模块的运行**
+
+导入后, 默认会执行包中的全部代码
+
+- 通常情况下, 为了检验模块中代码的正确性, 往往需要在模块中为其设计一段测试代码
+- 为让导入该模块的代码不自动执行测试代码, 借助`内置变量   __name__`
+
+1. 当直接运行一个模块时, name 变量的值为 `__main__`
+2. 将模块被导入其他程序中并运行该程序时, 处于模块中的 `__name__` 变量的值就变成了模块名
+
+```py
+# __name__  变量
+if __name__ == '__main__':
+  say() # 执行测试代码
+```
+
+## 8.3. 包
+
+包就是文件夹, 只不过在该文件夹下必须存在一个名为 `__init__.py` 的文件
+
+- 每个包的目录下都必须建立一个 `__init__.py` 的模块, 可以是一个空模块, 也可以是初始化代码
+  - `__init__.py` 不同于其他模块文件, 此模块的模块名不是 `__init__` , 而是它所在的包名, 即文件夹名
+- 文件夹的名称就是包名
+
+包导入的语法和导入模块相同, 只不过多了 `.` 点号, 用指定导入层级
+
+**__init__ 的编写**
+
+1. 导入包就等同于导入该包中的 `__init__.py` 文件
+2. 该文件的主要作用是导入该包内的其他模块
+
+```py
+# 在多文件编程中, 通过编写 __init__ 快速导入自定义包
+
+# 导入当前文件夹下的模块
+# 不同的书写方法会导致导入包后函数的调用
+
+# 需要用 包名.模块名.
+from . import module1
+
+# 虽然功能定义在模块2里, 但是调用时只用 包名.函数名
+from .module2 import * 
+```
+
+## 8.4. 包信息调取
+
+任何模块或者包作为一段python代码, 有自己内部定义的变量和类
+
+- help() 函数可以获取传入的对象的信息
+- `__doc__` 变量可以获取用户自己书写的文档
+- `__file__` 变量可以获取当前模块的源文件系统位置
+  - 包的话就是 `__init__.py` 文件的路径
+  - 模块就是源文件的路径
 
 # 12. Expressions 表达式
 # 13. Simple statements - 简单语句
@@ -1389,5 +1434,13 @@ while 条件表达式：
 else:
     pass
 ```
+
+## The match statement - python3.10 加入
+
+在 python 3.10 以前的版本使用该语句会报错, 向下兼容性很差
+
+
+
+
 
 # 15. Top-level components - 顶层复合语句
