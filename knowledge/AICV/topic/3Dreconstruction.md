@@ -23,16 +23,10 @@
 * 输出是 and view-dependent emitted radiance at that spatial location, 可以直接理解成新视角下的图像
 
 
-
 传统算法
 * 根据目标相机位姿和视角 生成 reprojection function, 将所有输入图像的能用得上的点重投影到目标视角下
   * 因此需要将所有输入图像存储到 GPU 是早期方法的缺点
   * 对于 unreconstructed regions 无法表示 或者有 over-reconstruction 问题
-
-
-
-
-
 
 基于 points 的 volumetric representation 的方法 (传统方法)
 * 极度不连续的缺点
@@ -47,7 +41,7 @@
   * 查询体积需要大量采样, 渲染成本相当高
 * NeRF 的优化点
   * 在既存方法上 加入了双层 inference 采样方法和 空间位置编码方法  极大的提高了质量
-* 
+
 
 
 
@@ -57,7 +51,7 @@
 * 这种方案最早的时候需要 GT 3D geomerty, 因此在研究中经常使用 synthetic 3d shape
 * 后来有直接输出每个坐标对应的 feature vector 和 RGB function, 在通过复杂的 rendering function 得到2D img 再计算 Loss
 
-# Volumetric Rendering 体渲染
+# 2. Volumetric Rendering 体渲染
 
 原本属于计算机科学的概念
 
@@ -65,12 +59,14 @@
 * 在渲染过程的权重计算上不太一样
 
 
-## 2.5. 3D Gaussian Splatting
+## 2.1. 3D Gaussian Splatting
 
-期刊文章, 开创了 隐式神经表达 视角合成 的新方向
+期刊文章, SIGGRAPH 2023, 视角合成任务的 里程碑手法
 
-全新的 3D 场景表达方法, 并不算是神经隐式表达
+从大的方向上来说属于 **Differentiable point-based rendering**
 
+
+全新的 3D 场景表达方法, 不算是神经隐式表达, 构造了显式表达并推算出了每一个项的导数
 指出了 NeRF 表达的不足
 * 虽然连续 MLP 的表达方法有助于拟合
 * 但是在渲染的时候需要随机采样空间点, 这不仅耗时而且容易产生噪声
@@ -87,7 +83,7 @@
 渲染过程
 * tile-based rasterizer
 
-### 2.5.1. vanilla
+### 2.1.1. vanilla
 
 Kerbl B, Kopanas G, Leimkühler T, Drettakis G. 3D Gaussian Splatting for Real-Time Radiance Field Rendering. ACM Trans. Graph.. 2023 Aug 1;42(4):139-.
 
@@ -164,7 +160,7 @@ tile-base rasterizer
     * 高斯的不透明度和渲染像素时候的 alpha 似乎不是同一个东西
 
 
-### 4D Gaussian Splatting for Real-Time Dynamic Scene Rendering (CVPR2024)
+### 2.1.2. 4D Gaussian Splatting for Real-Time Dynamic Scene Rendering (CVPR2024)
 
 ```latex
  @article{Wu_Yi_Fang_Xie_Zhang_Wei_Liu_Tian_Wang,  
@@ -200,8 +196,9 @@ tile-base rasterizer
   * 合成数据: D-NeRF
   * Realworld: HyperNeRF,  Neu3D
 
-### SuGaR: Surface-Aligned Gaussian Splatting for Efficient 3D Mesh Reconstruction and High-Quality Mesh Rendering
+### 2.1.3. SuGaR: Surface-Aligned Gaussian Splatting for Efficient 3D Mesh Reconstruction and High-Quality Mesh Rendering
 
+CVPR2024
 3D-GS 用于 Mesh 生成
 
 https://cvpr.thecvf.com/media/PosterPDFs/CVPR%202024/30910.png?t=1717366268.1976593
@@ -210,3 +207,70 @@ https://cvpr.thecvf.com/media/PosterPDFs/CVPR%202024/30910.png?t=1717366268.1976
 1. 一个正则化方法， 使得高斯能够更加准确的捕捉几何形状
 2. 高速的从高斯点中提取精确的网格的有效算法
 3. 高斯绑定到网格， 由于 3D-GS 是可解释的点， 所以该论文就展示了在 Mesh 生成方面 3D-GS 的可编辑性
+
+
+### 2.1.4. 2D Gaussian Splatting for Geometrically Accurate Radiance Fields
+
+
+观点: 表面建模本身和 3D GS 不匹配, 因此使用 降维后的 2D GS 来进行该工作
+
+并行工作PK:
+* 对3D GS 添加 法线属性
+  * 并行工作: 主要用于提高渲染的效果, 即 relightable 性能, 而不是表面建模
+  * 本工作  : 2D GS 本身具有法线属性, 因此在表面建模上更加符合
+* SuGaR :
+  * 使用了 额外的 loss 正规化项目, 使得 3D GS 尽可能扁平
+  * 本工作 : 2D GS 本来就是平面
+* NeuSG : 
+  * NeuS 的后续手法, 结合了 SDF 和 3D GS
+  * 本工作 : 从原理上来说更简单, 从实际上来说学习速度更快
+
+原理思路:
+* 3DGS 与 薄 thin 的 Surface 是相冲突的
+* 3DGS 本身没有 法线属性, 这对于表面重构是超级重要的
+* NVS 任务不必要, 但是表面重构是超级重要的 view consistency 在原本的 3DGS 中没有
+
+
+模型:
+* 直接删去 3D 高斯方差的一个维度, 同时将对应的实际属性拆分
+  * 中心点 $p_k$ 不变, 为 3维
+  * 两个主切向向量 (principal trangential vectors) $t_u, t_v$, 沿着表面切线方向, 同时沿着 GS 椭圆的 长短轴
+  * 一个 缩放向量 $S=(s_u, s_v)$, 控制 2D GS 在 UV 平面上的方差
+  * 主法线通过 $t_u \times t_v = t_w$ 来定义
+    * 同原本的 3D GS 相同的 旋转向量可以以此 获得 $R=[t_u, t_v, t_w]$
+    * 对应的 33 scale 矩阵也是, 直接将 $s_u, s_v$ 放在对角线上即可
+      * (t_u, t_v 沿着椭圆长短轴)因此 scale 矩阵是对角矩阵, 没有第三行列, 且前两行列没有协方差
+  * 2DGS 的不透明度和 球面谐波同原本的 3D GS 相同
+* 最终, 完整的 local tangent plane (局部切线平面) 在 world space 的表达为
+  * $P(u,v) = p_k + s_ut_uu +s_vt_vv= H(u,v,1,1)^T$
+  * H 是一个函数表达, 代表了 4x4 的 homogeneous transformation (齐次变换)
+$$H = \begin{bmatrix}
+  s_ut_u & s_vt_v& 0 &p_k \\
+  0 &0&0&1
+\end{bmatrix}=
+\begin{bmatrix}
+  RS & p_k \\
+  0 & 1
+\end{bmatrix}
+$$
+
+
+投影
+* 直接将 2D GS 按照中心点 affine 投影到 图像平面上, 会导致只有中心点的距离是正确的
+* 解决办法是, 将 2D splat 投影到 图像平面的这一过程描述为齐次坐标下的 general 2D-to-2D mapping
+  * 从图像平面 (x,y) 坐标出发的 camera ray 射线可 slpat 的焦点的深度为 z, 其空间点的坐标为 
+$$
+x = (xz, yz, z, 1)^T=WP(u,v) = WH(u,v,1,1)^T
+$$
+
+Splatting
+* 栅格化 rasterize : explicit ray-splat intersection
+  * 能够快速的确定每一个像素点对应的高斯距离
+* Degenerate Solutions : 
+  * 在渲染的时候剔除与相机射线近乎平行的 2DGS
+* rasterization : 与 3DGS 相同
+
+Mesh 建模:
+* TSDF 
+  * 使用 median depth 效果最好
+* Poisson surface reconstruction 也可以用, 但是效果不如上着
