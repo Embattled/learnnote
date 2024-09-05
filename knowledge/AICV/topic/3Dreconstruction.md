@@ -228,7 +228,7 @@ https://cvpr.thecvf.com/media/PosterPDFs/CVPR%202024/30910.png?t=1717366268.1976
 原理思路:
 * 3DGS 与 薄 thin 的 Surface 是相冲突的
 * 3DGS 本身没有 法线属性, 这对于表面重构是超级重要的
-* NVS 任务不必要, 但是表面重构是超级重要的 view consistency 在原本的 3DGS 中没有
+* NVS 任务不必要, 但是表面重构是超级重要的, view consistency 在原本的 3DGS 中没有
 
 
 模型:
@@ -274,3 +274,19 @@ Mesh 建模:
 * TSDF 
   * 使用 median depth 效果最好
 * Poisson surface reconstruction 也可以用, 但是效果不如上着
+
+
+### RaDe-GS: Rasterizing Depth in Gaussian Splatting 
+
+2D GS 的后继
+
+对之前工作的评价
+* GOF     : 计算量太大
+* 2D-GS   : 扁平化的 GS, 直接使用低维度的表达会导致 优化困难, 对于复杂的形状导致重建困难
+
+该工作的成果: 用原本 3D-GS 的速度实现了 NeuraLangelo (0.61)的近似精度 (0.69), 优于 GOF(0.74)  2D GS(0.80)
+* novel rasterized method 用来高效计算 depth and normal maps
+
+
+
+

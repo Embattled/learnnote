@@ -27,7 +27,10 @@ https://openvinotoolkit.github.io/nncf/schema/
 * log_dir
 
 
-input_info : 描述模型的具体输入大小, NNCF 会根据模型的输入大小来生成对应的 dummpy Tensor 用于作为 forward 的默认参数, 如果不设置的话 forward 里的 tensor 会作为位置参数. 是 `single_object_version` 或 `array_of_objects_version` 其中之一
+input_info : 描述模型的具体输入大小
+  * 是 `single_object_version` 或 `array_of_objects_version` 其中之一
+* 如果指定的话 ： NNCF 会根据模型的输入大小来生成对应的 dummpy Tensor 用于作为 forward 的默认参数
+* 如果不设置的话 forward 里的 tensor 会作为位置参数. 
 * single_object_version : 
   * `type` : tensor 的数据类型, Data type of the model input tensor, `float` 之类的
   * `sample_size`  : Shape of the tensor expected as input to the model. 用列表表示的模型输入 shape `[1, 4, 512, 512],`
@@ -56,15 +59,25 @@ Contains the configuration parameters required for NNCF to apply the selected al
 
 会从一个 dict 或者 JSON 文件中读取内容, 并依据相应的 schema 进行检查  
 
-
-* `class nncf.NNCFConfig(*args, **kwargs)`  类本身的构造函数并不经常使用, 主要通过类方法来获取对应的实例
-* `classmethod from_dict(nncf_dict)`        : 从一个 dict 中读取配置
-* `classmethod from_json(path)`             : 从一个 JSON 文件中读取配置
+创建/ 构造函数
+* `class nncf.NNCFConfig(*args, **kwargs)`  类本身的构造函数并不经常使用, 主要通过类方法来获取对应的实例, 例如
+  * `nncf.torch.register_default_init_args`
 * `static schema()`                         : 用于获取 用来检测对应输入是否合法的 `JSONSchema`  
 
 
-register_extra_structs(struct_list)
-get_redefinable_global_param_value_for_algo(param_name, algo_name)
+
+类方法:
+* `classmethod from_dict(nncf_dict)`        : 从一个 dict 中读取配置
+* `classmethod from_json(path)`             : 从一个 JSON 文件中读取配置
+
+
+
+其他方法:
+* `register_extra_structs(struct_list)`
+  * 在后期添加额外的 configuration 
+  * struct_list `(List[nncf.config.structures.NNCFExtraConfigStruct])` – List of extra configuration structures.
+
+* get_redefinable_global_param_value_for_algo(param_name, algo_name)
 
 
 ### 3.1.2. nncf.ModelType
@@ -137,42 +150,7 @@ import nncf  # Important - should be imported right after torch
 
 nncf.torch 模组下的主要函数接口
 
-### 4.1.1. create_compressed_model
-
-创建优化后的模型的核心接口 
-
-`nncf.torch.create_compressed_model(model, config, compression_state=None, dummy_forward_fn=None, wrap_inputs_fn=None, wrap_outputs_fn=None, dump_graphs=True)`
-
-参数:
-* config: `nncf.NNCFConfig` nncf的核心配置类
-* compression_state `(Optional[Dict[str, Any]])` 
-  * 压缩状态的核心 dict, 用于无差错的读取量化学习模型  
-* dump_graphs : 默认值 True, 是否 dump `.dot` 格式的模型压缩前后的内部 graph representation. 输出会保存到 log directory
-
-
-返回值:
-* `Tuple[nncf.api.compression.CompressionAlgorithmController, nncf.torch.nncf_network.NNCFNetwork]`
-* CompressionAlgorithmController: 用于控制压缩算法的控制器
-* NNCFNetwork : 经过 NNCF 压缩封装后的模型实例 
-
-### 4.1.2. load_state
-
-`nncf.torch.load_state(model, state_dict_to_load, is_resume=False, keys_to_ignore=None)`
-* nncf 框架下的 torch 模型加载, 在某些情况下稳定性要优于使用 torch 的接口    
-
-
-参数:
-* model : torch.nn.Module,  需要进行参数加载的 模型
-* state_dict_to_load : dict, 标准的参数字典
-* is_resume : 关键参数, 默认为 False
-  * 主要用于在 state_dict 与模型中的参数网络不匹配的时候是否报错. 这个不匹配是双向的.
-  * 通常情况下, 把一个未压缩的参数 dict 加载到一个已经应用过压缩算法的模型 (网络层有变动) 的时候, 置为 False.
-  * 如果是把 压缩过的参数 dict 加载到已经应用过压缩的 模型, 则需要置 True 用于保证安全加载
-* keys_to_ignore : `(List[str])`, 在加载过程中, 需要跳过 matching 过程的参数名称.  
-* 返回值 : int, The number of state_dict_to_load entries successfully matched and loaded into model.
-
-
-### 4.1.3. register_default_init_args - 建立NNCF控制参数
+### 4.1.1. register_default_init_args - 建立NNCF控制参数
 
 ```py
 nncf.torch.register_default_init_args(nncf_config, train_loader, 
@@ -189,6 +167,51 @@ Return type:
 ```
 
 文档中没有任何说明, 要查找只能依据各种 example
+传入一个 nncf.NNCFConfig, 然后再返回一个 nncf.NNCFConfig
+
+主要作用就是向 nncf.NNCFConfig 绑定标定用的数据集
+
+
+### 4.1.2. create_compressed_model
+
+创建优化后的模型的核心接口 
+
+```py
+def nncf.torch.create_compressed_model(model, config, 
+  compression_state=None,
+  dummy_forward_fn=None, 
+  wrap_inputs_fn=None, wrap_outputs_fn=None,
+  dump_graphs=True)
+```
+
+参数:
+* config: `nncf.NNCFConfig` nncf的核心配置类
+* compression_state `(Optional[Dict[str, Any]])` 
+  * 压缩状态的核心 dict, 用于无差错的读取量化学习模型  
+* dump_graphs : 默认值 True, 是否 dump `.dot` 格式的模型压缩前后的内部 graph representation. 输出会保存到 log directory
+
+
+返回值:
+* `Tuple[nncf.api.compression.CompressionAlgorithmController, nncf.torch.nncf_network.NNCFNetwork]`
+* CompressionAlgorithmController: 用于控制压缩算法的控制器
+* NNCFNetwork : 经过 NNCF 压缩封装后的模型实例 
+
+### 4.1.3. load_state
+
+`nncf.torch.load_state(model, state_dict_to_load, is_resume=False, keys_to_ignore=None)`
+* nncf 框架下的 torch 模型加载, 在某些情况下稳定性要优于使用 torch 的接口    
+
+
+参数:
+* model : torch.nn.Module,  需要进行参数加载的 模型
+* state_dict_to_load : dict, 标准的参数字典
+* is_resume : 关键参数, 默认为 False
+  * 主要用于在 state_dict 与模型中的参数网络不匹配的时候是否报错. 这个不匹配是双向的.
+  * 通常情况下, 把一个未压缩的参数 dict 加载到一个已经应用过压缩算法的模型 (网络层有变动) 的时候, 置为 False.
+  * 如果是把 压缩过的参数 dict 加载到已经应用过压缩的 模型, 则需要置 True 用于保证安全加载
+* keys_to_ignore : `(List[str])`, 在加载过程中, 需要跳过 matching 过程的参数名称.  
+* 返回值 : int, The number of state_dict_to_load entries successfully matched and loaded into model.
+
 
 
 

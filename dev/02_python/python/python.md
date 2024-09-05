@@ -7,69 +7,78 @@
   - [2.2. Python 保留字](#22-python-保留字)
   - [2.3. python 的类型提示](#23-python-的类型提示)
   - [2.4. 作用域](#24-作用域)
-- [4. Python的操作符与变量](#4-python的操作符与变量)
-  - [4.1. 基础类型](#41-基础类型)
-  - [4.2. 转义字符](#42-转义字符)
-  - [4.3. 运算符](#43-运算符)
-- [5. Python 流程控制](#5-python-流程控制)
-  - [5.1. 逻辑流程](#51-逻辑流程)
-    - [5.1.1. for 表达式](#511-for-表达式)
-    - [5.1.2. 列表推导式（又称列表解析式）](#512-列表推导式又称列表解析式)
-  - [5.2. 异常流程控制](#52-异常流程控制)
-    - [5.2.1. 异常类](#521-异常类)
-    - [5.2.2. raise 语句](#522-raise-语句)
-    - [5.2.3. assert 语句](#523-assert-语句)
-    - [5.2.4. 异常信息捕获](#524-异常信息捕获)
-    - [5.2.5. 自定义异常类](#525-自定义异常类)
-- [6. python 的函数](#6-python-的函数)
-  - [6.1. 函数参数](#61-函数参数)
-    - [6.1.1. Python的可变参数](#611-python的可变参数)
-    - [6.1.2. 逆向参数收集](#612-逆向参数收集)
-    - [6.1.3. partial 偏函数](#613-partial-偏函数)
-    - [6.1.4. 闭包函数](#614-闭包函数)
-  - [6.2. 函数的文档](#62-函数的文档)
-  - [6.3. yield 表达式](#63-yield-表达式)
-  - [6.4. lambda 表达式 匿名函数](#64-lambda-表达式-匿名函数)
-  - [6.5. 函数的异常处理](#65-函数的异常处理)
-- [7. python 的类](#7-python-的类)
-  - [7.1. 定义](#71-定义)
-  - [7.2. self](#72-self)
-  - [7.3. 类的变量](#73-类的变量)
-  - [7.4. 类方法 静态方法](#74-类方法-静态方法)
-  - [7.5. 类的描述符](#75-类的描述符)
-  - [7.6. 类的封装](#76-类的封装)
-    - [7.6.1. property()](#761-property)
-    - [7.6.2. @property 装饰器](#762-property-装饰器)
-  - [7.7. 类的继承和多态](#77-类的继承和多态)
-    - [7.7.1. super](#771-super)
-    - [7.7.2. MRO Method Resolution Order](#772-mro-method-resolution-order)
-- [9. Python 的文件操作](#9-python-的文件操作)
-  - [9.1. open 打开文件](#91-open-打开文件)
-  - [9.2. 读取文件](#92-读取文件)
-  - [9.3. 写入文件](#93-写入文件)
-  - [9.4. 结构化读取文件](#94-结构化读取文件)
-- [10. Command line and environment](#10-command-line-and-environment)
-  - [10.1. Command line](#101-command-line)
-    - [10.1.1. -m module-name](#1011--m-module-name)
-    - [10.1.2. 杂项选项](#1012-杂项选项)
-  - [10.2. python Environment variables](#102-python-environment-variables)
-- [Lexical analysis - 词法分析](#lexical-analysis---词法分析)
-  - [Identifiers and keywords - 标识符和关键字](#identifiers-and-keywords---标识符和关键字)
-    - [Keywords](#keywords)
-    - [Soft Keywords](#soft-keywords)
-    - [Reserved classes of identifiers - 保留的类](#reserved-classes-of-identifiers---保留的类)
-- [Execution model](#execution-model)
+- [3. Python的操作符与变量](#3-python的操作符与变量)
+  - [3.1. 基础类型](#31-基础类型)
+  - [3.2. 转义字符](#32-转义字符)
+  - [3.3. 运算符](#33-运算符)
+- [4. Python 流程控制](#4-python-流程控制)
+  - [4.1. 逻辑流程](#41-逻辑流程)
+    - [4.1.1. for 表达式](#411-for-表达式)
+    - [4.1.2. 列表推导式（又称列表解析式）](#412-列表推导式又称列表解析式)
+  - [4.2. 异常流程控制](#42-异常流程控制)
+    - [4.2.1. 异常类](#421-异常类)
+    - [4.2.2. raise 语句](#422-raise-语句)
+    - [4.2.3. assert 语句](#423-assert-语句)
+    - [4.2.4. 异常信息捕获](#424-异常信息捕获)
+    - [4.2.5. 自定义异常类](#425-自定义异常类)
+- [5. python 的函数](#5-python-的函数)
+  - [5.1. 函数参数](#51-函数参数)
+    - [5.1.1. Python的可变参数](#511-python的可变参数)
+    - [5.1.2. 逆向参数收集](#512-逆向参数收集)
+    - [5.1.3. partial 偏函数](#513-partial-偏函数)
+    - [5.1.4. 闭包函数](#514-闭包函数)
+  - [5.2. 函数的文档](#52-函数的文档)
+  - [5.3. yield 表达式](#53-yield-表达式)
+  - [5.4. lambda 表达式 匿名函数](#54-lambda-表达式-匿名函数)
+  - [5.5. 函数的异常处理](#55-函数的异常处理)
+- [6. Python 的文件操作](#6-python-的文件操作)
+  - [6.1. open 打开文件](#61-open-打开文件)
+  - [6.2. 读取文件](#62-读取文件)
+  - [6.3. 写入文件](#63-写入文件)
+  - [6.4. 结构化读取文件](#64-结构化读取文件)
+- [7. Command line and environment](#7-command-line-and-environment)
+  - [7.1. Command line](#71-command-line)
+    - [7.1.1. -m module-name](#711--m-module-name)
+    - [7.1.2. 杂项选项](#712-杂项选项)
+  - [7.2. python Environment variables](#72-python-environment-variables)
+- [8. Lexical analysis - 词法分析](#8-lexical-analysis---词法分析)
+  - [8.1. Identifiers and keywords - 标识符和关键字](#81-identifiers-and-keywords---标识符和关键字)
+    - [8.1.1. Keywords](#811-keywords)
+    - [8.1.2. Soft Keywords](#812-soft-keywords)
+    - [8.1.3. Reserved classes of identifiers - 保留的类](#813-reserved-classes-of-identifiers---保留的类)
+- [9. Data model - 数据模型](#9-data-model---数据模型)
+  - [9.1. Objects, values and types - 对象, 值, 类型 的定义](#91-objects-values-and-types---对象-值-类型-的定义)
+  - [9.2. The standard type hierarchy](#92-the-standard-type-hierarchy)
+  - [9.3. Special method names - 特殊方法名称](#93-special-method-names---特殊方法名称)
+  - [Coroutines - 协程](#coroutines---协程)
+- [10. Execution model](#10-execution-model)
 - [11. The import system - 模组导入系统](#11-the-import-system---模组导入系统)
-  - [8.1. 导入模块或包](#81-导入模块或包)
-  - [8.2. 自定义模块](#82-自定义模块)
-  - [8.3. 包](#83-包)
-  - [8.4. 包信息调取](#84-包信息调取)
+  - [11.1. 导入模块或包](#111-导入模块或包)
+  - [11.2. 自定义模块](#112-自定义模块)
+  - [11.3. 包](#113-包)
+  - [11.4. 包信息调取](#114-包信息调取)
 - [12. Expressions 表达式](#12-expressions-表达式)
+  - [Arithmetic conversions - 基础数值类型转换规则](#arithmetic-conversions---基础数值类型转换规则)
 - [13. Simple statements - 简单语句](#13-simple-statements---简单语句)
 - [14. Compound Statements - 复合语句](#14-compound-statements---复合语句)
   - [14.1. The if statement](#141-the-if-statement)
   - [14.2. The while statement](#142-the-while-statement)
-  - [The match statement - python3.10 加入](#the-match-statement---python310-加入)
+  - [The with statement - with 表达式](#the-with-statement---with-表达式)
+  - [14.3. The match statement - python3.10 加入](#143-the-match-statement---python310-加入)
+  - [Function definitions - 函数的定义](#function-definitions---函数的定义)
+  - [14.4. Class definitions - 类的定义](#144-class-definitions---类的定义)
+  - [Coroutines - 协程函数的定义](#coroutines---协程函数的定义)
+  - [Type parameter lists](#type-parameter-lists)
+  - [14.6. self](#146-self)
+  - [14.7. 类的变量](#147-类的变量)
+  - [14.8. 类方法 静态方法](#148-类方法-静态方法)
+  - [14.9. 类的描述符](#149-类的描述符)
+  - [14.10. 类的封装](#1410-类的封装)
+    - [14.10.1. property()](#14101-property)
+    - [14.10.2. @property 装饰器](#14102-property-装饰器)
+  - [14.11. 类的继承和多态](#1411-类的继承和多态)
+    - [14.11.1. super](#14111-super)
+    - [14.11.2. MRO Method Resolution Order](#14112-mro-method-resolution-order)
 - [15. Top-level components - 顶层复合语句](#15-top-level-components---顶层复合语句)
 
 # 1. The Python Language Reference
@@ -280,7 +289,7 @@ def spam():
 
 
 
-# 4. Python的操作符与变量
+# 3. Python的操作符与变量
 
 Python是弱类型语言
 
@@ -288,7 +297,7 @@ Python是弱类型语言
 - 变量的数据类型可以随时改变
 - 使用 type() 内置函数类检测某个变量或者表达式的类型
 
-## 4.1. 基础类型
+## 3.1. 基础类型
 
 整数, 浮点数, 复数, 字符串, bytes, 布尔
 
@@ -331,7 +340,7 @@ Python是弱类型语言
   - 以上都被认为是 False
 - `None` 是NoneType类型的唯一值,类似于C语言的 `null`
 
-## 4.2. 转义字符
+## 3.2. 转义字符
 
 在 Python 中, 一个 ASCII 字符除了可以用它的实体（也就是真正的字符）表示, 还可以用它的编码值表示  
 
@@ -354,7 +363,7 @@ Python是弱类型语言
 - \"  双引号
 - \  在字符串行尾的续行符, 即一行未完, 转到下一行继续写。
 
-## 4.3. 运算符
+## 3.3. 运算符
 
 1. 算术运算符
    - `+ - * %`与C语言相同
@@ -394,14 +403,14 @@ Python是弱类型语言
 
 
 
-# 5. Python 流程控制
+# 4. Python 流程控制
 
 控制程序的执行顺序
 
 - 运行逻辑控制
 - 异常处理
 
-## 5.1. 逻辑流程
+## 4.1. 逻辑流程
 
 - 逻辑流程控制
   - `break`和`continue` 同C语言是一样的
@@ -410,7 +419,7 @@ Python是弱类型语言
     - 但是使用 `break` 跳出当前循环体之后, 该循环后的 `else` 代码块**也不会被执行**
 
 
-### 5.1.1. for 表达式
+### 4.1.1. for 表达式
 
 1. for 循环中经常使用 `range()` 函数来指定循环
 2. 在使用 for 循环遍历字典时, 经常会用到和字典相关的 3 个方法, 即 items()、keys() 以及 values()
@@ -427,7 +436,7 @@ for ele in my_dic.items():
    print('ele =', ele)
 ```
 
-### 5.1.2. 列表推导式（又称列表解析式）
+### 4.1.2. 列表推导式（又称列表解析式）
 
 推导式（又称解析器）, 是 Python 独有的一种特性。  
 使用推导式可以快速生成列表、元组、字典以及集合类型的数据,因此推导式又可细分为:  
@@ -459,7 +468,7 @@ for x in range(1,5):
         x*y
 ```
 
-## 5.2. 异常流程控制
+## 4.2. 异常流程控制
 
 - python 的核心异常处理机制即 try except
 - 异常处理中也可以使用 else
@@ -494,7 +503,7 @@ finally:
   - `except  [Exception]` 代表程序可能发生的所有异常情况, 通常放在最后兜底
     - 这种语句写在最后, 就算不加 Exception 也代表接受所有异常情况
 
-### 5.2.1. 异常类
+### 4.2.1. 异常类
 
 - 异常作为一个类也拥有对应的属性
   - args  记录了异常的错误编号和描述字符串
@@ -523,7 +532,7 @@ except Exception as e:
 # ZeroDivisionError(division by zero',)
 ```
 
-### 5.2.2. raise 语句
+### 4.2.2. raise 语句
 
 - raise 语句用于主动调取一个异常
 - 语法格式: `raise [exceptionName [(reason)]]`
@@ -541,7 +550,7 @@ raise ZeroDivisionError("除数不能为零")
 # ZeroDivisionError: 除数不能为零
 ```
 
-### 5.2.3. assert 语句
+### 4.2.3. assert 语句
 
 类似于 C 语言的 assert
 
@@ -562,7 +571,7 @@ else:
     程序报 AssertionError 错误
 ```
 
-### 5.2.4. 异常信息捕获
+### 4.2.4. 异常信息捕获
 
 或许异常的详细信息
 
@@ -587,7 +596,7 @@ except:
 # File "C:\Users\mengma\Desktop\demo.py", line 7, in <module>
 ```
 
-### 5.2.5. 自定义异常类
+### 4.2.5. 自定义异常类
 
 - 自定义的异常类通常继承自 Exception 类, 名字以 `Error` 结尾
 - 自定义异常类也是一个类, 而且只能被 raise 调用, 不会被解释器触发
@@ -608,7 +617,7 @@ except SelfExceptionError as err:
 # error: 1 is invalid input
 ```
 
-# 6. python 的函数
+# 5. python 的函数
 
 函数的定义
 
@@ -627,7 +636,7 @@ def 函数名(参数列表):
 
 - 不手动写出的话会在幕后给没有 return 的函数添加 return None
 
-## 6.1. 函数参数
+## 5.1. 函数参数
 
 **Python的值传递和引用传递**
 
@@ -649,7 +658,7 @@ def 函数名(参数列表):
 - `print('a','b','c')` 在参数之间会默认隔一个空格
 - `print('a','b','c',seq=',')` 会输出 **a,b,c**
 
-### 6.1.1. Python的可变参数
+### 5.1.1. Python的可变参数
 
 - 可变参数, 即允许定义参数个数可变的函数。这样当调用该函数时, 可以向其传入任意多个参数, 包括不传参数。  
 - `*args` 可变参数的值默认是空元组
@@ -682,7 +691,7 @@ dis_str("http://c.biancheng.net",\
 
 ```
 
-### 6.1.2. 逆向参数收集
+### 5.1.2. 逆向参数收集
 
 - 通过星符号, 直接将  "列表、元组" 和 "字典" 作为函数参数
 - Python 会将其进行拆分, 把其中存储的元素按照次序分给函数中的各个形参。
@@ -703,7 +712,7 @@ dis_str(**data)
 
 ```
 
-### 6.1.3. partial 偏函数
+### 5.1.3. partial 偏函数
 
 - partial关键字, 位于 `functools` 模块中
 - 是专门用于对函数进行二次封装的功能 : 定义偏函数
@@ -724,7 +733,7 @@ GaryFun = partial(display,name = 'Gary')
 GaryFun(age = 13)
 ```
 
-### 6.1.4. 闭包函数
+### 5.1.4. 闭包函数
 
 同偏函数一样, 闭包函数也是削减参数个数的一种函数封装方法,  
 闭包函数的定义有特殊的语法:
@@ -757,7 +766,7 @@ print(square(2))
 print(square.__closure__)
 ```
 
-## 6.2. 函数的文档
+## 5.2. 函数的文档
 
 通过在合理的地方放置多行注释, python 可以方便的将其作为函数说明文档输出
 
@@ -779,7 +788,7 @@ print(str_max.__doc__)
 
 ```
 
-## 6.3. yield 表达式
+## 5.3. yield 表达式
 
 - yield 用来定义一个生成器函数或者异步生成器函数中
 - 因此只能被用在函数体的定义里, 使得该函数不再是一个普通函数
@@ -852,7 +861,7 @@ def read_file(fpath):
                 
 ```
 
-## 6.4. lambda 表达式 匿名函数
+## 5.4. lambda 表达式 匿名函数
 
 - lambda 表达式, 又称匿名函数, 常用来表示内部仅包含 1 行表达式的函数.  
 - 如果一个函数的函数体仅有 1 行表达式, 则该函数就可以用 lambda 表达式来代替。  
@@ -874,7 +883,7 @@ def name(list):
 name(list)
 ```
 
-## 6.5. 函数的异常处理
+## 5.5. 函数的异常处理
 
 如果 `try` 子句中的代码发生了错误, 则程序立即到 `except` 中的代码去执行  
 
@@ -894,41 +903,468 @@ python有很多的error类:
 `ValueError` 对于输入数据的类型不符
 `FileNotFoundError` 打开文件的路径不对, 文件不存在  
 
-# 7. python 的类
+# 6. Python 的文件操作
 
-类同C++无太大区别  
+- python 的文件操作核心就是 `file object`
 
-- python可以动态的给类添加变量和方法
-  - 添加使用正常赋值
-  - 删除使用 `del` 保留字
+- 与 C++ 的文件对象一样, 也有地点指针
+  - `.tell()` 返回一个整数, 代表当前的文件指针位置, 即从文件开始的bytes数或者字符数
+  - `.seek(offset,whence)`
+    - offset 表示偏移量
+    - whence表示偏移起始位置
+    - 0表示从文件开始
+    - 1表示从当前位置
+    - 2表示从文件末尾
 
-## 7.1. 定义
+## 6.1. open 打开文件
 
-python 的类通过`class`定义 , python的 `类名` 一般以大写字母开头的驼峰式  
+- 打开一个文件路径并返回 file object
+- 如果不能打开, 会 raise OSError
+  - 需要配合 with 语句来确保打开范围
+  - 如果不用 with 的话, 需要手动调用 f.close()来确保文件正常关闭
 
 ```py
-class TheFirstDemo:
-    '''这是一个学习Python定义的第一个类'''
-
-    # 定义类的构造函数  
-    def __init__(self,<other parameter>):
-        pass
-
-    # 下面定义了一个类属性
-    add = 'http://c.biancheng.net'
-
-    # 下面定义了一个say方法
-    def say(self, content):
-        print(content)
-
+open(file, mode='r', buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None)
+# file    ：一个 path-like object
+# mode    : 一个字符串用来指定打开的模式, 默认是'r', 
 
 ```
 
-1. 同理在定义下方第一行可以写类的文档
-2. `__init__` 是保留的构造函数名, 可以不写构造函数, 会隐式的定义默认的构造函数
-3. `self` 是保留的参数, 类的所有方法都需要有`self`参数, 但是该参数不需要真的传参
+| Character | Meaning                                                         |
+| --------- | --------------------------------------------------------------- |
+| 'r'       | open for reading                                                |
+| 'w'       | open for writing, truncating the file first                     |
+| 'x'       | open for exclusive creation, failing if the file already exists |
+| 'a'       | open for writing, appending to the end of the file if it exists |
+| 'b'       | binary mode                                                     |
+| 't'       | text mode (default)                                             |
+| '+'       | open for updating (reading and writing)                         |
 
-## 7.2. self
+## 6.2. 读取文件
+
+- 在通过 open 得到 file object 后, 即可通过相关方法来读取文件
+  - .read(size) 读取一定数量的数据
+    - size的单位是字符数或者bytes数
+    - 没有 size 默认读取整个文件
+  - .readline() 读取单个行
+    - 这种方法会读取到行末的 `\n`
+    - 使用 for 循环来遍历 file object 时也是默认以行为单位
+  - 希望将数据转换成 list
+    - list(f) 直接转化
+    - f.readlines() 返回一个list
+
+```python
+#这个文件对象只在with的Block里面有效
+with open('pi_digits.txt') as file_object:
+  # 1. read() 读取整个文件
+  contents = file_object.read()         
+  
+  # 2. 按行来读取文件
+  for line in file_object:
+    # 行末已有换行符
+    print(line,end='')
+
+  # 3. 将文件读取到一个list里
+  lines = file_object.readlines()
+for line in lines:  #可以在block外读取文件内容
+  print(line.rstrip()) # 可以用rstrip方法来清除文件的换行符
+```
+
+## 6.3. 写入文件
+
+- 要想写入文件,需要在文件对象创建的时候指定`'w'`参数,或者`'a'`参数
+- 使用方法 `.write(str)` 传入要写入的字符串, 同时会返回写入的字符个数
+
+```python
+# 使用 write()方法来写入内容
+# 记得自己输入换行符
+file_object.write("I like programming.\n") 
+```
+
+## 6.4. 结构化读取文件
+
+使用 enumerate 可以按行获取文件内容  
+`for j, data in enumerate(openfile)`
+
+```py
+with open('animal.txt', 'r') as openfile:
+  for j, data in enumerate(openfile):
+    if j % n == 0:
+      print(f'Line number {str(j)}. Content: {data}')
+```
+
+
+# 7. Command line and environment
+
+此节用于学习 python CLI 以及解释器的各种环境配置
+
+## 7.1. Command line
+
+使用 python CLI 的形式
+* `python myscript.py` 简单运行一个脚本
+* `python [-bBdEhiIOqsSuvVWx?] [-c command | -m module-name | script | - ] [args]`  完整的 CLI 可能输入
+
+### 7.1.1. -m module-name
+
+Search `sys.path` for the named module and execute its contents as the __main__ module.
+
+执行一个 包自己的 `main` 函数 `<pkg>.__main__`, module-name 不需要带上 `.py` 后缀  
+
+
+### 7.1.2. 杂项选项
+
+`python -m pip --version`
+
+
+
+## 7.2. python Environment variables
+
+会对 python 解释器起作用的环境变量  
+
+# 8. Lexical analysis - 词法分析
+
+就是编译原理的那个词法分析: 由于 python 是解释性语言, 所以代码会直接经过词法分析生成 token 传入执行设备
+python 默认使用 Unicode utf-8 来解码代码, 可以通过 encoding declaration 来更改
+
+
+## 8.1. Identifiers and keywords - 标识符和关键字
+
+
+### 8.1.1. Keywords
+
+以下的字符完全作为 python 语言的关键字 (与内置函数的含义不同), 是构成语法的关键, 使用时要完全正确拼写
+
+```
+False      await      else       import     pass
+None       break      except     in         raise
+True       class      finally    is         return
+and        continue   for        lambda     try
+as         def        from       nonlocal   while
+assert     del        global     not        with
+async      elif       if         or         yield
+```
+### 8.1.2. Soft Keywords 
+
+仅在特定的上下文 context 下被解释为关键字, 是 3.10 后加入的新的语法的功能  包括 
+
+`match, case, type, _`  4 种, soft keyward 的区分是发生在 parser level 
+* match, case, and _ are used in the `match` statement
+* type is used in the `type` statement.
+
+
+### 8.1.3. Reserved classes of identifiers - 保留的类
+
+某些 identifiers 会带有特殊含义, 通过特殊的前缀来实现区别
+
+# 9. Data model - 数据模型
+
+## 9.1. Objects, values and types - 对象, 值, 类型 的定义
+<!-- 完 -->
+
+objects: 是 python 对于数据的抽象表示, python 里面所有的数据都是 对象, 或者用对象之间的关系表示
+* 代码也由对象表示
+* 所有对象都有 identity, type, value, 其中 identity 是所有对象的唯一标识符, 类似于对象在内存中的地址, 但不一定是真的地址
+  * 可以通过 `is` 来进行对象的身份比较
+  * `id()` 返回一个表示对象身份的整数
+  * 对于 CPython 来说, `id(x)` 就是内存地址
+
+type: 决定了该对象所支持的操作, 例如能否获取长度, 以及该对象可能存入的值的类型
+* 对于一个对象来说, type 是不可更改的
+* type 本身也是一个对象
+
+
+value: 可以改变 value 的对象称为 mutable, 不可改变 value 的对象称为 immutable
+* 如果 immutable 里包含了 mutable, 那么 mutable 的值改变的时候， immutable 的实际上的值也发生了改变
+* immutable 只是从形式上不允许任何值操作
+
+
+Python 的 Object 永远没有显示的删除功能, 如果一个 object 不可被访问 (unreachable), 那么它可能会被当作垃圾收集
+* 从思想上 reachable object 永远不会被收集
+* 如果满足了上述条件, 则垃圾收集就是 Python 语言的实现质量的问题
+* CPython 的垃圾收集实现:
+  * 名为 reference-counting scheme with (optional) delayed detection of cyclically linked garbage 的方案
+  * 即当一个 object 不在被 reference, 即变得 unreachable, 则该对象理论上会被立即收集
+    * but is not guaranteed to collect garbage containing circular references
+    * 什么是 circular references? 两个结构体, 内部互相引用彼此, python 的 `gc` 包里面提供了 circular references 的检测接口, 用于获取内存中unreachable 的  circular references
+  * 就算被收集, 不代表对象会被立即摧毁, 因此在 Python 中永远应该显式的关闭文件 `file.close()`
+
+设计到非正常垃圾收集的语句有:
+* debugging facilities 会导致 object 持续保持活跃
+* try except : 语句很有可能会使得 try 中的对象在语句结束后仍然活跃
+
+因此凡是涉及到外部资源, 例如文件读取的操作的时候, python 极其推荐
+* 使用 try ... finally 来确保终结文件的打开状态
+* 使用 with 来方便的实现 上下文管理
+
+
+
+一个对象是否是 immutable 是十分重要的, 因为这涉及到在实现的过程中是否进行对象复用
+* 例如, int 类型本身是不可变的类型, 值1 和值2 是两个分别的对象 (只是举个例子, 不代表真实实现)
+* 执行 `a=1, b=1` 的时候, 有可能会使得 a,b 的值都是 id 相同的一个对象, 因为 1 值的对象可以复用
+* 因此在使用 object identity 的特性进行编程的时候需要格外谨慎
+* 注意:
+  * `a=[] , b=[]` 在 python 中会确保引用两个不同的, 唯一的, 新创建的空列表
+  * `a=b=[]` 会保证 a,b 引用相同的 空列表
+
+
+
+## 9.2. The standard type hierarchy
+
+## 9.3. Special method names - 特殊方法名称
+
+一个 class 可以通过实现特殊名称的 方法, 来实现由特殊语法调用的某些操作. 即运算符重载, 索引, 切片 等
+
+例如 `__getitem__()` 方法可以让类能够进行索引操作  
+
+同时, 如果运算符并未有对应操作的对应方法, 则会唤起 ERROR, 通常是  AttributeError or TypeError
+
+手动将某个特殊名称的方法设置为 None, 表示对应类不可以进行相应操作, 可以避免默认行为导致的歧义
+
+## Coroutines - 协程
+
+
+
+
+# 10. Execution model
+
+# 11. The import system - 模组导入系统
+
+
+
+Python 的核心封装功能
+
+## 11.1. 导入模块或包
+
+导入语句有多种写法
+
+1. `import <name1> [as <别名>], <name2> [as <别名>]`
+   - 来导入一个包,可以使用其中的函数  
+   - 在使用的时候要加上包名或者别名 `name.function()`  
+2. `from <name> import fun1[as <别名>], fun2[as <别名>]`
+   - 只导入指定函数,这时包中函数不再需要包名
+   - 直接使用成员名（或别名）即可
+
+模块导入的查找顺序
+
+- 在当前目录, 即当前执行的程序文件所在目录下查找；
+- 到 PYTHONPATH（环境变量）下的每个目录中查找；
+- 到 Python 默认的安装目录下查找。
+
+以上所有涉及到的目录, 都保存在标准模块 `sys` 的 `sys.path` 变量  
+因此在自定义包中的 `__init__` 文件中, 都会通过该变量进行路径添加  
+
+```py
+import sys, os
+import warnings
+if(not(os.path.dirname(os.path.realpath(__file__)) in sys.path)):
+    sys.path.append(os.path.dirname(os.path.realpath(__file__)))
+```
+
+## 11.2. 自定义模块
+
+- 只要是 Python 程序, 都可以作为模块导入
+- 模块名就是文件名, 不带`.py`
+
+自定义模块的文档  
+
+- 同理, 在模块开头的位置用多行字符串定义
+- 会自动赋值给该模块的 `__doc__` 变量
+
+模块的自定义导入
+
+1. 名称以下划线（单下划线“_”或者双下划线“__”）开头的变量、函数和类不会被导入, 属于本地
+2. 该模块设有 `__all__` 变量时, `from 模块名 import *` 只能导入该变量指定的成员, 用其他方式导入则不受影响
+
+**自定义模块的运行**
+
+导入后, 默认会执行包中的全部代码
+
+- 通常情况下, 为了检验模块中代码的正确性, 往往需要在模块中为其设计一段测试代码
+- 为让导入该模块的代码不自动执行测试代码, 借助`内置变量   __name__`
+
+1. 当直接运行一个模块时, name 变量的值为 `__main__`
+2. 将模块被导入其他程序中并运行该程序时, 处于模块中的 `__name__` 变量的值就变成了模块名
+
+```py
+# __name__  变量
+if __name__ == '__main__':
+  say() # 执行测试代码
+```
+
+## 11.3. 包
+
+包就是文件夹, 只不过在该文件夹下必须存在一个名为 `__init__.py` 的文件
+
+- 每个包的目录下都必须建立一个 `__init__.py` 的模块, 可以是一个空模块, 也可以是初始化代码
+  - `__init__.py` 不同于其他模块文件, 此模块的模块名不是 `__init__` , 而是它所在的包名, 即文件夹名
+- 文件夹的名称就是包名
+
+包导入的语法和导入模块相同, 只不过多了 `.` 点号, 用指定导入层级
+
+**__init__ 的编写**
+
+1. 导入包就等同于导入该包中的 `__init__.py` 文件
+2. 该文件的主要作用是导入该包内的其他模块
+
+```py
+# 在多文件编程中, 通过编写 __init__ 快速导入自定义包
+
+# 导入当前文件夹下的模块
+# 不同的书写方法会导致导入包后函数的调用
+
+# 需要用 包名.模块名.
+from . import module1
+
+# 虽然功能定义在模块2里, 但是调用时只用 包名.函数名
+from .module2 import * 
+```
+
+## 11.4. 包信息调取
+
+任何模块或者包作为一段python代码, 有自己内部定义的变量和类
+
+- help() 函数可以获取传入的对象的信息
+- `__doc__` 变量可以获取用户自己书写的文档
+- `__file__` 变量可以获取当前模块的源文件系统位置
+  - 包的话就是 `__init__.py` 文件的路径
+  - 模块就是源文件的路径
+
+# 12. Expressions 表达式
+
+该章节说明了 meaning of the elements of expressions
+
+## Arithmetic conversions - 基础数值类型转换规则 
+
+对于应用运算符的两个数值类型
+* 若有一方是复数, 则另一方转为复数
+* 若有一方是浮点数, 则另一方转为浮点数
+* 否则, 两边都必须是整数
+
+
+
+# 13. Simple statements - 简单语句
+
+# 14. Compound Statements - 复合语句
+
+复合语句 (包含了其他语法的代码组), 通常复合语句都会有多行  
+
+## 14.1. The if statement
+
+1. `if` `elif`  `else` 是三个关键字, 后面接表达式和 `:`
+2. 代码块记得加缩进
+3. `pass` 是 Python 中的关键字, 程序需要占一个位置, 或者放一条语句, 但又不希望这条语句做任何事
+
+```python
+if 表达式:
+  pass #内容
+elif 表达式:
+  pass
+else:
+  pass
+```
+
+## 14.2. The while statement
+
+内容同样不需要括号
+
+```py
+while 条件表达式：
+    代码块
+
+else:
+    pass
+```
+
+## The with statement - with 表达式
+
+通过 context manager 的方式来包装块的执行
+
+```py
+with_stmt          ::=  "with" ( "(" with_stmt_contents ","? ")" | with_stmt_contents ) ":" suite
+with_stmt_contents ::=  with_item ("," with_item)*
+with_item          ::=  expression ["as" target]
+```
+
+自底向上说明该语法:
+* `with_item` : context expression 会被执行, 其结果会作为 context manager, `["as" target]` 用于给 context manager 赋予名称
+
+
+## 14.3. The match statement - python3.10 加入
+
+在 python 3.10 以前的版本使用该语句会报错, 向下兼容性很差
+
+
+## Function definitions - 函数的定义
+
+## 14.4. Class definitions - 类的定义
+<!-- 完 -->
+
+类同C++无太大区别
+
+在 python 中, 类似乎更倾向于高级的数据结构, 因为 python 的很多基础的数据类型都类似于一个类, 可以参照 标准数据类型层级的说明: https://docs.python.org/3/reference/datamodel.html#types
+
+python 格式的定义语法为
+
+```py
+classdef    ::=  [decorators] "class" classname [type_params] [inheritance] ":" suite
+inheritance ::=  "(" [argument_list] ")"
+classname   ::=  identifier
+```
+
+`inheritance` : 类的继承列表
+* 该列表中的类会作为基类, 用于定义该新的用户类
+* 该列表中的 所有类都需要被允许进行子类的定义 
+  * each item in the list should evaluate to a class object which allows subclassing
+* 如果没有定义的类作为继承对象, 则会激动继承 python 的底层基类 `object`
+
+```py
+class Foo:
+    pass
+# 等同于
+class Foo(object):
+    pass
+
+# 1. 同理在定义下方第一行可以写类的文档
+# 2. `__init__` 是保留的构造函数名, 可以不写构造函数, 会隐式的定义默认的构造函数
+# 3. `self` 是保留的参数, 类的所有方法都需要有`self`参数, 但是该参数不需要真的传参
+```
+
+* `suite` : 在定义 class 之后, 会在 new execution frame 中执行 suite 里的语句
+  * 使用 newly created local namespace 以及 original global namespace
+  * suite 执行完成后, 对应的 execution frame 会被丢弃, 而 class 的 local namespace 会保留
+* 接下来, 会按照继承列表 创建基类, 并将对应的 local namespace 存入 attribute dictionary
+* 在原本的 origin local namespace 里将 class name 绑定到该 class object
+
+
+* `decorators` : 类也同函数一样, 可以被修饰
+  * (python3.9) class 可以被任何有效的  `assignment_expression` 修饰. 在 3.9 之前, 该语法更加严格
+* `type parameters` : 在 class's name 之后, 可以接续一个由方括号括起来的 `type parameters`
+  * (python3.12) type parameters 是 3.12 的新功能, 参照后面的章节
+  * 这回向 静态类型检查器(static type checkers) 表明该类是 generic 的
+  * 在 runtime 中, 对应的 type params 可以从  `__type_params__` 的属性中提取
+
+
+类的属性:
+* 在 class definition 中, 定义的变量 (不带 self.) 为 class attributes, 是 instances 共享的内容
+* instance attributes 是每个实例独有的, 要定义需要使用 `self.name = value`
+* class/instance attributes 在访问的时候使用相同的方法  `self.name`, 且名字相同的时候 instance 会覆盖 class attributes
+  * class attributes 在某种程度上可以作为属性的默认值
+  * 但是如何 class attributes 使用了 mutable values, 修改某一个实例会导致其他所有实例的值都更改导致非预期的行为, 因此不推荐
+* 
+
+
+
+
+## Coroutines - 协程函数的定义
+
+
+## Type parameter lists 
+
+Python 3.12 新功能
+
+
+
+## 14.6. self
 
 同C++一样, 指向方法的调用者  
 
@@ -951,7 +1387,7 @@ clanguage.bar = lambda self: print('--lambda表达式--', self)
 clanguage.bar(clanguage)
 ```
 
-## 7.3. 类的变量
+## 14.7. 类的变量
 
 1. 类变量: 类变量指的是在类中, 但在各个类方法外定义的变量。
    - 所有类的实例化对象都同时共享类变量, 即在所有实例化对象中是作为公用资源存在的
@@ -962,7 +1398,7 @@ clanguage.bar(clanguage)
 3. 局部变量 : 类方法中普通方法定义, 不使用 `self.` 来定义的变量
    - 函数执行完成后, 局部变量也会被销毁。
 
-## 7.4. 类方法 静态方法
+## 14.8. 类方法 静态方法
 
 1. `@classmethod` 修饰的方法为类方法
    - 相当于C++的类的静态方法
@@ -1013,7 +1449,7 @@ CLanguage.infos("C语言中文网","http://c.biancheng.net")
 
 - 而用类名调用类成员的方式称为非绑定方法。
 
-## 7.5. 类的描述符
+## 14.9. 类的描述符
 
 - 通过使用描述符, 可以让程序员在引用一个对象属性时自定义要完成的工作
 - 一个类可以将属性管理全权委托给描述符类
@@ -1052,7 +1488,7 @@ class myClass:
     y = 5
 ```
 
-## 7.6. 类的封装
+## 14.10. 类的封装
 
 - Python 并没有提供 public、private 这些修饰符
     默认情况下, Python 类中的变量和方法都是公有（public）的, 它们的名称前都没有下划线（_）；
@@ -1061,7 +1497,7 @@ class myClass:
   - 对于一个变量 `__私有变量` 在执行过程中实际的变量名变成了 `_类名__私有变量` 因此仍然可以在外部访问
 - 用 `类对象.属性` 的方法访问类中的属性是不妥的, 破坏了类的封装性
 
-### 7.6.1. property()
+### 14.10.1. property()
 
 - 为了实现类似于C++的类私有变量, 即只能通过类方法来间接操作类属性, 一般都会设置 getter setter 方法
 - 虽然保护了封装性, 但是调用起来非常麻烦
@@ -1089,7 +1525,7 @@ class CLanguage:
     name = property(getname, setname, delname, '指明出处')
 ```
 
-### 7.6.2. @property 装饰器
+### 14.10.2. @property 装饰器
 
 - 同 property 的作用一样, 这个装饰器的目的也是一样, 方便调用代码的书写
 - 通过该装饰器可以让方法的调用变得和属性一样 - 即不带括号
@@ -1122,7 +1558,7 @@ del rect.area
 print("删除后的area值为：",rect.area)
 ```
 
-## 7.7. 类的继承和多态
+## 14.11. 类的继承和多态
 
 - 类的继承, 在定义子类的时候, 将父类放在子类之后的圆括号即可
   - `class 类名(父类1, 父类2, ...)：`
@@ -1130,7 +1566,7 @@ print("删除后的area值为：",rect.area)
   - python 支持多继承, 大部分的对象语言都不允许多继承
     - 对于多个父类中的同名方法, 以最早出现的父类为准
 
-### 7.7.1. super
+### 14.11.1. super
   
 - 子类如果定义了自己的构造方法, 则里面必须要调用父类的构造方法
 - 在子类中的构造方法中, 调用父类构造方法的方式有 2 种, 分别是：
@@ -1140,307 +1576,7 @@ print("删除后的area值为：",rect.area)
 
 `super().__init__(self,...)`
 
-### 7.7.2. MRO Method Resolution Order
-
-
-# 9. Python 的文件操作
-
-- python 的文件操作核心就是 `file object`
-
-- 与 C++ 的文件对象一样, 也有地点指针
-  - `.tell()` 返回一个整数, 代表当前的文件指针位置, 即从文件开始的bytes数或者字符数
-  - `.seek(offset,whence)`
-    - offset 表示偏移量
-    - whence表示偏移起始位置
-    - 0表示从文件开始
-    - 1表示从当前位置
-    - 2表示从文件末尾
-
-## 9.1. open 打开文件
-
-- 打开一个文件路径并返回 file object
-- 如果不能打开, 会 raise OSError
-  - 需要配合 with 语句来确保打开范围
-  - 如果不用 with 的话, 需要手动调用 f.close()来确保文件正常关闭
-
-```py
-open(file, mode='r', buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None)
-# file    ：一个 path-like object
-# mode    : 一个字符串用来指定打开的模式, 默认是'r', 
-
-```
-
-| Character | Meaning                                                         |
-| --------- | --------------------------------------------------------------- |
-| 'r'       | open for reading                                                |
-| 'w'       | open for writing, truncating the file first                     |
-| 'x'       | open for exclusive creation, failing if the file already exists |
-| 'a'       | open for writing, appending to the end of the file if it exists |
-| 'b'       | binary mode                                                     |
-| 't'       | text mode (default)                                             |
-| '+'       | open for updating (reading and writing)                         |
-
-## 9.2. 读取文件
-
-- 在通过 open 得到 file object 后, 即可通过相关方法来读取文件
-  - .read(size) 读取一定数量的数据
-    - size的单位是字符数或者bytes数
-    - 没有 size 默认读取整个文件
-  - .readline() 读取单个行
-    - 这种方法会读取到行末的 `\n`
-    - 使用 for 循环来遍历 file object 时也是默认以行为单位
-  - 希望将数据转换成 list
-    - list(f) 直接转化
-    - f.readlines() 返回一个list
-
-```python
-#这个文件对象只在with的Block里面有效
-with open('pi_digits.txt') as file_object:
-  # 1. read() 读取整个文件
-  contents = file_object.read()         
-  
-  # 2. 按行来读取文件
-  for line in file_object:
-    # 行末已有换行符
-    print(line,end='')
-
-  # 3. 将文件读取到一个list里
-  lines = file_object.readlines()
-for line in lines:  #可以在block外读取文件内容
-  print(line.rstrip()) # 可以用rstrip方法来清除文件的换行符
-```
-
-## 9.3. 写入文件
-
-- 要想写入文件,需要在文件对象创建的时候指定`'w'`参数,或者`'a'`参数
-- 使用方法 `.write(str)` 传入要写入的字符串, 同时会返回写入的字符个数
-
-```python
-# 使用 write()方法来写入内容
-# 记得自己输入换行符
-file_object.write("I like programming.\n") 
-```
-
-## 9.4. 结构化读取文件
-
-使用 enumerate 可以按行获取文件内容  
-`for j, data in enumerate(openfile)`
-
-```py
-with open('animal.txt', 'r') as openfile:
-  for j, data in enumerate(openfile):
-    if j % n == 0:
-      print(f'Line number {str(j)}. Content: {data}')
-```
-
-
-# 10. Command line and environment
-
-此节用于学习 python CLI 以及解释器的各种环境配置
-
-## 10.1. Command line
-
-使用 python CLI 的形式
-* `python myscript.py` 简单运行一个脚本
-* `python [-bBdEhiIOqsSuvVWx?] [-c command | -m module-name | script | - ] [args]`  完整的 CLI 可能输入
-
-### 10.1.1. -m module-name
-
-Search `sys.path` for the named module and execute its contents as the __main__ module.
-
-执行一个 包自己的 `main` 函数 `<pkg>.__main__`, module-name 不需要带上 `.py` 后缀  
-
-
-### 10.1.2. 杂项选项
-
-`python -m pip --version`
-
-
-
-## 10.2. python Environment variables
-
-会对 python 解释器起作用的环境变量  
-
-# Lexical analysis - 词法分析
-
-就是编译原理的那个词法分析: 由于 python 是解释性语言, 所以代码会直接经过词法分析生成 token 传入执行设备
-python 默认使用 Unicode utf-8 来解码代码, 可以通过 encoding declaration 来更改
-
-
-## Identifiers and keywords - 标识符和关键字
-
-
-### Keywords
-
-以下的字符完全作为 python 语言的关键字 (与内置函数的含义不同), 是构成语法的关键, 使用时要完全正确拼写
-
-```
-False      await      else       import     pass
-None       break      except     in         raise
-True       class      finally    is         return
-and        continue   for        lambda     try
-as         def        from       nonlocal   while
-assert     del        global     not        with
-async      elif       if         or         yield
-```
-### Soft Keywords 
-
-仅在特定的上下文 context 下被解释为关键字, 是 3.10 后加入的新的语法的功能  包括 
-
-`match, case, type, _`  4 种, soft keyward 的区分是发生在 parser level 
-* match, case, and _ are used in the `match` statement
-* type is used in the `type` statement.
-
-
-### Reserved classes of identifiers - 保留的类
-
-某些 identifiers 会带有特殊含义, 通过特殊的前缀来实现区别
-
-
-# Execution model
-
-# 11. The import system - 模组导入系统
-
-
-
-Python 的核心封装功能
-
-## 8.1. 导入模块或包
-
-导入语句有多种写法
-
-1. `import <name1> [as <别名>], <name2> [as <别名>]`
-   - 来导入一个包,可以使用其中的函数  
-   - 在使用的时候要加上包名或者别名 `name.function()`  
-2. `from <name> import fun1[as <别名>], fun2[as <别名>]`
-   - 只导入指定函数,这时包中函数不再需要包名
-   - 直接使用成员名（或别名）即可
-
-模块导入的查找顺序
-
-- 在当前目录, 即当前执行的程序文件所在目录下查找；
-- 到 PYTHONPATH（环境变量）下的每个目录中查找；
-- 到 Python 默认的安装目录下查找。
-
-以上所有涉及到的目录, 都保存在标准模块 `sys` 的 `sys.path` 变量  
-因此在自定义包中的 `__init__` 文件中, 都会通过该变量进行路径添加  
-
-```py
-import sys, os
-import warnings
-if(not(os.path.dirname(os.path.realpath(__file__)) in sys.path)):
-    sys.path.append(os.path.dirname(os.path.realpath(__file__)))
-```
-
-## 8.2. 自定义模块
-
-- 只要是 Python 程序, 都可以作为模块导入
-- 模块名就是文件名, 不带`.py`
-
-自定义模块的文档  
-
-- 同理, 在模块开头的位置用多行字符串定义
-- 会自动赋值给该模块的 `__doc__` 变量
-
-模块的自定义导入
-
-1. 名称以下划线（单下划线“_”或者双下划线“__”）开头的变量、函数和类不会被导入, 属于本地
-2. 该模块设有 `__all__` 变量时, `from 模块名 import *` 只能导入该变量指定的成员, 用其他方式导入则不受影响
-
-**自定义模块的运行**
-
-导入后, 默认会执行包中的全部代码
-
-- 通常情况下, 为了检验模块中代码的正确性, 往往需要在模块中为其设计一段测试代码
-- 为让导入该模块的代码不自动执行测试代码, 借助`内置变量   __name__`
-
-1. 当直接运行一个模块时, name 变量的值为 `__main__`
-2. 将模块被导入其他程序中并运行该程序时, 处于模块中的 `__name__` 变量的值就变成了模块名
-
-```py
-# __name__  变量
-if __name__ == '__main__':
-  say() # 执行测试代码
-```
-
-## 8.3. 包
-
-包就是文件夹, 只不过在该文件夹下必须存在一个名为 `__init__.py` 的文件
-
-- 每个包的目录下都必须建立一个 `__init__.py` 的模块, 可以是一个空模块, 也可以是初始化代码
-  - `__init__.py` 不同于其他模块文件, 此模块的模块名不是 `__init__` , 而是它所在的包名, 即文件夹名
-- 文件夹的名称就是包名
-
-包导入的语法和导入模块相同, 只不过多了 `.` 点号, 用指定导入层级
-
-**__init__ 的编写**
-
-1. 导入包就等同于导入该包中的 `__init__.py` 文件
-2. 该文件的主要作用是导入该包内的其他模块
-
-```py
-# 在多文件编程中, 通过编写 __init__ 快速导入自定义包
-
-# 导入当前文件夹下的模块
-# 不同的书写方法会导致导入包后函数的调用
-
-# 需要用 包名.模块名.
-from . import module1
-
-# 虽然功能定义在模块2里, 但是调用时只用 包名.函数名
-from .module2 import * 
-```
-
-## 8.4. 包信息调取
-
-任何模块或者包作为一段python代码, 有自己内部定义的变量和类
-
-- help() 函数可以获取传入的对象的信息
-- `__doc__` 变量可以获取用户自己书写的文档
-- `__file__` 变量可以获取当前模块的源文件系统位置
-  - 包的话就是 `__init__.py` 文件的路径
-  - 模块就是源文件的路径
-
-# 12. Expressions 表达式
-# 13. Simple statements - 简单语句
-
-# 14. Compound Statements - 复合语句
-
-
-
-## 14.1. The if statement
-
-1. `if` `elif`  `else` 是三个关键字, 后面接表达式和 `:`
-2. 代码块记得加缩进
-3. `pass` 是 Python 中的关键字, 程序需要占一个位置, 或者放一条语句, 但又不希望这条语句做任何事
-
-```python
-if 表达式:
-  pass #内容
-elif 表达式:
-  pass
-else:
-  pass
-```
-
-## 14.2. The while statement
-
-内容同样不需要括号
-
-```py
-while 条件表达式：
-    代码块
-
-else:
-    pass
-```
-
-## The match statement - python3.10 加入
-
-在 python 3.10 以前的版本使用该语句会报错, 向下兼容性很差
-
-
-
+### 14.11.2. MRO Method Resolution Order
 
 
 # 15. Top-level components - 顶层复合语句

@@ -14,13 +14,13 @@
   - [3.5. Options to Control Diagnostic Messages Formatting](#35-options-to-control-diagnostic-messages-formatting)
   - [3.6. Options to Request or Suppress Warnings](#36-options-to-request-or-suppress-warnings)
   - [3.7. Options That Control Optimization](#37-options-that-control-optimization)
-  - [Machine-Dependent Options - 平台相关的参数](#machine-dependent-options---平台相关的参数)
-    - [ARM Options - 手机端常用的 ARM 架构的选项](#arm-options---手机端常用的-arm-架构的选项)
-      - [ARM march=](#arm-march)
-    - [GNU/Linux Options - GNU Linux 系统命令](#gnulinux-options---gnu-linux-系统命令)
-    - [x86 Options - x86 平台选项](#x86-options---x86-平台选项)
-  - [Options for Linking - 链接选项](#options-for-linking---链接选项)
-  - [Options for Code Generation Conventions](#options-for-code-generation-conventions)
+  - [3.8. Machine-Dependent Options - 平台相关的参数](#38-machine-dependent-options---平台相关的参数)
+    - [3.8.1. ARM Options - 手机端常用的 ARM 架构的选项](#381-arm-options---手机端常用的-arm-架构的选项)
+      - [3.8.1.1. ARM march=](#3811-arm-march)
+    - [3.8.2. GNU/Linux Options - GNU Linux 系统命令](#382-gnulinux-options---gnu-linux-系统命令)
+    - [3.8.3. x86 Options - x86 平台选项](#383-x86-options---x86-平台选项)
+  - [3.9. Options for Linking - 链接选项](#39-options-for-linking---链接选项)
+  - [3.10. Options for Code Generation Conventions](#310-options-for-code-generation-conventions)
 
 # 1. GCC, the GNU Compiler Collection
 
@@ -396,7 +396,7 @@ GCC 的优化策略很多, 并不是所有的优化策略都能够通过 flag �
 | `-Ofast`   | 基于 O3 的基础上, 解除标准合规性, 会应用一些不是所有标准都支持的优化策略                                                    |
 | `-Og`      | 基于 O1 的基础上去除所有会影响 debug 可行性的优化. 甚至优于 某些编译器上的 `-O0`, 因为有些编译器 O0 也不会保存 debug 信息   |
 
-## Machine-Dependent Options - 平台相关的参数
+## 3.8. Machine-Dependent Options - 平台相关的参数
 
 所有支持 GCC 的机器 (Architecture, operating system)  都可以拥有其独有的 option.  
 
@@ -407,10 +407,10 @@ GCC 的优化策略很多, 并不是所有的优化策略都能够通过 flag �
 通用命令:
 * `-march=[]`  似乎是指定架构的通用命令, 在多种平台存在
 
-### ARM Options - 手机端常用的 ARM 架构的选项
+### 3.8.1. ARM Options - 手机端常用的 ARM 架构的选项
 
 
-#### ARM march=
+#### 3.8.1.1. ARM march=
 
 `-march=name[+extension...]`   : 指定了 target ARM architecture, 确定编译后可以生成的 指令种类, 可以与 `-mcpu=` 结合或者代替使用
 
@@ -434,15 +434,15 @@ Permissible names are: ‘armv4t’, ‘armv5t’, ‘armv5te’, ‘armv6’, �
   * `dotprod` : 启用点乘 `Dot Product` 指令, 会同时启用 `Advanced SIMD`
 
 
-### GNU/Linux Options - GNU Linux 系统命令
+### 3.8.2. GNU/Linux Options - GNU Linux 系统命令
 
-### x86 Options - x86 平台选项 
-
-
-## Options for Linking - 链接选项
+### 3.8.3. x86 Options - x86 平台选项 
 
 
-## Options for Code Generation Conventions
+## 3.9. Options for Linking - 链接选项
+
+
+## 3.10. Options for Code Generation Conventions
 
 Code Generation COnventions 与机器无关, 文档给出的都是非默认的那一方
 

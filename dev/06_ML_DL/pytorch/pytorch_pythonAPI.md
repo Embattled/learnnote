@@ -32,7 +32,7 @@
   - [3.3. Pooling layers 池化层](#33-pooling-layers-池化层)
   - [3.4. Padding Layers](#34-padding-layers)
   - [3.5. Non-linear Activations (weighted sum, nonlinearity) 非线性激活函数](#35-non-linear-activations-weighted-sum-nonlinearity-非线性激活函数)
-    - [3.5.1. GELU](#351-gelu)
+    - [nn.Softmax](#nnsoftmax)
   - [3.6. Normalization Layers 归一化层](#36-normalization-layers-归一化层)
   - [3.7. Linear Layers  线性层](#37-linear-layers--线性层)
     - [3.7.1. Identity](#371-identity)
@@ -74,6 +74,9 @@
 - [8. torch.linalg - pytorch 的线性代数子库](#8-torchlinalg---pytorch-的线性代数子库)
   - [8.1. Matrix Properties](#81-matrix-properties)
   - [8.2. Decompositions](#82-decompositions)
+- [torch.profiler](#torchprofiler)
+  - [class torch.profiler.profile](#class-torchprofilerprofile)
+  - [class torch.profiler.\_KinetoProfile](#class-torchprofiler_kinetoprofile)
 - [9. torch.onnx](#9-torchonnx)
   - [9.1. TorchDynamo-based ONNX Exporter](#91-torchdynamo-based-onnx-exporter)
   - [9.2. TorchScript-based ONNX Exporter](#92-torchscript-based-onnx-exporter)
@@ -505,7 +508,6 @@ NamedTuple with missing_keys and unexpected_keys fields
 ### 3.1.2. torch.nn.Sequential 系列
 
 A sequential container.
-
 `class torch.nn.Sequential(*args: Module)`
 `class torch.nn.Sequential(arg: OrderedDict[str, Module])`
 
@@ -634,6 +636,7 @@ sequential 本身与 ModuleList 相似, 然后 ModuleList 更加偏向于以 lis
   * nn.Tanh
   * nn.Tanhshrink
   * nn.Threshold
+
 * 其他激活函数
   * nn.Softmin
   * nn.Softmax
@@ -649,10 +652,28 @@ sequential 本身与 ModuleList 相似, 然后 ModuleList 更加偏向于以 lis
     self.relu = nn.ReLU()
 ```
 
-### 3.5.1. GELU 
+大部分说明都定义在 F. 中
 
+### nn.Softmax
 
+`class torch.nn.Softmax(dim=None)`
+* 对 n-维 输入应用 softmax, 会将输入 Tensor 缩放到 `[0,1]` 范围同时求和为 1
+* 如果指定了 dim, 则 dim 的每一个值的切片都会分别 求和等于 1
 
+$$
+Softmax(x_i) = \frac{\exp(x_i)}{\sum_j\exp(x_j)} \\
+Softmax(x_i) = \frac{\exp(x_i/\tau)}{\sum_j\exp(x_j/\tau)} \\
+$$
+
+$\tau$ 是一个softmax 的改进变量, 成为 softmax 的温度, 通过进一步缩放输入数据, 会导致经过 exp 之后各个分量之间的距离改变
+* 高温度 tau > 1, softmax 的输出概率会变得更平滑, 类之间的距离变小
+* 地温度 0< tau <1 , softmax 的输出变得尖锐, 最有可能的类的概率变高, 其他类的概率更低
+
+温度通常作为一个超参数, 在一些学习中也作为可优化的参数直接并入学习, 对一个初始值为 0.0 的标量执行 exp (即 tau 为1)
+$$\tau = \exp(s)$$
+直接对 tau 进行优化有可能导致 温度值低于等于 0, 是无意义的
+
+pytorch 中没有对温度功能的直接实现
 
 ## 3.6. Normalization Layers 归一化层
 
@@ -1165,6 +1186,25 @@ torch.cuda 可以随时导入, 并通过  `is_available()` 来判断设备的 CU
 
 
 ## 8.2. Decompositions
+
+
+# torch.profiler
+
+允许在训练和推理期间收集性能指标的工具, 了解模型哪些运算符昂贵, 检查输入形状和追踪
+
+类似的量化性能 API 在 torch.autograd 中也有, 但是已被 deprecated
+
+## class torch.profiler.profile
+
+核心的 性能指标收集 类, 常通过 context manager 格式来使用
+
+
+
+## class torch.profiler._KinetoProfile
+
+核心类 profile 的父类, 定义了输出性能结果的方法  
+
+
 
 
 

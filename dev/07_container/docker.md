@@ -15,7 +15,8 @@
     - [2.1.3. docker image 镜像管理](#213-docker-image-镜像管理)
     - [2.1.4. docker container 容器管理](#214-docker-container-容器管理)
     - [2.1.5. docker tag  -  Create a tag TARGET\_IMAGE that refers to SOURCE\_IMAGE](#215-docker-tag-----create-a-tag-target_image-that-refers-to-source_image)
-    - [2.1.6. docker run 启动镜像 核心命令](#216-docker-run-启动镜像-核心命令)
+    - [2.1.6. docker run 启动镜像 核心命令 - docker container run](#216-docker-run-启动镜像-核心命令---docker-container-run)
+      - [Escalate container privileges (--privileged) 升级容器的高级权限](#escalate-container-privileges---privileged-升级容器的高级权限)
     - [2.1.7. docker stop  - Stop one or more running containers 停止容器](#217-docker-stop----stop-one-or-more-running-containers-停止容器)
     - [2.1.8. docker start - 容器启动(重启) Start one or more stopped containers](#218-docker-start---容器启动重启-start-one-or-more-stopped-containers)
     - [2.1.9. docker attach - 接入容器](#219-docker-attach---接入容器)
@@ -178,8 +179,9 @@ docker支持许多存储驱动, 在 `Ubuntu`下支持 : `overlay2, aufs, btrfs`
 
 # 2. Docker Engine - Command-line reference
 
-记录docker engine 的相关基础CLI运行命令
+https://docs.docker.com/reference/cli/docker/
 
+记录docker engine 的相关基础CLI运行命令
 docker 是一个基础接口, 其下的各种子命令都是独立的 binary, 分别有其各自自己的 --help 和其他各种子命令
 
 
@@ -295,7 +297,7 @@ Define and run multi-container applications with Docker.
 * `docker tag 旧名字 新名字` 用来给一个 image 赋予新的名字
 * 新旧名字会同时存在, 但是都指向同一个 image, ID 是相同的
 
-### 2.1.6. docker run 启动镜像 核心命令
+### 2.1.6. docker run 启动镜像 核心命令 - docker container run
 
 `docker run [OPTIONS] IMAGE [COMMAND] [ARG...]`   在本机的 docker engine 上运行一个镜像, 此时会创建一个容器
 该命令会被用来进行各种各样的容器配置
@@ -308,7 +310,6 @@ Define and run multi-container applications with Docker.
   * `-p xx:xx ` 端口映射  `host:container`
   * `--name` 如果容器有名字的话, 可以使用名字调用
   * `--runtime==nvidia` 指定 docker 使用GPU
-  * `-e NVIDIA_VISIBLE_DEVICES=1` 指定容器只能使用 GPU1
 
 
 容器行为:
@@ -321,8 +322,10 @@ Define and run multi-container applications with Docker.
 容器环境配置:
 * `--volume , -v    <local_path:container_path>` 		Bind mount a volume, 把本地路径挂载到容器的某个路径
 * `--env , -e`  为容器添加单个环境变量  `--env-file`  通过文件添加
-  * `docker run -e MYVAR1 --env MYVAR2=foo --env-file ./env.list ubuntu bash`
-  * `docker run --env VAR1 --env VAR2 ubuntu` 将已经在本地存在的环境变量值直接传入到容器中
+  * `-e MYVAR1 --env MYVAR2=foo --env-file ./env.list ubuntu bash`
+  * `--env VAR1 --env VAR2 ubuntu` 将已经在本地存在的环境变量值直接传入到容器中
+  * `-e NVIDIA_VISIBLE_DEVICES=1` 指定容器只能使用 GPU1
+
 
 spec. 管理:
 * `--gpus <all>` 	      GPU devices to add to the container (‘all’ to pass all GPUs)
@@ -334,6 +337,25 @@ spec. 管理:
 
 docker 环境
 * `--stop-signal` 		    : Signal to stop the container, 更改容器的停止信号
+
+
+#### Escalate container privileges (--privileged) 升级容器的高级权限
+
+* `--privileged`  : 一键给与容器特殊权限
+  * 启用所有内核功能    Enables all Linux kernel capabilities
+  * 禁用默认的 seccomp 和 AppArmor 配置文件 
+    * Disables the default seccomp profile
+    * Disables the default AppArmor profile
+  * 禁用 SELinux 的标签  Disables the SELinux process label
+  * 基于访问所有设备的权限  Grants access to all host devices
+  * 可以访问 /sys 读写 Makes /sys read-write
+  * 使得 cgroups 可读写  Makes cgroups mounts read-write 
+
+相当于该容易可以做任何 host 可以做的事, 不再是一个安全的沙盒, 容器可以获取 root shell 以及控制整个系统  
+* 正常情况下给容器添加内核权限应该使用 `--cap-add` , 单独指定所需要的权限  
+
+该标志的意义是用于 docker 里嵌套的 docker 容器 (不会影响到最终 host)
+
 
 
 ### 2.1.7. docker stop  - Stop one or more running containers 停止容器

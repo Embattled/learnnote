@@ -1,4 +1,4 @@
-# Image Restoration and Enhancement
+# 1. Image Restoration and Enhancement
 
 图像的复原和增强是广义上的图像处理应用  
 
@@ -11,5 +11,22 @@
 
 
 
-# (NTIRE) New Trends in Image Restoration and Enhancement
+# 2. (NTIRE) New Trends in Image Restoration and Enhancement
 
+
+
+
+# 3. Network
+
+### 3.0.1. NAFNet
+
+
+2022/04/10  Simple Baselines for Image Restoration
+
+旷视科技的文章, 化繁为简, 设计了一个及其简单的网络并达成了 NR 和 Deblur 任务的 SOTA
+
+Inter-block Complixity : 块间复杂度, 设计多了级联的 U-Net 来提高性能
+* Multi-Stage Progressive Image Restoration(2021)
+* HINet: Half Instance Normalization Network for Image Restoration (2021)
+
+Intra-block Complexity : 块内复杂度, 引入 Attention 进行降噪  
