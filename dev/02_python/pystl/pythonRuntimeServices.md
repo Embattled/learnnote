@@ -62,7 +62,7 @@
   * 除此之外 logging 模组也支持将警告类记录到日志里
 
 
-## Warning Categories
+## 4.1. Warning Categories
 
 内置的一些 实现为异常的 警告类, 尽管属于 `built-in exceptions`, 但他们的机制属于 warning
 
@@ -74,7 +74,7 @@
 * UserWarning             : 凡是由 warn() 调用的警报都 默认属于 该类
 ...
 
-## The Warnings Filter - 警报过滤器
+## 4.2. The Warnings Filter - 警报过滤器
 
 Filter 控制一个产生的警备是否被 忽略/显示/转为异常(被raise).  
 
@@ -97,9 +97,9 @@ filter 的每个元素的构成 (action, message, category, module, lineno)
 通过以上 4 个匹配的项目, 以及一个 action 来决定 warning 最终的表现, 如果warning 没有被匹配, 则使用 default action
 
 
-## Describing Warning Filters
+### 4.2.1. Describing Warning Filters
 
-## Default Warning Filter
+### 4.2.2. Default Warning Filter
 
 默认行为下 Python 对于 Warning 的表现  
 
@@ -111,7 +111,20 @@ ignore::PendingDeprecationWarning
 ignore::ImportWarning
 ignore::ResourceWarning
 ```
+### 4.2.3. Overriding the default filter - 覆盖默认 filter
 
+
+
+## 4.3. Available Functions - 完整包函数
+
+快速上手函数:
+* `warnings.simplefilter(action, category=Warning, lineno=0, append=False)`
+  * 快速添加一个简单的 filter 到 warning filter list
+  * 参数的含义与 `filterwarnings()` 相同, 但是不再需要正则表达式的 `message` 和 `module` 参数
+  * 即, 任意模组的任意消息的警告, 只要满足 category 和 lineno 相同, 就会被匹配
+* `warnings.resetwarnings()`
+  * 还原所有 warnings filter 为 default
+  * 会取消掉所有 `filterwarnings() 和 simplefilter()` 的调用, 包括 `-W` 的命令行选项
 
 
 # 5. abc - Abstract Base Class

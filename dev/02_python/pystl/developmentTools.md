@@ -8,11 +8,64 @@
 * 可以通过注释来添加类型标识, 解释器层面不会进行检查, 但是可以用于 IDE 来帮助检查
 * 简单来说就是符合语法的各种注释写法
 
+不经过 typing 也可以为函数添加简单的类型注释, 例如
+```py
+def surface_area_of_cube(edge_length: float) -> str:
+    return f"The surface area of the cube is {6 * edge_length ** 2}."
+```
+通过 typing, 可以实现更加高级的注释方法
+
+typing 包是一个高频率更新的包, 并且新版本的包会将功能添加到旧版本的  `typing_extensions`, 因此理论上可以避免因为 typing 导致的代码与旧版本不兼容
+
 The most fundamental support consists of the types `Any, Union, Tuple, Callable, TypeVar, and Generic`
+
+## Specification for the Python Type System
+
+python 语言的 type 系统规范可以在别的页面找到
+
+[“Specification for the Python type system”.](https://typing.readthedocs.io/en/latest/spec/index.html)
 
 ## 2.1. Special typing primitives
 
 用于 annotation 的各种特殊类型 
+
+## Type aliases - 类型别名
+
+可以查看 `type statement`, 虽然是 typing 模组里的功能但是使用不需要导入包 (python3.12 版本以后)
+```py
+type Vector = list[float]
+
+def scale(scalar: float, vector: Vector) -> Vector:
+    return [scalar * num for num in vector]
+
+# passes type checking; a list of floats qualifies as a Vector.
+new_vector = scale(2.0, [1.0, -4.2, 5.4])
+```
+
+type alias 对于将复杂类型简单化非常有用
+
+```py
+from collections.abc import Sequence
+
+type ConnectionOptions = dict[str, str]
+type Address = tuple[str, int]
+type Server = tuple[Address, ConnectionOptions]
+
+def broadcast_message(message: str, servers: Sequence[Server]) -> None:
+    ...
+
+# The static type checker will treat the previous type signature as
+# being exactly equivalent to this one.
+def broadcast_message(
+    message: str,
+    servers: Sequence[tuple[tuple[str, int], dict[str, str]]]
+) -> None:
+    ...
+```
+
+type 语法是 3.12 新功能, 但旧版本的 typing 包里面已经有 type alias, 对于旧版本 python 的支持
+* 可以直接定义 `Vector = list[float]`, created through simple assignment
+* 也可以导入 Typing 包然后声明好 这是一个 类型别名 `Vector: TypeAlias = list[float]`
 
 ### 2.1.1. Special types 特殊类型
 

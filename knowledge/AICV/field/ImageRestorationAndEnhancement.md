@@ -30,3 +30,18 @@ Inter-block Complixity : 块间复杂度, 设计多了级联的 U-Net 来提高�
 * HINet: Half Instance Normalization Network for Image Restoration (2021)
 
 Intra-block Complexity : 块内复杂度, 引入 Attention 进行降噪  
+
+
+### CUGAN - Toward Interactive Modulation for Photo-Realistic Image Restoration
+
+controllable Unet
+
+背景: 图像复原可以分为两个方向
+* PSNR-Oriented     : 底层是 MSE, 会导致忽视 mild degradation 而只重视 severe degradation, 导致不平衡学习
+* GAN-based         : 对于 servere degradation, 会直接被 discriminator 判定为 fake, (导致梯度消失?)
+
+
+要想提出一个 GAN 方法能够处理多种程度的退化, 需要让 discriminator 能够区别从各种不同的退化程度中恢复的图像. 
+根据输入图像的退化来调整其对退化程度判定的基准.  
+
+

@@ -1,4 +1,4 @@
-# Colmap
+# 1. Colmap
 
 COLMAP is a general-purpose Structure-from-Motion (SfM) and Multi-View Stereo (MVS) pipeline with a graphical and command-line interface.
 
@@ -19,22 +19,22 @@ COLMAP 是一个通用目的的 Structure-from-Motion (SfM) 和 Multi-View Stere
 * 使用 SfM 技术从 输入图像中获取相机的 pose
 * 获取到的相机 pose 和图像一起作为 MVS 的输入
 
-## Camera Model
+## 1.1. Camera Model
 
 Colmap 本身提供了多种相机模型, 如果模型实现不知道参数, 则 Colmap 会自动选择最简单 但足够建模畸变的模型  
 
 
 
-# 使用指南 
+# 2. 使用指南 
 
 
-## Feature Detection and Extraction
+## 2.1. Feature Detection and Extraction
 
 colmap 运行的第一步, 特征提取
 
 
 
-## Feature Matching and Geometric Verification
+## 2.2. Feature Matching and Geometric Verification
 
 第二步, 对各个图片中提取的图像进行匹配  
 
@@ -55,7 +55,7 @@ colmap 运行的第一步, 特征提取
   * 文档中没有更多的说明, 应该是特征压倒一切的匹配模式
 * 
 
-## Sparse Reconstruction - 稀疏重建
+## 2.3. Sparse Reconstruction - 稀疏重建
 
 特征提取以及匹配过后, 就可以进入 incremental reconstruction 增量重构模式   
 
@@ -69,10 +69,10 @@ colmap 运行的第一步, 特征提取
 * 执行附加 matching, 例如使用穷举匹配, 启用引导匹配, 增加词汇数, 或者增加顺序匹配中的重叠等
 * 手动选择构图的初始图象对
 
-# Command-line Interface
+# 3. Command-line Interface
 
 
-## feature_extractor
+## 3.1. feature_extractor
 ```sh
 $ colmap feature_extractor -h
 
@@ -109,6 +109,11 @@ $ colmap feature_extractor -h
 The available options can either be provided directly from the command-line or through a .ini file provided to --project_path.
 ```
 
-## sequential_matcher
+## 3.2. sequential_matcher
+
+
+
+## model_converter  - 模型格式转换
+
 
 

@@ -50,7 +50,7 @@
   - [9.1. Objects, values and types - 对象, 值, 类型 的定义](#91-objects-values-and-types---对象-值-类型-的定义)
   - [9.2. The standard type hierarchy](#92-the-standard-type-hierarchy)
   - [9.3. Special method names - 特殊方法名称](#93-special-method-names---特殊方法名称)
-  - [Coroutines - 协程](#coroutines---协程)
+  - [9.4. Coroutines - 协程](#94-coroutines---协程)
 - [10. Execution model](#10-execution-model)
 - [11. The import system - 模组导入系统](#11-the-import-system---模组导入系统)
   - [11.1. 导入模块或包](#111-导入模块或包)
@@ -58,27 +58,28 @@
   - [11.3. 包](#113-包)
   - [11.4. 包信息调取](#114-包信息调取)
 - [12. Expressions 表达式](#12-expressions-表达式)
-  - [Arithmetic conversions - 基础数值类型转换规则](#arithmetic-conversions---基础数值类型转换规则)
+  - [12.1. Arithmetic conversions - 基础数值类型转换规则](#121-arithmetic-conversions---基础数值类型转换规则)
 - [13. Simple statements - 简单语句](#13-simple-statements---简单语句)
+  - [13.1. The type statement - type 语句](#131-the-type-statement---type-语句)
 - [14. Compound Statements - 复合语句](#14-compound-statements---复合语句)
   - [14.1. The if statement](#141-the-if-statement)
   - [14.2. The while statement](#142-the-while-statement)
-  - [The with statement - with 表达式](#the-with-statement---with-表达式)
-  - [14.3. The match statement - python3.10 加入](#143-the-match-statement---python310-加入)
-  - [Function definitions - 函数的定义](#function-definitions---函数的定义)
-  - [14.4. Class definitions - 类的定义](#144-class-definitions---类的定义)
-  - [Coroutines - 协程函数的定义](#coroutines---协程函数的定义)
-  - [Type parameter lists](#type-parameter-lists)
-  - [14.6. self](#146-self)
-  - [14.7. 类的变量](#147-类的变量)
-  - [14.8. 类方法 静态方法](#148-类方法-静态方法)
-  - [14.9. 类的描述符](#149-类的描述符)
-  - [14.10. 类的封装](#1410-类的封装)
-    - [14.10.1. property()](#14101-property)
-    - [14.10.2. @property 装饰器](#14102-property-装饰器)
-  - [14.11. 类的继承和多态](#1411-类的继承和多态)
-    - [14.11.1. super](#14111-super)
-    - [14.11.2. MRO Method Resolution Order](#14112-mro-method-resolution-order)
+  - [14.3. The with statement - with 表达式](#143-the-with-statement---with-表达式)
+  - [14.4. The match statement - python3.10 加入](#144-the-match-statement---python310-加入)
+  - [14.5. Function definitions - 函数的定义](#145-function-definitions---函数的定义)
+  - [14.6. Class definitions - 类的定义](#146-class-definitions---类的定义)
+  - [14.7. Coroutines - 协程函数的定义](#147-coroutines---协程函数的定义)
+  - [14.8. Type parameter lists](#148-type-parameter-lists)
+  - [14.9. self](#149-self)
+  - [14.10. 类的变量](#1410-类的变量)
+  - [14.11. 类方法 静态方法](#1411-类方法-静态方法)
+  - [14.12. 类的描述符](#1412-类的描述符)
+  - [14.13. 类的封装](#1413-类的封装)
+    - [14.13.1. property()](#14131-property)
+    - [14.13.2. @property 装饰器](#14132-property-装饰器)
+  - [14.14. 类的继承和多态](#1414-类的继承和多态)
+    - [14.14.1. super](#14141-super)
+    - [14.14.2. MRO Method Resolution Order](#14142-mro-method-resolution-order)
 - [15. Top-level components - 顶层复合语句](#15-top-level-components---顶层复合语句)
 
 # 1. The Python Language Reference
@@ -1120,7 +1121,7 @@ Python 的 Object 永远没有显示的删除功能, 如果一个 object 不可�
 
 手动将某个特殊名称的方法设置为 None, 表示对应类不可以进行相应操作, 可以避免默认行为导致的歧义
 
-## Coroutines - 协程
+## 9.4. Coroutines - 协程
 
 
 
@@ -1233,7 +1234,7 @@ from .module2 import *
 
 该章节说明了 meaning of the elements of expressions
 
-## Arithmetic conversions - 基础数值类型转换规则 
+## 12.1. Arithmetic conversions - 基础数值类型转换规则 
 
 对于应用运算符的两个数值类型
 * 若有一方是复数, 则另一方转为复数
@@ -1243,6 +1244,31 @@ from .module2 import *
 
 
 # 13. Simple statements - 简单语句
+
+## 13.1. The type statement - type 语句
+<!-- 完 -->
+python 3.12 新语法
+
+`type_stmt ::=  'type' identifier [type_params] "=" expression`  
+
+当前版本 两类 soft keyword 的其中之一 `type` 所对应的语句
+
+type 被作为 soft keyword 从 typing 模组加入到了语言 built-in, type statement 会创建一个 `type alias`, 其为 `typing.TypeAliasType` 的实例
+可以查看 typing 模组的说明
+
+type 将某个符合类型声明为一个新的 类型别名 对象
+```py
+type Point = tuple[float, float]
+
+# This code is roughly equivalent to:
+annotation-def VALUE_OF_Point():
+    return tuple[float, float]
+Point = typing.TypeAliasType("Point", VALUE_OF_Point())
+```
+
+type alias 对象使用了 延迟求值(lazy evaluation) 方案, 即创建的时候不会对齐求值, 直接访问类型的 `__value__` 属性的时候才求值
+这允许了 type alias 的定义可以引用尚未定义的名称
+
 
 # 14. Compound Statements - 复合语句
 
@@ -1275,7 +1301,7 @@ else:
     pass
 ```
 
-## The with statement - with 表达式
+## 14.3. The with statement - with 表达式
 
 通过 context manager 的方式来包装块的执行
 
@@ -1289,14 +1315,14 @@ with_item          ::=  expression ["as" target]
 * `with_item` : context expression 会被执行, 其结果会作为 context manager, `["as" target]` 用于给 context manager 赋予名称
 
 
-## 14.3. The match statement - python3.10 加入
+## 14.4. The match statement - python3.10 加入
 
 在 python 3.10 以前的版本使用该语句会报错, 向下兼容性很差
 
 
-## Function definitions - 函数的定义
+## 14.5. Function definitions - 函数的定义
 
-## 14.4. Class definitions - 类的定义
+## 14.6. Class definitions - 类的定义
 <!-- 完 -->
 
 类同C++无太大区别
@@ -1355,16 +1381,16 @@ class Foo(object):
 
 
 
-## Coroutines - 协程函数的定义
+## 14.7. Coroutines - 协程函数的定义
 
 
-## Type parameter lists 
+## 14.8. Type parameter lists 
 
 Python 3.12 新功能
 
 
 
-## 14.6. self
+## 14.9. self
 
 同C++一样, 指向方法的调用者  
 
@@ -1387,7 +1413,7 @@ clanguage.bar = lambda self: print('--lambda表达式--', self)
 clanguage.bar(clanguage)
 ```
 
-## 14.7. 类的变量
+## 14.10. 类的变量
 
 1. 类变量: 类变量指的是在类中, 但在各个类方法外定义的变量。
    - 所有类的实例化对象都同时共享类变量, 即在所有实例化对象中是作为公用资源存在的
@@ -1398,7 +1424,7 @@ clanguage.bar(clanguage)
 3. 局部变量 : 类方法中普通方法定义, 不使用 `self.` 来定义的变量
    - 函数执行完成后, 局部变量也会被销毁。
 
-## 14.8. 类方法 静态方法
+## 14.11. 类方法 静态方法
 
 1. `@classmethod` 修饰的方法为类方法
    - 相当于C++的类的静态方法
@@ -1449,7 +1475,7 @@ CLanguage.infos("C语言中文网","http://c.biancheng.net")
 
 - 而用类名调用类成员的方式称为非绑定方法。
 
-## 14.9. 类的描述符
+## 14.12. 类的描述符
 
 - 通过使用描述符, 可以让程序员在引用一个对象属性时自定义要完成的工作
 - 一个类可以将属性管理全权委托给描述符类
@@ -1488,7 +1514,7 @@ class myClass:
     y = 5
 ```
 
-## 14.10. 类的封装
+## 14.13. 类的封装
 
 - Python 并没有提供 public、private 这些修饰符
     默认情况下, Python 类中的变量和方法都是公有（public）的, 它们的名称前都没有下划线（_）；
@@ -1497,7 +1523,7 @@ class myClass:
   - 对于一个变量 `__私有变量` 在执行过程中实际的变量名变成了 `_类名__私有变量` 因此仍然可以在外部访问
 - 用 `类对象.属性` 的方法访问类中的属性是不妥的, 破坏了类的封装性
 
-### 14.10.1. property()
+### 14.13.1. property()
 
 - 为了实现类似于C++的类私有变量, 即只能通过类方法来间接操作类属性, 一般都会设置 getter setter 方法
 - 虽然保护了封装性, 但是调用起来非常麻烦
@@ -1525,7 +1551,7 @@ class CLanguage:
     name = property(getname, setname, delname, '指明出处')
 ```
 
-### 14.10.2. @property 装饰器
+### 14.13.2. @property 装饰器
 
 - 同 property 的作用一样, 这个装饰器的目的也是一样, 方便调用代码的书写
 - 通过该装饰器可以让方法的调用变得和属性一样 - 即不带括号
@@ -1558,7 +1584,7 @@ del rect.area
 print("删除后的area值为：",rect.area)
 ```
 
-## 14.11. 类的继承和多态
+## 14.14. 类的继承和多态
 
 - 类的继承, 在定义子类的时候, 将父类放在子类之后的圆括号即可
   - `class 类名(父类1, 父类2, ...)：`
@@ -1566,7 +1592,7 @@ print("删除后的area值为：",rect.area)
   - python 支持多继承, 大部分的对象语言都不允许多继承
     - 对于多个父类中的同名方法, 以最早出现的父类为准
 
-### 14.11.1. super
+### 14.14.1. super
   
 - 子类如果定义了自己的构造方法, 则里面必须要调用父类的构造方法
 - 在子类中的构造方法中, 调用父类构造方法的方式有 2 种, 分别是：
@@ -1576,7 +1602,7 @@ print("删除后的area值为：",rect.area)
 
 `super().__init__(self,...)`
 
-### 14.11.2. MRO Method Resolution Order
+### 14.14.2. MRO Method Resolution Order
 
 
 # 15. Top-level components - 顶层复合语句

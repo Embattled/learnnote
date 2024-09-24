@@ -1007,5 +1007,71 @@ python 的迭代器概念:
 
 
 
+
+## 4.7. Type Annotation Types — Generic Alias, Union
+
+用于 type annotations 的核心 built-in 数据类型有两个
+Generic Alias  和 Union
+
+其他更高级的类型提示在 typing 模组里
+
+### Generic Alias Type
+
+通常通过 subscripting 一个 class 来创建, 一般和 container classes 一起使用, 例如 list or dict
+
+e.g.  `list[int]` 就是一个 GenericAlias, 通过对一个 container class 取索引 int 来生成
+* 所谓的 container class 就是指实现了 `__class_getitem__()` 的类, 可以取索引的类
+
+
+### Union Type
+
+Python 3.10 新语法!!
+
+Union 类型则是通过对多个 type objects 应用  bitwise or 比特或 `|` 运算符
+
+文档中指明 built-in Union 比 `typing.Union` 的类型提示更加清晰
+* `X|Y` 等同于 `typing.Union[X,Y]`
+
+Union 的 equality 有一些很好的特性实现
+* 拆括号  `(int | str) | float == int | str | float`
+* 删除冗余  `int | str | int == int | str`
+* 无视顺序 `int | str == str | int`
+* 同 `typing.Union` 完全兼容  `int | str == typing.Union[int, str]`
+* 带有 None 选项的参数则兼容 `typing.Optional`   `str | None == typing.Optional[str]`
+
+
+
+当前最新版本中
+  isinstance(obj, union_object)
+  issubclass(obj, union_object)
+都对 union 类型有了实现
+
+```py
+isinstance("", int | str)
+# True
+
+
+# 对于 GenericsAlise 的判定则无法实现
+isinstance(1, int | list[int])  # short-circuit evaluation
+# True
+isinstance([1], int | list[int])
+# Traceback (most recent call last):
+
+
+
+# Union object 本身可以被传入 isinstance, 即被实例化
+import types
+isinstance(int | str, types.UnionType)
+# True
+
+# UnionType 本身是不能被实例化的
+types.UnionType()
+# Traceback (most recent call last):
+#   File "<stdin>", line 1, in <module>
+# TypeError: cannot create 'types.UnionType' instances
+
+```
+
+
 # 5. Built-in Exceptions
 

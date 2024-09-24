@@ -51,7 +51,7 @@ API的构造上和 threading 相似
 * subprocess.run : 阻塞调用子进程
 
 
-## 4.1. subprocess.run
+## 4.1. subprocess 的使用
 
 尽管是最关键的函数,  run 其实是 python3.5 才加入的功能
 
@@ -105,7 +105,9 @@ run 函数的返回值 `class subprocess.CompletedProcess` , 代表了一个子�
 * `subprocess.STDOUT`   : can be used as the stderr argument to `Popen`. indicates that standard error should go into the same handle as standard output.
 
 
-## 4.2. class subprocess.Popen
+## 4.2. Popen Constructor 
+
+class subprocess.Popen
 
 整个 subprocess 模组最终要的类, 作为其他类和函数 `subprocess.run` 的底层实现, 用于实际上的创建和管理子线程  
 * 模组的其他子进程相关函数, 大部分传入该类的构造函数中

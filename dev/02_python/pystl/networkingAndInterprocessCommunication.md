@@ -23,12 +23,12 @@ Python socket 接口是 :
 
 上一节主要介绍了 python 下的 socket 构成, 这一节记录模组的主要内容, 但是最核心的 socket 类在下一节单独叙述
 
-### Creating sockets
+### 2.1.1. Creating sockets
 
 创建 socket object 的几种方法  
 
 
-### 2.1.1. Other functions - 和系统网络相关的信息函数
+### 2.1.2. Other functions - 和系统网络相关的信息函数
 
 特殊功能函数
 * `socket.close(f)`     : 关闭一个 socket file descriptor. 在 Unix 下基本上当作普通文件使用 `os.close()` 即可, 然而在 windows 下有可能会产生特例, 需要使用该函数  
