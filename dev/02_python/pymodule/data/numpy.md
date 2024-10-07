@@ -363,7 +363,6 @@ numpy.array 的各种创建函数能够创建各种各样的预设 array
   * `indexing` : {‘xy’, ‘ij’}, optional. 用于指定坐标的先后顺序
     * xy 代表了图像领域的坐标, x 是横坐标, y 是纵坐标, 但是在数据索引上 y 纵坐标是行数因此靠前, 即坐标顺序是颠倒的
     * ij 代表了普通数列的索引方式, 靠前的维度坐标也靠前
-  * 
   * return : X1, X2, ...,XN  根据 len(xi) 和 indexing
     * 代表了该空间下每个点的具体坐标数列  
     * 点的坐标依次是 `( x1[0],x2[0],...,xn[0]  ) , (x1[1],x2[1],..,xn[1])`
@@ -526,7 +525,7 @@ numpy.concatenate((a1, a2, ...), axis=0, out=None, dtype=None, casting="same_kin
   * 输入的 reps 即重复次数, 但是 reps 自身也可以是一个 array 
   * 输出的结果的 ndim 会是 max (len(reps), A.dim)
   * 如果 A.dim < len(reps), 那么 A 将会被前补 dim, 即 (2,2) -> (1,2,2). 如果这不是想要的形式则需要手动 expand_dim 在使用该函数
-  * 如果 A.dim > len(reps), 那么 reps 将会被前补 dim, 即 (2,2) -> (1,2,2). 如果这不是想要的形式则需要手动 expand_dim 在使用该函数
+  * 如果 A.dim > len(reps), 那么 reps 将会被前补 dim, 即 (2,2) -> (1,2,2) 优先重复后面的维度. 如果这不是想要的形式则需要手动 expand_dim 在使用该函数
 
 * `numpy.repeat(a, repeats, axis=None)` : Repeat elements of an array.
   * repeats : int or array of ints. 

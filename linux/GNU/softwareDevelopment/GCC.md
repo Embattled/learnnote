@@ -7,20 +7,21 @@
     - [2.2.3. 动态链接库的显式调用](#223-动态链接库的显式调用)
     - [2.2.4. 解决找不到库的问题](#224-解决找不到库的问题)
 - [3. GCC Command Options](#3-gcc-command-options)
-  - [3.1. Options Controlling the Kind of Output](#31-options-controlling-the-kind-of-output)
-  - [3.2. Compiling C++ Programs](#32-compiling-c-programs)
-  - [3.3. Options Controlling C Dialect](#33-options-controlling-c-dialect)
-  - [3.4. Options Controlling C++ Dialect](#34-options-controlling-c-dialect)
-  - [3.5. Options to Control Diagnostic Messages Formatting](#35-options-to-control-diagnostic-messages-formatting)
-  - [3.6. Options to Request or Suppress Warnings](#36-options-to-request-or-suppress-warnings)
-  - [3.7. Options That Control Optimization](#37-options-that-control-optimization)
-  - [3.8. Machine-Dependent Options - 平台相关的参数](#38-machine-dependent-options---平台相关的参数)
-    - [3.8.1. ARM Options - 手机端常用的 ARM 架构的选项](#381-arm-options---手机端常用的-arm-架构的选项)
-      - [3.8.1.1. ARM march=](#3811-arm-march)
-    - [3.8.2. GNU/Linux Options - GNU Linux 系统命令](#382-gnulinux-options---gnu-linux-系统命令)
-    - [3.8.3. x86 Options - x86 平台选项](#383-x86-options---x86-平台选项)
-  - [3.9. Options for Linking - 链接选项](#39-options-for-linking---链接选项)
-  - [3.10. Options for Code Generation Conventions](#310-options-for-code-generation-conventions)
+  - [3.1. Option Summary](#31-option-summary)
+  - [3.2. Options Controlling the Kind of Output](#32-options-controlling-the-kind-of-output)
+  - [3.3. Compiling C++ Programs](#33-compiling-c-programs)
+  - [3.4. Options Controlling C Dialect](#34-options-controlling-c-dialect)
+  - [3.5. Options Controlling C++ Dialect](#35-options-controlling-c-dialect)
+  - [3.6. Options to Control Diagnostic Messages Formatting](#36-options-to-control-diagnostic-messages-formatting)
+  - [3.7. Options to Request or Suppress Warnings](#37-options-to-request-or-suppress-warnings)
+  - [3.8. Options That Control Optimization](#38-options-that-control-optimization)
+  - [3.9. Machine-Dependent Options - 平台相关的参数](#39-machine-dependent-options---平台相关的参数)
+    - [3.9.1. ARM Options - 手机端常用的 ARM 架构的选项](#391-arm-options---手机端常用的-arm-架构的选项)
+      - [3.9.1.1. ARM march=](#3911-arm-march)
+    - [3.9.2. GNU/Linux Options - GNU Linux 系统命令](#392-gnulinux-options---gnu-linux-系统命令)
+    - [3.9.3. x86 Options - x86 平台选项](#393-x86-options---x86-平台选项)
+  - [3.10. Options for Linking - 链接选项](#310-options-for-linking---链接选项)
+  - [3.11. Options for Code Generation Conventions](#311-options-for-code-generation-conventions)
 
 # 1. GCC, the GNU Compiler Collection
 
@@ -272,7 +273,18 @@ GCC 的命令众多, 因此不要把多个命令参数打包, 例如不要把 `-
 * 16进制的数字需要以 `0x` 开头
 * 对于指定数据大小的参数, 可以可选的添加后缀 `kB KiB MB MiB GB GiB` etc
 
-## 3.1. Options Controlling the Kind of Output
+## 3.1. Option Summary
+
+整合所有的命令并分类, 用于快速查找
+
+
+Overall Options: 全局命令, 参照 3.2 Options Controlling the Kind of Output
+
+C Language Options: C 语言命令 See Section 3.4 Options Controlling C Dialect]
+
+C++ Language Options: See Section 3.5 Options Controlling C++ Dialect
+
+## 3.2. Options Controlling the Kind of Output
 
 GCC 的工作主要包括 预处理, 编译, 汇编,链接. `overall options` 可以指定这整个流程, 使得 gcc 只进行一部分的工作. 
 
@@ -327,21 +339,29 @@ gcc -o hello hello.cpp
 gcc hello.c -Wall
 ```
 
-## 3.2. Compiling C++ Programs
+## 3.3. Compiling C++ Programs
 
 When you compile C++ programs, you should invoke GCC as `g++` instead.
 
-## 3.3. Options Controlling C Dialect
 
 
-## 3.4. Options Controlling C++ Dialect
+## 3.4. Options Controlling C Dialect
 
-## 3.5. Options to Control Diagnostic Messages Formatting
+该章节描述源自于 C 的编译器命令, 同时支持从 C 语言派生的 C++, Objective-C, Objective-C++
+
+`-ansi`
+
+`-std=`
+
+
+## 3.5. Options Controlling C++ Dialect
+
+## 3.6. Options to Control Diagnostic Messages Formatting
 
 用于去控制诊断信息的格式. 传统上, 诊断信息的格式与显示输出设备的方面无关.   
 可以通过 `-f` 命令来控制诊断信息的格式信息, 例如每行多少个字符.  多久报告一次源代码位置信息, 某些语言可能不支持一些选项.  
 
-## 3.6. Options to Request or Suppress Warnings
+## 3.7. Options to Request or Suppress Warnings
 
 Warnings 属于诊断信息, 指明出来的警告在构造的本质上不是错误的, 但是存在风险, 或者可能存在错误. 
 
@@ -358,7 +378,7 @@ Warnings 属于诊断信息, 指明出来的警告在构造的本质上不是错
 
 
 
-## 3.7. Options That Control Optimization
+## 3.8. Options That Control Optimization
 
 超级长的一章 (70页), 命令多到不可能读完   
 
@@ -396,7 +416,7 @@ GCC 的优化策略很多, 并不是所有的优化策略都能够通过 flag �
 | `-Ofast`   | 基于 O3 的基础上, 解除标准合规性, 会应用一些不是所有标准都支持的优化策略                                                    |
 | `-Og`      | 基于 O1 的基础上去除所有会影响 debug 可行性的优化. 甚至优于 某些编译器上的 `-O0`, 因为有些编译器 O0 也不会保存 debug 信息   |
 
-## 3.8. Machine-Dependent Options - 平台相关的参数
+## 3.9. Machine-Dependent Options - 平台相关的参数
 
 所有支持 GCC 的机器 (Architecture, operating system)  都可以拥有其独有的 option.  
 
@@ -407,10 +427,10 @@ GCC 的优化策略很多, 并不是所有的优化策略都能够通过 flag �
 通用命令:
 * `-march=[]`  似乎是指定架构的通用命令, 在多种平台存在
 
-### 3.8.1. ARM Options - 手机端常用的 ARM 架构的选项
+### 3.9.1. ARM Options - 手机端常用的 ARM 架构的选项
 
 
-#### 3.8.1.1. ARM march=
+#### 3.9.1.1. ARM march=
 
 `-march=name[+extension...]`   : 指定了 target ARM architecture, 确定编译后可以生成的 指令种类, 可以与 `-mcpu=` 结合或者代替使用
 
@@ -434,17 +454,19 @@ Permissible names are: ‘armv4t’, ‘armv5t’, ‘armv5te’, ‘armv6’, �
   * `dotprod` : 启用点乘 `Dot Product` 指令, 会同时启用 `Advanced SIMD`
 
 
-### 3.8.2. GNU/Linux Options - GNU Linux 系统命令
+### 3.9.2. GNU/Linux Options - GNU Linux 系统命令
 
-### 3.8.3. x86 Options - x86 平台选项 
-
-
-## 3.9. Options for Linking - 链接选项
+### 3.9.3. x86 Options - x86 平台选项 
 
 
-## 3.10. Options for Code Generation Conventions
+## 3.10. Options for Linking - 链接选项
+
+
+## 3.11. Options for Code Generation Conventions
 
 Code Generation COnventions 与机器无关, 文档给出的都是非默认的那一方
+编写动态链接库时用的标志 `-fPIC`
+
 
 
 * `-fpic`  : 生成 position-independent code (PIC) 用于 shared library.

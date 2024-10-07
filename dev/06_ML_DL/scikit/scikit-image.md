@@ -24,7 +24,7 @@ Submodules:
 * util
 * viewer
 
-## 全局参数
+## 1.1. 全局参数
 
 因为都是面向图像的处理, 所属于不同子包的函数有相同的参数, 置于此处
 
@@ -32,6 +32,51 @@ Submodules:
 | 参数           | 意义                                                                                    |
 | -------------- | --------------------------------------------------------------------------------------- |
 | `channel_axis` | 需要手动输入来表示颜色 channel 是哪一个 axis, 0 or 2, 默认会把图片当作 grayscale 来处理 |
+
+# Examples
+
+
+通过实例展示 scikit-image 的用法
+gallery / showcase
+
+
+## Segmentation of objects
+
+
+
+### Comparison of segmentation and superpixel algorithms
+
+比较了 4 种流行的 low-level 图像分割方法.  
+segmentation 任务中, "好" 的分割结果通常取决于后端应用, 因此这些方法通常用于获得 `oversegmentation`, 也被称为 `superpixels`
+
+这些 superpixels 通常会作为 其他更复杂算法的基础, 例如 `Conditional Random Fields (CRF)`
+
+
+
+(2004) Efficient graph-based image segmentation, Felzenszwalb, P.F. and Huttenlocher, D.P. International Journal of Computer Vision (IJCV)
+* Felzenszwalb’s efficient graph based segmentation. 
+* 只有一个参数 `scale` 用于控制全局的 number of segments, 速度快
+
+
+(2008) Quick shift and kernel methods for mode seeking, Vedaldi, A. and Soatto, S. European Conference on Computer Vision. (ECCV)
+* Quickshift image segmentation. 基于 kernelized mean-shift 的近似, 属于局部模式搜索, 在图像颜色和坐标的 5-D 空间上进行搜索匹配.  因此同时会计算多个尺度的分层分割.
+* 有两个主要参数 `sigma` : 用于控制 local density approximation, `max_dist` 用于 分层分割中的级别选择.
+* 颜色空间中的距离和图像空间中的距离之间的权重 也存在 `ratio` 比率的参数
+
+
+(2012) Radhakrishna Achanta, Appu Shaji, Kevin Smith, Aurelien Lucchi, Pascal Fua, and Sabine Suesstrunk, SLIC Superpixels Compared to State-of-the-art Superpixel Methods, TPAMI.
+* SLIC - K-Means based image segmentation, 和 Quickshift 类似, 同样是在 5-D 空间中进行 K-means. 由于聚类方法比较简单, 因此效率很高.
+* 然而图像需要在 `Lab` 色彩空间中才能获得较好的效果.
+* `compactness` 参数用于权衡 颜色相似性和距离, 类似于 Quickshift 的 ratio
+* `n_segments` 直接用于控制 聚类的中心数量
+
+
+
+(2014) Peer Neubert & Peter Protzel (2014). Compact Watershed and Preemptive SLIC: On Improving Trade-offs of Superpixel Segmentation Algorithms. ICPR 2014, pp 996-1001.
+* Compact watershed segmentation of gradient images.
+* watershed 算法需要 grayscale gradient 图像作为输入, 明亮的像素表示区域之间的边界
+* 将整张图象比作山岭, 输入的梯度图像的明亮像素形成高峰, 从给定的标记处灌入洪水, 直到单独的洪水盆地在山峰处相遇, 每个不同的盆地形成各自的图像片段.
+
 
 # 2. io
 
@@ -103,28 +148,6 @@ skimage.io.imread_collection(
 ```
 
 
-# 3. transform
-
-## 3.1. resize
-
-```py
-skimage.transform.resize(
-  image, 
-  output_shape, 
-  order=None, 
-  mode='reflect', 
-  cval=0, 
-  clip=True, 
-  preserve_range=False, 
-  anti_aliasing=None, 
-  anti_aliasing_sigma=None)
-""" 
-image         : (ndarray) Input image.
-output_shape  : tuple or ndarray 
-                Size of the generated output image (rows, cols[, …][, dim])
-其他7个参数都是通用参数
-"""
-```
 
 # 4. morphology
 
@@ -254,12 +277,12 @@ hog_image   : (M, N) ndarray, optional
 * clip  : bool , 用于防止添加噪声后的数据范围越界
 * seed  : int, 随机化的种子, 用于数据再现
 
-# restoration 图片复原
+# 7. restoration 图片复原
 
 图像修复算法实现, 比起单纯的 filter 来说更加注重对图像的修复, 例如反卷积, 具体的降噪算法等
 `skimage.restoration.*`
 
-## Tools 
+## 7.1. Tools 
 
 基于小波域的高斯噪声标准差测量
 * `estimate_sigma(image, average_sigmas=False, multichannel=False, *, channel_axis=None)`
@@ -267,7 +290,7 @@ hog_image   : (M, N) ndarray, optional
   * channel_axis
 
 
-## 降噪方法
+## 7.2. 降噪方法
 
 小波域阈值降噪
 * `denoise_wavelet(image, sigma=None, wavelet='db1', mode='soft', wavelet_levels=None, convert2ycbcr=False, method='BayesShrink', rescale_sigma=True, *, channel_axis=None)`
@@ -281,11 +304,11 @@ hog_image   : (M, N) ndarray, optional
 
 
 
-# filter 图片滤波  
+# 8. filter 图片滤波  
 
 
 
-# metrics  图片评价指标
+# 9. metrics  图片评价指标
 
 图片评价指标  `skimage.metrics.*`
 
@@ -309,3 +332,39 @@ hog_image   : (M, N) ndarray, optional
     * K1 : SSIM 的常数
     * K2 : SSIM 的常数
     * sigma : gaussian_weight 的方差
+
+
+# skimage.segmentation
+
+将图像划分为有意义的区域或者边界的算法
+
+
+## Felsenszwalb’s efficient graph based image segmentation
+
+`skimage.segmentation.felzenszwalb(image, scale=1, sigma=0.8, min_size=20, *, channel_axis=-1)`
+
+
+
+
+# 3. skimage.transform
+
+## 3.1. resize
+
+```py
+skimage.transform.resize(
+  image, 
+  output_shape, 
+  order=None, 
+  mode='reflect', 
+  cval=0, 
+  clip=True, 
+  preserve_range=False, 
+  anti_aliasing=None, 
+  anti_aliasing_sigma=None)
+""" 
+image         : (ndarray) Input image.
+output_shape  : tuple or ndarray 
+                Size of the generated output image (rows, cols[, …][, dim])
+其他7个参数都是通用参数
+"""
+```

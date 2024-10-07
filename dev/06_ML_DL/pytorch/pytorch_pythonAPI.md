@@ -927,6 +927,8 @@ def normalize(input: Tensor, p: float = 2.0, dim: int = 1, eps: float = 1e-12, o
 
 ## 4.3. Vision functions
 
+视觉相关的特殊函数
+
 `torch.nn.functional.pad(input, pad, mode='constant', value=None) → Tensor`
 * 填充函数
 * 输入的 pad 会按照从对输入 x 后往前的顺序对每一个维度进行, 前后分别指定宽度的 pad
@@ -936,6 +938,12 @@ def normalize(input: Tensor, p: float = 2.0, dim: int = 1, eps: float = 1e-12, o
   * pad (tuple) – m-elements tuple, where `m/2 ≤ input dimensions` and m is even.
   * mode (str) – 'constant', 'reflect', 'replicate' or 'circular'. Default: 'constant'
   * `value (Optional[float])` – fill value for 'constant' padding. Default: 0
+
+
+`torch.nn.functional.grid_sample(input, grid, mode='bilinear', padding_mode='zeros', align_corners=None)`
+* 计算 grid sample
+* grid 在这里值得是 flow-field, 通过 input 和 grid 里指定的坐标获取 output
+* 当前 4-D 和 5-D(volumetric, 3维空间 体) 数据可以作为 input 被输入
 
 
 
