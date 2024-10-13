@@ -13,14 +13,15 @@
   - [2.3. 序列化 Serialization](#23-序列化-serialization)
     - [2.3.1. torch.save](#231-torchsave)
     - [2.3.2. torch.load](#232-torchload)
-  - [2.4. Locally disabling gradient computation - 局部禁用梯度计算](#24-locally-disabling-gradient-computation---局部禁用梯度计算)
-  - [2.5. Math operations](#25-math-operations)
-    - [2.5.1. Pointwise Ops 元素为单位的操作](#251-pointwise-ops-元素为单位的操作)
-    - [2.5.2. Reduction Ops 元素之间的操作(降维)](#252-reduction-ops-元素之间的操作降维)
-      - [2.5.2.1. 极值操作](#2521-极值操作)
-    - [2.5.3. Comparison Ops](#253-comparison-ops)
-    - [2.5.4. Spectral Ops - 光谱函数 在频域上操作信号](#254-spectral-ops---光谱函数-在频域上操作信号)
-    - [2.5.5. Other Operations - 无法分类的其他函数](#255-other-operations---无法分类的其他函数)
+  - [2.4. Parallelism  - 并行化信息](#24-parallelism----并行化信息)
+  - [2.5. Locally disabling gradient computation - 局部禁用梯度计算](#25-locally-disabling-gradient-computation---局部禁用梯度计算)
+  - [2.6. Math operations](#26-math-operations)
+    - [2.6.1. Pointwise Ops 元素为单位的操作](#261-pointwise-ops-元素为单位的操作)
+    - [2.6.2. Reduction Ops 元素之间的操作(降维)](#262-reduction-ops-元素之间的操作降维)
+      - [2.6.2.1. 极值操作](#2621-极值操作)
+    - [2.6.3. Comparison Ops](#263-comparison-ops)
+    - [2.6.4. Spectral Ops - 光谱函数 在频域上操作信号](#264-spectral-ops---光谱函数-在频域上操作信号)
+    - [2.6.5. Other Operations - 无法分类的其他函数](#265-other-operations---无法分类的其他函数)
 - [3. torch.nn](#3-torchnn)
   - [3.1. Containers 网络容器](#31-containers-网络容器)
     - [3.1.1. torch.nn.Module 类](#311-torchnnmodule-类)
@@ -32,7 +33,7 @@
   - [3.3. Pooling layers 池化层](#33-pooling-layers-池化层)
   - [3.4. Padding Layers](#34-padding-layers)
   - [3.5. Non-linear Activations (weighted sum, nonlinearity) 非线性激活函数](#35-non-linear-activations-weighted-sum-nonlinearity-非线性激活函数)
-    - [nn.Softmax](#nnsoftmax)
+    - [3.5.1. nn.Softmax](#351-nnsoftmax)
   - [3.6. Normalization Layers 归一化层](#36-normalization-layers-归一化层)
   - [3.7. Linear Layers  线性层](#37-linear-layers--线性层)
     - [3.7.1. Identity](#371-identity)
@@ -74,21 +75,21 @@
 - [8. torch.linalg - pytorch 的线性代数子库](#8-torchlinalg---pytorch-的线性代数子库)
   - [8.1. Matrix Properties](#81-matrix-properties)
   - [8.2. Decompositions](#82-decompositions)
-- [torch.profiler](#torchprofiler)
-  - [class torch.profiler.profile](#class-torchprofilerprofile)
-  - [class torch.profiler.\_KinetoProfile](#class-torchprofiler_kinetoprofile)
-- [9. torch.onnx](#9-torchonnx)
-  - [9.1. TorchDynamo-based ONNX Exporter](#91-torchdynamo-based-onnx-exporter)
-  - [9.2. TorchScript-based ONNX Exporter](#92-torchscript-based-onnx-exporter)
-    - [9.2.1. API of TorchScript-based ONNX Exporter](#921-api-of-torchscript-based-onnx-exporter)
-- [10. torch.optim](#10-torchoptim)
-  - [10.1. 预定义 Algorithm](#101-预定义-algorithm)
-  - [10.2. torch.optim.lr\_scheduler - 动态 Learn Rate](#102-torchoptimlr_scheduler---动态-learn-rate)
-    - [10.2.1. 有序调整](#1021-有序调整)
-  - [10.3. 定义自己的 optim](#103-定义自己的-optim)
-    - [10.3.1. Optimizer 基类](#1031-optimizer-基类)
-    - [10.3.2. optimization step](#1032-optimization-step)
-    - [10.3.3. per-parameter options](#1033-per-parameter-options)
+- [9. torch.profiler](#9-torchprofiler)
+  - [9.1. class torch.profiler.profile](#91-class-torchprofilerprofile)
+  - [9.2. class torch.profiler.\_KinetoProfile](#92-class-torchprofiler_kinetoprofile)
+- [10. torch.onnx](#10-torchonnx)
+  - [10.1. TorchDynamo-based ONNX Exporter](#101-torchdynamo-based-onnx-exporter)
+  - [10.2. TorchScript-based ONNX Exporter](#102-torchscript-based-onnx-exporter)
+    - [10.2.1. API of TorchScript-based ONNX Exporter](#1021-api-of-torchscript-based-onnx-exporter)
+- [11. torch.optim](#11-torchoptim)
+  - [11.1. 预定义 Algorithm](#111-预定义-algorithm)
+  - [11.2. torch.optim.lr\_scheduler - 动态 Learn Rate](#112-torchoptimlr_scheduler---动态-learn-rate)
+    - [11.2.1. 有序调整](#1121-有序调整)
+  - [11.3. 定义自己的 optim](#113-定义自己的-optim)
+    - [11.3.1. Optimizer 基类](#1131-optimizer-基类)
+    - [11.3.2. optimization step](#1132-optimization-step)
+    - [11.3.3. per-parameter options](#1133-per-parameter-options)
 
 
 # 1. Python API
@@ -290,7 +291,12 @@ map_location    : a function, torch.device, string or a dict specifying how to r
 pickle_module   :  
 pickle_load_args: (Python 3 only) optional keyword arguments passed over to pickle_module.load() and pickle_module.Unpickler()
 
-## 2.4. Locally disabling gradient computation - 局部禁用梯度计算  
+
+## 2.4. Parallelism  - 并行化信息
+
+
+
+## 2.5. Locally disabling gradient computation - 局部禁用梯度计算  
 
 梯度上下文管理有三个接口, 用于在局部对梯度计算进行启用, 停用:
 * 在 `torch.autograd` 中有更详细的描述  
@@ -300,6 +306,10 @@ pickle_load_args: (Python 3 only) optional keyword arguments passed over to pick
 
 梯度管理方法 `torch.*`
 * no_grad  :          Context-manager that disables gradient calculation.
+  * 关闭梯度, 需要确保不会调用 `Tensor.backward()`
+  * 注意, 对于 factory funcions, 或者在函数里创建的 new Tensor 并设置 requires_grad 为True, 则无法受此上下文管理器影响
+  * 也可以作为 函数修饰器使用
+
 * enable_grad :       Context-manager that enables gradient calculation
 
 * inference_mode   :  Context-manager that enables or disables inference mode
@@ -313,16 +323,27 @@ pickle_load_args: (Python 3 only) optional keyword arguments passed over to pick
   * 这个接口同其他几个不同, 还可以作为函数使用用来全局的关闭梯度计算.  
   * 参数 : mode (bool)
 
-## 2.5. Math operations
+
+```py
+
+# 作为函数修饰器使用
+@torch.no_grad()
+def tripler(x):
+     return x * 3
+
+```
+
+
+## 2.6. Math operations
 
 提供对 tensor 的各种数学操作
 
-### 2.5.1. Pointwise Ops 元素为单位的操作
+### 2.6.1. Pointwise Ops 元素为单位的操作
 
 * 三角函数
   * torch.sin
 
-### 2.5.2. Reduction Ops 元素之间的操作(降维)
+### 2.6.2. Reduction Ops 元素之间的操作(降维)
 
 * 所有函数都默认对张量的全部元素进行运算
 * 提供了针对选定维度的修改运算, 参数为
@@ -342,7 +363,7 @@ pickle_load_args: (Python 3 only) optional keyword arguments passed over to pick
 * 求范数
   * torch.norm()    : 求范数, 该函数已经被 deprecated. 使用 `torch.linalg` 中的对应函数
 
-#### 2.5.2.1. 极值操作
+#### 2.6.2.1. 极值操作
 
 * max/min : 返回最大值, 默认对全元素进行, 可以输入单个整数 dim 来对某一维度进行运算, 此时会返回两个值, 第二个返回值是索引位置
 * argmax/argmin : 返回最大值的索引, 默认对全元素进行操作, 可以输入单个整数 dim 来对某一维度进行运算, 等同于 max/min 输入 dim 的第二个返回值
@@ -350,7 +371,7 @@ pickle_load_args: (Python 3 only) optional keyword arguments passed over to pick
 
 
 
-### 2.5.3. Comparison Ops
+### 2.6.3. Comparison Ops
 
 专门用来比较的函数 
 
@@ -361,9 +382,9 @@ pickle_load_args: (Python 3 only) optional keyword arguments passed over to pick
 * sorted: bool, 是否按对应的顺序返回这k个值
 
 
-### 2.5.4. Spectral Ops - 光谱函数 在频域上操作信号
+### 2.6.4. Spectral Ops - 光谱函数 在频域上操作信号
 
-### 2.5.5. Other Operations - 无法分类的其他函数
+### 2.6.5. Other Operations - 无法分类的其他函数
 
 
 cum 累计系类:
@@ -654,7 +675,7 @@ sequential 本身与 ModuleList 相似, 然后 ModuleList 更加偏向于以 lis
 
 大部分说明都定义在 F. 中
 
-### nn.Softmax
+### 3.5.1. nn.Softmax
 
 `class torch.nn.Softmax(dim=None)`
 * 对 n-维 输入应用 softmax, 会将输入 Tensor 缩放到 `[0,1]` 范围同时求和为 1
@@ -1196,19 +1217,19 @@ torch.cuda 可以随时导入, 并通过  `is_available()` 来判断设备的 CU
 ## 8.2. Decompositions
 
 
-# torch.profiler
+# 9. torch.profiler
 
 允许在训练和推理期间收集性能指标的工具, 了解模型哪些运算符昂贵, 检查输入形状和追踪
 
 类似的量化性能 API 在 torch.autograd 中也有, 但是已被 deprecated
 
-## class torch.profiler.profile
+## 9.1. class torch.profiler.profile
 
 核心的 性能指标收集 类, 常通过 context manager 格式来使用
 
 
 
-## class torch.profiler._KinetoProfile
+## 9.2. class torch.profiler._KinetoProfile
 
 核心类 profile 的父类, 定义了输出性能结果的方法  
 
@@ -1216,7 +1237,7 @@ torch.cuda 可以随时导入, 并通过  `is_available()` 来判断设备的 CU
 
 
 
-# 9. torch.onnx
+# 10. torch.onnx
 
 将 torch 模型转换成 ONNX graph 的 API
 
@@ -1224,14 +1245,14 @@ torch.cuda 可以随时导入, 并通过  `is_available()` 来判断设备的 CU
 
 在 Pytorch 中, 定义了两种转化为 ONNX 模型的偏好
 
-## 9.1. TorchDynamo-based ONNX Exporter
+## 10.1. TorchDynamo-based ONNX Exporter
 
 于 Torch 2.0 推出的最新的转换方法, 目前还是 Beta?
 * 在转换中与 Python's frame evaluation API 链接, 动态的将字节码重写为 FX 图表
 * 对FX 进行完善, 最终才将其转化为 ONNX
 * 使用字节码分析捕获 FX graph, 能够保留模型的 动态特性, 而不是传统的静态跟踪技术
 
-## 9.2. TorchScript-based ONNX Exporter
+## 10.2. TorchScript-based ONNX Exporter
 
 于 Pytorch 1.2.0 推出的 ONNX 转换器  
 * 通过使用 TorchScript 来跟踪 模型, 并捕获静态计算图
@@ -1240,7 +1261,7 @@ torch.cuda 可以随时导入, 并通过  `is_available()` 来判断设备的 CU
   * 不会处理 training 和 eval 模型之间的细微差距 (例如 dropoff?)
   * 没有真正意义上处理动态输入的能力 Does not truly handle dynamic inputs
 
-### 9.2.1. API of TorchScript-based ONNX Exporter
+### 10.2.1. API of TorchScript-based ONNX Exporter
 
 ```py
 torch.onnx.export(model, args, f, export_params=True, verbose=False, training=<TrainingMode.EVAL: 0>, input_names=None, output_names=None, operator_export_type=<OperatorExportTypes.ONNX: 0>, opset_version=None, do_constant_folding=True, dynamic_axes=None, keep_initializers_as_inputs=None, custom_opsets=None, export_modules_as_functions=False, autograd_inlining=True)
@@ -1261,7 +1282,7 @@ args = ( x,{"y": input_y, "z": input_z} )
 # 主要用于模型需要 命名的参数的情况, 这种时候可以给模型 forward 定义输入默认值, 如果在字典中不给 named arg 提供输入值的话, 默认输入值是 None
 ```
 
-# 10. torch.optim
+# 11. torch.optim
 
 是一个实现各种优化算法的包。已经支持最常用的方法，并且界面足够通用，因此将来可以轻松集成更复杂的方法。  
 
@@ -1279,7 +1300,7 @@ optimizer = optim.Adam([var1, var2], lr = 0.0001)
 
 ```
 
-## 10.1. 预定义 Algorithm
+## 11.1. 预定义 Algorithm
 
 优化方法, (参数各不相同, 一般都有 lr )
 * Adadelta
@@ -1294,7 +1315,7 @@ optimizer = optim.Adam([var1, var2], lr = 0.0001)
 * Rprop
 * SGD
 
-## 10.2. torch.optim.lr_scheduler - 动态 Learn Rate
+## 11.2. torch.optim.lr_scheduler - 动态 Learn Rate
 
 `torch.optim.lr_scheduler` 提供了一些接口用来根据 epoch 或者其他计算来调整学习速率  
 `torch.optim.lr_scheduler.ReduceLROnPlateau` 则可以根据一些 validation measurements 来调整学习速率  
@@ -1337,7 +1358,7 @@ scheduler 的种类:
 * orch.optim.lr_scheduler.ExponentialLR : 学习率指数下降
 
 
-### 10.2.1. 有序调整
+### 11.2.1. 有序调整
 
 
 * LambdaLr : 使用自定义函数来生成学习率
@@ -1360,9 +1381,9 @@ optim.lr_scheduler.LambdaLR(optimizer,liner_func,**kwargs)
 ```
 
 
-## 10.3. 定义自己的 optim
+## 11.3. 定义自己的 optim
 
-### 10.3.1. Optimizer 基类
+### 11.3.1. Optimizer 基类
 
 `class torch.optim.Optimizer(params, defaults)` 是所有优化器的基类, 定义了优化器的必须操作  
 * 参数
@@ -1380,7 +1401,7 @@ optim.lr_scheduler.LambdaLR(optimizer,liner_func,**kwargs)
     初始化所有梯度为0 
     `set_to_none` 设置初始化梯度不是0而是 `None` 这会带来一些性能优化,但同时会有一些其他后果 *懒得看了
 
-### 10.3.2. optimization step
+### 11.3.2. optimization step
 
 重点: 所有 optimizers 必须实现 step 方法, 用来更新要优化的参数  
 
@@ -1423,7 +1444,7 @@ for input, target in dataset:
 
 ```
 
-### 10.3.3. per-parameter options
+### 11.3.3. per-parameter options
 
 To do this, instead of passing an iterable of `Variable` s, pass in an iterable of `dict` s.    
 * dict 中指定了不同的 parameter group, 并且需要使用 `params` 关键字

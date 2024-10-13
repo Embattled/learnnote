@@ -288,9 +288,6 @@ Mesh 建模:
 * novel rasterized method 用来高效计算 depth and normal maps
 
 
-
-
-
 ## 2.2. Neural Radiance Fields (NeRF) 基于(MLP)神经网络的 Radiance Fields
 
 
@@ -503,7 +500,44 @@ Point‐Based Neural Rendering with Per‐View Optimization
 
 
 
-# 3. 2D - Implicit Image Function
 
-通过 神经网络表达 2D 图像
+# 3. Direct RGB-to-3D 
+
+模型本身学习了 Strong 3D priors, 例如单目深度预测
+
+此外, 建立一个可微分的 SfM Pipeline 并 E2E 的学习
+
+# Pointmap Regression
+
+通过向预训练完成的模型输入一系列的 无 Pose 无相机参数的图像, 直接推理出每一个点的空间坐标, 而其他的常见SfM相关的后继任务可以作为点图的后处理来实现
+
+## 3R 系列
+
+
+### DUSt3R: Geometric 3D Vision Made Easy
+
+Dense and Unconstrained Stereo 3D Reconstruction (DUSt3R) 
+
+
+密集 2D 输入作为 3D 点图, 2D 图像上的一个像素对应空间中的一点 $X\in \mathbb{R}^{W\times H\times 3}$
+
+假定每一个像素的 camera ray 只会最终击中单个 3D point, 忽视所有半透明的表面
+
+那么假设获取了某一个图像的 GT 深度图 D, 则可以根据 深度图和相机内参获取该 2D 图对应的 pointmap
+
+$D\in \mathbb{R}^{W\times H}, X_{i,j}= K^{-1}[iD_{i,j},jD_{i,j},D_{i,j}]^T$
+
+模型说明：
+1. 整个模型由一个 Encoder 和两个 Decoder 序列构成
+2. 输入数据为一个 image pair, 经过相同的 Encoder 获取特征量
+3. 由于两个 Decoder 是由多个 block 构成的, 这里两个 Decoder 在最开始和每个 block 后面都会进行信息交换
+4. 最后的两个 Head 会分别解码出两个 image 各自的 pointmap 和 confidence map, 其中 point map 只包含相对信息, 不包含针对特定相机模型的绝对坐标
+
+
+伴随 confidence 的训练:
+* 提出于  Confnet: Predict with Confidence
+* 模型输出的 Confidence 的原始值 $\tilde{C}$,  应用 $C= 1+ \exp{\tilde{C}}$ 确保信用度为正且大于1
+* 添加信用度的损失函数 $L = Cl - \alpha log{C}$ 迫使网络优先去拟合高难度区域
+
+
 

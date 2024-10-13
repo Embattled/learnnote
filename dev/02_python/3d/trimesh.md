@@ -1,4 +1,4 @@
-# trimesh 
+# 1. trimesh 
 
 一个很受欢迎的轻量化 3D mesh 处理库
 
@@ -6,18 +6,18 @@
 
 库本身没有特别清晰的层级结构
 
-# quick start
+# 2. quick start
 
 
 
-# trimesh
+# 3. trimesh
 
 trimesh 最顶层的接口
 
 包括了最上层的类对象和高级 IO 函数
 
 
-## basic I
+## 3.1. basic IO
 
 * trimesh.load          : Load mesh or vectorized path into objects like Trimesh, Path2D, Path3D, Scene.
 * trimesh.load_mesh     : Load a mesh file into a Trimesh object.
@@ -45,27 +45,27 @@ trimesh.load_path(file_obj, file_type=None, **kwargs)
 trimesh.load_remote(url, **kwargs)
 ```
 
-## class trimesh.Geometry
+## 3.2. class trimesh.Geometry
 
 Geometry 是所有高级类的父类 (虚基类) Bases: ABD
 
 内部定义有很多的 abstract
 
 
-## class trimesh.PointCloud
+## 3.3. class trimesh.PointCloud
 
 Bases: Geometry3D
 
 Hold 3D points in an object which can be visualized in a scene.
 
-## class trimesh.Scene
+## 3.4. class trimesh.Scene
 
 Bases: Geometry3D
 
 A simple scene graph which can be rendered directly via pyglet/openGL or through other endpoints such as a raytracer. Meshes are added by name, which can then be moved by updating transform in the transform tree.
 
 
-## class trimesh.Trimesh
+## 3.5. class trimesh.Trimesh
 
 Bases: Geometry3D
 A Trimesh object contains a triangular 3D mesh.
@@ -83,7 +83,7 @@ A Trimesh object contains a triangular 3D mesh.
 * initial_cache 
 * visual 
 
-### is_* property
+### 3.5.1. is_* property
 
 
 * is_convex : bool, 该网格是否是 凸的
