@@ -43,7 +43,7 @@ $$p_{\text{parent}}=
 
 
 
-### World coordinates
+### 1.1.3. World coordinates
 
 世界坐标系
 
@@ -53,7 +53,7 @@ $$p_{\text{parent}}=
 
 `viser.SceneApi.set_up_direction(direction: Literal[‘+x’, ‘+y’, ‘+z’, ‘-x’, ‘-y’, ‘-z’] | tuple[float, float, float] | ndarray) → None`
 
-### Cameras 
+### 1.1.4. Cameras 
 
 相机的方向, 在 viser 里使用的是 COLMAP/OpenCV 的约定方向
 
@@ -68,7 +68,7 @@ $$p_{\text{parent}}=
 
 因此要在两种相机约定之间进行转换, 可以简单的围绕 X 轴旋转 180 度
 
-## Development
+## 1.2. Development
 
 简要概述 viser 开发的实例和流程
 
@@ -76,7 +76,7 @@ viser 的单元测试比较难以实现, 可以通过一个命令行 `viser-dev-
 * runs linting, formatting, and type-checking
 
 
-### Message updates
+### 1.2.1. Message updates
 
 通过一组共享的消息定义 来实现 前后端的通信
 * 服务器端, 定义为 Python 的数据类 `~/viser/src/viser/_messages.py`
@@ -85,7 +85,7 @@ viser 的单元测试比较难以实现, 可以通过一个命令行 `viser-dev-
 
 在开发的过程中, 不应该直接修改 TypeScript 的定义, 而是应该在 Python 的类中进行修改, viser 提供了 `sync_message_defs.py` 来同步对应的更改
 
-### Client development
+### 1.2.2. Client development
 
 
 启动书写好的 viser 服务端代码 `python 05_camera_commands.py`
@@ -107,11 +107,11 @@ viser 的单元测试比较难以实现, 可以通过一个命令行 `viser-dev-
   * `npx prettier -w .`
 
 
-# API (Basics) - 基本的 API
+# 2. API (Basics) - 基本的 API
 
 基本 API 里的内容非常简洁, 所有接口都应以在了对应的3个类里
 
-## Viser Server
+## 2.1. Viser Server
 
 `class viser.ViserServer`
 全局的核心 API， 在该类的实例初始化的时候, 会在一个线程里建立 web server, 并提供对应的高级 API 用于交互式 3D 可视化
@@ -133,13 +133,18 @@ viser 的单元测试比较难以实现, 可以通过一个命令行 `viser-dev-
 * port  : Port to bind server to
 * label : Label shown at the top of the GUI panel
 
-属性:
+属性: 只有两个
 * `scene: SceneApi`  : Handle for interacting with the 3D scene.
 * `gui: GuiApi`      : Handle for interacting with the GUI.
 
+### 2.1.1. get_* 函数
+
+`get_clients() → dict[int, ClientHandle]`
+* 获取 IDs 和对应的 clientHandle
 
 
-## Scene API
+
+## 2.2. Scene API
 
 `class viser.SceneApi`
 Interface for adding 3D primitives to the scene.
@@ -147,25 +152,94 @@ Interface for adding 3D primitives to the scene.
 用于向 3D 场景中添加图元(primitives), 所有客户端同步的 Server 和 客户端独立的 Client 的 句柄 (Handles) 都使用该类
 
 
-### Scene add 系列方法
+### 2.2.1. Scene add 系列方法
 
 向场景中添加图元
 
+* add_frame         : 添加坐标轴
+* add_image         : 添加静态图
+* add_point_cloud   : 添加点云
+* 
+
+
+Scene 的元件通用参数:
+* `name (str)` – Scene node name. 节点名称
+* `wxyz (Tuple[float, float, float, float] | ndarray)` – R_parent_local transformation. 从父节点坐标系到当前节点坐标系的旋转四元数
+* `position (Tuple[float, float, float] | ndarray)` – t_parent_local transformation. 父节点坐标系到当前节点坐标系的位移
+* `visible (bool)` – Initial visibility of scene node. 控制节点的可见性
+
+
+`add_frame(name: str, show_axes: bool = True, axes_length: float = 0.5, axes_radius: float = 0.025, origin_radius: float | None = None, wxyz: tuple[float, float, float, float] | ndarray = (1.0, 0.0, 0.0, 0.0), position: tuple[float, float, float] | ndarray = (0.0, 0.0, 0.0), visible: bool = True) → FrameHandle`
+* 添加坐标轴, 可以作为相机坐标, 但是可视化效果不太好
 
 
 
-## GUI API
+`add_point_cloud(name: str, points: ndarray, colors: ndarray | tuple[float, float, float], point_size: float = 0.1, point_shape: Literal[‘square’, ‘diamond’, ‘circle’, ‘rounded’, ‘sparkle’] = 'square', wxyz: tuple[float, float, float, float] | ndarray = (1.0, 0.0, 0.0, 0.0), position: tuple[float, float, float] | ndarray = (0.0, 0.0, 0.0), visible: bool = True) → PointCloudHandle`
+* 添加点云
+* 参数:
+  * points  : (n, 3) 的点云坐标
+  * colors  : (n, 3) 的点的颜色
+ 
+
+
+
+`add_mesh_skinned(name: str, vertices: ndarray, faces: ndarray, bone_wxyzs: tuple[tuple[float, float, float, float], …] | ndarray, bone_positions: tuple[tuple[float, float, float], …] | ndarray, skin_weights: ndarray, color: Tuple[int, int, int] | Tuple[float, float, float] | ndarray = (90, 200, 255), wireframe: bool = False, opacity: float | None = None, material: Literal[‘standard’, ‘toon3’, ‘toon5’] = 'standard', flat_shading: bool = False, side: Literal[‘front’, ‘back’, ‘double’] = 'front', wxyz: Tuple[float, float, float, float] | ndarray = (1.0, 0.0, 0.0, 0.0), position: Tuple[float, float, float] | ndarray = (0.0, 0.0, 0.0), visible: bool = True) → MeshSkinnedHandle`
+* 添加 skinned mesh , 可以使用 bone transformations 来进行变形
+
+
+
+`add_mesh_simple(name: str, vertices: ndarray, faces: ndarray, color: Tuple[int, int, int] | Tuple[float, float, float] | ndarray = (90, 200, 255), wireframe: bool = False, opacity: float | None = None, material: Literal[‘standard’, ‘toon3’, ‘toon5’] = 'standard', flat_shading: bool = False, side: Literal[‘front’, ‘back’, ‘double’] = 'front', wxyz: tuple[float, float, float, float] | ndarray = (1.0, 0.0, 0.0, 0.0), position: tuple[float, float, float] | ndarray = (0.0, 0.0, 0.0), visible: bool = True) → MeshHandle`
+* 添加普通的 mesh
+
+
+
+`add_mesh_trimesh(name: str, mesh: trimesh.Trimesh, scale: float = 1.0, wxyz: tuple[float, float, float, float] | np.ndarray = (1.0, 0.0, 0.0, 0.0), position: tuple[float, float, float] | np.ndarray = (0.0, 0.0, 0.0), visible: bool = True) → GlbHandle`
+* 添加 trimesh 库格式的 mesh `trimesh.Trimesh`
+
+
+`add_gaussian_splats(name: str, centers: ndarray, covariances: ndarray, rgbs: ndarray, opacities: ndarray, wxyz: Tuple[float, float, float, float] | ndarray = (1.0, 0.0, 0.0, 0.0), position: Tuple[float, float, float] | ndarray = (0.0, 0.0, 0.0), visible: bool = True) → GaussianSplatHandle`
+* 添加 高斯飞溅模型. 该功能正处于试验阶段
+* 参数列表:
+  * `centers (ndarray)` : Gaussians 的中心坐标 (N,3)
+  * `covariances (ndarray)` : Gaussians 的协方差矩阵 (N, 3, 3)
+  * `rgbs (ndarray)`  : Gaussian 的渲染颜色. (N, 3)
+  * `opacities (ndarray)` : Gaussian 的不透明度. (N, 1)
+
+
+
+
+`add_image(name: str, image: ndarray, render_width: float, render_height: float, format: Literal[‘png’, ‘jpeg’] = 'jpeg', jpeg_quality: int | None = None, wxyz: tuple[float, float, float, float] | ndarray = (1.0, 0.0, 0.0, 0.0), position: tuple[float, float, float] | ndarray = (0.0, 0.0, 0.0), visible: bool = True) → ImageHandle`
+* 添加静态图片
+* 参数:
+  * render_width, render_height : 在坐标系中的渲染长宽
+  * wxyz  : 旋转四元数
+  * position  : 坐标
+
+
+### 2.2.2. set_* 函数
+
+`set_up_direction(direction: Literal[‘+x’, ‘+y’, ‘+z’, ‘-x’, ‘-y’, ‘-z’] | tuple[float, float, float] | ndarray) → None`
+* 用于调整坐标系的方向
+* 默认为 +Z-up
+
+
+
+## 2.3. GUI API
 
 `class viser.GuiApi`
 同  SceneAPI 一样, 只不过只负责 2D GUI
 
 
-### GUI add 系列方法
+### 2.3.1. GUI add 系列方法
 
 方法列表
-* add_folder
-* add_number
-* add_slider
+* add_folder    : 用于元件管理
+* add_number    : 数字输入组件
+* add_button    : 按钮
+* add_checkbox  : 勾选框
+* add_dropdown  : 下拉菜单组件
+* add_slider    : 滑动条组件
+* 
 
 `add_folder(label: str, order: float | None = None, expand_by_default: bool = True, visible: bool = True) → GuiFolderHandle`
 添加一个GUI元件 folder, 返回一个 Handle 用于控制句柄的结束, 通常使用 with 的上下文管理器来使用, 根据 GUI 内容对各个组件进行分类, 在 folder 里进行定义即可
@@ -181,6 +255,12 @@ Interface for adding 3D primitives to the scene.
 添加一个 数字输入 组件, 参数超级多
 
 
+
+`add_dropdown(label: str, options: Sequence[TLiteralString], initial_value: TLiteralString | None = None, disabled: bool = False, visible: bool = True, hint: str | None = None, order: float | None = None) → GuiDropdownHandle[TLiteralString]`
+* 下拉组件
+
+
+
 `add_slider(label: str, min: IntOrFloat, max: IntOrFloat, step: IntOrFloat, initial_value: IntOrFloat, marks: tuple[IntOrFloat | tuple[IntOrFloat, str], …] | None = None, disabled: bool = False, visible: bool = True, hint: str | None = None, order: float | None = None) → GuiSliderHandle[IntOrFloat]`
 
 
@@ -188,20 +268,69 @@ Interface for adding 3D primitives to the scene.
 
 
 
-# API (Advanced)
 
-## Client Handles
+# 3. API (Advanced)
 
-## Camera Handles
 
-## GUI Handles
+## 3.1. Handle 通用方法
+
+回调函数  `on_*`
+回调函数可以作为 装饰器, 来快速的定义回调
+
+## 3.2. Client Handles
+
+`class viser.ClientHandle`
+* 用以管理每个 ClientHandle 链接
+* 有各自的几大属性
+  * scene  : SceneApi
+  * gui     : GuiApi
+  * client_id : int
+  * camera  : CameraHandle, 管理 client 的 viewport
+
+
+## 3.3. Camera Handles
+
+## 3.4. GUI Handles
 
 GUI 的各个组件进行独自管理的内容, 实例一般都是作为 add 方法的返回值获取
 
-# Examples 示例
+## 3.5. Events
+
+事件 Event 类型, 这些类型的实例会作为 参数 传递给 callback functions
+前两个比较高阶, 常用的应该就最后一个 GUI 的回调实例
 
 
-## 00_coordinate_frames
+* class viser.ScenePointerEvent   : scene 的点击回调
+  * client
+  * client_id
+  * event_type
+  * ray_origin
+  * ray_direction
+  * screen_pos
+* class viser.SceneNodePointerEvent   : scene nodes 的点击回调
+  * 
+* class viser.GuiEvent  : GUI 的 update or click 
+  * client      : ClientHandle
+  * client_id   : int
+  * target      : TGuiHandle, 受影响的 GUI 元素 (不太懂)
+
+
+
+
+
+# 4. API (Auxiliary) : 辅佐库
+
+## 4.1. Transforms
+
+viser 内部实现的 李群库, 基于 jaxlie, 被用于 viser 内部以及示例.
+
+Implements SO(2), SO(3), SE(2), and SE(3) Lie groups. Rotations are parameterized via S^1 and S^3.
+
+
+# 5. Examples 示例
+
+
+## 5.1. 00_coordinate_frames
 
 ```python
 import viser
@@ -226,7 +355,7 @@ while True:
     time.sleep(0.5)
 ```
 
-##  01_image
+##  5.2. 01_image
 
 ```python
 # 添加全局固定的背景图片
@@ -234,4 +363,41 @@ server.scene.set_background_image
 
 # 添加图片
 server.scene.add_image
+```
+
+
+
+## 5.3. 05_xcamera_commands 
+
+```py
+
+# Move the camera when we click a frame., 把相机的视角移动到对应的坐标轴上
+@frame.on_click
+def _(_):
+    T_world_current = tf.SE3.from_rotation_and_translation(
+        tf.SO3(client.camera.wxyz), client.camera.position
+    )
+    T_world_target = tf.SE3.from_rotation_and_translation(
+        tf.SO3(frame.wxyz), frame.position
+    ) @ tf.SE3.from_translation(np.array([0.0, 0.0, -0.5]))
+
+    T_current_target = T_world_current.inverse() @ T_world_target
+
+    for j in range(20):
+        T_world_set = T_world_current @ tf.SE3.exp(
+            T_current_target.log() * j / 19.0
+        )
+
+        # We can atomically set the orientation and the position of the camera
+        # together to prevent jitter that might happen if one was set before the
+        # other.
+        with client.atomic():
+            client.camera.wxyz = T_world_set.rotation().wxyz
+            client.camera.position = T_world_set.translation()
+
+        client.flush()  # Optional!
+        time.sleep(10.0 / 60.0)
+
+    # Mouse interactions should orbit around the frame origin.
+    client.camera.look_at = frame.position
 ```

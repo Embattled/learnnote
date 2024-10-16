@@ -4,6 +4,9 @@
 
 # 2. typing
 
+https://docs.python.org/3/library/typing.html#module-typing
+
+
 * python 是弱类型语言, 语法上不强制任何类型匹配
 * 可以通过注释来添加类型标识, 解释器层面不会进行检查, 但是可以用于 IDE 来帮助检查
 * 简单来说就是符合语法的各种注释写法
@@ -19,17 +22,13 @@ typing 包是一个高频率更新的包, 并且新版本的包会将功能添�
 
 The most fundamental support consists of the types `Any, Union, Tuple, Callable, TypeVar, and Generic`
 
-## Specification for the Python Type System
+## 2.1. Specification for the Python Type System
 
 python 语言的 type 系统规范可以在别的页面找到
 
 [“Specification for the Python type system”.](https://typing.readthedocs.io/en/latest/spec/index.html)
 
-## 2.1. Special typing primitives
-
-用于 annotation 的各种特殊类型 
-
-## Type aliases - 类型别名
+## 2.2. Type aliases - 类型别名
 
 可以查看 `type statement`, 虽然是 typing 模组里的功能但是使用不需要导入包 (python3.12 版本以后)
 ```py
@@ -67,7 +66,18 @@ type 语法是 3.12 新功能, 但旧版本的 typing 包里面已经有 type al
 * 可以直接定义 `Vector = list[float]`, created through simple assignment
 * 也可以导入 Typing 包然后声明好 这是一个 类型别名 `Vector: TypeAlias = list[float]`
 
-### 2.1.1. Special types 特殊类型
+
+
+## 2.3. Module contents
+
+typing 模组定义的一系列用于类型提示的 类, 函数, 描述符
+
+### 2.3.1. Special typing primitives
+
+用于 annotation 的各种特殊类型 
+
+
+#### 2.3.1.1. Special types 特殊类型
 
 两个非常常用的类型, 不支持放在方括号中 `[]`
 
@@ -85,10 +95,17 @@ def stop(
     raise RuntimeError('no way')
 ```
 
-### 2.1.2. Special forms
+#### 2.3.1.2. Special forms
 
 * 这几个类型可以用于描述一个使用方括号的类型, 每一个类型都有特殊的语法
 * 最早用于方便 annotation 的类型有一些已经被 新版本的抽象类实现了
+
+整理
+* Union     : 用于定义 `或`
+* Optional  : 相当于 `Union[X|None]`
+* Literal   : 用于定义参数为  一个字符串列表中的其中之一 
+
+
 
 * `typing.Union`
   * 用于指定该类型是可选列表中的其中一种, 且不能为空
@@ -121,8 +138,14 @@ def stop(
   * `Callable[[Arg1Type, Arg2Type], ReturnType]`
   * 一个方括号, 里面有两个参数, 第一个是参数列表, 第二个是返回值类型
 
+#### 2.3.1.3. Building generic types and type aliases
 
-## 2.2. 基础用法
+
+#### Other special directives
+
+
+
+## 2.4. 基础用法
 
 类型别称:
 * 用于辅助类型标识, 可以理解为 `typedef`
@@ -146,7 +169,7 @@ def scale(
     return [scalar * num for num in vector]
 ```
 
-## 2.3. NewType
+## 2.5. NewType
 
 * NewType 是 typing 包中的一个函数 `from typing import NewType`
 * NewType 同样类似于 `typedef` 不过该类型定义是有程序含义的, 类似于 subclass
@@ -164,7 +187,7 @@ some_id = UserId(524313)
 output = UserId(23413) + UserId(54341)
 ```
 
-## 2.4. Callable
+## 2.6. Callable
 
 Callable 是一个 注释类型, 用于说明这是一个函数
 
@@ -183,7 +206,7 @@ def async_query(
     ) -> None:
 ```
 
-## 2.5. Generics
+## 2.7. Generics
 
 ```py
 from collections.abc import Mapping, Sequence

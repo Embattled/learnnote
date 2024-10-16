@@ -50,6 +50,7 @@
   - [9.1. Objects, values and types - 对象, 值, 类型 的定义](#91-objects-values-and-types---对象-值-类型-的定义)
   - [9.2. The standard type hierarchy](#92-the-standard-type-hierarchy)
   - [9.3. Special method names - 特殊方法名称](#93-special-method-names---特殊方法名称)
+    - [9.3.1. Basic customization](#931-basic-customization)
   - [9.4. Coroutines - 协程](#94-coroutines---协程)
 - [10. Execution model](#10-execution-model)
 - [11. The import system - 模组导入系统](#11-the-import-system---模组导入系统)
@@ -72,14 +73,13 @@
   - [14.8. Type parameter lists](#148-type-parameter-lists)
   - [14.9. self](#149-self)
   - [14.10. 类的变量](#1410-类的变量)
-  - [14.11. 类方法 静态方法](#1411-类方法-静态方法)
-  - [14.12. 类的描述符](#1412-类的描述符)
-  - [14.13. 类的封装](#1413-类的封装)
-    - [14.13.1. property()](#14131-property)
-    - [14.13.2. @property 装饰器](#14132-property-装饰器)
-  - [14.14. 类的继承和多态](#1414-类的继承和多态)
-    - [14.14.1. super](#14141-super)
-    - [14.14.2. MRO Method Resolution Order](#14142-mro-method-resolution-order)
+  - [14.11. 类的描述符](#1411-类的描述符)
+  - [14.12. 类的封装](#1412-类的封装)
+    - [14.12.1. property()](#14121-property)
+    - [14.12.2. @property 装饰器](#14122-property-装饰器)
+  - [14.13. 类的继承和多态](#1413-类的继承和多态)
+    - [14.13.1. super](#14131-super)
+    - [14.13.2. MRO Method Resolution Order](#14132-mro-method-resolution-order)
 - [15. Top-level components - 顶层复合语句](#15-top-level-components---顶层复合语句)
 
 # 1. The Python Language Reference
@@ -1111,6 +1111,9 @@ Python 的 Object 永远没有显示的删除功能, 如果一个 object 不可�
 
 ## 9.2. The standard type hierarchy
 
+在本章节会介绍 Python 的内置类型.   
+扩展模块可以定义其他类型
+
 ## 9.3. Special method names - 特殊方法名称
 
 一个 class 可以通过实现特殊名称的 方法, 来实现由特殊语法调用的某些操作. 即运算符重载, 索引, 切片 等
@@ -1120,6 +1123,25 @@ Python 的 Object 永远没有显示的删除功能, 如果一个 object 不可�
 同时, 如果运算符并未有对应操作的对应方法, 则会唤起 ERROR, 通常是  AttributeError or TypeError
 
 手动将某个特殊名称的方法设置为 None, 表示对应类不可以进行相应操作, 可以避免默认行为导致的歧义
+
+
+### 9.3.1. Basic customization
+
+
+
+`object.__repr__(self)` : 用于定义该 对象的 `正式 offical` 字符串表达形式, 会作为 `repr(obj)` 的返回值
+* 返回值必须是 字符串对象
+* 如果有条件的话, 返回值应当可以被用于 重新创建 一个具有相同值的对象 `的 Python 表达式`
+* 如果上述条件不满足的话, 则最起码应该返回一个  `<...some useful description...>` 样子的字符串
+  * 可以参考在 交互式终端中输出 np.ndarray 时候的形式
+* 对于 `非正式 informal` 字符串形式的 `__str__` 如果没有被定义的话, `__repr__` 则会被替代使用
+* 该方法通常用于 debug, 因此输出信息的量往往非常丰富且明确
+
+
+`object.__str__(self)`   : 用于该对象的 `informal` or `nicely printable` 字符串表达, 会作为 `str(obj)` 的返回值, 用于 `format() print()`
+* 返回值必须是字符串对象
+* 不期望返回值是一个 Python 表达式
+* 该函数的默认实现是直接调用 `__repr__()`
 
 ## 9.4. Coroutines - 协程
 
@@ -1424,58 +1446,9 @@ clanguage.bar(clanguage)
 3. 局部变量 : 类方法中普通方法定义, 不使用 `self.` 来定义的变量
    - 函数执行完成后, 局部变量也会被销毁。
 
-## 14.11. 类方法 静态方法
-
-1. `@classmethod` 修饰的方法为类方法
-   - 相当于C++的类的静态方法
-2. `@staticmethod` 修饰的方法为静态方法
-   - 相当于在类中定义了一个普通函数, 但是属于类的命名空间
-   - 没有 self 参数, 因此不会绑定类对象, 也因此不能调用任何类对象和类方法
-3. 不用任何修改的方法为实例方法
-4. `@classmethod` 和 `@staticmethod` 都是函数装饰器
-
-- 实例方法
-  - 通常通过对象访问, 最少包含一个 `self` 参数
-  - 通过类名访问, 需要提供对象参数 `CLanguage.say(clang)`
-  - 用类的实例对象访问类成员的方式称为绑定方法, 而用类名调用类成员的方式称为非绑定方法。
-
-- 在实际编程中, 几乎不会用到类方法和静态方法
-- 特殊的场景中（例如工厂模式中）, 使用类方法和静态方法也是很不错的选择。
-
-```py
-class CLanguage:
-    #类构造方法, 也属于实例方法
-    def __init__(self):
-        self.name = "C语言中文网"
-        self.add = "http://c.biancheng.net"
-
-    # 类方法需要使用＠classmethod修饰符进行修饰
-    #下面定义了一个类方法
-    @classmethod
-    def info(cls):
-        print("正在调用类方法",cls)
-
-    @staticmethod
-    def infos(name,add):
-        print(name,add)
 
 
-# 类方法也要包含一个参数, 通常将其命名为 cls
-# Python 会自动将类本身绑定给 cls 参数
-
-# 类方法推荐使用类名直接调用, 当然也可以使用实例对象来调用（不推荐）
-CLanguage.info()
-
-# 类的静态方法中无法调用任何类属性和类方法, 所以能用静态方法完成的工作都可以用普通函数完成
-CLanguage.infos("C语言中文网","http://c.biancheng.net")
-
-```
-
-- 用类的实例对象访问类成员的方式称为绑定方法
-
-- 而用类名调用类成员的方式称为非绑定方法。
-
-## 14.12. 类的描述符
+## 14.11. 类的描述符
 
 - 通过使用描述符, 可以让程序员在引用一个对象属性时自定义要完成的工作
 - 一个类可以将属性管理全权委托给描述符类
@@ -1514,7 +1487,7 @@ class myClass:
     y = 5
 ```
 
-## 14.13. 类的封装
+## 14.12. 类的封装
 
 - Python 并没有提供 public、private 这些修饰符
     默认情况下, Python 类中的变量和方法都是公有（public）的, 它们的名称前都没有下划线（_）；
@@ -1523,7 +1496,7 @@ class myClass:
   - 对于一个变量 `__私有变量` 在执行过程中实际的变量名变成了 `_类名__私有变量` 因此仍然可以在外部访问
 - 用 `类对象.属性` 的方法访问类中的属性是不妥的, 破坏了类的封装性
 
-### 14.13.1. property()
+### 14.12.1. property()
 
 - 为了实现类似于C++的类私有变量, 即只能通过类方法来间接操作类属性, 一般都会设置 getter setter 方法
 - 虽然保护了封装性, 但是调用起来非常麻烦
@@ -1551,7 +1524,7 @@ class CLanguage:
     name = property(getname, setname, delname, '指明出处')
 ```
 
-### 14.13.2. @property 装饰器
+### 14.12.2. @property 装饰器
 
 - 同 property 的作用一样, 这个装饰器的目的也是一样, 方便调用代码的书写
 - 通过该装饰器可以让方法的调用变得和属性一样 - 即不带括号
@@ -1584,7 +1557,7 @@ del rect.area
 print("删除后的area值为：",rect.area)
 ```
 
-## 14.14. 类的继承和多态
+## 14.13. 类的继承和多态
 
 - 类的继承, 在定义子类的时候, 将父类放在子类之后的圆括号即可
   - `class 类名(父类1, 父类2, ...)：`
@@ -1592,7 +1565,7 @@ print("删除后的area值为：",rect.area)
   - python 支持多继承, 大部分的对象语言都不允许多继承
     - 对于多个父类中的同名方法, 以最早出现的父类为准
 
-### 14.14.1. super
+### 14.13.1. super
   
 - 子类如果定义了自己的构造方法, 则里面必须要调用父类的构造方法
 - 在子类中的构造方法中, 调用父类构造方法的方式有 2 种, 分别是：
@@ -1602,7 +1575,7 @@ print("删除后的area值为：",rect.area)
 
 `super().__init__(self,...)`
 
-### 14.14.2. MRO Method Resolution Order
+### 14.13.2. MRO Method Resolution Order
 
 
 # 15. Top-level components - 顶层复合语句

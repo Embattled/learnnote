@@ -6,12 +6,16 @@
 
 # 2. Built-in Functions
 
+https://docs.python.org/3/library/functions.html
 
 可以直接使用, 不需要导入某个模块, 解释器自带的函数叫做内置函数  
 
     在 Python 2.x 中, print 是一个关键字；到了 Python 3.x 中, print 变成了内置函数。
 
 不要使用内置函数的名字作为标识符使用, 虽然这样做 Python 解释器不会报错, 但这会导致同名的内置函数被覆盖, 从而无法使用  
+
+官方文档中没有对 Built-in Functions 进行分节分类
+
 
 其他未学习的内置函数
 ```
@@ -24,10 +28,11 @@ breakpoint()
     iter()  
 callable()  format()  len()  property() 
 frozenset()     
-classmethod()  
 compile()    map()   
 complex()  round()
 ```
+
+
 ## 2.1. 基本函数
 
 过于语言基本的函数, 无法分类
@@ -58,6 +63,7 @@ complex()  round()
   - bytearray()
   - memoryview()
 
+
 ## 2.3. 类型转换函数
 
 虽然 Python 是弱类型编程语言, 在一些特定场景中, 仍然需要考虑到类型  
@@ -72,7 +78,7 @@ complex()  round()
 
 2. 使用print()输出时, 通过一行语句输出字符串和变量内容但不使用格式化字符串时, 需要转换
    - str(x)  将 x 转换为字符串
-   - repr(x)  将 x 转换为表达式字符串
+   - repr(x)  将 x 转换为表达式字符串 
 
 3. ASCII码函数
    - ord() : 字符转化成 Unicode 码
@@ -99,6 +105,73 @@ attr系列
 * `hasattr(object, name)`           : 简单的逻辑判断 object 中是否有名为 name 的成员
 * `delattr(object, name)`           : 可以理解为 setattr 的反函数, 删除名为 name 的成员, 相当于 `del object.name`
 
+
+## 类方法
+
+不用任何修改的方法为实例方法
+- 实例方法
+  - 通常通过对象访问, 最少包含一个 `self` 参数
+  - 通过类名访问, 需要提供对象参数 `CLanguage.say(clang)`
+  - 用类的实例对象访问类成员的方式称为绑定方法, 而用类名调用类成员的方式称为非绑定方法。
+
+- 在实际编程中, 几乎不会用到类方法和静态方法
+- 特殊的场景中（例如工厂模式中）, 使用类方法和静态方法也是很不错的选择。
+
+
+`@classmethod` 和 `@staticmethod` 都是函数装饰器
+
+`Changed in version 3.10: Class methods/Static methods now inherit the method attributes (__module__, __name__, __qualname__, __doc__ and __annotations__) and have a new __wrapped__ attribute.`
+
+描述符
+* `@classmethod`              : 将一个类方法转换成 `classmethod`, 即类本身的方法
+  * `@classmethod` 修饰的方法为类方法
+  * 相当于C++的类的静态方法, 而若要实现纯粹的 static method 则使用另一个 staticmethod 描述符
+  * 同定义方法的时候需要第一个参数为 示例 self, 定义类方法的时候第一个参数也需要为 cls
+  * 类方法可以直接在类上调用, 也可以在实例上调用. 类方法也可以被派生类直接调用, 派生类会直接作为第一个参数被传入
+
+
+```py
+# 定义类方法可以用如下的模板
+class C:
+    @classmethod
+    def f(cls, arg1, arg2): ...
+```
+
+* `@staticmethod` 修饰的方法为静态方法
+  * 相当于在类中定义了一个普通函数, 但是属于类的命名空间
+  * 没有 self 参数, 因此不会绑定类对象, 也因此不能调用任何类对象和类方法
+
+```py
+class CLanguage:
+    #类构造方法, 也属于实例方法
+    def __init__(self):
+        self.name = "C语言中文网"
+        self.add = "http://c.biancheng.net"
+
+    # 类方法需要使用＠classmethod修饰符进行修饰
+    #下面定义了一个类方法
+    @classmethod
+    def info(cls):
+        print("正在调用类方法",cls)
+
+    @staticmethod
+    def infos(name,add):
+        print(name,add)
+
+
+# 类方法也要包含一个参数, 通常将其命名为 cls
+# Python 会自动将类本身绑定给 cls 参数
+
+# 类方法推荐使用类名直接调用, 当然也可以使用实例对象来调用（不推荐）
+CLanguage.info()
+
+# 类的静态方法中无法调用任何类属性和类方法, 所以能用静态方法完成的工作都可以用普通函数完成
+CLanguage.infos("C语言中文网","http://c.biancheng.net")
+
+```
+
+- 用类的实例对象访问类成员的方式称为绑定方法
+- 而用类名调用类成员的方式称为非绑定方法。
 
 ## 2.6. 数学逻辑函数
 

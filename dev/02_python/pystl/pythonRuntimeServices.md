@@ -126,8 +126,145 @@ ignore::ResourceWarning
   * 还原所有 warnings filter 为 default
   * 会取消掉所有 `filterwarnings() 和 simplefilter()` 的调用, 包括 `-W` 的命令行选项
 
+# 5. dataclasses — Data Classes
 
-# 5. abc - Abstract Base Class
+该模块提供了一个 装饰器 decorator 和几个函数, 用于自动将生成的 special methods 添加到 用户定义的类中
+* 所谓的 special methods 举例有 : `__init__()` 和 `__repr__()`
+
+描述于 PEP 557 Python 3.7 
+
+
+快速示例, 通过 PEP 526 定义的类型注释 (annotations) 和 @dataclass 来隐式的定义构造函数
+
+```py
+from dataclasses import dataclass
+
+@dataclass
+class InventoryItem:
+    """Class for keeping track of an item in inventory."""
+    name: str
+    unit_price: float
+    quantity_on_hand: int = 0
+
+    def total_cost(self) -> float:
+        return self.unit_price * self.quantity_on_hand
+
+    # 这个函数是被隐式的定义的
+    def __init__(self, name: str, unit_price: float, quantity_on_hand: int = 0):
+        self.name = name
+        self.unit_price = unit_price
+        self.quantity_on_hand = quantity_on_hand
+```
+
+
+## 5.1. Module contents
+
+
+### 5.1.1. Field 类 概念
+
+
+
+`class dataclasses.Field`
+* 一个 Field 对象 定义了一个 field. 这些 对象都是隐式的定义的, 并作为 `dataclass.fields()` 接口的返回值
+* 用户永远不应该 自己定义一个 Field 实例
+* field 保有的属性有
+  * name
+  * type
+  * `default, default_factory, init, repr, hash, compare, metadata, kw_only` have the identical meaning and values as they do in the `field()` function.
+* 除此之外还有一些用于正确工作的私有属性
+
+`dataclasses.fields(class_or_instance)`
+* 将参数转化成  `tuple of Field objects`, 接受的参数类型为  dataclass or instance of a dataclass
+* 如果参数不是 dataclass or instance of a dataclass 会报错
+
+
+`dataclasses.field(*, default=MISSING, default_factory=MISSING, init=True, repr=True, hash=None, compare=True, metadata=None, kw_only=MISSING)`
+用于辅佐 dataclass 的定义, 通过替换 annotation 字段为 `field()` 函数可以实现对 field 追加额外信息
+```py
+@dataclass
+class C:
+    x: int
+    y: int = field(repr=False)
+    z: int = field(repr=False, default=10)
+    t: int = 20
+# The class attribute C.z will be 10, the class attribute C.t will be 20, and the class attributes C.x and C.y will not be set.
+```
+* 参数:
+  * init: If true (the default), this field is included as a parameter to the generated `__init__()` method.
+  * repr: If true (the default), this field is included in the string returned by the generated `__repr__()` method.
+
+
+### 5.1.2. 装饰器 @dataclasses.dataclass
+
+`@dataclasses.dataclass(*, init=True, repr=True, eq=True, order=False, unsafe_hash=False, frozen=False, match_args=True, kw_only=False, slots=False, weakref_slot=False)`
+* 一个装饰器 用于自动生成 类的 特殊方法
+* 定义了该装饰器的类会自动查找类的 `field`s
+  * field : 是一个 拥有 type annotation 的类的变量
+  * 尽管 field 包含 type annotations, 但并不会实际上检查 变量的类型, 除了两个例外
+* `field`s 在生成的方法中的顺序 同 他们在类定义中的顺序一致
+* 该装饰器会自动给类添加许多 `dunder` 方法, 而如果这些方法已经存在于类中, 则最终的行为取决于 装饰器参数
+  * 装饰器的默认参数调用有三种写法
+
+
+```py
+@dataclass
+@dataclass()
+# 完整的默认参数调用
+@dataclasses.dataclass(*, init=True, repr=True, eq=True, order=False, unsafe_hash=False, frozen=False, match_args=True, kw_only=False, slots=False, weakref_slot=False)
+```
+
+### 5.1.3. 类型转换函数
+
+
+`dataclasses.asdict(obj, *, dict_factory=dict)`
+* 把 dataclass obj 转换为字典, 通过使用 工厂函数 `dict`
+* dataclass 会转换成其 fileds 的字典
+  * dataclasses, dicts, lists, tuples 会递归的嵌入
+  * 其他的类型会直接进行 深拷贝 
+* obj 必须是 dataclass 的实例, 否则会报错
+
+```py
+@dataclass
+class Point:
+     x: int
+     y: int
+
+@dataclass
+class C:
+     mylist: list[Point]
+
+# 查验 asdict 的结果
+p = Point(10, 20)
+assert asdict(p) == {'x': 10, 'y': 20}
+
+c = C([Point(0, 0), Point(10, 4)])
+assert asdict(c) == {'mylist': [{'x': 0, 'y': 0}, {'x': 10, 'y': 4}]}
+
+# 若要避免 asdict 的深拷贝, 可以使用特殊的构造方法
+{field.name: getattr(obj, field.name) for field in fields(obj)}
+```
+
+
+`dataclasses.astuple(obj, *, tuple_factory=tuple)`
+* 把 dataclass obj 转换为 tuple, 通过使用 工厂函数 `tuple`
+* dataclasses, dicts, lists, and tuples are recursed into.
+* Other objects are copied with copy.deepcopy().
+* 同样的 obj 只接受 dataclass
+
+
+```py
+# 同 asdict 相比就是失去了 变量名作为 字典的  key 的能力
+assert astuple(p) == (10, 20)
+assert astuple(c) == ([(0, 0), (10, 4)],)
+
+# 浅拷贝
+tuple(getattr(obj, field.name) for field in dataclasses.fields(obj))
+```
+
+
+
+
+# 6. abc - Abstract Base Class
 
 该包提供了 Python 用于定义虚基类 ABC 的基础设置, 在 PEP3119 中被引述.  
 此外 numbers 模组中的层次数字类是基于 ABC 的, 可以参阅 PEP3141
@@ -150,9 +287,9 @@ class MyABC(ABC):
 
 #
 ```
-# 6. traceback 用于异常溯源
+# 7. traceback 用于异常溯源
 
-# 7. inspect — Inspect live objects
+# 8. inspect — Inspect live objects
 
 审查模组
 * 获取活动对象的信息, (模组, 类, 方法, 函数等)
@@ -162,23 +299,23 @@ class MyABC(ABC):
     4. get all the information you need to display a detailed traceback.
 
 
-## 7.1. 类型以及成员
+## 8.1. 类型以及成员
 
 
 
-### 7.1.1. 对象自带属性
+### 8.1.1. 对象自带属性
 在该模组的文档中有 python 所有对象的自带属性的[说明](https://docs.python.org/3/library/inspect.html)
 
-## 7.2. 获取源代码
+## 8.2. 获取源代码
 
 * getsource(obj)
 
-## 7.3. 
+## 8.3. 
 
 
 
 
-# 8. site Site-specific configuration hook¶
+# 9. site Site-specific configuration hook¶
 
 这是一个会被 python 解释器自动导入的包  
 * This module is automatically imported during initialization.
