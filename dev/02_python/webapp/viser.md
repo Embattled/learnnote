@@ -156,6 +156,7 @@ Interface for adding 3D primitives to the scene.
 
 向场景中添加图元
 
+* add_camera_frustum  : 添加相机图片视锥
 * add_frame         : 添加坐标轴
 * add_image         : 添加静态图
 * add_point_cloud   : 添加点云
@@ -167,6 +168,14 @@ Scene 的元件通用参数:
 * `wxyz (Tuple[float, float, float, float] | ndarray)` – R_parent_local transformation. 从父节点坐标系到当前节点坐标系的旋转四元数
 * `position (Tuple[float, float, float] | ndarray)` – t_parent_local transformation. 父节点坐标系到当前节点坐标系的位移
 * `visible (bool)` – Initial visibility of scene node. 控制节点的可见性
+
+
+`add_camera_frustum(name: str, fov: float, aspect: float, scale: float = 0.3, color: Tuple[int, int, int] | Tuple[float, float, float] | ndarray = (20, 20, 20), image: ndarray | None = None, format: Literal[‘png’, ‘jpeg’] = 'jpeg', jpeg_quality: int | None = None, wxyz: tuple[float, float, float, float] | ndarray = (1.0, 0.0, 0.0, 0.0), position: tuple[float, float, float] | ndarray = (0.0, 0.0, 0.0), visible: bool = True) → CameraFrustumHandle`
+* Add a camera frustum to the scene for visualization.
+* 
+
+
+
 
 
 `add_frame(name: str, show_axes: bool = True, axes_length: float = 0.5, axes_radius: float = 0.025, origin_radius: float | None = None, wxyz: tuple[float, float, float, float] | ndarray = (1.0, 0.0, 0.0, 0.0), position: tuple[float, float, float] | ndarray = (0.0, 0.0, 0.0), visible: bool = True) → FrameHandle`
@@ -297,7 +306,7 @@ GUI 的各个组件进行独自管理的内容, 实例一般都是作为 add 方
 ## 3.5. Events
 
 事件 Event 类型, 这些类型的实例会作为 参数 传递给 callback functions
-前两个比较高阶, 常用的应该就最后一个 GUI 的回调实例
+前两个比较高阶, 
 
 
 * class viser.ScenePointerEvent   : scene 的点击回调
@@ -325,6 +334,43 @@ GUI 的各个组件进行独自管理的内容, 实例一般都是作为 add 方
 viser 内部实现的 李群库, 基于 jaxlie, 被用于 viser 内部以及示例.
 
 Implements SO(2), SO(3), SE(2), and SE(3) Lie groups. Rotations are parameterized via S^1 and S^3.
+
+有一些特殊的构造函数是通过类的静态函数实现的, 学到了 
+
+
+
+### 4.1.1. 虚基类 class viser.transforms.MatrixLieGroup
+
+用于定义  matrix Lei groups
+
+`Bases: ABC`
+
+
+### 4.1.2. class viser.transforms.SOBase
+
+Base class for special orthogonal groups.
+
+`Bases: MatrixLieGroup`
+
+
+
+
+### 4.1.3. class viser.transforms.SO3
+
+用于表示 3D 旋转的 special orthogonal group 
+拥有与 numpy 相同的 broadcasting rules
+
+
+内部参数为 `qw, qx, qy, qz`
+切线参数为  `omega_x, omega_y, omega_z`
+
+
+属性:
+`wxyz: onpt.NDArray[onp.floating]`
+* Internal parameters. (w, x, y, z) quaternion. Shape should be `(*, 4)`.
+
+
+
 
 
 # 5. Examples 示例
@@ -367,23 +413,32 @@ server.scene.add_image
 
 
 
-## 5.3. 05_xcamera_commands 
+## 5.3. 05_camera_commands 
 
 ```py
 
 # Move the camera when we click a frame., 把相机的视角移动到对应的坐标轴上
 @frame.on_click
 def _(_):
+    # 从相机的 wxyz 和 位置坐标 构建 相机位置的 SE3
     T_world_current = tf.SE3.from_rotation_and_translation(
         tf.SO3(client.camera.wxyz), client.camera.position
     )
+
+    # 目标坐标系的 wxyz 和 坐标的 SE3
+    # 目标坐标系稍微往坐标系的后面一点, 这样视野里能看到坐标系本身
     T_world_target = tf.SE3.from_rotation_and_translation(
         tf.SO3(frame.wxyz), frame.position
     ) @ tf.SE3.from_translation(np.array([0.0, 0.0, -0.5]))
 
+    # 从当前到目标的相对旋转
     T_current_target = T_world_current.inverse() @ T_world_target
 
     for j in range(20):
+      # 微分相对旋转
+      # 涉及到 对李群转为李代数的正向和逆向变换
+      # log() 转为 李代数, exp 从李代数变回李群
+      # 在李代数上可以直接进行线性运算
         T_world_set = T_world_current @ tf.SE3.exp(
             T_current_target.log() * j / 19.0
         )
@@ -391,6 +446,7 @@ def _(_):
         # We can atomically set the orientation and the position of the camera
         # together to prevent jitter that might happen if one was set before the
         # other.
+        # 原子设定, viser 内部应该是有一些隐藏的并行化处理, 
         with client.atomic():
             client.camera.wxyz = T_world_set.rotation().wxyz
             client.camera.position = T_world_set.translation()
@@ -399,5 +455,59 @@ def _(_):
         time.sleep(10.0 / 60.0)
 
     # Mouse interactions should orbit around the frame origin.
+    # 在旋转的时候 client.camera 始终注视要移动的目标点
     client.camera.look_at = frame.position
+```
+
+
+
+## 5.4. 11_colmap_visualizer
+
+
+```py
+# viser 的视角有一定的限制, 导致一定程度视角的不自由, 通过重新相机的正上方向可以调整相机视角的自由度
+
+gui_reset_up = server.gui.add_button(
+    "Reset up direction",
+    hint="Set the camera control 'up' direction to the current camera's 'up'.",
+)
+
+@gui_reset_up.on_click
+def _(event: viser.GuiEvent) -> None:
+    client = event.client
+    assert client is not None
+    client.camera.up_direction = tf.SO3(client.camera.wxyz) @ np.array(
+        [0.0, -1.0, 0.0]
+    )
+
+
+
+# 注意这里的 inverse 
+T_world_camera = tf.SE3.from_rotation_and_translation(tf.SO3(img.qvec), img.tvec)
+.inverse()
+frame = server.scene.add_frame(
+    f"/colmap/frame_{img_id}",
+    wxyz=T_world_camera.rotation().wxyz,
+    position=T_world_camera.translation(),
+    axes_length=0.1,
+    axes_radius=0.005,
+)
+frames.append(frame)
+
+
+# 基于相机参数, 创建 colmap 的图片视锥
+# 注意这里的 name tips, 因为名字是在上面 frame 的节点的下面, 因此不需要指定坐标和旋转, 会直接继承 frame 的
+H, W = cam.height, cam.width
+fy = cam.params[1]
+image = iio.imread(image_filename)
+image = image[::downsample_factor, ::downsample_factor]
+frustum = server.scene.add_camera_frustum(
+    f"/colmap/frame_{img_id}/frustum",
+    fov=2 * np.arctan2(H / 2, fy),
+    aspect=W / H,
+    scale=0.15,
+    image=image,
+)
+
+
 ```

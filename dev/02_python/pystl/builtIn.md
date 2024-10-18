@@ -22,7 +22,6 @@ https://docs.python.org/3/library/functions.html
  hash()    
  dir()    next()  slicea()
 ascii()  divmod()   object()  
-      staticmethod()
 breakpoint() 
   filter()  issubclass()   super()
     iter()  
