@@ -47,7 +47,12 @@
 - [7. Visual Odometry - 视觉里程计 Part 2](#7-visual-odometry---视觉里程计-part-2)
   - [7.1. The Motivation of the Direct Method - 直接法的引出](#71-the-motivation-of-the-direct-method---直接法的引出)
   - [7.2. 2D Optical Flow - 2D 光流](#72-2d-optical-flow---2d-光流)
-  - [7.3. Practice Direct Method - 实践中的直接法](#73-practice-direct-method---实践中的直接法)
+    - [7.2.1. Lucas-Kanade 光流](#721-lucas-kanade-光流)
+    - [7.2.2. 光流法实践](#722-光流法实践)
+  - [7.3. Direct Method 直接法](#73-direct-method-直接法)
+    - [7.3.1. Derivation of the Direct Method - 直接法的推导](#731-derivation-of-the-direct-method---直接法的推导)
+    - [7.3.2. 直接法的讨论](#732-直接法的讨论)
+  - [7.4. Practice Direct Method - 实践中的直接法](#74-practice-direct-method---实践中的直接法)
 - [8. Filters and Optimization Approaches - 后端 Part1](#8-filters-and-optimization-approaches---后端-part1)
   - [8.1. Introduction of backend](#81-introduction-of-backend)
     - [8.1.1. State Estimation from Probabilistic Perspective - 状态估计的概率解释](#811-state-estimation-from-probabilistic-perspective---状态估计的概率解释)
@@ -1159,6 +1164,7 @@ $$\frac{\partial e}{\partial \delta\xi}= -(\exp(\xi\hat{\space})p_i')^\odot$$
 使用直接法的近期的主流方法有 : SVO, LSD-SLAM, DSO 等
 
 ## 7.2. 2D Optical Flow - 2D 光流
+<!-- 完 -->
 
 直接法是从光流法演变而来的, 因此很相似, 在直接法之前先学习 光流法  
 * 光流法描述了像素在图像中的运动
@@ -1167,11 +1173,186 @@ $$\frac{\partial e}{\partial \delta\xi}= -(\exp(\xi\hat{\space})p_i')^\odot$$
 光流 用于描述 pixels 在图像之间的运动, 即追踪像素点.
 * 计算部分像素运动称为 Sparse Optical Flow (稀疏光流)
   * 在实际中, 主要用来追踪 特征点
-  * 以 Lucas-Kanade (LK flow, LK光流) 为代表
+  * 以 `Lucas-Kanade` (LK flow, LK光流) 为代表
 * 计算全部像素则为 Dense Optical Flow (稠密光流)
   * 以 Horn-Schunck 光流 为代表
 
-## 7.3. Practice Direct Method - 实践中的直接法
+
+
+### 7.2.1. Lucas-Kanade 光流 
+
+LK 光流中, 假设 相机的图像随时间变化, 图像看作时间的函数  $I(t)$ 具体到像素 则有 $I(x,y,t)$
+
+光流估计的最基本的假设: 灰度不变假设  同一个空间点的像素灰度值, 在各个图像中是固定不变的.  
+(这是一个很强的假设, 现实中往往不成立, 物体的材质, 高光和阴影, 相机的自动曝光参数等, 光流法就是基于如此的强假设的算法)
+
+对于像素的移动, 有  $I(x+dx, y+dy, t+dt) = I(x,y,t)$, 左边进行一阶泰勒展开  
+$\approx I(x,y,t) + \frac{\partial I}{\partial x}dx + \frac{\partial I}{\partial y}dy + \frac{\partial I}{\partial t}dt$
+
+此时应用灰度不变假设, 从而 $\frac{\partial I}{\partial x}dx + \frac{\partial I}{\partial y}dy + \frac{\partial I}{\partial t}dt =0$
+
+两边除以 dt, 得
+
+$$\frac{\partial I}{\partial x}\frac{dx}{dt} + \frac{\partial I}{\partial y}\frac{dy}{dt} = - \frac{\partial I}{\partial t}$$
+
+整理上式的各个元素
+* $\frac{dx}{dt}, \frac{dx}{dt}$ 是像素在 x, y 轴上的运动速度, 可以记为 $u, v$
+* $\frac{\partial I}{\partial x}, \frac{\partial I}{\partial x}$ 是像素在 x, y 方向上的梯度, 记为 $I_x, I_y$
+* 图像灰度对时间的变化量为 $I_t$
+写为矩阵乘法形式, 整理得 
+$$
+\begin{bmatrix}
+  I_x & I_y
+\end{bmatrix}
+\begin{bmatrix}
+  u \\ v
+\end{bmatrix}
+= -I_t
+$$
+
+这里要计算的是变量 u,v 然而目前的形式是 二元一次方程, 约束不够, 此时引入第二个约束
+
+**假设某一个窗口内的像素具有相同的运动**  
+
+此时假设计算窗口为 $\omega \times \omega$ 有像素下标 $k=i,...,\omega^2$
+$$
+A=\begin{bmatrix}
+  [I_x,I_y]_1 \\
+  ... \\
+  [I_x,I_y]_{\omega^2}
+\end{bmatrix},
+b=
+\begin{bmatrix}
+  I_{t1} \\
+  ... \\
+  I_{t\omega^2}
+\end{bmatrix},
+A\begin{bmatrix}
+  u \\
+  v
+\end{bmatrix}= -b 
+$$
+
+这是一个关于 u,v 的超定线性方程, 传统解法是求最小二乘解
+
+$$
+\begin{bmatrix}
+  u \\ v
+\end{bmatrix}^\ast = -(A^TA)^{-1} A^Tb
+$$
+注: 等式右边就是多元最小二乘法的通用解   
+* 最小二乘法的优点: 简单易用
+* 缺点: 对异常值敏感, 模型被假设为了线性
+
+
+光流法小结:
+* LK 光流能够直接得到特征点的对应关系, 类似于描述子的匹配
+* 光流法对于图像的连续性和光照稳定性要求更高一些
+* 可以避免计算和匹配 描述子的过程, 但要求相机运动平滑, 或者采集频率较高
+
+### 7.2.2. 光流法实践
+
+TODO
+
+
+
+
+## 7.3. Direct Method 直接法
+<!-- 完 -->
+
+### 7.3.1. Derivation of the Direct Method - 直接法的推导
+<!-- 完 -->
+光流法的思路: 追踪特征点的位置 -> 根据位置确定相机的运动  (两部一走, 难以保证全局最优性 )
+
+直接法 : 根据相机位置的运动 初始假设, 反过来调整光流的计算结果 
+
+假设空间点 P $[X, Y, Z]$, 在两个时刻的相机上成像, 像素坐标为 $p_1, p_2$
+
+求解第一个相机到第二个相机的相对位姿变换   R,t, 相机内参相同 为 K
+
+
+特征点的方法中, 通过描述子和匹配知道了点 p 在两个成像上的坐标, 而在直接法中并没有这些情报
+
+同样是基于灰度不变假设, 
+要同时优化相机位姿以及 点p 的匹配信息, 可以通过求解一个优化问题来实现: 光度误差
+
+同重投影误差不同, 光度误差测量的是两个像素的亮度误差
+
+$$e=I_1(p_1)-I_2(p_2)$$
+
+e是一个误差的标量, 取该误差的二范数, 不加权
+$$\underset{T}{min}J(T) = ||e||^2$$  
+
+假设有多个空间点 $P_i$ 的时候
+$$\underset{T}{min}J(T) = \sum_{i=1}^N e^T_ie_i, e_i=I_1(p_{1,i}) - I_2(p_{2,i})$$  
+
+注意, 直接法的优化对象是 相机位姿 T, 而不是特征点本身的运动, 因此在意的是误差 e 随相机 T 运动的变化关系, 即 e 和 T 的导数关系  
+
+
+整理关系式
+* $q=TP$ , q 为目标点在第二个相机下的坐标
+* $u=\frac{1}{Z_2} Kq$ , u 为像素坐标
+
+考虑李代数的左扰动模型 利用一阶泰勒展开
+$$e(T) = I_1(p_1) - I_2(u)$$
+
+$$
+\frac{\partial e}{\partial T} = \frac{\partial I_2}{\partial u}\frac{\partial u}{\partial q} \frac{\partial q}{\partial \delta \xi} \delta \xi
+$$
+
+其中 $\delta \xi$为T 的左扰动, 一阶导数由于链式法则分成了三个部分, 而三个部分分别都是容易计算的 
+* $\frac{\partial I_2}{\partial u}$ 为像素在 坐标 u 的梯度
+* $\frac{\partial u}{\partial q}$ 投影方程关于相机坐标系下的 三维点 的导数, 记三维坐标为 $q=[X, Y, Z]^T$, 根据上一大章的推到方程, 此处的导数为  
+
+$$
+\frac{\partial u}{\partial q} = 
+\begin{bmatrix}
+  \frac{\partial u}{\partial X} & \frac{\partial u}{\partial Y} & \frac{\partial u}{\partial Z} \\
+  \frac{\partial v}{\partial X} & \frac{\partial v}{\partial Y} & \frac{\partial v}{\partial Z}
+\end{bmatrix}=
+\begin{bmatrix}
+  \frac{f_x}{Z} & 0 & -\frac{f_xX}{Z^2}\\
+  0 & \frac{f_y}{Z} & -\frac{f_yY}{Z^2}\\
+\end{bmatrix}
+$$
+
+* $\frac{\partial q}{\partial \delta \xi}$ 为 变换后的三位点对 变换本身 的导数, 这在 李代数的章节有推导 $\frac{\partial q}{\partial \delta \xi}=[I, -q\hat{\space}]$
+
+可以看到后两项与图像本身没有关系, 因此可以合并
+
+$$
+\frac{\partial q}{\partial \delta \xi} = \begin{bmatrix}
+    \frac{f_x}{Z} & 0 & -\frac{f_xX}{Z^2}& -\frac{f_xXY}{Z^2} & f_x+\frac{f_xX^2}{Z^2} & \frac{f_xY}{Z}\\
+  0 & \frac{f_y}{Z} & -\frac{f_yY}{Z^2}  & -(f_y+\frac{f_yY^2}{Z^2}) & \frac{f_yXY}{Z^2} & \frac{f_yX}{Z}\\
+\end{bmatrix}
+$$
+
+该 2 X 6 的矩阵在上一章也出现过, 最终 得到了 直接法的误差 相对于 李代数的雅可比矩阵  
+
+$$J = -\frac{\partial I_2}{\partial u} \frac{\partial u}{\partial \delta \xi}$$
+
+由此, 可以用这种方法计算优化 问题的 雅可比矩阵, 然后使用高斯牛顿法 (Gauss-Newton) 或者 列文伯格-马夸尔特方法 (Levenberg-Marquardt)  来计算增量, 迭代求导
+
+### 7.3.2. 直接法的讨论
+<!-- 完 -->
+
+在直接法推导的一开始, 给定了 空间点 P 的坐标, 关于 P 的坐标生成
+* 在 RGB-D 相机下, 可以直接将任意像素反投影到三维空间中
+* 在双目相机系统中, 可以直接根据视差计算像素的深度  
+* 在单目中, 该任务则变得尤为复杂, 因为存在深度不确定性
+
+
+根据 P 的空间点的来源, 可以对直接法进行分类
+* P 来自稀疏的关键点 : 稀疏直接法 (sparse direct method), 使用 数百个至上千个关键点, 并且像 L-K 光流那样, 假设周围像素也是不变的, 这种稀疏法不必直接计算描述子. 只使用数百个像素, 速度最快, 但是只能进行稀疏的重构
+* P 来自部分像素 : 如果像素梯度为 0, 则整个雅可比矩阵就为0, 不会对计算有任何贡献, 因此在计算之初就过滤掉没有梯度的像素点, 称为半稠密直接法 (Semi-Dense) , 可以重构一个半稠密的结构
+* P 为所有像素 : 计算量最大, 图片中的像素一般为几十万个, 多数不能在 CPU 上直接计算, 需要 GPU 加速. 尽管如此, 梯度为0 的区域仍然难以对优化有贡献
+
+从稀疏到稠密重构, 都可以用直接法计算, 因此计算量也是可以控制逐渐增长的
+* 稀疏方法可以快速地求解相机位姿
+* 稠密方法可以建立完整地图
+
+
+## 7.4. Practice Direct Method - 实践中的直接法
 
 
 优缺点总结:
@@ -1186,6 +1367,7 @@ $$\frac{\partial e}{\partial \delta\xi}= -(\exp(\xi\hat{\space})p_i')^\odot$$
 
 
 # 8. Filters and Optimization Approaches - 后端 Part1 
+
 
 本章目标
 * 理解够短的概念, 理解 后端优化的非线性性 

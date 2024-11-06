@@ -181,6 +181,11 @@ tensor([[ 1,  1],
 * dim (int, optional) – the dimension over which the tensors are concatenated
 
 
+`torch.tile(input, dims) → Tensor`
+* 指定某个维度按照一定的格式进行平铺
+* 类似于 numpy.tile()
+* Tensor 类本身也有实现, 但是名字不统一 `Tensor.repeat()`
+
 #### 2.1.2.3. Dimension - 维度操作函数 
 
 `torch.squeeze(input, dim = None)`
@@ -386,6 +391,7 @@ def tripler(x):
 
 ### 2.6.5. Other Operations - 无法分类的其他函数
 
+参照 numpy 的相关实现
 
 cum 累计系类:
 * `torch.cumsum(input, dim, *, dtype=None, out=None) → Tensor`    : 将输入沿着某一维度 累加
@@ -400,6 +406,16 @@ broadcast 家族:
 * 寻找有序插入位置
 * 常被用来实现基于 torch 的线性插值, 因为 torch 似乎没有直接提供类似于 `numpy.interp` 用于非自然数索引的插值方法
 * `right=False` 返回的插入位置是达成有序的最左边, 即会插入到相同值的元素的前面, 如果至 True, 则代表右边
+
+
+`torch.meshgrid(*tensors, indexing=None)`
+* 生成 `*tensors` 作为索引构成的坐标 grid
+
+
+`torch.repeat_interleave(input, repeats, dim=None, *, output_size=None)`
+* This is different from torch.Tensor.repeat() but similar to numpy.repeat.
+* 指定每一个元素各自重复多少次, 类似于 numpy.repeat()
+
 
 # 3. torch.nn
 

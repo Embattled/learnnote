@@ -4,9 +4,8 @@
   - [1.3. 底层语言](#13-底层语言)
 - [2. Python的语法](#2-python的语法)
   - [2.1. Python 书写规范 (PEP 8)](#21-python-书写规范-pep-8)
-  - [2.2. Python 保留字](#22-python-保留字)
-  - [2.3. python 的类型提示](#23-python-的类型提示)
-  - [2.4. 作用域](#24-作用域)
+  - [2.2. python 的类型提示](#22-python-的类型提示)
+  - [2.3. 作用域](#23-作用域)
 - [3. Python的操作符与变量](#3-python的操作符与变量)
   - [3.1. 基础类型](#31-基础类型)
   - [3.2. 转义字符](#32-转义字符)
@@ -18,9 +17,8 @@
   - [4.2. 异常流程控制](#42-异常流程控制)
     - [4.2.1. 异常类](#421-异常类)
     - [4.2.2. raise 语句](#422-raise-语句)
-    - [4.2.3. assert 语句](#423-assert-语句)
-    - [4.2.4. 异常信息捕获](#424-异常信息捕获)
-    - [4.2.5. 自定义异常类](#425-自定义异常类)
+    - [4.2.3. 异常信息捕获](#423-异常信息捕获)
+    - [4.2.4. 自定义异常类](#424-自定义异常类)
 - [5. python 的函数](#5-python-的函数)
   - [5.1. 函数参数](#51-函数参数)
     - [5.1.1. Python的可变参数](#511-python的可变参数)
@@ -61,7 +59,11 @@
 - [12. Expressions 表达式](#12-expressions-表达式)
   - [12.1. Arithmetic conversions - 基础数值类型转换规则](#121-arithmetic-conversions---基础数值类型转换规则)
 - [13. Simple statements - 简单语句](#13-simple-statements---简单语句)
-  - [13.1. The type statement - type 语句](#131-the-type-statement---type-语句)
+  - [13.1. Expression statements - 表达式语句](#131-expression-statements---表达式语句)
+  - [13.2. Assignment statements - 赋值语句](#132-assignment-statements---赋值语句)
+  - [13.3. The assert statement - 断言语句](#133-the-assert-statement---断言语句)
+  - [13.4. The pass statement](#134-the-pass-statement)
+  - [13.5. The type statement - type 语句](#135-the-type-statement---type-语句)
 - [14. Compound Statements - 复合语句](#14-compound-statements---复合语句)
   - [14.1. The if statement](#141-the-if-statement)
   - [14.2. The while statement](#142-the-while-statement)
@@ -183,58 +185,8 @@ PEP（Python Enhancement Proposal）, 全称是 Python 改进方案
 2. 而方法定义之间空一行
 3. 运算符两侧、函数参数之间以及逗号两侧, 都建议使用空格进行分隔
 
-## 2.2. Python 保留字
 
-Python 包含的保留字可以执行命令进行查看
-
-```py
-import keyword
-keyword.kwlist
-```
-
-- 包保留字
-  - import  : 导入
-  - as      : 重命名
-  - from    : 母包
-
-- 类型保留字
-  - True False              : bool类型的值  
-  - None                    : NoneType的值
-
-- 函数保留字
-  - def  : 函数定义
-  - lambda : lambda函数
-  - yield : 定义生成器
-
-- 运算保留字
-  - and or not is           : 逻辑保留字
-  - not 可以和一些保留字组合取反义
-
-- pass                    : 空语句
-
-- 控制保留字
-  - for while elif if else  : 流程控制
-  - break continue          : 循环控制
-
-- assert                  : 断言
-- in                      : 序列元素检查
-
-- del  : 字典删除键值对
-- class : 创建类
-
-其他保留字:  
-finally
-global  
-nonlocal
-raise  
-return  
-with  
-
-- 鲁棒性保留字
-  - try  
-  - except  
-
-## 2.3. python 的类型提示
+## 2.2. python 的类型提示
 
 - python 本身的运行时不强制执行函数和变量类型注解
 - 但是加入类型注解可以辅助 IDE 等第三方工具的错误检查
@@ -254,7 +206,7 @@ def greeting(name: str) -> str:
     return 'Hello ' + name
 ```
 
-## 2.4. 作用域
+## 2.3. 作用域
 
 同C语言 全局和局部的覆盖原则也相同  
 函数中引用外部变量 使用`global` 关键字
@@ -551,28 +503,8 @@ raise ZeroDivisionError("除数不能为零")
 # ZeroDivisionError: 除数不能为零
 ```
 
-### 4.2.3. assert 语句
 
-类似于 C 语言的 assert
-
-- 判断某个表达式的值, 如果值为真, 则程序可以继续往下执行
-- 反之, Python 解释器会报 AssertionError 错误。
-
-不能滥用 assert, 很多情况下, 程序中出现的不同情况都是意料之中的, 需要用不同的方案去处理  
-有时用条件语句进行判断更为合适, 而对于程序中可能出现的一些异常, 要记得用 try except 语句处理  
-
-```py
-assert 表达式
-
-# 等同于
-
-if 表达式==True:
-    程序继续执行
-else:
-    程序报 AssertionError 错误
-```
-
-### 4.2.4. 异常信息捕获
+### 4.2.3. 异常信息捕获
 
 或许异常的详细信息
 
@@ -597,7 +529,7 @@ except:
 # File "C:\Users\mengma\Desktop\demo.py", line 7, in <module>
 ```
 
-### 4.2.5. 自定义异常类
+### 4.2.4. 自定义异常类
 
 - 自定义的异常类通常继承自 Exception 类, 名字以 `Error` 结尾
 - 自定义异常类也是一个类, 而且只能被 raise 调用, 不会被解释器触发
@@ -1031,6 +963,56 @@ python 默认使用 Unicode utf-8 来解码代码, 可以通过 encoding declara
 ## 8.1. Identifiers and keywords - 标识符和关键字
 
 
+
+Python 包含的保留字可以执行命令进行查看
+
+```py
+import keyword
+keyword.kwlist
+```
+
+- 包保留字
+  - import  : 导入
+  - as      : 重命名
+  - from    : 母包
+
+- 类型保留字
+  - True False              : bool类型的值  
+  - None                    : NoneType的值
+
+- 函数保留字
+  - def  : 函数定义
+  - lambda : lambda函数
+  - yield : 定义生成器
+
+- 运算保留字
+  - and or not is           : 逻辑保留字
+  - not 可以和一些保留字组合取反义
+
+- pass                    : 空语句
+
+- 控制保留字
+  - for while elif if else  : 流程控制
+  - break continue          : 循环控制
+
+- assert                  : 断言
+- in                      : 序列元素检查
+
+- del  : 字典删除键值对
+- class : 创建类
+
+其他保留字:  
+finally
+global  
+nonlocal
+raise  
+return  
+with  
+
+- 鲁棒性保留字
+  - try  
+  - except  
+
 ### 8.1.1. Keywords
 
 以下的字符完全作为 python 语言的关键字 (与内置函数的含义不同), 是构成语法的关键, 使用时要完全正确拼写
@@ -1267,7 +1249,51 @@ from .module2 import *
 
 # 13. Simple statements - 简单语句
 
-## 13.1. The type statement - type 语句
+## 13.1. Expression statements - 表达式语句
+
+## 13.2. Assignment statements - 赋值语句
+
+## 13.3. The assert statement - 断言语句
+<!-- 完 -->
+
+用于向程序插入 调试断言的 便捷的方法
+类似于 C 语言的 assert
+
+`assert_stmt ::=  "assert" expression ["," expression]`
+
+```py
+
+assert expression
+
+# 等同于
+if 表达式==True:
+    程序继续执行
+else:
+    程序报 AssertionError 错误
+
+# equivalent 
+if __debug__:
+    if not expression: raise AssertionError
+
+assert expression1, expression2
+if __debug__:
+    if not expression1: raise AssertionError(expression2)
+```
+
+assert 语句的行为会参照 内置变量 `__debug__`
+* `__debug__` 的值在解释器启动的时候确定, 为 `__debug__` 进行赋值是非法的
+* 对解释器添加 `-O` 选项即可启动最优化, 即 在代码运行的时候不会针对 assert 语句编译任何内容, 此时 `__debug__` 为 False
+* 错误信息不需要包括源代码, 会作为 stack trace 的一部分被输出
+
+## 13.4. The pass statement
+<!-- 完 -->
+`pass_stmt ::=  "pass"` 
+
+空运算符, 作为 占位符.  
+当某个语法需要 statement 的时候使用
+
+
+## 13.5. The type statement - type 语句
 <!-- 完 -->
 python 3.12 新语法
 

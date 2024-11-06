@@ -1,4 +1,30 @@
-# 1. Image Restoration and Enhancement
+# 1. Image Transformation
+
+最广义的图像处理
+
+input image is tranformed into an output image:
+* image denoising
+* super-resolution
+* colorization
+* style transfer
+
+输入 image 通常被称为 degraded image: noisy, low-resolution, grayscale  
+
+
+## Loss 损失函数
+
+* pixel-loss 
+* perceptual loss   : 直接使用预训练的特征提取网络作为 loss
+* conditional random field (CRF) : CRF loss
+
+
+这一思路与一致性正则化（Consistency Regularization）、对比学习（Contrastive Learning）、以及特征对齐（Feature Alignment） 有很大关系。已有相关的研究和方法包括：
+* Feature Matching
+* Consistency Regularization
+* Contrastive Learning
+
+
+# 2. Image Restoration and Enhancement
 
 图像的复原和增强是广义上的图像处理应用  
 
@@ -11,14 +37,14 @@
 
 
 
-# 2. (NTIRE) New Trends in Image Restoration and Enhancement
+# 3. (NTIRE) New Trends in Image Restoration and Enhancement
 
 
 
 
-# 3. Network
+# 4. Network
 
-### 3.0.1. NAFNet
+### 4.0.1. NAFNet
 
 
 2022/04/10  Simple Baselines for Image Restoration
@@ -32,7 +58,7 @@ Inter-block Complixity : 块间复杂度, 设计多了级联的 U-Net 来提高�
 Intra-block Complexity : 块内复杂度, 引入 Attention 进行降噪  
 
 
-### CUGAN - Toward Interactive Modulation for Photo-Realistic Image Restoration
+### 4.0.2. CUGAN - Toward Interactive Modulation for Photo-Realistic Image Restoration
 
 controllable Unet
 
