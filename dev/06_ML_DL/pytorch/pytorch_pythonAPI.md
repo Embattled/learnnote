@@ -27,7 +27,7 @@
     - [3.1.1. torch.nn.Module 类](#311-torchnnmodule-类)
       - [3.1.1.1. 基础方法及应用](#3111-基础方法及应用)
       - [3.1.1.2. 网络参数以及存取](#3112-网络参数以及存取)
-      - [3.1.1.3. 残差结构](#3113-残差结构)
+      - [特殊参数](#特殊参数)
     - [3.1.2. torch.nn.Sequential 系列](#312-torchnnsequential-系列)
   - [3.2. Convolution Layers 卷积层](#32-convolution-layers-卷积层)
   - [3.3. Pooling layers 池化层](#33-pooling-layers-池化层)
@@ -39,6 +39,7 @@
     - [3.7.1. Identity](#371-identity)
     - [3.7.2. Linear](#372-linear)
   - [3.8. Loss Function 损失函数](#38-loss-function-损失函数)
+    - [Binary Cross Entropy (BCE)](#binary-cross-entropy-bce)
   - [3.9. Vision Layrers - 与图像相关的网络层](#39-vision-layrers---与图像相关的网络层)
   - [3.10. ChannelShuffle - 重排列 Channel](#310-channelshuffle---重排列-channel)
 - [4. torch.nn.functional](#4-torchnnfunctional)
@@ -67,6 +68,7 @@
     - [5.4.5. tensor复制](#545-tensor复制)
     - [5.4.6. .new\_ 方法](#546-new_-方法)
 - [6. torch.autograd - 梯度计算包](#6-torchautograd---梯度计算包)
+  - [Locally disabling gradient computation](#locally-disabling-gradient-computation)
 - [7. Torch Devices](#7-torch-devices)
   - [7.1. torch.cpu - 虚类实现](#71-torchcpu---虚类实现)
   - [7.2. torch.cuda - CUDA 计算](#72-torchcuda---cuda-计算)
@@ -90,6 +92,13 @@
     - [11.3.1. Optimizer 基类](#1131-optimizer-基类)
     - [11.3.2. optimization step](#1132-optimization-step)
     - [11.3.3. per-parameter options](#1133-per-parameter-options)
+- [Autograd mechanics](#autograd-mechanics)
+  - [Locally disabling gradient computation](#locally-disabling-gradient-computation-1)
+    - [Setting requires\_grad](#setting-requires_grad)
+    - [Grad Modes](#grad-modes)
+    - [No-grad Mode](#no-grad-mode)
+    - [Inference Mode](#inference-mode)
+    - [Evaluation Mode (nn.Module.eval())](#evaluation-mode-nnmoduleeval)
 
 
 # 1. Python API
@@ -310,12 +319,12 @@ pickle_load_args: (Python 3 only) optional keyword arguments passed over to pick
 
 
 梯度管理方法 `torch.*`
-* no_grad  :          Context-manager that disables gradient calculation.
-  * 关闭梯度, 需要确保不会调用 `Tensor.backward()`
+* `no_grad()`  :          Context-manager that disables gradient calculation.
+  * 关闭梯度计算, 中断计算图, 需要确保不会调用 `Tensor.backward()`
   * 注意, 对于 factory funcions, 或者在函数里创建的 new Tensor 并设置 requires_grad 为True, 则无法受此上下文管理器影响
   * 也可以作为 函数修饰器使用
+* `enable_grad` :       Context-manager that enables gradient calculation
 
-* enable_grad :       Context-manager that enables gradient calculation
 
 * inference_mode   :  Context-manager that enables or disables inference mode
 
@@ -368,13 +377,20 @@ def tripler(x):
 * 求范数
   * torch.norm()    : 求范数, 该函数已经被 deprecated. 使用 `torch.linalg` 中的对应函数
 
+
+
+
+`torch.logsumexp(input, dim, keepdim=False, *, out=None)`
+* 求 log sum exp , 先取自然数的幂, 再求和, 再取对数
+* 直接应用了 Log-Sum-Exp Trick 避免数值溢出
+* 作为降维方法使用
+
+
 #### 2.6.2.1. 极值操作
 
 * max/min : 返回最大值, 默认对全元素进行, 可以输入单个整数 dim 来对某一维度进行运算, 此时会返回两个值, 第二个返回值是索引位置
 * argmax/argmin : 返回最大值的索引, 默认对全元素进行操作, 可以输入单个整数 dim 来对某一维度进行运算, 等同于 max/min 输入 dim 的第二个返回值
 * amax/amin : 返回最大值, 专门用来对指定维度进行运算, dim 是必须参数且可以是 int or tuple, 即可以对多个维度进行运算, 不会返回索引
-
-
 
 ### 2.6.3. Comparison Ops
 
@@ -539,7 +555,18 @@ NamedTuple with missing_keys and unexpected_keys fields
 """
 
 ```
-#### 3.1.1.3. 残差结构
+
+#### 3.1.1.3. 特殊参数
+
+
+`Module.register_buffer(name, tensor, persistent=True)`
+* 向模型中添加一个 参数 buffer, 标准名称为 缓冲区张量
+* 其属性很有意思, 可以参与前向传播但是不参与梯度计算  (not to be considered a model permeter) 
+  * 从根本上该张量不属于模型参数, 不会被任何优化器更新
+  * 和设置 requires_grad=False 的参数相比较, 后者仅仅是暂时冻结参数, 但本质上仍然属于模型参数, 甚至可以被优化器操作, 因此可能会被自定义的优化器更新
+  * register_buffer 不会包含在  `Module.parameers()` 中 反而会出现在 `Module.buffer()` 中
+  * register_buffer 的内容不会出现在 `state_dict()`中, 除非重写 state_dict
+
 
 
 ### 3.1.2. torch.nn.Sequential 系列
@@ -811,6 +838,40 @@ pytorch 的损失函数直接定义在了 torch.nn 中
 # 使用时直接定义对象即可
 loss_func = nn.CrossEntropyLoss()
 ```
+
+
+
+
+
+### 3.8.1. Binary Cross Entropy (BCE)
+
+
+
+`torch.nn.BCELoss(weight=None, size_average=None, reduce=None, reduction='mean')`
+* 二元交叉熵损失, 通常用于 GAN 网络的 discriminator 
+  * 真实样本的目标值为 1
+  * fake 的目标值为 0
+* `l(x,y) = -w(y*log(x) + (1-y)*log(1-x))`
+  * 目标值 y 为 1 的时候, 希望 x 尽可能逼近1, 使得 log(x) 从负值逼近于 0, 在 loss 的开头加上 负号使得 loss 始终为 正值
+  * 目标值 y 为 0 的时候, 希望 x 尽可能逼近0, 效果相同
+  * y 必须是在 0到1之间的数字
+* 这种损失是 GAN 网络最原始的损失, 在 discriminator 的判别精准度很好的时候会导致梯度消失, 因此该损失在实际中很少使用
+* pytorch 中的实现, 会对 log 函数的输出限制在 -100 以内, 确保不会在 x =0 或者 1 的时候出现梯度爆炸
+* 参数含义:
+  * `weight` : 对于 batch 输入的时候, 指定每一个 element 的权重
+  * `size_average` bool, optional : deprecated.
+  * `reduce=None`  bool, optional : deprecated. 
+  * `reduction='mean'` : 对于 batch 输入的时候, 计算最终 loss 的降维方法
+    *  `mean` : 取均值
+    *  `sum`  : 求和
+    *  `none` : 不进行降维
+    *  该 loss 用于自动编码器的重建误差
+
+
+`torch.nn.BCEWithLogitsLoss(weight=None, size_average=None, reduce=None, reduction='mean', pos_weight=None)`
+* BCELoss 的改进版本, 相当于 Sigmoid 后接一个 BCELoss, 同时使用了 log-sum-exp trick 使得计算更加稳定
+* 计算上和 BCELoss 相比, 就单纯的对输入的 x 先进行 Sigmoid 处理
+  * `l(x,y) = -w(y*log( sig(x) ) + (1-y)*log(1- sig(x) ))`
 
 
 ## 3.9. Vision Layrers - 与图像相关的网络层
@@ -1175,6 +1236,15 @@ To create a tensor with similar type but different size as another tensor, use t
 
 # 6. torch.autograd - 梯度计算包
 
+## 6.1. Locally disabling gradient computation
+
+与该章节相关的内容还有两个  
+
+一个是 torch 下的接口列表 Locally disabling gradient computation
+另一个是介绍 Autograd mechanics 的 
+* https://pytorch.org/docs/stable/notes/autograd.html#locally-disable-grad-doc
+
+
 # 7. Torch Devices
 
 torch.cpu  
@@ -1476,4 +1546,74 @@ optim.SGD([
 ```
 
 
+
+#  12. Autograd mechanics
+
+
+## 12.1. Locally disabling gradient computation
+
+局部关闭梯度在 pytorch 中事实上有多种模式, 其中有些许的区别
+
+禁用整个块的梯度可以用上下文管理器例如 no_grad 或者 inference 模式, 如果要细微的从梯度计算中排除某一个 子图 则可以设置 requires_grad
+
+除此之外  nn.Module.eval() 虽然称为 评估模式, 但是并不是用来禁用梯度的, 这点常常会产生混淆
+
+
+
+### 12.1.1. Setting requires_grad
+
+手动设置某一个 Tensor 的梯度情况, 这是一个 Tensor 的 flag, 但是只有设置在 nn.Parameter 中的 Tensor 才会自动被设置为 requires_grad = True
+
+
+在计算梯度的时候, 只有 require_grad = True 的张量才会将梯度累计到 .grad 字段中
+* 要注意, 在一个计算图中, 这个 flag 只针对 叶子节点的张量有意义
+* 非叶子节点的梯度需求是受 叶子节点影响的, 如果叶子节点需要梯度, 那么路径上的非叶子节点也必须有梯度, 因此 非叶子节点的 True 会被自动设置 
+
+
+手动设置 require_grad 主要用于 在模型微调的时候冻结 pretrain 模型的参数  
+这是一种最常见的模式, 因此可以使用 `nn.Module.requires_grad_()` 在模块级别设置 requires_grad
+
+
+### 12.1.2. Grad Modes
+
+除了 rquire_grad 的 flag 之外, 还有三种模式会影响 autograd 的计算方式
+* 默认 grad
+* no-grad
+* inference
+这三种模式的应用层级高于 requires_grad
+
+
+grad 模式: 默认模式, 只有在该模式下 require_grad 才会生效, 之所以成为 grad 模式只是为了与其他两种没有梯度的模式做区别  
+
+
+### 12.1.3. No-grad Mode
+
+no-grad 从整体上彻底停止了一切梯度  
+
+作为上下文的时候很方便
+
+no-grad 应该被用于修改模型参数的时候, 例如自定义 optimizer 的时候对 parameter 进行更新
+
+此外, 模型在初始化的时候对参数进行设置 也是在 no-grad 模式下的 
+
+
+### 12.1.4. Inference Mode
+
+比 no-grad 更进一步的优化, 推理速度更快  
+
+区别在于 在 inference 模式下创建的 Tensor (例如推理结果), 在 inference 模式推出了后也不能作为 autograd 记录的计算  
+
+如果推理的结果与 autograd 在推出 inference 模式后也 没有任何的交互的话, 可以使用 inference 模式
+
+
+
+### 12.1.5. Evaluation Mode (nn.Module.eval())
+
+
+该模式会出现在该章节仅仅是因为特别容易混淆  
+
+module.eval() 和 module.train() 所影响的完全是模型的行为本身, 因为某些模型本身就对于推理和训练有不同的行为
+* 最典型的就是 dropout
+* 以及 BatchNorm2d : avoid updating your BatchNorm running statistics on validation data.
+* 不管如何, 在 validation 的时候使用 module.eval() 总是正确的 
 

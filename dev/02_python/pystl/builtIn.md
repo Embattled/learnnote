@@ -25,7 +25,7 @@ ascii()  divmod()   object()
 breakpoint() 
   filter()  issubclass()   super()
     iter()  
-callable()  format()  len()  property() 
+callable()  format()  len()
 frozenset()     
 compile()    map()   
 complex()  round()
@@ -96,18 +96,9 @@ complex()  round()
 - locals()    : 将局部空间的所有变量以字典形式返回, 等同于 `vars(空)`
 - globals()   : 将全局空间的所有变量以字典形式返回, 注意以本 module 为基准, 不包括调用的module
 
-## 2.5. 类/包相关的函数  
 
-attr系列
-* `getattr(object, name, default)`  : 从一个 object 中提取名为 name 的成员, name 必须是  string, 如果设置了 default 则 object 中不存在该成员的时候会返回该 default, 否则报 `AttributeError`
-* `setattr(object, name, value)`    : 为一个 object 设置名为 name 的成员, 如果对象允许的话, 会把值赋予对应的 name 成员
-* `hasattr(object, name)`           : 简单的逻辑判断 object 中是否有名为 name 的成员
-* `delattr(object, name)`           : 可以理解为 setattr 的反函数, 删除名为 name 的成员, 相当于 `del object.name`
+## 2.5. 类方法
 
-
-## 类方法
-
-不用任何修改的方法为实例方法
 - 实例方法
   - 通常通过对象访问, 最少包含一个 `self` 参数
   - 通过类名访问, 需要提供对象参数 `CLanguage.say(clang)`
@@ -117,7 +108,7 @@ attr系列
 - 特殊的场景中（例如工厂模式中）, 使用类方法和静态方法也是很不错的选择。
 
 
-`@classmethod` 和 `@staticmethod` 都是函数装饰器
+`@classmethod` 和 `@staticmethod` 都是函数装饰器  `@property`
 
 `Changed in version 3.10: Class methods/Static methods now inherit the method attributes (__module__, __name__, __qualname__, __doc__ and __annotations__) and have a new __wrapped__ attribute.`
 
@@ -171,6 +162,91 @@ CLanguage.infos("C语言中文网","http://c.biancheng.net")
 
 - 用类的实例对象访问类成员的方式称为绑定方法
 - 而用类名调用类成员的方式称为非绑定方法。
+
+### 2.5.1. property
+
+`class property(fget=None, fset=None, fdel=None, doc=None)`
+
+生成一个被精致管理的类的属性, 四个参数分别为
+* 获取值
+* 设置值
+* 删除值
+* 文档
+
+一个基本的使用方法为
+```py
+class C:
+    def __init__(self):
+        self._x = None
+
+    def getx(self):
+        return self._x
+
+    def setx(self, value):
+        self._x = value
+
+    def delx(self):
+        del self._x
+
+    x = property(getx, setx, delx, "I'm the 'x' property.")
+
+# 相当与直接提供了以下三种用法
+c.x
+c.x = value
+del c.x
+```
+类的属性也具有 docstring, 可以通过上述的 doc 参数设置, 否则会直接使用对应 fget's 方法的 docstring
+
+
+回顾 decorator 的语法, 当 property 作为函数修饰器的时候, 相当于创建了一个 property 实例, 但是只提供了 fget, 最终得到了一个 只读属性, 这在某些场合是非常有用的  
+进一步, 对应的 属性的 文档也会直接被设置成 fget 的文档, 可以在书写的时候直接表明该接口的只读属性
+```py
+class Parrot:
+    def __init__(self):
+        self._voltage = 100000
+
+    @property
+    def voltage(self):
+        """Get the current voltage."""
+        return self._voltage
+    
+    # 附加了 @property 后, voltage() 方法变为了 只读属性 voltage 的 getter 函数
+    # 同时给 voltage() 添加了 docstring 
+```
+
+
+除此之外, 还有三种 修饰器  getter setter deleter
+
+```py
+class C:
+    def __init__(self):
+        self._x = None
+
+    @property
+    def x(self):
+        """I'm the 'x' property."""
+        return self._x
+
+    @x.setter
+    def x(self, value):
+        self._x = value
+
+    @x.deleter
+    def x(self):
+        del self._x
+# 效果同上述 定义好各个方法之后调用  x = property(getx, setx, delx, "I'm the 'x' property.")  相同
+# 相当于先定义了 只读属性,  然后再附加 setter 和 deleter
+```
+
+### 2.5.2. 类属性相关
+
+attr系列
+* `getattr(object, name, default)`  : 从一个 object 中提取名为 name 的成员, name 必须是  string, 如果设置了 default 则 object 中不存在该成员的时候会返回该 default, 否则报 `AttributeError`
+* `setattr(object, name, value)`    : 为一个 object 设置名为 name 的成员, 如果对象允许的话, 会把值赋予对应的 name 成员
+* `hasattr(object, name)`           : 简单的逻辑判断 object 中是否有名为 name 的成员
+* `delattr(object, name)`           : 可以理解为 setattr 的反函数, 删除名为 name 的成员, 相当于 `del object.name`
+
+
 
 ## 2.6. 数学逻辑函数
 
@@ -440,6 +516,12 @@ python官方提供了三个更推荐使用别的函数的使用场景, 可以获
 * 把一组字符串链接起来, 使用 `''.join(sequence)`
 * 把小数数据提高精度, 使用 `math.fsum()`
 * 把数个 iterables 链接起来, 使用 `itertools.chain()`
+
+
+
+### 2.10.7. 迭代器操作
+
+
 
 # 3. Built-in Constants
 
@@ -1087,7 +1169,7 @@ Generic Alias  和 Union
 
 其他更高级的类型提示在 typing 模组里
 
-### Generic Alias Type
+### 4.7.1. Generic Alias Type
 
 通常通过 subscripting 一个 class 来创建, 一般和 container classes 一起使用, 例如 list or dict
 
@@ -1095,7 +1177,7 @@ e.g.  `list[int]` 就是一个 GenericAlias, 通过对一个 container class 取
 * 所谓的 container class 就是指实现了 `__class_getitem__()` 的类, 可以取索引的类
 
 
-### Union Type
+### 4.7.2. Union Type
 
 Python 3.10 新语法!!
 

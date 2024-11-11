@@ -41,6 +41,9 @@
     - [6.2.3. Homography Matrix - 单应矩阵](#623-homography-matrix---单应矩阵)
   - [6.3. Triangulation - 三角测量 (三角化)](#63-triangulation---三角测量-三角化)
   - [6.4. 3D-2D : PnP](#64-3d-2d--pnp)
+    - [6.4.1. Direct Linear Transformation 直接线性变换](#641-direct-linear-transformation-直接线性变换)
+    - [P3P](#p3p)
+    - [Minimizing the Reprojection Error](#minimizing-the-reprojection-error)
   - [6.5. 3D-3D : ICP](#65-3d-3d--icp)
     - [6.5.1. SVD - Linear Algebra Method](#651-svd---linear-algebra-method)
     - [6.5.2. Non-linear Optimization Method](#652-non-linear-optimization-method)
@@ -1088,6 +1091,106 @@ $$x_2\hat{\space}s_2x_2 =0= x_2\hat{\space}s_1Rx_1+t$$
 ## 6.4. 3D-2D : PnP 
 
 Perspective-n-Point  求解 3D 到 2D 的点对运动的方法
+
+当知道了 n 个 3D 空间点以及其对应投影位置的时候, 如何估计相机位姿  
+
+在前面的章节中, 提到了 
+* 2D-2D 的对极几何方法需要 8个 或者 8个以上的点对 (以 8 点法为例), 而且还需要考虑 初始化, 纯旋转和尺度的问题
+* 如果 两张图象中的 1张, 其特征点的 3D 位置已知, 那么最少只需要 3 个点对 (以及一个验证点) 即可就可以估计相机运动, 这种情况下的点的 3D 位置通常由 三角化 或者 RGB-D 相机的深度图来确定
+  * 因此在双目或者  RGB-D 的视觉里程计中, 可以直接使用 PnP 来估计相机运动
+  * 在单目视觉里程计中, 必须先 初始化, 然后才能用 PnP
+* 3D-2D 方法 不需要使用对极约束, 且可以在很少的匹配点中获得 较好的运动估计  是最重要的姿态估计方法
+
+PnP 问题的解法其实有很多:  
+* 3对点估计位姿:  P3P
+* 直接线性变换  : DLT (Direct Linear Transformation)
+* EPnP    : Efficient PnP
+* UPnP
+* 非线性优化  : 构建最小二乘问题并迭代求解, 也就是 Bundle Adjustment(BA) 光束平差法
+
+
+### 6.4.1. Direct Linear Transformation 直接线性变换  
+
+给定 3D 点的位置以及在某个相机中的投影位置, 求相机位姿  
+如果 3D 点的位置是在另一个相机坐标系的话, 则求的是两个相机的相对运动  
+
+考虑空间点 P, 有
+* 齐次坐标 $P=(X,Y,Z,1)^T$
+* 在图像的坐标 $x_1=(u_1, v_1, 1)^T$
+* 此时相机位姿 R,t 是未知的, 此时展开形式满足  
+
+$$
+s\begin{pmatrix}
+  u_1\\
+  v_1\\
+  1
+\end{pmatrix}=
+\begin{pmatrix}
+  t_1  & t_2 & t_3  & t_4 \\
+  t_5  & t_6 & t_7  & t_8 \\
+  t_9  & t_{10} & t_{11}  & t_{12} \\
+\end{pmatrix}
+\begin{pmatrix}
+  X\\
+  Y\\
+  Z\\
+  1
+\end{pmatrix}
+$$
+
+该等式可以通过前两行消去最后一行, 得到两个约束式  
+
+$$
+u_1 = \frac{t_1X+t_2Y+t_3Z+t_4}{t_9X+t_{10}Y+t_{11}Z+t_{12}} , v_1 = \frac{t_5X+t_6Y+t_7Z+t_8}{t_9X+t_{10}Y+t_{11}Z+t_{12}}
+$$
+
+此时可以定义 行向量并简化表达  
+$$
+\bold{t_1} = (t_1, t_2,t_3,t_4)^T, 
+\bold{t_2} = (t_5 , t_6, t_7 , t_8)^T, 
+\bold{t_3} = (t_9 , t_{10}, t_{11} , t_{12})^T \\
+
+\bold{t_1^T}P-\bold{t_3^T}Pu_1=0, 
+\bold{t_2^T}P-\bold{t_3^T}Pv_1=0, 
+$$
+
+3个t向量是待求的变量, 而每一个点提供了 两个关于 t 的线性约束, 假设一共有 N 个特征点, 则可以写成方程的形式  
+
+$$
+\begin{pmatrix}
+  P^T_1 & 0 & -u_1P^T_1 \\ 
+  0 & P^T_1 &  -u_1P^T_1 \\ 
+  P^T_N & 0 & -u_NP^T_N \\ 
+  0 & P^T_N &  -u_NP^T_N \\ 
+\end{pmatrix}\begin{pmatrix}
+  t_1 \\
+  t_2 \\
+  t_3 \\
+\end{pmatrix}=0
+$$
+
+由于 t 的变量一共 12 维, 因此最少通过 6 对 匹配的特征点即可求解矩阵 T, 这种方法就叫做 DLT  
+
+当匹配点多于 6 对的时候, 通过 SVD 等方法对超定方程求解最小二乘解   
+
+这种解法是直接将 Rt 看作了 12 个未知数, 忽略了他们作为 SE3 的内在联系, 且 旋转矩阵属于 SO3, 而求解得到的旋转不一定满足该约束  
+
+对于旋转矩阵 R, 需要针对 DLT 的结果寻找一个最好的 旋转矩阵对他进行近似, 可以由 QR分解完成, 或者  
+$$R\larr (RR^T)^{-\frac{1}{2}} $$  
+
+相当于把结果从 矩阵空间重新投影到 SE3 的形态, 转换成旋转和平移两部分   
+
+在该章节中, x 直接使用了归一化的坐标, 在 SLAM 中内参通常都做假定为已知, 就算内参未知, 也可以用 PnP 直接去估计 K,R,t 三个量, 由于未知量增多, 效果会差一些  
+
+### P3P
+
+
+### Minimizing the Reprojection Error
+
+可以把 PnP 问题构建成一个关于重投影误差的 `非线性最小二乘问题`  可以优化 PnP 或者 ICP
+
+这一类把 相机和三维点 放在一起进行最小化的问题, 统称为 Bundle Adjustment
+
 
 ## 6.5. 3D-3D : ICP
 
