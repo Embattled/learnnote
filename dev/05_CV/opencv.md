@@ -1401,11 +1401,59 @@ Python:
 * P : fisheye 实现了传入新相机的内部参数 3x3 或者整个 projection matrix 3x4
 
 
+## stereo 双目相机
+
+* cv::stereoCalibrate
+* cv::stereoRectify
+* cv::stereoRectifyUncalibrated
+
+
+## PnP 求解
+
+全局指导: 
+`Perspective-n-Point (PnP) pose computation`  
+求解 PnP 问题  
+* cv::solveP3P
+* cv::solvePnP
+* cv::solvePnPGeneric	: 检索 所有可能的方案  
+* cv::solvePnPRansac	: 使用 RANSAC 来处理异常值
+* Pose refinement: 姿态细化, 使用非线性最小化方法, 从解的初始值开始估计旋转和平移, 最小化重投影误差
+  * cv::solvePnPRefineLM
+  * cv::solvePnPRefineVVS
+
+`enum cv::SolvePnPMethod`  
+
+
+
+
+通用参数:
+* `objectPoints`	: 空间点坐标数组, 传入 (N, 3) 或者 cv 里的 `vector<Point3d>`
+* `imagePoints`		: 空间点对应的图像点的数组, (N, 2), 传入 cv `vector<Point2d>`
+* `cameraMatrix`	: 提供预定义的相机内参 `3x3` 矩阵, 包括 主点信息和焦距信息共4个值
+* `distCoeffs`		: 相机的 扭曲系数, 可以是 `4, 5, 8, 12 or 14` 长度, 需要参考 OpenCV 的扭曲模型
+* `iterationsCount`	: 迭代求解的迭代次数  
+* `reprojectionError`	: 求解过程中的距离阈值, 用于管理某个点是否被视作 `inlier`
+* 
+* `flags`			: 求解 PnP 的解法标志
+
+
+
+
+
 ## Rodrigues - 旋转矩阵
 
 将旋转矩阵转为旋转向量, 或者执行相反操作.  
 
 
+
+## 三角标定 
+
+* cv::triangulatePoints
+
+
+## 验证函数 
+
+* cv::validateDisparity
 
 
 # 9. features2d - 2D Features Framework 2D图像的传统特征检测

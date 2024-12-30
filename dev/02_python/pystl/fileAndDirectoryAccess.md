@@ -13,14 +13,15 @@
     - [3.1.3. 提取路径成分](#313-提取路径成分)
     - [3.1.4. 变更路径成分](#314-变更路径成分)
   - [3.2. pathlib.Path - Concrete paths](#32-pathlibpath---concrete-paths)
-    - [3.2.1. 创建路径](#321-创建路径)
-    - [3.2.2. 获取文件信息](#322-获取文件信息)
-    - [3.2.3. 更改文件信息](#323-更改文件信息)
-    - [3.2.4. 文件(夹) 创建与访问](#324-文件夹-创建与访问)
-    - [3.2.5. link 的创建与修改](#325-link-的创建与修改)
-    - [3.2.6. is\_\* 系列判断函数](#326-is_-系列判断函数)
-    - [3.2.7. 检索文件夹](#327-检索文件夹)
-    - [3.2.8. 与 OS. 的互换性](#328-与-os-的互换性)
+    - [3.2.1. Expanding and resolving paths 解析路径](#321-expanding-and-resolving-paths-解析路径)
+    - [3.2.2. Querying file type and status 判断文件状态函数](#322-querying-file-type-and-status-判断文件状态函数)
+    - [3.2.3. Reading and writing files 读写文件](#323-reading-and-writing-files-读写文件)
+    - [3.2.4. Reading directories 读取并检索文件夹](#324-reading-directories-读取并检索文件夹)
+    - [3.2.5. 创建路径](#325-创建路径)
+    - [3.2.6. Creating files and directories 文件(夹) 创建](#326-creating-files-and-directories-文件夹-创建)
+    - [3.2.7. Renaming and deleting 重命名, 更改路径, 删除](#327-renaming-and-deleting-重命名-更改路径-删除)
+    - [3.2.8. Permissions and ownership](#328-permissions-and-ownership)
+    - [3.2.9. 与 OS. 的互换性](#329-与-os-的互换性)
 - [4. shutil - High-level file operations](#4-shutil---high-level-file-operations)
 - [5. 简单功能模组](#5-简单功能模组)
   - [5.1. fnmatch - Unix filename pattern matching](#51-fnmatch---unix-filename-pattern-matching)
@@ -282,101 +283,39 @@ pathlib 还提供了函数可以便捷的更换某一个 Path 对象的某个成
 * Path类是PurePath的子类, 因此继承的方法不多赘述
 * Path类的路径必须是真实有效的
 
-提供的方法 : 各种 OS 路径访问  
+提供的方法 : 各种 OS 路径访问 影响硬盘上的文件的实际 OS 操作
 * 判断路径是否真实存在
 * 判断该路径对应的是文件还是文件夹
 * 如果是文件，还支持对文件进行读写等操作
 
 很多都是从 os. 包中进行再封装的函数  
 
-### 3.2.1. 创建路径
+好像文档有更新, 分类更加清晰了
 
-类构造函数创建
-* `pathlib.Path(*pathsegments)`
-  * `path1 = Path('.') / 'folder1' / 'text1.txt'`
-  * 会根据操作系统自动创建对应的 Path, 因此一般不需要用到下面的函数
-  * `pathlib.PosixPath(*pathsegments)`
-  * `class pathlib.WindowsPath(*pathsegments)`
+### 3.2.1. Expanding and resolving paths 解析路径
 
+解析某一个路径, 获取特定路径的快捷方法
 
-便捷类方法创建
-* 创建当前路径的 Path
-  * `Path.cwd()`
-  * `Path('.')`
-* 创建用户主目录 Path
-  * `Path.home()`
-
-路径的解释与转换
-* 解释 用户主目录符号 `~`
+* `classmethod Path.home()` 直接获取用户主目录
+  * `PosixPath('/home/antoine')`
+* ` classmethod Path.cwd()` 获取当前路径 即 python 程序的执行路径
+  * 和代码文件的位置没有关系!
+* ` Path.expanduser()`  解析某一个路径中的 `~` 符号
   * `Path('~').expanduser()  ->  PosixPath('/home/longubuntu') `
-  * 注意, 带有 `~` 的 path 必须在通过该解释函数后才能正确使用
-  * 踩坑过一次, 重要!!!
-* 转化成绝对路径
-  * `Path.resolve(strict=False)`
-  * 解释路径中的所有 `.`  `..` 等
+  * 用处太限定了, 但是 pathlib 中 带有 `~` 的 path 必须在通过该解释函数后才能正确使用, 踩坑过一次, 重要!!!
+* `Path.absolute()` : 转化成绝对路径
+  * 解析路径的相对位置, 获取绝对路径
+  * 不会解析 symlinks
+* `Path.resolve(strict=False)` : 转化成绝对路径
+  * 解释路径中的所有 `.`  `..` 等, pathlib 只有这唯一一个函数会解析 `..`
+  * 会解析 symlinks
   * `strict=True` 相当于同时执行了 Path.exists(), 属于是一个懒人参数
-* 转化(追踪) link
-  * `Path.readlink()` 追踪一个link 的 path, 即返回 path of target file 
 
+* `Path.readlink()` 转化(追踪) link
+  *  追踪一个link 的 path, 即返回 path of target file 
 
-### 3.2.2. 获取文件信息
+### 3.2.2. Querying file type and status 判断文件状态函数
 
-简单函数 省略 Path.*
-
-| 名称                          | 功能                                                                                    |
-| ----------------------------- | --------------------------------------------------------------------------------------- |
-| owner()                       | Return the name of the user owning the file                                             |
-| group()                       | Return name of the group owning the file                                                |
-| stat(*, follow_symlinks=True) | 返回一个 `os.stat_result` 对象, 具体查看该对象的成员, 传入 False 则查看 link 本身的信息 |
-| lstat()                       | 懒人函数, 相当于 stat(follow_symlinks=False)                                            |
-
-
-### 3.2.3. 更改文件信息
-
-
-`Path.chmod(mode, *, follow_symlinks=True)`
-* Change the file mode and permissions, like `os.chmod()`
-* e.g. `p.chmod(0o444)`
-* `Path.lchmod(mode)`  懒人函数, 相当于 `chmod(mode, follow_symlinks=False)`
-
-`Path.rename(target)`
-* 重命名/移动一个 文件(夹)
-* 如果 target 已经存在
-  * Unix : 会静默覆盖目标文件
-  * Windows : 会报错
-
-`Path.replace(target)`
-* 重命名/移动一个 文件(夹)
-* rename 的确保覆盖版本, 目标除了 file 以外, 还可以是 empty folder
-
-
-### 3.2.4. 文件(夹) 创建与访问
-
-文件夹 增删
-* `Path.mkdir(mode=0o777, parents=False, exist_ok=False)`
-  * Path 的创建文件夹, 比较方便
-`Path.rmdir()`
-  * 删除一个文件夹, 该文件夹必须为空  
-
-`Path.open(mode='r', buffering=- 1, encoding=None, errors=None, newline=None)`
-* 返回一个 opened file
-* 相当于 `open(Path)`
-
-
-文件读写函数, 直接省去 .open() 的过程
-* `Path.read_bytes()` 文件内容以 byte 读取, 返回 `b'` 二进制内容
-* `Path.read_text(encoding=None, errors=None)` : 文件内容以 txt 读取
-
-
-
-
-### 3.2.5. link 的创建与修改
-
-链接的创建以及 Follow
-* `Path.readlink()` 追踪一个link 的 path, 即返回 path of target file 
-* `Path.symlink_to(target, target_is_directory=False)`
-
-### 3.2.6. is_* 系列判断函数
 
 该部分统一返回 bool, 省略 Path.*
 
@@ -399,10 +338,29 @@ pathlib 还提供了函数可以便捷的更换某一个 Path 对象的某个成
 | is_char_device()  | True if the path points to a character device      |
 
 
-### 3.2.7. 检索文件夹
+简单函数 省略 Path.*
+
+| 名称                          | 功能                                                                                    |
+| ----------------------------- | --------------------------------------------------------------------------------------- |
+
+| stat(*, follow_symlinks=True) | 返回一个 `os.stat_result` 对象, 具体查看该对象的成员, 传入 False 则查看 link 本身的信息 |
+| lstat()                       | 懒人函数, 相当于 stat(follow_symlinks=False)                                            |
 
 
-* `.iterdir()` 获取一层文件列表, 注意该函数返回的是一个迭代器, 需要手动转化成list * 
+### 3.2.3. Reading and writing files 读写文件
+
+文件读写函数, 直接省去 .open() 的过程
+* `Path.read_bytes()` 文件内容以 byte 读取, 返回 `b'` 二进制内容
+* `Path.read_text(encoding=None, errors=None)` : 文件内容以 txt 读取
+
+`Path.open(mode='r', buffering=- 1, encoding=None, errors=None, newline=None)`
+* 返回一个 opened file
+* 相当于 `open(Path)`
+
+
+### 3.2.4. Reading directories 读取并检索文件夹
+
+* `.iterdir()` 获取一层文件列表, 注意该函数返回的是一个迭代器, 需要手动转化成list
 
 ```py
 path2 = Path('.') / 'folder1'
@@ -416,8 +374,71 @@ print(f'Number of files: {len(path_list)}')
 * `Path.rglob(pattern)` 递归的 pattern 检索
   * 懒人函数
   * 相当于默认在 pattern 前面添加了 `**/`
+* `Path.walk(top_down=True, on_error=None, follow_symlinks=False)`
+  * Generate the file names in a directory tree by walking the tree either top-down or bottom-up.
+  * 说明超级长, 好像功能很强大
 
-### 3.2.8. 与 OS. 的互换性
+### 3.2.5. 创建路径
+
+类构造函数创建
+* `pathlib.Path(*pathsegments)`
+  * `path1 = Path('.') / 'folder1' / 'text1.txt'`
+  * 会根据操作系统自动创建对应的 Path, 因此一般不需要用到下面的函数
+  * `pathlib.PosixPath(*pathsegments)`
+  * `class pathlib.WindowsPath(*pathsegments)`
+
+
+### 3.2.6. Creating files and directories 文件(夹) 创建
+
+文件主要涉及 文件夹的创建
+
+* `Path.touch(mode=0o666, exist_ok=True)`
+  * 创建一个文件
+  * 类似功能的函数很多 : The open(), write_text() and write_bytes() methods are often used to create files.
+* `Path.mkdir(mode=0o777, parents=False, exist_ok=False)`
+  * Path 的创建文件夹, 比较方便
+`Path.rmdir()`
+  * 删除一个文件夹, 该文件夹必须为空  
+
+
+
+* `Path.symlink_to(target, target_is_directory=False)`
+
+### 3.2.7. Renaming and deleting 重命名, 更改路径, 删除
+
+
+`Path.rename(target)`
+* 重命名/移动一个 文件(夹)
+* 如果 target 已经存在
+  * Unix : 会静默覆盖目标文件
+  * Windows : 会报错
+
+`Path.replace(target)`
+* 重命名/移动一个 文件(夹)
+* rename 的确保覆盖版本, 目标除了 file 以外, 还可以是 empty folder
+
+`Path.unlink(missing_ok=False)`
+* 删除一个文件或者链接符号
+
+
+`Path.rmdir()`
+* Remove this directory. The directory must be empty.
+
+
+
+### 3.2.8. Permissions and ownership
+
+`Path.chmod(mode, *, follow_symlinks=True)`
+* Change the file mode and permissions, like `os.chmod()`
+* e.g. `p.chmod(0o444)`
+* `Path.lchmod(mode)`  懒人函数, 相当于 `chmod(mode, follow_symlinks=False)`
+
+查看所有者和所属的组
+| owner()                       | Return the name of the user owning the file                                             |
+| group()                       | Return name of the group owning the file                                                |
+
+
+### 3.2.9. 与 OS. 的互换性
 
 由于很多函数都是 os. 的封装, 文档中列出了与 os 的函数对照表
 

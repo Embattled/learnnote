@@ -58,6 +58,8 @@
   - [11.4. 包信息调取](#114-包信息调取)
 - [12. Expressions 表达式](#12-expressions-表达式)
   - [12.1. Arithmetic conversions - 基础数值类型转换规则](#121-arithmetic-conversions---基础数值类型转换规则)
+  - [Comparisons - 比较表达式](#comparisons---比较表达式)
+    - [Identity comparisons - 身份比较](#identity-comparisons---身份比较)
 - [13. Simple statements - 简单语句](#13-simple-statements---简单语句)
   - [13.1. Expression statements - 表达式语句](#131-expression-statements---表达式语句)
   - [13.2. Assignment statements - 赋值语句](#132-assignment-statements---赋值语句)
@@ -1246,6 +1248,16 @@ from .module2 import *
 * 否则, 两边都必须是整数
 
 
+## Comparisons - 比较表达式
+
+
+### Identity comparisons - 身份比较
+
+* `is` `is not` 用于 对象的身份标识
+* `x is y` 只有当 二者是同一个 对象的时候才会返回真
+* 具体的 identity 是通过 `id()` 函数来确定的
+
+用法: 由于 None 是 types.NoneType 的唯一 object, 因此用 is 来进行输入的 None 是非常有用的
 
 # 13. Simple statements - 简单语句
 

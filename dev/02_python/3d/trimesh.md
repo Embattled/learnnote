@@ -45,34 +45,36 @@ trimesh.load_path(file_obj, file_type=None, **kwargs)
 trimesh.load_remote(url, **kwargs)
 ```
 
-## 3.2. class trimesh.Geometry
+# 4. class trimesh.Geometry
 
 Geometry 是所有高级类的父类 (虚基类) Bases: ABD
 
 内部定义有很多的 abstract
 
 
-## 3.3. class trimesh.PointCloud
+# 5. class trimesh.PointCloud
 
 Bases: Geometry3D
 
 Hold 3D points in an object which can be visualized in a scene.
 
-## 3.4. class trimesh.Scene
+# 6. class trimesh.Scene
 
 Bases: Geometry3D
 
 A simple scene graph which can be rendered directly via pyglet/openGL or through other endpoints such as a raytracer. Meshes are added by name, which can then be moved by updating transform in the transform tree.
 
 
-## 3.5. class trimesh.Trimesh
+# 7. class trimesh.Trimesh
 
 Bases: Geometry3D
 A Trimesh object contains a triangular 3D mesh.
 
-最核心最顶层的 Mesh 类
+最核心最顶层的 Mesh 类 
+`https://trimesh.org/trimesh.base.html#trimesh.base.Trimesh`
 
 构造函数参数 : array 支持的类型写的超级详细所以省略
+* 所有参数都是关键字参数, 且默认值为 None, 从文档中无法得知创建一个 Mesh 的必要参数
 * vertices      ((n, 3) float)          – Array of vertex locations, 顶点的 3D 坐标
 * faces         ((m, 3) or (m, 4) int)  – Array of triangular or quad faces (triangulated on load), 在读取的适合统一转成 三角面
 * face_normals  ((m, 3) float)          – Array of normal vectors corresponding to faces, 面的法线向量
@@ -83,7 +85,7 @@ A Trimesh object contains a triangular 3D mesh.
 * initial_cache 
 * visual 
 
-### 3.5.1. is_* property
+## 7.1. is_* property
 
 
 * is_convex : bool, 该网格是否是 凸的

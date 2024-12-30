@@ -17,6 +17,7 @@
   - [2.5. Locally disabling gradient computation - 局部禁用梯度计算](#25-locally-disabling-gradient-computation---局部禁用梯度计算)
   - [2.6. Math operations](#26-math-operations)
     - [2.6.1. Pointwise Ops 元素为单位的操作](#261-pointwise-ops-元素为单位的操作)
+      - [2.6.1.1. special 特殊高精度计算](#2611-special-特殊高精度计算)
     - [2.6.2. Reduction Ops 元素之间的操作(降维)](#262-reduction-ops-元素之间的操作降维)
       - [2.6.2.1. 极值操作](#2621-极值操作)
     - [2.6.3. Comparison Ops](#263-comparison-ops)
@@ -27,7 +28,7 @@
     - [3.1.1. torch.nn.Module 类](#311-torchnnmodule-类)
       - [3.1.1.1. 基础方法及应用](#3111-基础方法及应用)
       - [3.1.1.2. 网络参数以及存取](#3112-网络参数以及存取)
-      - [特殊参数](#特殊参数)
+      - [3.1.1.3. 特殊参数](#3113-特殊参数)
     - [3.1.2. torch.nn.Sequential 系列](#312-torchnnsequential-系列)
   - [3.2. Convolution Layers 卷积层](#32-convolution-layers-卷积层)
   - [3.3. Pooling layers 池化层](#33-pooling-layers-池化层)
@@ -39,7 +40,7 @@
     - [3.7.1. Identity](#371-identity)
     - [3.7.2. Linear](#372-linear)
   - [3.8. Loss Function 损失函数](#38-loss-function-损失函数)
-    - [Binary Cross Entropy (BCE)](#binary-cross-entropy-bce)
+    - [3.8.1. Binary Cross Entropy (BCE)](#381-binary-cross-entropy-bce)
   - [3.9. Vision Layrers - 与图像相关的网络层](#39-vision-layrers---与图像相关的网络层)
   - [3.10. ChannelShuffle - 重排列 Channel](#310-channelshuffle---重排列-channel)
 - [4. torch.nn.functional](#4-torchnnfunctional)
@@ -67,38 +68,45 @@
     - [5.4.4. torch.from\_numpy](#544-torchfrom_numpy)
     - [5.4.5. tensor复制](#545-tensor复制)
     - [5.4.6. .new\_ 方法](#546-new_-方法)
-- [6. torch.autograd - 梯度计算包](#6-torchautograd---梯度计算包)
-  - [Locally disabling gradient computation](#locally-disabling-gradient-computation)
-- [7. Torch Devices](#7-torch-devices)
-  - [7.1. torch.cpu - 虚类实现](#71-torchcpu---虚类实现)
-  - [7.2. torch.cuda - CUDA 计算](#72-torchcuda---cuda-计算)
-    - [7.2.1. General - 通用接口](#721-general---通用接口)
-    - [7.2.2. Memory management - CUDA 设备内存管理](#722-memory-management---cuda-设备内存管理)
-- [8. torch.linalg - pytorch 的线性代数子库](#8-torchlinalg---pytorch-的线性代数子库)
-  - [8.1. Matrix Properties](#81-matrix-properties)
-  - [8.2. Decompositions](#82-decompositions)
-- [9. torch.profiler](#9-torchprofiler)
-  - [9.1. class torch.profiler.profile](#91-class-torchprofilerprofile)
-  - [9.2. class torch.profiler.\_KinetoProfile](#92-class-torchprofiler_kinetoprofile)
-- [10. torch.onnx](#10-torchonnx)
-  - [10.1. TorchDynamo-based ONNX Exporter](#101-torchdynamo-based-onnx-exporter)
-  - [10.2. TorchScript-based ONNX Exporter](#102-torchscript-based-onnx-exporter)
-    - [10.2.1. API of TorchScript-based ONNX Exporter](#1021-api-of-torchscript-based-onnx-exporter)
-- [11. torch.optim](#11-torchoptim)
-  - [11.1. 预定义 Algorithm](#111-预定义-algorithm)
-  - [11.2. torch.optim.lr\_scheduler - 动态 Learn Rate](#112-torchoptimlr_scheduler---动态-learn-rate)
-    - [11.2.1. 有序调整](#1121-有序调整)
-  - [11.3. 定义自己的 optim](#113-定义自己的-optim)
-    - [11.3.1. Optimizer 基类](#1131-optimizer-基类)
-    - [11.3.2. optimization step](#1132-optimization-step)
-    - [11.3.3. per-parameter options](#1133-per-parameter-options)
-- [Autograd mechanics](#autograd-mechanics)
-  - [Locally disabling gradient computation](#locally-disabling-gradient-computation-1)
-    - [Setting requires\_grad](#setting-requires_grad)
-    - [Grad Modes](#grad-modes)
-    - [No-grad Mode](#no-grad-mode)
-    - [Inference Mode](#inference-mode)
-    - [Evaluation Mode (nn.Module.eval())](#evaluation-mode-nnmoduleeval)
+- [6. torch.amp - Automatic Mixed Precision package](#6-torchamp---automatic-mixed-precision-package)
+  - [6.1. Autocasting - torch 接口](#61-autocasting---torch-接口)
+    - [6.1.1. Gradient Scaling](#611-gradient-scaling)
+  - [6.2. Autocast Op Reference - 自动类型转换参考](#62-autocast-op-reference---自动类型转换参考)
+- [7. torch.autograd - 梯度计算包](#7-torchautograd---梯度计算包)
+  - [7.1. Locally disabling gradient computation](#71-locally-disabling-gradient-computation)
+- [8. Torch Devices](#8-torch-devices)
+  - [8.1. torch.cpu - 虚类实现](#81-torchcpu---虚类实现)
+  - [8.2. torch.cuda - CUDA 计算](#82-torchcuda---cuda-计算)
+    - [8.2.1. General - 通用接口](#821-general---通用接口)
+    - [8.2.2. Memory management - CUDA 设备内存管理](#822-memory-management---cuda-设备内存管理)
+- [9. torch.linalg - pytorch 的线性代数子库](#9-torchlinalg---pytorch-的线性代数子库)
+  - [9.1. Matrix Properties](#91-matrix-properties)
+  - [9.2. Decompositions](#92-decompositions)
+- [10. torch.profiler](#10-torchprofiler)
+  - [10.1. class torch.profiler.profile](#101-class-torchprofilerprofile)
+  - [10.2. class torch.profiler.\_KinetoProfile](#102-class-torchprofiler_kinetoprofile)
+- [11. torch.onnx](#11-torchonnx)
+  - [11.1. TorchDynamo-based ONNX Exporter](#111-torchdynamo-based-onnx-exporter)
+  - [11.2. TorchScript-based ONNX Exporter](#112-torchscript-based-onnx-exporter)
+    - [11.2.1. API of TorchScript-based ONNX Exporter](#1121-api-of-torchscript-based-onnx-exporter)
+- [12. torch.optim](#12-torchoptim)
+  - [12.1. 预定义优化 Algorithm](#121-预定义优化-algorithm)
+    - [12.1.1. optim 通用参数](#1211-optim-通用参数)
+  - [12.2. Adjust learning rate - lr\_scheduler 动态 Learn Rate](#122-adjust-learning-rate---lr_scheduler-动态-learn-rate)
+    - [12.2.1. Optim Scheduler 通用参数和方法](#1221-optim-scheduler-通用参数和方法)
+    - [12.2.2. Optim Class](#1222-optim-class)
+    - [12.2.3. 有序调整](#1223-有序调整)
+  - [12.3. 定义自己的 optim](#123-定义自己的-optim)
+    - [12.3.1. Optimizer 基类](#1231-optimizer-基类)
+    - [12.3.2. optimization step](#1232-optimization-step)
+    - [12.3.3. per-parameter options](#1233-per-parameter-options)
+- [13. Autograd mechanics](#13-autograd-mechanics)
+  - [13.1. Locally disabling gradient computation](#131-locally-disabling-gradient-computation)
+    - [13.1.1. Setting requires\_grad](#1311-setting-requires_grad)
+    - [13.1.2. Grad Modes](#1312-grad-modes)
+    - [13.1.3. No-grad Mode](#1313-no-grad-mode)
+    - [13.1.4. Inference Mode](#1314-inference-mode)
+    - [13.1.5. Evaluation Mode (nn.Module.eval())](#1315-evaluation-mode-nnmoduleeval)
 
 
 # 1. Python API
@@ -158,9 +166,9 @@ torch 的创建等间隔函数, 返回值都是 1-D 的
 #### 2.1.2.1. Indexing 
 
 `torch.gather(input, dim, index, *, sparse_grad=False, out=None) → Tensor`
-* 形容起来比较复杂, 提供两个相同 维度数的 Tensor input 和 index
+* 形容起来比较复杂, 提供两个**相同 维度数**的 Tensor input 和 index
   * `input.dim == index.dim` 
-  * index 和 input 不会互相 broadcast, 且需要在每个维度上 `index.size(d) <= input.size(d)`
+  * index 和 input 不会互相 broadcast, 且需要在dim 以外的所有维度上 `index.size(d) <= input.size(d)`
   * 输出的 shape 和 index 相同
 * 根据指定的 dim, 参照 index 提供的数据在 input 的 dim 维度重新选择数据输出
   * 因此属于 Indexing 函数
@@ -170,6 +178,40 @@ torch.gather(t, 1, torch.tensor([[0, 0], [1, 0]]))
 tensor([[ 1,  1],
         [ 4,  3]])
 ```
+
+
+高级索引方法, beta 函数: This function is in beta and may change in the near future.
+* `index_reduce(input, dim, index, source, reduce, *, include_self=True, out=None)→ Tensor`
+  * 对于 `index[i]=j`, `result[j]=f(result[j], source[i])`
+    * 因此shape的要求是:
+    * `source.shape[dim] == len(index)` index 每一个元素对应一个 source
+    * source.shape 的 dim 以外的维度需要和 input 匹配
+  * `self[index[i], :, :] *= src[i, :, :]  # if dim == 0`
+  * 参数:
+    * `dim` :  (int): index 的维度
+    * `index` :  (Tensor): 索引 Tensor, 必须是整数
+    * `source` :  (FloatTensor) : 值 Tensor
+    * `reduce` : (str) : 降维方法
+  * 看得出来 这里的 `index` 是一个1维 Tensor, 在执行 reduce 的时候, 索引访问的切片会作为一个整体, 而不是单个元素, 因此可以在reduce内部可以进行 broadcast
+    * 对于 shape 的约束比较小
+  * This function only supports floating point tensors.
+
+* `scatter_reduce(input, dim, index, src, reduce, *, include_self=True)→ Tensor`
+  * 从功能上看上去 index_reduce 一样
+  * 需要所有输入的 dim 统一 `self, index and src` should all have the same number of dimensions
+  * `self[index[i][j][k]][j][k] += src[i][j][k]  # if dim == 0`
+  * 参数也基本上一样:
+    * `dim`, `index`, `src` ``reduce`
+    * index 支持多维度
+  * 从shape上
+    * 对于所有维度, 需要有 `index.size(d) <= src.size(d)`. 即每一个 index 元素 都有对应的 src 元素, index 和 src 不会进行 broadcast
+    * 对于 `d!= dim`, 需要有 `index.size(d) <= self.size(d)`, 即除了索引应用的维度以外, 同样需要 index 每个元素有对应的 self 的位置.
+    * 索引维度除外, 要考虑 index 元素值的范围是否在 self 对应维度之内
+  * backward: 使用该函数的时候要考虑是否有反向传播的需求, 只有在 `src.shape==index.shape` 的时候才能够反向传播
+
+
+
+
 
 
 #### 2.1.2.2. Joining 函数 
@@ -357,6 +399,21 @@ def tripler(x):
 * 三角函数
   * torch.sin
 
+* 取倒数
+  * torch.reciprocal
+
+
+#### 2.6.1.1. special 特殊高精度计算  
+
+有一部分函数是 torch.special 中接口的别名   
+torch.special 则是仿照 scipy 的 special 模组  
+
+
+对于非常接近 0 的微小值的计算, 如果直接实现计算数式的话会导致精度损失  
+* `expm1`   : `exp(x) -1`, alias for `torch.special.expm1()`
+* `log1p`   : `log(x+1)`, 
+
+
 ### 2.6.2. Reduction Ops 元素之间的操作(降维)
 
 * 所有函数都默认对张量的全部元素进行运算
@@ -426,6 +483,7 @@ broadcast 家族:
 
 `torch.meshgrid(*tensors, indexing=None)`
 * 生成 `*tensors` 作为索引构成的坐标 grid
+* indexing =`ij` 是默认索引顺序, 等同于先行后列
 
 
 `torch.repeat_interleave(input, repeats, dim=None, *, output_size=None)`
@@ -565,7 +623,7 @@ NamedTuple with missing_keys and unexpected_keys fields
   * 从根本上该张量不属于模型参数, 不会被任何优化器更新
   * 和设置 requires_grad=False 的参数相比较, 后者仅仅是暂时冻结参数, 但本质上仍然属于模型参数, 甚至可以被优化器操作, 因此可能会被自定义的优化器更新
   * register_buffer 不会包含在  `Module.parameers()` 中 反而会出现在 `Module.buffer()` 中
-  * register_buffer 的内容不会出现在 `state_dict()`中, 除非重写 state_dict
+  * register_buffer 的内容默认也会出现在 `state_dict()`中, 可以指定 `persistent=False` 来使得其不出现在 state_dict
 
 
 
@@ -872,6 +930,16 @@ loss_func = nn.CrossEntropyLoss()
 * BCELoss 的改进版本, 相当于 Sigmoid 后接一个 BCELoss, 同时使用了 log-sum-exp trick 使得计算更加稳定
 * 计算上和 BCELoss 相比, 就单纯的对输入的 x 先进行 Sigmoid 处理
   * `l(x,y) = -w(y*log( sig(x) ) + (1-y)*log(1- sig(x) ))`
+
+
+
+`torch.nn.HingeEmbeddingLoss(margin=1.0, size_average=None, reduce=None, reduction='mean')`
+* 二元 Loss 的一种
+* 期望值 分别是 1和 -1
+* pytorch 的实现方法优点奇怪, 
+* chatgpt 给出的公式倒是比较合理 `HingeLoss(x,y) = max(0, 1-yixi)`
+* 但是 y 值似乎指定 -1, 1 以外的值没有意义
+
 
 
 ## 3.9. Vision Layrers - 与图像相关的网络层
@@ -1233,10 +1301,39 @@ To create a tensor with similar type but different size as another tensor, use t
 4. new_ones
 5. new_zeros
 
+# 6. torch.amp - Automatic Mixed Precision package
 
-# 6. torch.autograd - 梯度计算包
+`torch.amp` 提供了 方面的工具用于 mixed precision 混合精度?  
 
-## 6.1. Locally disabling gradient computation
+对于一些运算, 例如 linear layers and convolutions, float16 会比 float32 快得多.
+amp 包用于在训练, 推理的时候方便的处理类型转换  
+
+被弃用的接口:
+* `torch.cuda.amp.autocast` `torch.cuda.amp.GradScaler`
+* `torch.cpu.amp.autocast`  `torch.cpu.amp.GradScaler`
+
+## 6.1. Autocasting - torch 接口
+
+`class torch.autocast(device_type, dtype=None, enabled=True, cache_enabled=None)`
+* autocast 的实例 会作为 context managers 或者 decorators, 允许特定区域的代码以混合精度来运行  
+* 对应区域的 Tensor 可以是任何类型, 此时不应该再调用 Tensor 本身的 float() 或者 half() 接口
+* `autocast` 只应该应用在 forward 以及 loss 计算,  不推荐在 backword 的部分应用 autocast
+
+
+### 6.1.1. Gradient Scaling
+
+
+
+
+## 6.2. Autocast Op Reference - 自动类型转换参考
+
+
+
+
+
+# 7. torch.autograd - 梯度计算包
+
+## 7.1. Locally disabling gradient computation
 
 与该章节相关的内容还有两个  
 
@@ -1245,21 +1342,21 @@ To create a tensor with similar type but different size as another tensor, use t
 * https://pytorch.org/docs/stable/notes/autograd.html#locally-disable-grad-doc
 
 
-# 7. Torch Devices
+# 8. Torch Devices
 
 torch.cpu  
 torch.cuda
 
-## 7.1. torch.cpu - 虚类实现
+## 8.1. torch.cpu - 虚类实现
 
-## 7.2. torch.cuda - CUDA 计算  
+## 8.2. torch.cuda - CUDA 计算  
 
 torch.cuda 主要实现了 CUDA 张量类型, 同 CPU 张量的各种接口都一样, 但是是以 GPU 来计算的  
 
 torch.cuda 可以随时导入, 并通过  `is_available()` 来判断设备的 CUDA 设备可用情况  
 
 
-### 7.2.1. General - 通用接口
+### 8.2.1. General - 通用接口
 
 主要是对设备的管理而非计算
 
@@ -1270,7 +1367,7 @@ torch.cuda 可以随时导入, 并通过  `is_available()` 来判断设备的 CU
   * 需要手动调用的情况可能是, if you are interacting with PyTorch via its C API
   * 在初始化之前, Python 与 CUDA 功能的链接不会被建立
 
-### 7.2.2. Memory management - CUDA 设备内存管理  
+### 8.2.2. Memory management - CUDA 设备内存管理  
 
 更多的是用来管理监视学习进程的内存情况   
 
@@ -1284,11 +1381,11 @@ torch.cuda 可以随时导入, 并通过  `is_available()` 来判断设备的 CU
   * 该函数目前是 reset_peak 的封装, 本质上是一样的
 
 
-# 8. torch.linalg - pytorch 的线性代数子库
+# 9. torch.linalg - pytorch 的线性代数子库
 
 `torch.linalg.*`
 
-## 8.1. Matrix Properties
+## 9.1. Matrix Properties
 
 * `vector_norm`          Computes a vector norm.
   * `torch.linalg.vector_norm(x, ord=2, dim=None, keepdim=False, *, dtype=None, out=None)`
@@ -1300,22 +1397,22 @@ torch.cuda 可以随时导入, 并通过  `is_available()` 来判断设备的 CU
   * 属于上面两个函数的结合体, 根据输入的 shape 和 dim 来判断要执行的计算
 
 
-## 8.2. Decompositions
+## 9.2. Decompositions
 
 
-# 9. torch.profiler
+# 10. torch.profiler
 
 允许在训练和推理期间收集性能指标的工具, 了解模型哪些运算符昂贵, 检查输入形状和追踪
 
 类似的量化性能 API 在 torch.autograd 中也有, 但是已被 deprecated
 
-## 9.1. class torch.profiler.profile
+## 10.1. class torch.profiler.profile
 
 核心的 性能指标收集 类, 常通过 context manager 格式来使用
 
 
 
-## 9.2. class torch.profiler._KinetoProfile
+## 10.2. class torch.profiler._KinetoProfile
 
 核心类 profile 的父类, 定义了输出性能结果的方法  
 
@@ -1323,7 +1420,7 @@ torch.cuda 可以随时导入, 并通过  `is_available()` 来判断设备的 CU
 
 
 
-# 10. torch.onnx
+# 11. torch.onnx
 
 将 torch 模型转换成 ONNX graph 的 API
 
@@ -1331,14 +1428,14 @@ torch.cuda 可以随时导入, 并通过  `is_available()` 来判断设备的 CU
 
 在 Pytorch 中, 定义了两种转化为 ONNX 模型的偏好
 
-## 10.1. TorchDynamo-based ONNX Exporter
+## 11.1. TorchDynamo-based ONNX Exporter
 
 于 Torch 2.0 推出的最新的转换方法, 目前还是 Beta?
 * 在转换中与 Python's frame evaluation API 链接, 动态的将字节码重写为 FX 图表
 * 对FX 进行完善, 最终才将其转化为 ONNX
 * 使用字节码分析捕获 FX graph, 能够保留模型的 动态特性, 而不是传统的静态跟踪技术
 
-## 10.2. TorchScript-based ONNX Exporter
+## 11.2. TorchScript-based ONNX Exporter
 
 于 Pytorch 1.2.0 推出的 ONNX 转换器  
 * 通过使用 TorchScript 来跟踪 模型, 并捕获静态计算图
@@ -1347,7 +1444,7 @@ torch.cuda 可以随时导入, 并通过  `is_available()` 来判断设备的 CU
   * 不会处理 training 和 eval 模型之间的细微差距 (例如 dropoff?)
   * 没有真正意义上处理动态输入的能力 Does not truly handle dynamic inputs
 
-### 10.2.1. API of TorchScript-based ONNX Exporter
+### 11.2.1. API of TorchScript-based ONNX Exporter
 
 ```py
 torch.onnx.export(model, args, f, export_params=True, verbose=False, training=<TrainingMode.EVAL: 0>, input_names=None, output_names=None, operator_export_type=<OperatorExportTypes.ONNX: 0>, opset_version=None, do_constant_folding=True, dynamic_axes=None, keep_initializers_as_inputs=None, custom_opsets=None, export_modules_as_functions=False, autograd_inlining=True)
@@ -1368,7 +1465,7 @@ args = ( x,{"y": input_y, "z": input_z} )
 # 主要用于模型需要 命名的参数的情况, 这种时候可以给模型 forward 定义输入默认值, 如果在字典中不给 named arg 提供输入值的话, 默认输入值是 None
 ```
 
-# 11. torch.optim
+# 12. torch.optim
 
 是一个实现各种优化算法的包。已经支持最常用的方法，并且界面足够通用，因此将来可以轻松集成更复杂的方法。  
 
@@ -1386,9 +1483,9 @@ optimizer = optim.Adam([var1, var2], lr = 0.0001)
 
 ```
 
-## 11.1. 预定义 Algorithm
+## 12.1. 预定义优化 Algorithm
 
-优化方法, (参数各不相同, 一般都有 lr )
+各种参数优化方法, (参数各不相同, 一般都有 lr )
 * Adadelta
 * Adagrad
 * Adam
@@ -1401,7 +1498,14 @@ optimizer = optim.Adam([var1, var2], lr = 0.0001)
 * Rprop
 * SGD
 
-## 11.2. torch.optim.lr_scheduler - 动态 Learn Rate
+
+### 12.1.1. optim 通用参数
+
+* `lr` (float, Tensor, optional), 学习速率
+* `betas` (Tuple[float, float], optional), 用于计算 梯度和梯度平方的running averages 的系数
+* `verbose` : 被弃用的参数, Deprecated since version 2.2: verbose is deprecated. Please use get_last_lr() to access the learning rate.
+
+## 12.2. Adjust learning rate - lr_scheduler 动态 Learn Rate
 
 `torch.optim.lr_scheduler` 提供了一些接口用来根据 epoch 或者其他计算来调整学习速率  
 `torch.optim.lr_scheduler.ReduceLROnPlateau` 则可以根据一些 validation measurements 来调整学习速率  
@@ -1412,6 +1516,7 @@ pytorch提供的学习率调整器可以分成三大类:
 * 自定义调整 : LambdaLR
 
 
+
 调整器的使用方法:  
 ```py
 # 定义优化器
@@ -1420,6 +1525,7 @@ optimizer = SGD(model, 0.1)
 scheduler = ExponentialLR(optimizer, gamma=0.9)
 
 # 使用方法: 一般学习速度的调整应该放在 optimizer 更新之后, 在 epoch 的循环里调整
+# 运行完一个完整的 epoch 《后》 更新学习速率 是 pytorch 1.1 版本以后的约定
 for epoch in range(100):
     for input, target in dataset:
       forward...
@@ -1429,22 +1535,61 @@ for epoch in range(100):
   scheduler.step()
 ```
 
+### 12.2.1. Optim Scheduler 通用参数和方法
+
 scheduler 的通用参数:
-* gamma : float, 乘法参数, 当前学习速率直接乘以该值 
-* last_epoch : 
+* `gamma` : float, 乘法参数, 当前学习速率直接乘以该值
+* `last_epoch` : (int), 主要用于学习再开, 设置最新的学习状态
 
 scheduler 的通用成员方法:
 * print_lr(is_verbose, group, lr, epoch=None)  : 打印当前的学习速率
 * get_last_lr() : 根据输入的参数计算最终的学习率
 
+### 12.2.2. Optim Class 
 
-scheduler 的种类:
-* torch.optim.lr_scheduler.StepLR : 最基础的种类, 每 `step_size` 个 epochs 时候降低一次学习速率
-* torch.optim.lr_scheduler.MultiStepLR : 同 Step, 只不过 step 变为数组
-* orch.optim.lr_scheduler.ExponentialLR : 学习率指数下降
+scheduler 的种类: `torch.optim.lr_scheduler.*`
+
+`StepLR(optimizer, step_size, gamma=0.1, last_epoch=-1, verbose='deprecated')`
+* 每经过固定 step_size, 对 lr 乘以 gamma 系数
+
+`MultiStepLR(optimizer, milestones, gamma=0.1, last_epoch=-1, verbose='deprecated')`
+* `milestones` (list) – List of epoch indices. Must be increasing.
+* 同 Step, 只不过 step 变为数组, 每达到 milestones 的某一个元素的时候, 应用 gamma 系数
 
 
-### 11.2.1. 有序调整
+`LinearLR(optimizer, start_factor=0.3333333333333333, end_factor=1.0, total_iters=5, last_epoch=-1, verbose='deprecated')`
+* 线性调整 lr 的乘法系数, 直到最终的 total_iters. lr 本身的变化不是线性的 
+* `start_factor` `end_factor`, lr 乘法系数的数值, 从一开始的 0.5 (减半) 到最终的 1.0 (lr保持不变)
+
+`ExponentialLR(optimizer, gamma, last_epoch=-1, verbose='deprecated')`
+* ExponentialLR : 对比 StepLR, 代表每一个 epoch 都进行学习速率衰减  
+* 
+
+
+`CosineAnnealingLR(optimizer, T_max, eta_min=0.0, last_epoch=-1, verbose='deprecated')`
+* 余弦退火 (cosine annealing) 来调整学习速率  
+* 学习速率是一个余弦曲线, 但不清楚具体在应用的时候需不需要使用超过一个周期的 数值
+* `T_max` (int), 通常是 epoch_final
+* `eta_min` (float), 最终的最小学习速率
+
+
+`ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=10, threshold=0.0001, threshold_mode='rel', cooldown=0, min_lr=0, eps=1e-08, verbose='deprecated')`
+* 模型在学习停滞 stagnates 的时候通常将 lr 降低 2-10 倍, 会从中受益, 根据 评价 metric, 如果 metric 停止改进, 则降低学习速度
+* `mode`  : 设置目标 matric 的模式, 最小化还是最大化, loss通常是需要 min 最小化的
+* `factor`: (float), 调整 lr 的系数, 乘法应用, 相当于其他 Scheduler 的 Gamma参数
+* `patience` : (int), 所允许的没有改进的 epoch 数量, 在之后 lr 将会降低
+* `threshold` : (float), 仅关注 阈值之上的改进
+* `cooldown` :(int), lr 降低后, 回复 normal operation 所需要的时间, 没太懂
+* `min_lr ` : (float or list), 学习率的下限
+* 方法:
+  * `step(metrics, epoch=None)`  : 传入 metrics
+
+
+
+
+
+
+### 12.2.3. 有序调整
 
 
 * LambdaLr : 使用自定义函数来生成学习率
@@ -1467,9 +1612,9 @@ optim.lr_scheduler.LambdaLR(optimizer,liner_func,**kwargs)
 ```
 
 
-## 11.3. 定义自己的 optim
+## 12.3. 定义自己的 optim
 
-### 11.3.1. Optimizer 基类
+### 12.3.1. Optimizer 基类
 
 `class torch.optim.Optimizer(params, defaults)` 是所有优化器的基类, 定义了优化器的必须操作  
 * 参数
@@ -1487,7 +1632,7 @@ optim.lr_scheduler.LambdaLR(optimizer,liner_func,**kwargs)
     初始化所有梯度为0 
     `set_to_none` 设置初始化梯度不是0而是 `None` 这会带来一些性能优化,但同时会有一些其他后果 *懒得看了
 
-### 11.3.2. optimization step
+### 12.3.2. optimization step
 
 重点: 所有 optimizers 必须实现 step 方法, 用来更新要优化的参数  
 
@@ -1530,7 +1675,7 @@ for input, target in dataset:
 
 ```
 
-### 11.3.3. per-parameter options
+### 12.3.3. per-parameter options
 
 To do this, instead of passing an iterable of `Variable` s, pass in an iterable of `dict` s.    
 * dict 中指定了不同的 parameter group, 并且需要使用 `params` 关键字
@@ -1547,10 +1692,10 @@ optim.SGD([
 
 
 
-#  12. Autograd mechanics
+#  13. Autograd mechanics
 
 
-## 12.1. Locally disabling gradient computation
+## 13.1. Locally disabling gradient computation
 
 局部关闭梯度在 pytorch 中事实上有多种模式, 其中有些许的区别
 
@@ -1560,7 +1705,7 @@ optim.SGD([
 
 
 
-### 12.1.1. Setting requires_grad
+### 13.1.1. Setting requires_grad
 
 手动设置某一个 Tensor 的梯度情况, 这是一个 Tensor 的 flag, 但是只有设置在 nn.Parameter 中的 Tensor 才会自动被设置为 requires_grad = True
 
@@ -1574,7 +1719,7 @@ optim.SGD([
 这是一种最常见的模式, 因此可以使用 `nn.Module.requires_grad_()` 在模块级别设置 requires_grad
 
 
-### 12.1.2. Grad Modes
+### 13.1.2. Grad Modes
 
 除了 rquire_grad 的 flag 之外, 还有三种模式会影响 autograd 的计算方式
 * 默认 grad
@@ -1586,7 +1731,7 @@ optim.SGD([
 grad 模式: 默认模式, 只有在该模式下 require_grad 才会生效, 之所以成为 grad 模式只是为了与其他两种没有梯度的模式做区别  
 
 
-### 12.1.3. No-grad Mode
+### 13.1.3. No-grad Mode
 
 no-grad 从整体上彻底停止了一切梯度  
 
@@ -1597,7 +1742,7 @@ no-grad 应该被用于修改模型参数的时候, 例如自定义 optimizer �
 此外, 模型在初始化的时候对参数进行设置 也是在 no-grad 模式下的 
 
 
-### 12.1.4. Inference Mode
+### 13.1.4. Inference Mode
 
 比 no-grad 更进一步的优化, 推理速度更快  
 
@@ -1607,7 +1752,7 @@ no-grad 应该被用于修改模型参数的时候, 例如自定义 optimizer �
 
 
 
-### 12.1.5. Evaluation Mode (nn.Module.eval())
+### 13.1.5. Evaluation Mode (nn.Module.eval())
 
 
 该模式会出现在该章节仅仅是因为特别容易混淆  

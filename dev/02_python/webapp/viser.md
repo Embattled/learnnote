@@ -172,7 +172,9 @@ Scene 的元件通用参数:
 
 `add_camera_frustum(name: str, fov: float, aspect: float, scale: float = 0.3, color: Tuple[int, int, int] | Tuple[float, float, float] | ndarray = (20, 20, 20), image: ndarray | None = None, format: Literal[‘png’, ‘jpeg’] = 'jpeg', jpeg_quality: int | None = None, wxyz: tuple[float, float, float, float] | ndarray = (1.0, 0.0, 0.0, 0.0), position: tuple[float, float, float] | ndarray = (0.0, 0.0, 0.0), visible: bool = True) → CameraFrustumHandle`
 * Add a camera frustum to the scene for visualization.
-* 
+* 参数
+  * `aspect` : 
+  * `scale` : 比例因子
 
 
 
@@ -370,8 +372,23 @@ Base class for special orthogonal groups.
 * Internal parameters. (w, x, y, z) quaternion. Shape should be `(*, 4)`.
 
 
+### 4.1.4. class viser.transforms.SE3
+
+`Bases: SEBase[SO3]`
+
+定义 3D 刚体旋转的 特殊欧式群  
 
 
+构建方法:
+* `classmethod from_matrix(matrix: ndarray[tuple[int, …], dtype[floating]]) → SE3`
+
+获取变换:
+* `as_matrix() → ndarray[tuple[int, ...], dtype[floating]]`
+* `parameters() → ndarray[tuple[int, ...], dtype[floating]]`
+* 
+
+运算:
+* `__matmul__(other: Self | ndarray[tuple[int, …], dtype[floating]]) → Self | ndarray[tuple[int, ...], dtype[floating]]`  重载了 `@` 运算
 
 # 5. Examples 示例
 

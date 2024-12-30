@@ -15,7 +15,7 @@ Bash 的改进主要有:
 * integer arithmetic in any base from two to sixty-four.
 
 
-
+https://www.gnu.org/software/bash/
 
 ## 1.1. What is Bash? 
 <!-- 完 -->
@@ -31,8 +31,78 @@ Bash 旨在提供一个 IEEE POSIX Shell and Tools 规范的实现 (IEEE Standar
 ## 1.2. What is shell?
 
 
+# Definitions
 
-# 2. Shell Builtin Commands
+These definitions are used throughout the remainder of this manual.   
+文档中的固有名称
+
+# 2. Basic Shell Features
+
+Bash 是 `Bourne-Again SHell` 的缩写, 而 `Bourne shell` 就是最原始的由 `Stephen Bourne` 编写的 Shell
+
+shell 的内置命令都被集成在了 bash 中, 而 evaluation 和 quoting 的规则都遵循了标准 Unix shell 的 POSIX 规范
+
+
+该章节会介绍 shell 的 `building blocks`
+* commands
+* control structures
+* shell function
+* shell parameters
+* shell expansions
+* redirections (直接输入和输出命名文件的方法)
+* how shell executes commands
+<!-- 头部完 -->
+
+## 2.1. Shell Syntax
+
+## Shell Commands
+
+shell 命令的介绍章节, shell 脚本编程的基础内容
+
+
+### Reserved Words 保留字
+
+用于 shell 脚本的流程控制  
+
+```sh
+if	then	elif	else	fi	time
+for	in	until	while	do	done
+case	esac	coproc	select	function
+{	}	[[	]]	!
+
+```
+### Simple Commands
+<!-- 完 -->
+由一系列空格分隔的单词构成, 由 shell 的一个控制运算符 `control operators` 终止(?)
+
+第一个单词用于指定要执行的命令, 跟随的单词用于程序的参数  
+
+simple commands 命令的 return status 是由 POSIX 1003.1 waitpid 函数提供的退出状态  
+如果命令由 `signal n` 终止而不是正常退出, 则返回值是 `128 + n`
+
+
+### Pipelines
+
+shell 管线, 通过 `|` 或者 `|&` 分割的多个命令  
+
+`[time [-p]] [!] command1 [ | or |& command2 ] …`
+
+
+### Lists of Commands
+
+### Compound Commands
+
+## Shell Functions
+
+## Shell Parameters
+
+## Shell Expansions
+
+## Redirections
+
+
+
+# 3. Shell Builtin Commands
 
 所谓的 builtin commands 即不是由来于其他任何软件包, 而是 shell 本身所提供的 commands. 对于那些用单独的程序来实现几乎不可能或者不方便的功能来说, 内置 commands 是必须的. 
 
@@ -47,17 +117,37 @@ Bash 旨在提供一个 IEEE POSIX Shell and Tools 规范的实现 (IEEE Standar
 * command history
 * programmable completion facilities
 
-## Bourne Shell Builtins
+## 3.1. Bourne Shell Builtins
 
-## Bash Builtin Commands
+## 3.2. Bash Builtin Commands
 
-## Modifying Shell Behavior
+## 3.3. Modifying Shell Behavior
 
 自定义 Shell 的行为
 
-### The Set Builtin
+### 3.3.1. The Set Builtin
 
-# 3. Job Control
+
+# 4. Shell Variables
+
+# 5. Bash Features
+
+独立于 shell 的 Bash 独有的 feature
+This chapter describes features unique to Bash. 
+
+## 5.1. Invoking Bash
+
+## 5.2. Bash Startup Files
+
+## 5.3. Bash Conditional Expressions
+
+bash 的条件判定表达式 
+
+## 5.4. Shell Arithmetic
+
+
+
+# 6. Job Control
 
 介绍 Bash 提供的 任务管理功能
 
@@ -75,7 +165,7 @@ Bash 旨在提供一个 IEEE POSIX Shell and Tools 规范的实现 (IEEE Standar
 
 常用的 nohup 命令不属于 Bash 的 job control 内置功能.  
 
-## 3.1. Job Control Basics
+## 6.1. Job Control Basics
 
 
 工作控制即 用户可以有选择性的 停止/挂起/(suspend) 某一个 进程, 并在之后恢复其运行. 实现该功能主要依靠系统内核的驱动以及 Bash
@@ -98,7 +188,7 @@ shell 会把每一个 job 关联到每一个 pipeline. shell 会保存一个 job
 * `%其他字符` `%?其他字符`: 进行起始字符匹配, 带问号的则是包含匹配
 
 
-## 3.2. Job Control Builtins
+## 6.2. Job Control Builtins
 
 介绍具体的 Bash 内置的 job control 机能  
 * `bg [jobspec...] ` : 恢复在后台挂起的进程 使其在后台 继续工作, 就类似于该 job 是以 `&` 启动的那样
@@ -127,14 +217,14 @@ shell 会把每一个 job 关联到每一个 pipeline. shell 会保存一个 job
 * `suspend`
 
 
-## 3.3. Job Control Variables
+## 6.3. Job Control Variables
 
 bash 提供了一个全局变量 `auto_resume`
 
 该变量用于控制 shell 如何与 user 以及 job control 交互
 
 
-# 4. Command Line Editing
+# 7. Command Line Editing
 <!-- 头部完 -->
 本章介绍 GNU command line editing interface.  是 GUN readline 库的上层实现。 
 
@@ -142,7 +232,7 @@ bash 提供了一个全局变量 `auto_resume`
 
 同理 Bash 的内置命令 read 也支持在 `-e` 参属下使用 command line editing 功能  
 
-## Introduction to Line Editing
+## 7.1. Introduction to Line Editing
 <!-- 完 -->
 介绍了在 Line Editing 中的键盘绑定
 * C- 代表 Control 组合键
@@ -155,12 +245,12 @@ bash 提供了一个全局变量 `auto_resume`
 * `LFD` : 没有改键的话, 使用 C-j 代替
 * `DEL ESC SPC TAB`  常见按键
 
-## Readline Interaction
+## 7.2. Readline Interaction
 <!-- 头部完 -->
 主要用于修正命令, 例如在交互式命令行中, 注意到长命令的靠前字符错误, Readline 提供了快速移动光标的功能  
 对于光标位置, 无论在哪, 键入 RET 都会让 Bash 接收到整行命令, 即无需将光标移动到末尾再键入
 
-### Readline Bare Essentials - Readline 按键绑定基础
+### 7.2.1. Readline Bare Essentials - Readline 按键绑定基础
 <!-- 完 -->
 
 * C-b C-f 向左向右移动光标, 目前主要被方向键代替 
@@ -168,7 +258,7 @@ bash 提供了一个全局变量 `auto_resume`
 * DEL C-d      删除光标当前位置的字符
 * C-_ C-x C-u  删除一段, Undo last editing command, 但是实测效果不统一
 
-### Readline Movement Commands
+### 7.2.2. Readline Movement Commands
 <!-- 完 -->
 * C-a   : 移动到行首, 比 Home 键方便很多
 * C-e   : 移动到行尾, 比 End 键快
@@ -176,7 +266,7 @@ bash 提供了一个全局变量 `auto_resume`
 * M-b   : 向后移动一个 word
 * C-l   : clear 的快捷键, 方便
 
-### Readline Killing Commands
+### 7.2.3. Readline Killing Commands
 <!-- 完 -->
 Killing test 意思是从行中删除文本, 但是会将其保存到剪贴板中, 以供以后使用, 通常是用于快速更改命令再行中的位置.
 
@@ -193,9 +283,9 @@ kill-yank 是较古老的叫法, 目前是称为 cut-paste
 * M-y   : Rotate the kill-ring, 即在当前光标位置循环滚动 kill-ring , 知道找到想要插入的内容
 
 
-### Readline Arguments
+### 7.2.4. Readline Arguments
 
-### Searching for Commands in the History
+### 7.2.5. Searching for Commands in the History
 
 两种模式用于在历史命令记录中进行搜索  
 * incremental       : 在每次键入搜索字符的时候都启动搜索
@@ -207,7 +297,7 @@ kill-yank 是较古老的叫法, 目前是称为 cut-paste
   * 移动命令 终止搜索并应用搜索结果, 开始编辑
 
 
-# 5. Using History Interactively
+# 8. Using History Interactively
 
 介绍如何在 Bash 中使用 GNU History Library interactively, 本章主要作为一个 user's guide.  对于更多关于 GNU History Library 的信息, 则需要参考对应的专门文档.  
 
