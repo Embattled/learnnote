@@ -331,307 +331,191 @@ Clock ID Constants : used as parameters for `clock_getres()` and `clock_gettime(
 
 # 4. logging 日志模块
 
+为应用程序和库实现灵活的系统日志的 函数和类 
 
-# 5. argparse
-
-argparse组件可以很方便的写一个命令行界面, 可以很容易的定义程序的参数, 并从`sys.argv`中提取出来, 同时还会自动提供错误信息  
+使用 STL 的 logging API 的好处是所有的 Python 模块都可以参与 logging
 
 
+基础用法示例
 ```py
-import argparse
-# 建立命令行翻译器, 可以同时设置该程序的主要目的
-parser = argparse.ArgumentParser(description="calculate X to the power of Y")  
-args = parser.parse_args() # 翻译传入的命令行参数
+# myapp.py
+import logging
+import mylib
+logger = logging.getLogger(__name__)
+
+def main():
+    logging.basicConfig(filename='myapp.log', level=logging.INFO)
+    logger.info('Started')
+    mylib.do_something()
+    logger.info('Finished')
+
+if __name__ == '__main__':
+    main()
+
+# mylib.py
+import logging
+logger = logging.getLogger(__name__)
+
+def do_something():
+    logger.info('Doing something')
+
+# 日志内容
+INFO:__main__:Started
+INFO:mylib:Doing something
+INFO:__main__:Finished
 ```
 
+基本用法: hierarchical logging 分层日志记录  
+* 每一个 module 都创建一个 module 级别的日志记录器 `logger`, 使用接口 `getLogger`, 记录任何所有需要的日志记录
+* logger 允许下游代码在需要的时候进行 日志粒度控制
+* module 级别的 日志会转发到更高级别 module 的日志 handlers 中, 一直到被称为 `root logger`
+* python 文档提供了 logging 的专用教程
+
+日志的配置:
+* 对每一个 logger 配置 level 和 destination
+* 通常会基于 CLI 或者 config 文件修改 特定模块的日志记录方式
+* 在大多数情况下, 只有 root logger 需要进行配置, 因为模块级别的所有较低级别的记录器最终都会将其消息转发到 root logger
+* `basicConfig()` 接口提供了快速配置 root logger 的方法
 
 
+logging 模块的 构成
+* `Logger`  : 程序记录日志的直接接口
+* `Handler` : 负责 log 的正确转发
+* `Filter`  : 负责日志的粒度控制
+* `Formatter` : 负责最终日志文件的输出 format
 
-## 5.1. class argparse.ArgumentParser
+## 4.1. Logging HOWTO
 
-整个库的核心类, 在 CLI 处理的一开始定义, 有很多参数   
+日志, 开发人员的工具
 
+日志的重要性称为 level or severity
+
+
+### 4.1.1. Basic Logging Tutorial - 基础用法
+#### 4.1.1.1. When to use logging : 使用 log 的时机
+
+创建一个 `logger = getLogger(__name__)`, 然后根据任务的需要访问 logger 的不同模块
+
+日志的使用时机
+| 目标                                              | 工具                                                                                            |
+| ------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| 标准命令行输出                                    | print()                                                                                         |
+| 报告程序正常运行期间发生的事件(状态监控/故障调查) | logger's `info()` or `debug()`                                                                  |
+| 做出特定 runtime event 的警告                     | warnings.warn() 用于用户可以规避的警告, logger's `warning()` 则表示单纯的提醒(用户无法进行规避) |
+| runtime event error                               | Raise an exception                                                                              |
+| 报告被捕捉到的异常, 不引发程序异常                | logger's `error()` `exception()` `critical()` 用于服务器进程中的错误处理                        |
+
+
+logger methods 的方法根据对应日志的严重性来命名, 按照级别递增的顺序依次为
+* DEBUG     : 细节信息, 主要用于 Debug
+* INFO      : 用于确定程序是否按照期望运行
+* WARNING   : 表明发生了意外情况, 并在将来 可能会出现程序问题, 但软件仍然在正常工作
+* ERROR     : 表明程序已经无法执行某些功能
+* CRITICAL  : 严重错误, 程序已经无法继续执行
+* 日志的默认级别是 `WARNING`, 表明只有更高严重性的事件才会被跟踪
+* 可以通过不同的方式处理所跟踪的日志, 常见的有 打印到控制台或者输出到文件
+
+
+简单的示例
 ```py
-class argparse.ArgumentParser(
-  prog=None, usage=None, description=None, 
-  epilog=None, parents=[], 
-  formatter_class=argparse.HelpFormatter, 
-  prefix_chars='-', 
-  fromfile_prefix_chars=None, 
-  argument_default=None, 
-  conflict_handler='error', add_help=True, 
-  allow_abbrev=True, exit_on_error=True)
+import logging
+logging.warning('Watch out!')  # will print a message to the console
+logging.info('I told you so')  # will not print anything
+
+# 直接调用模组 logging 的方法会自动在 根 logger 上执行对应接口
+# 如果 根 logger 没有被创建, 则会自动调用 basicConfig()
+# 通常情况下会自己配置 logger 的各种条件, 因此大多数情况下会手动的创建 basicConfig() 然后使用实例的接口
 ```
 
-该类的所有参数都必须通过 kw 传递  
-该类除了 `add_argument()` 的其他方法在 `Other utilities` 部分进行说明
+#### 4.1.1.2. Logging to a file - 日志保存到文件
 
-说明用
-* prog    : The name of the program `(default: os.path.basename(sys.argv[0]))`, 及在调用该程序的时候终端里应该输入的程序名称, 通过这个参数可以修改默认的程序名称
-
-全局配置参数
-* argument_default  : The global default value for arguments (default: None)
-  * 用于全局的设置默认值
-  * 除了默认的 None 以外, 另一个有用的是`argument_default=SUPPRESS`, 代表未出现的参数不会出现在返回的字典中 
-
-组合:
-* parents   :  A list of ArgumentParser objects whose arguments should also be included. 详情参考 subparser 的部分
+通过在 basicConfig 的参数中设置对应的日志文件名, 即可实现日志输出到文件  
+* 使用 basicConfig 对 root 进行的配置应该发生在 所有 logger 方法调用之前, 例如 `debug() info()` 等
 * 
 
+```py
+import logging
+logger = logging.getLogger(__name__)
 
-## 5.2. add_argument() - 添加一个命令
+# 进行 config 配置  
+# 从 3.9 开始可以指定编码格式
+logging.basicConfig(filename='example.log', encoding='utf-8', level=logging.DEBUG)
+# 配置 filemode 使得日志会覆盖上一次的日志, 默认写入方式是 append
+logging.basicConfig(filename='example.log', filemode='w', level=logging.DEBUG)
+logger.debug('This message should go to the log file')
+logger.info('So should this')
+logger.warning('And this, too')
+logger.error('And non-ASCII stuff, too, like Øresund and Malmö')
+```
 
-作为 ArgumentParser 的最关键的方法, 重要程度是相同的, 这里详细解释该方法的各个参数  
+#### 4.1.1.3. Logging variable data
 
-* 基础上使用 `parser.add_argument()` 来添加一个命令行参数  
-* 添加可选参数的时候使用 `-` 或者 `--`, 会自动识别, 且在调用值的时候不需要加 `-`
-  * 同时有 `-` 和 `--` 的时候会选择 `--` 的名字作为参数调用名
+将 变量数据输入到 日志, 简单的使用 字符串打印的格式即可添加内容  
+
+使用的格式是旧的 `%-style` 的字符串风格, 用于向前兼容.  
+新的风格也支持, 需要参照别的章节  
 
 ```py
-ArgumentParser.add_argument(
-  name or flags...
-  [, action]      # 动作
-  [, nargs]       # 多个参数
-  [, const]
-  [, default]     # 默认值无需多解释
-  [, type]        # 转换的类型
-  [, choices]     # 限制该参数可能的值, 输入一个 list 
-  [, required]    # 官方推荐带 - 的就是可选参数, 否则必须参数, 官方doc说设置required会带来混淆因此应该避免使用. 但是实际上都在用
-  [, help]        # str, 当使用 --help 时, 对该参数的说明
-  [, metavar]
-  [, dest])
+import logging
+logging.warning('%s before you %s', 'Look', 'leap!')
+```
+
+#### 4.1.1.4. Changing the format of displayed messages 更改日志的输出格式
+
+
+通过传入 basicConfig 的 format 参数, 即可控制日志输出的内容项目  
+* `%(levelname)s`
+* `%(message)s`
+* `%(asctime)s`   : 日志的发生时间
+  * 向 basicConfig 传入 `datefmt` 即可控制时间的输出格式
+
+```py
+import logging
+# 只输出 level 和内容
+# 默认会带有 logger 所属的模组
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+logging.debug('This message should appear on the console')
+logging.info('So should this')
+logging.warning('And this, too')
+
+"""
+DEBUG:This message should appear on the console
+INFO:So should this
+WARNING:And this, too
+"""
 ```
 
 
-按照常用的顺序进行说明:
-1. `type`    指定该参数被转换成什么类型, 默认是 string, 这个可以指定为一个接受单个字符串的函数
-```py
-parser.add_argument('count', type=int)
-parser.add_argument('distance', type=float)
-parser.add_argument('street', type=ascii)
-parser.add_argument('code_point', type=ord)
+### 4.1.2. Advanced Logging Tutorial - 高级 logging 用法
 
-def hyphenated(string):
-  pass
-parser.add_argument('short_title', type=hyphenated)
-```
-2. `default`  就是默认值, 注意 `default=argparse.SUPPRESS` 表示为默认该成员不出现在返回中, 如果不指定的话默认值是 `None`
-3. `action`   特殊操作, 代表该参数是一个动作参数, 默认是`store`, 在Action class 中具体说
-4. `choices`  该参数只能是特定值中的某一项, 否则会报错, 用于防止输入非法的值
+### 4.1.3. Logging Levels - 日志的等级
 
+日志的等级是一个数字, 而默认的以字符串命名的等级参照表格
+* CRITICAL : 50
+* ERROR    : 40
+* WARNING  : 30
+* INFO     : 20
+* DEBUG    : 10
+* NOTSET   : 0
 
-### 5.2.1. name or flags
+Levels 会与 logger 关联,  开发人员通过更改 logging configuration 可以控制日志的级别.
+如果 logger's level 高于 method call's level, 则对应的消息不会被作为日志生成. 
 
-```python
+logging messages 会被编码为 `LogRecord` 实例, 当 logger 决定去实际生成一个 event 的时候, 从 logging message 中生成 LogRecord
 
-# action="store_true"
-parser.add_argument("-V","--verbose", help="increase output verbosity", action="store_true")
+## 4.2. Logging API
 
-# 用另一种方法增加信息冗余 action="count" ,统计某一参数出现了几次
-# 可以识别 -v -vv -vvv '--verbosity --verbosity'
-# 可以创建一个矛盾参数组, 当中的参数不能同时出现
-group = parser.add_mutually_exclusive_group()
-# 在group的方法中添加参数
-group.add_argument("-v", "--verbose", action="store_true")
-group.add_argument("-q", "--quiet", action="store_true")
-```  
+https://docs.python.org/3/library/logging.html
+https://docs.python.org/3/library/logging.config.html
+https://docs.python.org/3/library/logging.handlers.html
 
 
-### 5.2.2. action - Action class
-
-Action classes implement the Action API
-* a callable which returns a callable which processes arguments from the command-line.
-* Any object which follows this API may be passed as the action parameter to add_argument().
-
-### 5.2.3. nargs
-
-默认情况下, 单个命令行参数是与一个动作绑定的, 但是 nargs 定义可以将多个命令行参数绑定为同一个动作  
-
-`nargs`支持的参数:
-* `N` (an integer)    : 接下来的 N 个命令行参数会被打包成 list 作为一个参数值
-  * 要注意当 N=1 的时候, 仍然会创建一个包含唯一参数的 list, 这与默认情况下仍然是不同的
-* `'?'` : ? 字符    :  不是很好理解 `[TODO]`
-  * 
-* `'*'` : 星号字符   : 所有的 CLI 参数都会被打包成 list
-  * 对于位置参数, 创建多个 `nargs='*'` 没有任何意义
-  * 对于可选参数, 因为可以通过选项来进行区分所以可以多个存在, 但是在输入的时候要注意和位置星号参数的关系, 要先输入位置再输入可选
-
-```py
-# 两个可选和一个位置
-parser = argparse.ArgumentParser()
-parser.add_argument('--foo', nargs='*')
-parser.add_argument('--bar', nargs='*')
-parser.add_argument('baz', nargs='*')
-
-# 在进行 parse 的时候需要注意参数的输入顺序
-parser.parse_args('a b --foo x y --bar 1 2'.split())
-Namespace(bar=['1', '2'], baz=['a', 'b'], foo=['x', 'y'])
-```
-
-### 5.2.4. type
-
-参数的类型, 默认情况下 读取到的 CLI 参数都是作为 string 保存的, 然而某些情况下需要对 string 进行转换, 通过 type 可以便捷地对输入的值进行 转换和检查  
-
-* 注意: 如果 type 参数和 default 参数一起使用, 那么类型转换只会在输入的值为默认值的时候生效  
-* 可以调用的 type:  type 参数的输入可以是一个 callable, 即函数
-  * 定义一个函数, 该函数接受一个 string, 并进行自定义的处理
-  * 函数可以内建 ArgumentTypeError, TypeError, or ValueError, 这些 error 可以被正确的捕获并输出信息
-* 基本上常用的 build-in 类型或者函数 都可以作为 type
-* 对于复杂的类型, 例如 JSON 或者 YAML, 官方不推荐将内容的读取直接作为 callable type 来实现
-
-
-```py
-# 常用的 build-in 都可以作为 type, 
-parser.add_argument('count', type=int)
-parser.add_argument('distance', type=float)
-parser.add_argument('street', type=ascii)
-parser.add_argument('code_point', type=ord)
-parser.add_argument('source_file', type=open)
-
-# 官方不推荐这种 Type, 因为在其他参数不正确输入的情况下会导致文件没被正确的关闭
-parser.add_argument('dest_file', type=argparse.FileType('w', encoding='latin-1'))
-
-# 直接转化成 pathlib.Path
-parser.add_argument('datapath', type=pathlib.Path)
-
-
-# 自定义一个函数作为 type
-def hyphenated(string):
-    return '-'.join([word[:4] for word in string.casefold().split()])
-
-_ = parser.add_argument('short_title', type=hyphenated)
-parser.parse_args(['"The Tale of Two Cities"'])
-# Namespace(short_title='"the-tale-of-two-citi')
-```
-
-## 5.3. parse_args() - 解析 CLI 命令
-
-* `parser.parse_args()` 一般就是直接无参数调用, 会直接翻译传入的命令行参数, 返回一个 `Namespace` object
-
-### 5.3.1. Namespace - 存储命令解析结果
-
-* `Namespace` 就是定义在 argparse 包中的一个简单的类, 和字典类似, 但是 print()更加可读 
-* 可以使用 `vars()` 方法进行转换成字典
-* `args.*` 用点号进行对应的参数访问
-
-通过在 parse_args 中添加 namespace 参数可以在某个已经存在的基础上再次进行 CLI 解析
-`parser.parse_args(args=['--foo', 'BAR'], namespace=c)`
-
-
-## 5.4. 高级 args
-
-除了基础的直接对 parser 里添加参数外, 还有其他特殊的参数类别  
-
-* ArgumentParser.add_argument_group()
-* ArgumentParser.add_mutually_exclusive_group
-* ArgumentParser.add_subparsers
-* ArgumentParser.set_defaults
-
-### 5.4.1. Argument groups 参数分组
-
-* 可以将不同的参数归到一组里,
-* 这个组在参数调用的时候没有任何卵用
-* 但是可以在程序帮助信息打印的时候更加清晰明确
-  * `title` 和 `descripition` 参数用于清晰打印
-  * 如果二者都为空, 那么在组之间只会有空行
-
-```py
-parser = argparse.ArgumentParser()
-group = argparse.add_argument_group(title=None, description=None)
-# 可以设置组的名称和说明 
-
-group.add_argument('--foo', action='store_true')
-group.add_argument('--bar', action='store_false')
-# 添加至这个组的参数在打印参数说明的时候会单独分隔开, 方便区分
-```
-
-### 5.4.2. mutual exclusion 矛盾参数
-
-* 可以将不同的参数归到一组里, 这个组的参数只能出现一种
-* 每次调用该参数会返回一个类似于`ArgumentParser` 的对象, 通过调用该对象的 add_argument来实现矛盾参数
-* required 参数代表该组参数是否必须出现一个, 同单个参数的 required 的差不多相同意思  
-
-`ArgumentParser.add_mutually_exclusive_group(required=False)`  
-
-```py
-parser = argparse.ArgumentParser()
-group = parser.add_mutually_exclusive_group()
-
-group.add_argument('--foo', action='store_true')
-group.add_argument('--bar', action='store_false')
-```
-
-### 5.4.3. subparsers 子解释器
-
-```py
-ArgumentParser.add_subparsers(
-  [title][, description][, prog]
-  [, parser_class][, action]
-  [, option_strings][, dest]
-  [, required][, help][, metavar])
-```
-
-许多程序会将其功能拆分成许多子命令
-* eg. `git commit  git add`
-* 子命令之间需要的参数并不相同
-* 不希望各个功能的参数一直保存在 parser 里
-* 通过拆分, 可以让各个子命令读取后返回的 Namespace 互相独立, 即字典里只包括 main 的参数以及命令行所选择的 subparser 里的参数
-* 各个 subparser 里的参数名字是可以重复的, 完全独立
-* 想要打印帮助信息的时候, 如果选择了 subparser, 那么 parent parser 的帮助信息是不会被打印的
-
-
-* `add_subparsers()` 方法一般无参数调用, 返回一个专有的特殊对象
-  * 该特殊对象只有一个方法 `add_parser()`
-  * `add_parser()` 方法接受一个 `command name`, 以及完整的 `ArgumentParser` 构造函数参数, 可以多次调用创建不同的 `subparser`
-  * 返回的 ArgumentParser 对象和基础的该类对象在使用上没有任何区别, 可以嵌套
-  * 结合 `set_default()` 方法可以非常方便的实现功能选择模块 
-
-
-`add_subparsers()` 方法尽管一般无参数调用, 但是还是说明下参数功能:
-* 
-
-### 5.4.4. Parser defaults
-
-`ArgumentParser.set_defaults(**kwargs)` 
-
-* 该方法传入的内容都是直接作为字典数据传入 args
-* allows some additional attributes that are determined without any inspection of the command line to be added.
-* 另一种默认值的写法, 该默认值会覆盖 `add_argument()` 的效果, 但是不会覆盖命令行的输入
-
-该方法可以设置一些无法通过命令行输入的参数, 例如设置函数, 和 subparser 结合可以实现自动执行对应函数的功能
-
-```py
-parser=argparse.ArgumentParser()
-parser.set_defaults(default_func=func)
-
-subparser=parser.add_subparsers()
-parser1=subparser.add_parser('a1')
-parser1.set_defaults(default_func=func1)
-parser2=subparser.add_parser('a2')
-parser2.set_defaults(default_func=func2)
-
-args=parser.parse_args()
-
-# 可以根据进入 subparser 自动选择正确的功能
-args.default_func()
-```
-
-## 5.5. Parser defaults
+### LogRecord attributes - LogRecord 中可以打印的项目
 
 
 
-# 6. getpass  — Portable password input 
 
-类似于 argparse , 只是该模组只针对密码界面    
-The getpass module provides two functions:
-* `getpass.getpass(prompt='Password: ', stream=None)`
-  * prompt : 提示信息
-  * 可以用字符串存储得到的密码 `input_str=getpass.getpass()`
-* `getpass.getuser()`
-  * 获取当前进程的用户名
-  * This function checks the environment variables `LOGNAME`, `USER`, `LNAME` and `USERNAME`, in order, and returns the value of the first one which is set to a `non-empty string`. 
-  
-# 7. ctypes — A foreign function library for Python
+# 5. ctypes — A foreign function library for Python
 
 foreign function library for Python, 外部函数库
 * 提供了与 C 语言兼容的数据类型
@@ -639,12 +523,12 @@ foreign function library for Python, 外部函数库
 * 用于将库函数应用在纯 Python 中
 
 
-## 7.1. ctypes tutorial
+## 5.1. ctypes tutorial
 使用指南:
 1. 建立动态库示例
 2. 获取动态库函数
 
-### 7.1.1. Loading dynamic link libraries
+### 5.1.1. Loading dynamic link libraries
 
 
 ctypes 会导出一个 `cdll` 的对象, 其是一个 LibraryLoader. 在 Windows 上体现为 `windll` `oledll` 对象, 用于加载动态链接库.
@@ -681,7 +565,7 @@ libc
 # <CDLL 'libc.so.6', handle ... at ...>  
 ```
 
-### 7.1.2. Accessing functions from loaded dlls - 获取动态库函数  
+### 5.1.2. Accessing functions from loaded dlls - 获取动态库函数  
 
 通过直接访问 dll objects 的成员即可使用函数
 
@@ -703,7 +587,7 @@ getattr(cdll.msvcrt, "??2@YAPAXI@Z")
 
 还是在 Windows, 一些 dlls 导出的函数并不是按照名称, 而是按照标号顺序排序的, 这种时候可以通过直接访问库的ojbect的下标来访问函数, 但是感觉用处不大
 
-### 7.1.3. Calling functions - 调用动态库函数  
+### 5.1.3. Calling functions - 调用动态库函数  
 
 获取了库文件的标号后, 即可按照 Python 的标准来调用对应的库函数
 
@@ -712,7 +596,7 @@ getattr(cdll.msvcrt, "??2@YAPAXI@Z")
 此外, 错误的调用很容易导致 Python 崩溃, 特别是 C 中的段错误.  
 
 
-### 7.1.4. Fundamental data types
+### 5.1.4. Fundamental data types
 
 对于参数:
 * None    :  C NULL 指针
@@ -763,7 +647,7 @@ printf(b"An int %d, a double %f\n", 1234, c_double(3.14))
 # 31
 ```
 
-### 7.1.5. Specifying the required argument types (function prototypes)
+### 5.1.5. Specifying the required argument types (function prototypes)
 
 通过指定一个 C 函数实例的 `.argtypes` 属性, 可以让传入的参数非 ctypes 标准类型的时候进行自动转换  
 除此之外, 在特定平台 (Apple 的 ARM64) 上可以用于指定特定的 可变参数的函数
@@ -787,13 +671,13 @@ printf(b"%d %d %d", 1, 2, 3)  # 会由 Python 来进行报错
   * 该函数接受 Python 类型, 返回该类的对象 (_as_parameter 被正确设置的对象)
 这样该函数就可以作为 argtypes 被指定为 库函数的属性
 
-### 7.1.6. Return types - 定义函数的返回值
+### 5.1.6. Return types - 定义函数的返回值
 
 通过设置函数的 restype 属性来定义函数的返回值类型, 在一定程度上自动化函数的调用
 
 对于返回值代表函数是否正常结束的时候, 也可以将返回值设定为结果检查的类型
 
-### 7.1.7. Passing pointers (or: passing parameters by reference)
+### 5.1.7. Passing pointers (or: passing parameters by reference)
 
 如果 C 的函数需要传入的是数据的指针
 * 函数可能需要修改数据的内容 , 例如  `scanf`
@@ -804,14 +688,14 @@ printf(b"%d %d %d", 1, 2, 3)  # 会由 Python 来进行报错
 * byref()  获取一个变量的地址
 * pointer() 把一个变量构建成完整的 Python 指针对象 (相对来说功能丰富但是较慢)
 
-### 7.1.8. Arrays
+### 5.1.8. Arrays
 
 
 
-## 7.2. ctypes 文档
+## 5.2. ctypes 文档
 
 
-### 7.2.1. Finding shared libraries 动态库查找
+### 5.2.1. Finding shared libraries 动态库查找
 
 在某一个平台上, 同一个库可能有不同的版本, 一般情况下最新的版本应该被使用, ctypes 提供了一个工具函数用于定位库
 `ctypes.util.find_library(name)`:
@@ -822,7 +706,7 @@ printf(b"%d %d %d", 1, 2, 3)  # 会由 Python 来进行报错
 
 自 3.6 起: Changed in version 3.6: On Linux, the value of the environment variable LD_LIBRARY_PATH is used when searching for libraries, if a library cannot be found by any other means.
 
-### 7.2.2. Loading shared libraries
+### 5.2.2. Loading shared libraries
 
 共享库可以通过 预制的对象来加载, 预制对象是 LibraryLoader 的实例
 * 通过对象的 LoadLibrary() 方法
@@ -835,10 +719,10 @@ printf(b"%d %d %d", 1, 2, 3)  # 会由 Python 来进行报错
 * ctypes.pydll    PyDLL 的实例
 * ctypes.pythonapi    专门用于操作 C Python API 的实例 (基于 PyDLL  )
 
-### 7.2.3. Utility functions - 库的工具函数
+### 5.2.3. Utility functions - 库的工具函数
 
 
-### 7.2.4. Structured data types
+### 5.2.4. Structured data types
 
 定义依了一系列虚基类用于 C - Python 的结构体交互
 
@@ -855,7 +739,7 @@ printf(b"%d %d %d", 1, 2, 3)  # 会由 Python 来进行报错
 
 
 
-### 7.2.5. Arrays and pointers
+### 5.2.5. Arrays and pointers
 
 定义了数组和指针的虚基类, 具体使用方法还是需要参照 Guide
 

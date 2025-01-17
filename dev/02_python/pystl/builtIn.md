@@ -19,13 +19,13 @@ https://docs.python.org/3/library/functions.html
 
 其他未学习的内置函数
 ```
- hash()    
+     
  dir()    next()  slicea()
 ascii()  divmod()   object()  
 breakpoint() 
   filter()  issubclass()   super()
     iter()  
-callable()  format()  len()
+format()  len()
 frozenset()     
 compile()    map()   
 complex()  round()
@@ -63,12 +63,18 @@ complex()  round()
   - memoryview()
 
 
-## 2.3. 类型转换函数
+## 2.3. 类型 确认/转换 函数
 
 虽然 Python 是弱类型编程语言, 在一些特定场景中, 仍然需要考虑到类型  
 
-- 确认一个变量的类型
-  - isinstance(object, classinfo)   如果 object 的类型属于 classinfo 中的一种, 返回 True
+
+
+* 确认一个变量的类型
+  * `isinstance(object, classinfo)`   如果 object 的类型属于 classinfo 中的一种, 返回 True
+  * `callable(object)`   判断一个 object 是否可调用
+    * 如果是 类 则 可调用
+    * 如果是 实例, 则如果该类拥有 `__call__` 方法, 则可调用
+    * 返回 `True` 的并不代表调用一定成功   
 
 1. 因为python默认读入的内容都被识别为字符串, 因此需要类型转换
    - int(x,n)  将 x 转换成整数类型
@@ -95,6 +101,18 @@ complex()  round()
 - vars(object) : 返回object 的 `__dict__` 属性, 如果object没有该属性则报异常
 - locals()    : 将局部空间的所有变量以字典形式返回, 等同于 `vars(空)`
 - globals()   : 将全局空间的所有变量以字典形式返回, 注意以本 module 为基准, 不包括调用的module
+
+
+## hash 哈希函数
+
+hash(object)
+
+获取一个 object 的哈希值:
+* 哈希值 是一个整数, 用于查字典的时候快速比较 dictionary keys
+* 相等的数值拥有相同的哈希值, 例如 整数 1 和小数 1.0 拥有相同的哈希值
+* 如果 类拥有自定义的 `__hash__` 方法, 则会使用自定义的类返回 哈希值
+  * (自定义 `__hash__` 的返回值会根据 主机的位宽截断 )
+
 
 
 ## 2.5. 类方法
@@ -464,12 +482,12 @@ print([x for x in reversed((1,2,3,4,5))])
 
 ### 2.10.4. sorted()
 
-- `list = sorted(iterable, key=None, reverse=False)`
-- iterable 表示指定的序列
-- key 参数可以自定义排序规则
-- reverse 参数指定以升序（False, 默认）还是降序（True）进行排序
-- sorted() 函数会返回一个排好序的**列表**
-- 字典默认按照key进行排序
+* `list = sorted(iterable, key=None, reverse=False)`
+* iterable 表示指定的序列
+* key 参数可以自定义排序规则
+* reverse 参数指定以升序（False, 默认）还是降序（True）进行排序
+* sorted() 函数会返回一个排好序的**列表**
+* dict 类型 默认按照key进行排序
 
 ```py
 a = "51423"
@@ -485,6 +503,10 @@ chars=['http://c.biancheng.net',\
 #自定义按照字符串长度排序
 # 传入 key 等于一个 lambda 函数
 print(sorted(chars,key=lambda x:len(x)))
+
+
+# 字典根据 value 进行排序
+sorted_keys = sorted(data, key=data.get, reverse=True)
 ```
 
 ### 2.10.5. enumerate() 遍历对象函数

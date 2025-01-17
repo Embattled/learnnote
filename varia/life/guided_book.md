@@ -161,3 +161,10 @@ Fn + Control + M | 更改键盘到 Mac 模式
 | Fn+Q -> Fn+z + delete     | 删除所有蓝牙登录     |
 | Fn + X                    | 退出 Fn+Q 模式       |
 
+
+# 生活
+
+
+
+
+

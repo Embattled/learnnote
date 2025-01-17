@@ -2,6 +2,7 @@
 - [2. torch](#2-torch)
   - [2.1. Tensors](#21-tensors)
     - [2.1.1. Creation Ops](#211-creation-ops)
+      - [2.1.1.1. tensor复制](#2111-tensor复制)
     - [2.1.2. Indexing, Slicing, Joining, Mutating Ops 拼接与截取等](#212-indexing-slicing-joining-mutating-ops-拼接与截取等)
       - [2.1.2.1. Indexing](#2121-indexing)
       - [2.1.2.2. Joining 函数](#2122-joining-函数)
@@ -9,20 +10,20 @@
       - [2.1.2.4. Slicing - 切片函数](#2124-slicing---切片函数)
   - [2.2. Generators, Random Sampling - 随机采样](#22-generators-random-sampling---随机采样)
     - [2.2.1. Generator 相关](#221-generator-相关)
-    - [2.2.2. Random Sampling - 默认使用全局 rng](#222-random-sampling---默认使用全局-rng)
-  - [2.3. 序列化 Serialization](#23-序列化-serialization)
-    - [2.3.1. torch.save](#231-torchsave)
-    - [2.3.2. torch.load](#232-torchload)
-  - [2.4. Parallelism  - 并行化信息](#24-parallelism----并行化信息)
-  - [2.5. Locally disabling gradient computation - 局部禁用梯度计算](#25-locally-disabling-gradient-computation---局部禁用梯度计算)
-  - [2.6. Math operations](#26-math-operations)
-    - [2.6.1. Pointwise Ops 元素为单位的操作](#261-pointwise-ops-元素为单位的操作)
-      - [2.6.1.1. special 特殊高精度计算](#2611-special-特殊高精度计算)
-    - [2.6.2. Reduction Ops 元素之间的操作(降维)](#262-reduction-ops-元素之间的操作降维)
-      - [2.6.2.1. 极值操作](#2621-极值操作)
-    - [2.6.3. Comparison Ops](#263-comparison-ops)
-    - [2.6.4. Spectral Ops - 光谱函数 在频域上操作信号](#264-spectral-ops---光谱函数-在频域上操作信号)
-    - [2.6.5. Other Operations - 无法分类的其他函数](#265-other-operations---无法分类的其他函数)
+  - [2.3. Random Sampling - 默认使用全局 rng](#23-random-sampling---默认使用全局-rng)
+  - [2.4. 序列化 Serialization](#24-序列化-serialization)
+    - [2.4.1. torch.save](#241-torchsave)
+    - [2.4.2. torch.load](#242-torchload)
+  - [2.5. Parallelism  - 并行化信息](#25-parallelism----并行化信息)
+  - [2.6. Locally disabling gradient computation - 局部禁用梯度计算](#26-locally-disabling-gradient-computation---局部禁用梯度计算)
+  - [2.7. Math operations](#27-math-operations)
+    - [2.7.1. Pointwise Ops 元素为单位的操作](#271-pointwise-ops-元素为单位的操作)
+      - [2.7.1.1. special 特殊高精度计算](#2711-special-特殊高精度计算)
+    - [2.7.2. Reduction Ops 元素之间的操作(降维)](#272-reduction-ops-元素之间的操作降维)
+      - [2.7.2.1. 极值操作](#2721-极值操作)
+    - [2.7.3. Comparison Ops](#273-comparison-ops)
+    - [2.7.4. Spectral Ops - 光谱函数 在频域上操作信号](#274-spectral-ops---光谱函数-在频域上操作信号)
+    - [2.7.5. Other Operations - 无法分类的其他函数](#275-other-operations---无法分类的其他函数)
 - [3. torch.nn](#3-torchnn)
   - [3.1. Containers 网络容器](#31-containers-网络容器)
     - [3.1.1. torch.nn.Module 类](#311-torchnnmodule-类)
@@ -60,14 +61,8 @@
   - [5.3. 类方法](#53-类方法)
     - [5.3.1. 类型转换](#531-类型转换)
     - [5.3.2. view 变形](#532-view-变形)
-    - [5.3.3. transpose](#533-transpose)
-  - [5.4. 创建操作 Creation Ops](#54-创建操作-creation-ops)
-    - [5.4.1. 统一值 tensor](#541-统一值-tensor)
-    - [5.4.2. 随机值 random](#542-随机值-random)
-    - [5.4.3. like 类方法](#543-like-类方法)
-    - [5.4.4. torch.from\_numpy](#544-torchfrom_numpy)
-    - [5.4.5. tensor复制](#545-tensor复制)
-    - [5.4.6. .new\_ 方法](#546-new_-方法)
+    - [5.3.3. .new\_ 方法](#533-new_-方法)
+    - [5.3.4. 内存管理](#534-内存管理)
 - [6. torch.amp - Automatic Mixed Precision package](#6-torchamp---automatic-mixed-precision-package)
   - [6.1. Autocasting - torch 接口](#61-autocasting---torch-接口)
     - [6.1.1. Gradient Scaling](#611-gradient-scaling)
@@ -150,12 +145,30 @@ torch.tensor(data, *, dtype=None, device=None, requires_grad=False, pin_memory=F
 ``` 
 
 
-torch 的创建等间隔函数, 返回值都是 1-D 的
+torch 的创建 `等间隔函数`, 返回值都是 1-D 的
 * torch.arange    : 不包含 end 的区间
 * torch.range     : 包含 end 的区间, 这点和 python 内置的 range 不同
   * 因此使用该函数本身已经被附加了 deprecated 的警告
 * torch.linspace  : 获取从区间等分的 N 个数, 指定 N 而不是指定 step
 * torch.logspace  : 在给定的 base 上, 获取 指数从 `[start, end]` 上的 step 个函数
+
+
+`torch.from_numpy` 接受一个 ndarray 并转换成 tensor 没有任何参数  
+```py
+torch.from_numpy(ndarray) → Tensor
+```
+
+
+#### 2.1.1.1. tensor复制
+
+
+* `torch.clone(input, *, memory_format=torch.preserve_format) → Tensor`
+  * 返回一个完全相同的tensor,新的tensor开辟新的内存，但是仍然留在计算图中。
+* `torch.Tensor.detach()`
+  * detach() 属于 view 函数
+  * 返回一个完全相同的tensor,新的tensor开辟与旧的tensor共享内存, 但会脱离计算图，不会牵扯梯度计算
+
+一般彻底的复制并脱离可以使用  `tensor.clone().detach()`  这也是官方推荐的方法  
 
 
 ### 2.1.2. Indexing, Slicing, Joining, Mutating Ops 拼接与截取等
@@ -178,6 +191,14 @@ torch.gather(t, 1, torch.tensor([[0, 0], [1, 0]]))
 tensor([[ 1,  1],
         [ 4,  3]])
 ```
+
+
+`index_select(input, dim, index, *, out=None) → Tensor`
+* index 是 1-D tensor
+* 根据指定的 dim, input 会沿着该 dim 根据 index 选择对应的数据输出
+* 输出的 tensor 和 input 有相同 dims
+* 而 dim 的 size 会变为 index 的长度
+* 只会在 一个维度上操作
 
 
 高级索引方法, beta 函数: This function is in beta and may change in the near future.
@@ -208,7 +229,6 @@ tensor([[ 1,  1],
     * 对于 `d!= dim`, 需要有 `index.size(d) <= self.size(d)`, 即除了索引应用的维度以外, 同样需要 index 每个元素有对应的 self 的位置.
     * 索引维度除外, 要考虑 index 元素值的范围是否在 self 对应维度之内
   * backward: 使用该函数的时候要考虑是否有反向传播的需求, 只有在 `src.shape==index.shape` 的时候才能够反向传播
-
 
 
 
@@ -250,6 +270,18 @@ tensor([[ 1,  1],
 * 在指定位置添加一个维度
 * dim(int) 为必须参数, 可以是  `[-input.dim() - 1, input.dim() + 1)` 中的值
 
+
+`torch.transpose(input, dim0, dim1) → Tensor`  
+* transpose 可以解释为view的一种
+* 返回一个 transposed 的 tensor, 交换其中的两个维度
+* The given dimensions dim0 and dim1 are swapped.
+* 该方法是共享内存的, 不进行拷贝
+* 同 numpy 的 transpose 不同, numpy 的transpose 可以直接交换多个维度  
+* 该方法还有 两个 alias
+  * `torch.swapaxes`
+  * `torch.swapdims`
+
+
 #### 2.1.2.4. Slicing - 切片函数 
 
 
@@ -277,14 +309,47 @@ torch. 下的针对全局 Generator 有同样名称的一组接口
 * `torch.set_rng_state(new_state)`
 
 
-### 2.2.2. Random Sampling - 默认使用全局 rng
+## 2.3. Random Sampling - 默认使用全局 rng
 
 一些和 numpy 重名的函数反而效果不同, 需要多留意
 
-* rand    : 随机 `[0,1)`
+函数参数 : `(*size, *, out=None, dtype=None, layout=torch.strided, device=None, requires_grad=False)`
+* size 指定大小
+* out  除了返回值以外的另一种获取方法
+* dtype
+* layout 指定 tensor 的 layout (暂时还不懂)
+* device 默认时会指定为 `torch.set_default_tensor_type()`
+* requires_grad : If autograd should record operations on the returned tensor.
 
 
-## 2.3. 序列化 Serialization
+种子操作:
+* seed   :Sets the seed for generating random numbers to a non-deterministic random number.
+* manual_seed   :Sets the seed for generating random numbers.
+* initial_seed   :Returns the initial seed for generating random numbers as a Python long.
+* get_rng_state   :Returns the random number generator state as a torch.ByteTensor.
+* set_rng_state   :Sets the random number generator state.
+
+
+基础函数:
+* rand(*)                Uniform distribution on interval `[0,1)`
+* randint(low=0,high)    high是必须参数, Uniform, 范围为 `[low,high)`
+* randn(*)               standard normal distribution
+
+需要获取一个不确定维度的 tensor, 即通过另一个 tensor 指定大小
+* rand_like
+* randint_like
+* randn_like
+
+特殊函数:
+* normal(mean, std)      随机标准分布, 均值方差手动指定
+  * 这个函数原型 mean 和 std 至少有一项必须是 tensor, 用来指明生成的 tensor 的 size
+  * normal(mean, std, size) 该原型用第三个参数来指定tensor 大小
+* randperm(n)            随机 0~n-1 的排列, 默认type是 int64
+
+
+
+
+## 2.4. 序列化 Serialization
 
 和存储相关, 将各种模型, 张量, 字典等数据类型序列化后存储到文件, 或者从文件中读取, 并不单只能用来存取网络  
 
@@ -304,7 +369,7 @@ Pytorch 的约定是 用 `.pt` 来保存 tensors
 * `torch.save(model, PATH)`    : 直接保存整个网络
 * `model = torch.load(PATH)`
 
-### 2.3.1. torch.save
+### 2.4.1. torch.save
 
 ```py
 torch.save(
@@ -323,7 +388,7 @@ torch.save(
 * pickle_protocol :   can be specified to override the default protocol
 * _use_new_zipfile_serialization : 如果要读取 pytorch 1.6 之前的旧数据, 传入 False
 
-### 2.3.2. torch.load
+### 2.4.2. torch.load
 
 ```py
 torch.load(
@@ -348,11 +413,11 @@ pickle_module   :
 pickle_load_args: (Python 3 only) optional keyword arguments passed over to pickle_module.load() and pickle_module.Unpickler()
 
 
-## 2.4. Parallelism  - 并行化信息
+## 2.5. Parallelism  - 并行化信息
 
 
 
-## 2.5. Locally disabling gradient computation - 局部禁用梯度计算  
+## 2.6. Locally disabling gradient computation - 局部禁用梯度计算  
 
 梯度上下文管理有三个接口, 用于在局部对梯度计算进行启用, 停用:
 * 在 `torch.autograd` 中有更详细的描述  
@@ -390,11 +455,11 @@ def tripler(x):
 ```
 
 
-## 2.6. Math operations
+## 2.7. Math operations
 
 提供对 tensor 的各种数学操作
 
-### 2.6.1. Pointwise Ops 元素为单位的操作
+### 2.7.1. Pointwise Ops 元素为单位的操作
 
 * 三角函数
   * torch.sin
@@ -403,7 +468,7 @@ def tripler(x):
   * torch.reciprocal
 
 
-#### 2.6.1.1. special 特殊高精度计算  
+#### 2.7.1.1. special 特殊高精度计算  
 
 有一部分函数是 torch.special 中接口的别名   
 torch.special 则是仿照 scipy 的 special 模组  
@@ -414,7 +479,7 @@ torch.special 则是仿照 scipy 的 special 模组
 * `log1p`   : `log(x+1)`, 
 
 
-### 2.6.2. Reduction Ops 元素之间的操作(降维)
+### 2.7.2. Reduction Ops 元素之间的操作(降维)
 
 * 所有函数都默认对张量的全部元素进行运算
 * 提供了针对选定维度的修改运算, 参数为
@@ -443,13 +508,13 @@ torch.special 则是仿照 scipy 的 special 模组
 * 作为降维方法使用
 
 
-#### 2.6.2.1. 极值操作
+#### 2.7.2.1. 极值操作
 
 * max/min : 返回最大值, 默认对全元素进行, 可以输入单个整数 dim 来对某一维度进行运算, 此时会返回两个值, 第二个返回值是索引位置
 * argmax/argmin : 返回最大值的索引, 默认对全元素进行操作, 可以输入单个整数 dim 来对某一维度进行运算, 等同于 max/min 输入 dim 的第二个返回值
 * amax/amin : 返回最大值, 专门用来对指定维度进行运算, dim 是必须参数且可以是 int or tuple, 即可以对多个维度进行运算, 不会返回索引
 
-### 2.6.3. Comparison Ops
+### 2.7.3. Comparison Ops
 
 专门用来比较的函数 
 
@@ -460,9 +525,9 @@ torch.special 则是仿照 scipy 的 special 模组
 * sorted: bool, 是否按对应的顺序返回这k个值
 
 
-### 2.6.4. Spectral Ops - 光谱函数 在频域上操作信号
+### 2.7.4. Spectral Ops - 光谱函数 在频域上操作信号
 
-### 2.6.5. Other Operations - 无法分类的其他函数
+### 2.7.5. Other Operations - 无法分类的其他函数
 
 参照 numpy 的相关实现
 
@@ -1121,6 +1186,8 @@ def normalize(input: Tensor, p: float = 2.0, dim: int = 1, eps: float = 1e-12, o
 * Tensor 类里面也有许多转换格式的方法
 * 几乎所有的类方法都有 torch.* 下的同名方法, 功能一样, 多一个参数是输入 tensor   
 
+这里着重记录 只作为 Tensor method 的接口
+
 ## 5.1. torch.Tensor 的格式
 
 * `torch.Tensor` 其实是 `torch.FloatTensor` 的别称, 即默认都会创建该类型的张量  
@@ -1173,10 +1240,6 @@ def normalize(input: Tensor, p: float = 2.0, dim: int = 1, eps: float = 1e-12, o
 
 
 
-
-
-
-
 ## 5.3. 类方法
 ### 5.3.1. 类型转换
 
@@ -1207,88 +1270,8 @@ c = a.view(1, 3, 2, 4)
 # torch.Size([1, 3, 2, 4])
 ```
 
-### 5.3.3. transpose
 
-`torch.transpose(input, dim0, dim1) → Tensor`  
-* transpose 可以解释为view的一种
-* 返回一个 transposed 的 tensor
-* The given dimensions dim0 and dim1 are swapped.
-* 该方法是共享内存的, 不进行拷贝
-  
-
-注意该方法只能交换两个维度  
-同 numpy 的 transpose 不同, numpy 的transpose 可以直接交换多个维度  
-
-
-## 5.4. 创建操作 Creation Ops
-
-
-
-### 5.4.1. 统一值 tensor
-
-
-### 5.4.2. 随机值 random
-
-函数参数 : `(*size, *, out=None, dtype=None, layout=torch.strided, device=None, requires_grad=False)`
-* size 指定大小
-* out  除了返回值以外的另一种获取方法
-* dtype
-* layout 指定 tensor 的 layout (暂时还不懂)
-* device 默认时会指定为 `torch.set_default_tensor_type()`
-* requires_grad : If autograd should record operations on the returned tensor.
-
-
-基础函数:
-* rand(*)                Uniform distribution on interval `[0,1)`
-* randint(low=0,high)    high是必须参数, Uniform 
-* randn(*)               standard normal distribution
-* 
-
-特殊函数:
-* normal(mean, std)      随机标准分布, 均值方差手动指定
-  * 这个函数原型 mean 和 std 至少有一项必须是 tensor, 用来指明生成的 tensor 的 size
-  * normal(mean, std, size) 该原型用第三个参数来指定tensor 大小
-* randperm(n)            随机 0~n-1 的排列, 默认type是 int64
-
-
-
-
-种子操作:
-* seed   :Sets the seed for generating random numbers to a non-deterministic random number.
-* manual_seed   :Sets the seed for generating random numbers.
-* initial_seed   :Returns the initial seed for generating random numbers as a Python long.
-* get_rng_state   :Returns the random number generator state as a torch.ByteTensor.
-* set_rng_state   :Sets the random number generator state.
-
-
-### 5.4.3. like 类方法
-
-需要获取一个不确定维度的 tensor, 即通过另一个 tensor 指定大小
-* rand_like
-* randint_like
-* randn_like
-
-
-### 5.4.4. torch.from_numpy
-
-`torch.from_numpy` 接受一个 ndarray 并转换成 tensor 没有任何参数  
-```py
-torch.from_numpy(ndarray) → Tensor
-```
-
-### 5.4.5. tensor复制
-
-
-* `torch.clone(input, *, memory_format=torch.preserve_format) → Tensor`
-  * 返回一个完全相同的tensor,新的tensor开辟新的内存，但是仍然留在计算图中。
-* `torch.Tensor.detach()`
-  * detach() 属于 view 函数
-  * 返回一个完全相同的tensor,新的tensor开辟与旧的tensor共享内存, 但会脱离计算图，不会牵扯梯度计算
-
-一般彻底的复制并脱离可以使用  `tensor.clone().detach()`  这也是官方推荐的方法  
-
-
-### 5.4.6. .new_ 方法
+### 5.3.3. .new_ 方法
 
 To create a tensor with similar type but different size as another tensor, use tensor.new_* creation ops.  
 
@@ -1300,6 +1283,14 @@ To create a tensor with similar type but different size as another tensor, use t
 3. new_empty
 4. new_ones
 5. new_zeros
+
+### 5.3.4. 内存管理
+
+
+`Tensor.contiguous(memory_format=torch.contiguous_format)`
+* 获取一个数据在内存中按照指定的格式顺序排列的拷贝
+* 如果数据本身已经满足对应的要求, 则返回对象本身
+
 
 # 6. torch.amp - Automatic Mixed Precision package
 

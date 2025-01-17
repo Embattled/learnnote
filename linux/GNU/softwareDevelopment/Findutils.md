@@ -46,13 +46,13 @@ xargs : `xargs [option…] [command [initial-arguments]]`
 * e.g. `xargs grep typedef < file-list` :  从 file-list 中检测所有字符行, 并输出带有 typedef 的行
 
 
-# Actions - 查找结果的使用方法
+# 3. Actions - 查找结果的使用方法
 
 find 语句的查找结果可以直接被用来执行命令, 通过 find 本身的程序参数.
 
 默认的行为就是打印所有查找结果
 
-## Print File Name
+## 3.1. Print File Name
 
 * `-print`          : 在 std out 打印所有查找结果, 每一个结果追加一个 newline, 即一行一个
   * `-print0` : 结果不追加换行
@@ -60,7 +60,7 @@ find 语句的查找结果可以直接被用来执行命令, 通过 find 本身�
   * `-fprint0 ` 不追加换行
 
 
-## Print File Information
+## 3.2. Print File Information
 
 打印文件的详细信息
 
@@ -68,12 +68,12 @@ find 语句的查找结果可以直接被用来执行命令, 通过 find 本身�
 
 * `-printf format`
 
-## Run Commands
+## 3.3. Run Commands
 
 将查找的结果用于命令行参数
 
 
-### Single File
+### 3.3.1. Single File
 
 最基础的用法, 生成顺序的命令流, 同一时间只执行一个命令
 
@@ -86,20 +86,20 @@ find 语句的查找结果可以直接被用来执行命令, 通过 find 本身�
 `find . -name '*.h' -execdir diff -u '{}' /tmp/master ';'`
 
 
-### Multiple Files
+### 3.3.2. Multiple Files
 
 对于查找到的多个文件结果, 尽可能多的并行的执行多个命令, 节省时间
 
 
 
-# 3. Reference
+# 4. Reference
 
 Below are summaries of the command line syntax for the programs discussed in this manual. 
 
 程序本身的简要指令说明 
 * find
 
-## 3.1. Invoking find
+## 4.1. Invoking find
 
 完整的语法    
 
@@ -111,11 +111,11 @@ GNU程序都有的管理用程序
 * --version
     Print the version number of find and exit. 
 
-### Filesystem Traversal Options
+### 4.1.1. Filesystem Traversal Options
 
 用于指定文件查找
 
-### Find Expressions
+### 4.1.2. Find Expressions
 
 用于指定表达式, 如果未指定, 则打印所有查找结果, 即默认使用 `-print`
 

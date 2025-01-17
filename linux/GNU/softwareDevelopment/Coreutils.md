@@ -25,6 +25,7 @@
 - [16. Conditions](#16-conditions)
 - [17. Redirection](#17-redirection)
 - [18. File name manipulation](#18-file-name-manipulation)
+  - [basename: Strip directory and suffix from a file name](#basename-strip-directory-and-suffix-from-a-file-name)
 - [19. Working context](#19-working-context)
   - [19.1. pwd: Print working directory](#191-pwd-print-working-directory)
   - [19.2. stty: Print or change terminal characteristics](#192-stty-print-or-change-terminal-characteristics)
@@ -399,6 +400,29 @@ tee 会把标准输入流的内容 复制到 标准输出流, 并同时复制的
     18.4 mktemp: Create temporary file or directory
     18.5 realpath: Print the resolved file name.
         18.5.1 Realpath usage examples
+
+
+## basename: Strip directory and suffix from a file name
+
+删除文档的目录, 可选的删除文件的后缀名  
+```sh
+basename name [suffix]
+basename option… name…
+
+# Output "sort".
+basename /usr/bin/sort
+
+# Output "stdio".
+basename include/stdio.h .h
+
+# Output "stdio".
+basename -s .h include/stdio.h
+
+# Output "stdio" followed by "stdlib"
+basename -a -s .h include/stdio.h include/stdlib.h
+```
+
+
 
 # 19. Working context
 
@@ -850,6 +874,7 @@ env
 - [16. Conditions](#16-conditions)
 - [17. Redirection](#17-redirection)
 - [18. File name manipulation](#18-file-name-manipulation)
+  - [basename: Strip directory and suffix from a file name](#basename-strip-directory-and-suffix-from-a-file-name)
 - [19. Working context](#19-working-context)
   - [19.1. pwd: Print working directory](#191-pwd-print-working-directory)
   - [19.2. stty: Print or change terminal characteristics](#192-stty-print-or-change-terminal-characteristics)

@@ -11,3 +11,6 @@ test.*
 *.c
 *.exe
 *.o
+
+# unison files
+.unison*
