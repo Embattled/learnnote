@@ -105,6 +105,15 @@ Spline interpolation 的基础步骤
 
 Scipy 也有图像处理的相关函数, 对比 scikit-image 里较为基础, 但也足够强大  
 
+
+## Filters - 通用滤波
+
+
+## Fourier filters - 傅里叶滤波
+
+## Interpolation - 插值
+
+
 # 5. Signal Processing (scipy.signal)
 
 SciPy 中专门用于处理信号的包
