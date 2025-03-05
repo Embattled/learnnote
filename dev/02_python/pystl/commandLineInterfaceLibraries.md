@@ -31,7 +31,7 @@ args = parser.parse_args() # 翻译传入的命令行参数
 
 
 
-## 2.1. class argparse.ArgumentParser
+## 2.1. argparse.ArgumentParser Objects
 
 整个库的核心类, 在 CLI 处理的一开始定义, 有很多参数   
 
@@ -121,11 +121,21 @@ group.add_argument("-q", "--quiet", action="store_true")
 ```  
 
 
-### 2.2.2. action - Action class
+### 2.2.2. action - API 提供的参数行为
 
-Action classes implement the Action API
-* a callable which returns a callable which processes arguments from the command-line.
-* Any object which follows this API may be passed as the action parameter to add_argument().
+* `store`   : 存储对应参数数值, 默认行为
+* `store_const` : 参数列表中如果出现了对应 option, 则会把对应 value 设置为函数调用参数中的 `const` 值
+* `store_true` /  `store_false` : 特殊种类的 `store_const`, 会将对应参数分别存储为 True, 或者 False. 对应的, 会将该参数设置默认值为 False/True  
+* `append`
+* `append_const`
+* `extend`
+* `count` : 用于技术对应的参数出现的次数, 常用来指定 verbosity levels
+  * `parser.add_argument('--verbose', '-v', action='count', default=0)`
+  * 
+* `help`
+* `version` : 特殊 action, 用于打印程序版本
+  * 需要在 add_argument 的时候指定 `version` 参数
+  * `parser.add_argument('--version', action='version', version='%(prog)s 2.0')`
 
 ### 2.2.3. nargs
 
@@ -188,7 +198,16 @@ parser.parse_args(['"The Tale of Two Cities"'])
 # Namespace(short_title='"the-tale-of-two-citi')
 ```
 
-## 2.3. parse_args() - 解析 CLI 命令
+### 2.2.5. action - Action class
+
+Action classes implement the Action API
+* a callable which returns a callable which processes arguments from the command-line.
+* Any object which follows this API may be passed as the action parameter to add_argument().
+
+
+
+
+## 2.3. The parse_args() method - 解析 CLI 命令
 
 * `parser.parse_args()` 一般就是直接无参数调用, 会直接翻译传入的命令行参数, 返回一个 `Namespace` object
 

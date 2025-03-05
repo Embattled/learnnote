@@ -23,8 +23,8 @@
   - [4.1. Plotting](#41-plotting)
     - [4.1.1. Basic 基础图](#411-basic-基础图)
       - [4.1.1.1. plot 万物基础-折线图](#4111-plot-万物基础-折线图)
-      - [bar 条图 直方图](#bar-条图-直方图)
-      - [4.1.1.2. lines](#4112-lines)
+      - [4.1.1.2. bar 条图 直方图](#4112-bar-条图-直方图)
+      - [4.1.1.3. lines](#4113-lines)
     - [4.1.2. Spans 跨度线](#412-spans-跨度线)
     - [4.1.3. Spectral](#413-spectral)
     - [4.1.4. Statistics 统计图](#414-statistics-统计图)
@@ -67,9 +67,9 @@
   - [4.11. 图的设置](#411-图的设置)
     - [4.11.1. 为折线图的线添加注解](#4111-为折线图的线添加注解)
   - [4.12. Text properties](#412-text-properties)
-- [matplotlib.animation](#matplotlibanimation)
-  - [Animation](#animation)
-  - [Helper Classes](#helper-classes)
+- [5. matplotlib.animation](#5-matplotlibanimation)
+  - [5.1. Animation](#51-animation)
+  - [5.2. Helper Classes](#52-helper-classes)
 
 
 # 1. matplotlib包 图表制作
@@ -438,7 +438,7 @@ plot(x, y)
 plot(x1, y1, 'g^', x2, y2, 'g-')
 ```
 
-#### bar 条图 直方图
+#### 4.1.1.2. bar 条图 直方图
 
 `Axes.bar(x, height, width=0.8, bottom=None, *, align='center', data=None, **kwargs)`
 * 条状图, x 制定了条的对齐点, 由高度和 width 来指定条的大小
@@ -460,7 +460,7 @@ plot(x1, y1, 'g^', x2, y2, 'g-')
 
 
 
-#### 4.1.1.2. lines
+#### 4.1.1.3. lines
 
 画横线/竖线
 * 这里线的长度是根据坐标轴的数值来指定的, 且为必须参数
@@ -1236,11 +1236,11 @@ https://matplotlib.org/tutorials/text/text_props.html#sphx-glr-tutorials-text-te
 
 
 
-# matplotlib.animation
+# 5. matplotlib.animation
 
 使用 animation 模组来创建图的动画  
 
-## Animation
+## 5.1. Animation
 
 提供了 Animation 类用于以最简单的方法来创建动画, 定义了3个类  
 * `Animation` : 动画的基类, 并不是主要的操作 interface
@@ -1253,7 +1253,7 @@ https://matplotlib.org/tutorials/text/text_props.html#sphx-glr-tutorials-text-te
 
 
 
-## Helper Classes
+## 5.2. Helper Classes
 
 非用户操作接口, 而是各种功能的底层实现
 

@@ -6,6 +6,7 @@
   - [2.2. Endocer Decoder](#22-endocer-decoder)
   - [2.3. Exception](#23-exception)
   - [2.4. python 命令行直接使用](#24-python-命令行直接使用)
+- [base64 — Base16, Base32, Base64, Base85 Data Encodings](#base64--base16-base32-base64-base85-data-encodings)
 
 # 1. Internet Data Handling and Structured Markup Processing Tools
 
@@ -124,3 +125,48 @@ print(json.dumps({'4': 5, '6': 7}, sort_keys=True, indent=4))
 ## 2.4. python 命令行直接使用
 
 
+# base64 — Base16, Base32, Base64, Base85 Data Encodings
+
+将 2进制数据编码为可打印的 ASCII 字符串
+
+提供了 RFC 4648 中定义的 Base16, Base32, Base64 算法, 以及 de-facto 标准的 Ascii85 和 Base85 的编码算法
+
+RFC 4648 的编码适用于将二进制数据编码成能够方便的通过邮件发送, 或者作为 URL 以及 http post 的字符格式  
+编码算法与 uuencode 程序不同
+
+
+模块提供两个接口
+* 将 bytes-like 对象转为 ASCII bytes
+* 将 bytes-like 对象 或者 ASCII字符串 转回 bytes
+* base-64 alphabets 定义在 RFC 4648 文件中
+
+模组中有 legacy 接口:
+* 仅支持 Base64 标准字母
+* 不支持 字符串接口, 但是支持从 文件中解码
+* 根据 RFC 2045, 对每 76 个字符添加一个 newlines
+* 应该是专用于电子邮件的解码格式, 然而专用于 RFC 2045 的解码支持定义在了 `email` 中, 因此传统接口理论上没有应用场景
+
+
+
+接口
+* `b64encode(s, altchars=None)`
+  * 编码 bytes-like, `altchars` 用于替代 Base64 编码的 `+/` flag, 因为 `+/` 字符在文件名和 url 中可能不安全
+  * `altchars` 必须长度为 2
+* `standard_b64encode(s)`
+  * 标准 Base64 编码
+* `urlsafe_b64encode(s)`
+  * 直接生成文件名和URL安全的 Base64 编码
+  * 用 `-`替代 `+`, 用 `_` 替代 `/`, 感觉应该相当于 `b64encode(s, altchars='-_')`
+* `b32encode(s)`
+  * Base32 编码
+* `b32hexencode(s)` : 3.10 新接口
+  * 使用 RFC 4648 定义的拓展 16进制字符 Hel Alphabet
+* `b16encode(s)`
+  * Base16 编码
+
+
+The legacy interface: 不推荐使用的
+* decode
+* decodebytes
+* encode
+* encodebytes

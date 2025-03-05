@@ -488,6 +488,14 @@ WARNING:And this, too
 
 ### 4.1.2. Advanced Logging Tutorial - 高级 logging 用法
 
+
+#### 4.1.2.1. Logging Flow
+#### 4.1.2.2. Loggers
+#### 4.1.2.3. Handlers
+#### 4.1.2.4. Formatters
+
+
+
 ### 4.1.3. Logging Levels - 日志的等级
 
 日志的等级是一个数字, 而默认的以字符串命名的等级参照表格
@@ -510,7 +518,57 @@ https://docs.python.org/3/library/logging.config.html
 https://docs.python.org/3/library/logging.handlers.html
 
 
-### LogRecord attributes - LogRecord 中可以打印的项目
+
+### 4.2.1. Logger Objects - Logger 对象
+
+`class logging.Logger`
+
+
+
+
+### 4.2.2. Thread Safety - 关于线程安全
+<!-- 完 -->
+logging module 旨在用户不需要任何特殊的配置即可实现安全的多线程工作
+
+logging 模组使用线程锁来实现这一目标, one lock to serialize access to the modules's shared data
+一个全局锁用于 模组级别的共享数据  
+
+另外每一个 handler 还有各自的锁用于序列化 对 基础 I/O 的访问
+
+
+如果在使用 `signal` 模组开发 异步信号处理程序, 则该 logging 模块可能无法对应相应的 handlers
+这是由于 `threading` 模组的锁实现 并不总是会 re-entrant, 所以可能无法从对应的 signal handlers invoke
+
+
+### 4.2.3. Module-Level Functions - 模组级别的函数
+
+
+`logging.getLogger(name=None)`
+* 获取一个 logger 拥有参数的名称, 默认值会返回 root logger of the hierarchy
+* 在绝大多数情况下, 很少有不传入 `__name__` 的理由
+* 所有name参数相同的调用都会返回同一个实例, 因此 logger 实例不需要跨应用传递
+
+`logging.basicConfig(**kwargs)`
+* 执行基础的 logging system 配置
+  * 创建一个 StreamHandler 拥有 默认的 Formatter, 并夫妇加到 root logger
+  * 模组级别的 debug info warning error 会在 root logger 没有 handlers 的时候自动调用
+  * 如果 root logger 已经拥有 handlers, 那么该函数不会重新创建 handlers (可以通过 `force=True` 来强制重新创建)
+* 关于线程安全问题
+  * 在启动其他线程之前, 应当从主线程调用该函数
+  * 在旧版本中, 如果从多个线程调用该函数, 有可能会导致根记录器的日志重复
+* 参数表
+  * filename
+  * filemode
+  * format
+  * datafmt
+  * style     :(3.2)
+  * level     : 传入 logging 的 level, 应该可以直接传数字
+  * stream
+  * handlers  :(3.3)
+  * force     :(3.8)
+  * encodding :(3.9)
+  * errors    :(3.9)
+
 
 
 
