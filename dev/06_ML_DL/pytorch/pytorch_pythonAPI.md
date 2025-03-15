@@ -40,8 +40,10 @@
   - [3.7. Linear Layers  线性层](#37-linear-layers--线性层)
     - [3.7.1. Identity](#371-identity)
     - [3.7.2. Linear](#372-linear)
+  - [Distance Functions 距离函数](#distance-functions-距离函数)
   - [3.8. Loss Function 损失函数](#38-loss-function-损失函数)
     - [3.8.1. Binary Cross Entropy (BCE)](#381-binary-cross-entropy-bce)
+    - [Pixel-level Loss](#pixel-level-loss)
   - [3.9. Vision Layrers - 与图像相关的网络层](#39-vision-layrers---与图像相关的网络层)
   - [3.10. ChannelShuffle - 重排列 Channel](#310-channelshuffle---重排列-channel)
 - [4. torch.nn.functional](#4-torchnnfunctional)
@@ -54,6 +56,8 @@
     - [4.2.5. F.instance\_norm](#425-finstance_norm)
     - [4.2.6. F.layer\_norm](#426-flayer_norm)
     - [4.2.7. F.normalize](#427-fnormalize)
+  - [Distance functions - 距离函数](#distance-functions---距离函数)
+  - [Loss functions](#loss-functions)
   - [4.3. Vision functions](#43-vision-functions)
 - [5. torch.Tensor 张量类](#5-torchtensor-张量类)
   - [5.1. torch.Tensor 的格式](#51-torchtensor-的格式)
@@ -933,6 +937,30 @@ torch.nn.Linear(in_features, out_features, bias=True, device=None, dtype=None)
 
 ```
 
+## Distance Functions 距离函数
+
+在某些情况下也作为 Loss 计算的方法, 可能不能直接用来当作 Loss
+参照 nn.functional 下面的 Distance 章节
+
+`class torch.nn.CosineSimilarity(dim=1, eps=1e-08)`
+* dim: 指定哪一个维度作为向量计算 余弦相似度, 通常为图像的通道应该
+* eps: (float) 防止除零
+* 调用的时候 `cos(input1, input2)`
+
+
+`torch.nn.PairwiseDistance(p=2.0, eps=1e-06, keepdim=False)`
+* 计算输入
+  * 向量的 pairwise 距离
+  * 或者 矩阵的 columns 距离
+  * 总之对于输入的维度还是有严格限制的
+* 底层上用的还是 `p-norm`
+  * p 默认是 2 , 即标准的多维空间下的向量长度
+
+完整公式: e 是 单位向量
+
+$$dist(x,y) = ||x-y+\eps e||_p$$
+$$||x||_p = (\sum^n_{i=1}|x_i|^p)^{1/p}$$
+
 ## 3.8. Loss Function 损失函数
 
 pytorch 的损失函数直接定义在了 torch.nn 中
@@ -944,15 +972,11 @@ pytorch 的损失函数直接定义在了 torch.nn 中
     NLLLoss
     PoissonNLLLoss
     KLDivLoss
-    BCELoss
-    BCEWithLogitsLoss
     MarginRankingLoss
-    HingeEmbeddingLoss
     MultiLabelMarginLoss
     SmoothL1Loss
     SoftMarginLoss
     MultiLabelSoftMarginLoss
-    CosineEmbeddingLoss
     MultiMarginLoss
     TripletMarginLoss
 
@@ -968,7 +992,7 @@ loss_func = nn.CrossEntropyLoss()
 
 ### 3.8.1. Binary Cross Entropy (BCE)
 
-
+用于预测模型, 分类模型, GAN Discrimator 的Loss
 
 `torch.nn.BCELoss(weight=None, size_average=None, reduce=None, reduction='mean')`
 * 二元交叉熵损失, 通常用于 GAN 网络的 discriminator 
@@ -1003,7 +1027,31 @@ loss_func = nn.CrossEntropyLoss()
 * 期望值 分别是 1和 -1
 * pytorch 的实现方法优点奇怪, 
 * chatgpt 给出的公式倒是比较合理 `HingeLoss(x,y) = max(0, 1-yixi)`
-* 但是 y 值似乎指定 -1, 1 以外的值没有意义
+* 但是 y 值似乎指定 -1, 1 以外的值没有意义 ->
+  * 对于超限的值不会产生损失
+
+
+### Pixel-level Loss
+
+用于降噪/超分/语义分割的像素级 Loss
+
+`torch.nn.CosineEmbeddingLoss(margin=0.0, size_average=None, reduce=None, reduction='mean')`
+* 通常用于学习 非线性的嵌入 或者半监督性学习
+* 给定两个输入 Tensor, 计算他们之间的余弦相似度
+  * y 是一个目标值, 可能是用于在 GAN 网络中指定真假的标签, 为 0/1 
+  * 当  y = 1 时, 会最大化 x1, x2 的余弦相似度
+  * y = -1 时, 则最小化
+* 公式
+  * y=1 $1-\cos(x_1, x_2)$    : 样本为真时, 期望 x_1, x_2 相似, 最终 cos 贴近 1
+  * y=-1  $\max(0, \cos(x_1,x_2)-margin)$   : 样本为假时, x_1,x_2 距离尽可能远, cos 值贴近0到-1
+* 参数
+  * margin : (float), 输入 `[-1, 1.0]`,  建议的值是 `[0, 0.5]`, 默认值是 0, 保证样本为假的时候, x_1, _x2
+  * reduction : (str, option), 指定如何, 是否对结果进行降维
+    * 可选项
+      * none : 不降维
+      * mean : 均值, 默认
+      * sum : 求和 
+
 
 
 
@@ -1155,6 +1203,56 @@ def normalize(input: Tensor, p: float = 2.0, dim: int = 1, eps: float = 1e-12, o
         denom = input.norm(p, dim, keepdim=True).clamp_min(eps).expand_as(input)
         return input / denom
 ```
+
+
+
+## Distance functions - 距离函数
+
+在某些情况下也作为 Loss 计算的方法, 可能不能直接用来当作 Loss
+
+同等的 nn.Module 下面只有两个, 没有 pdist
+* nn.CosineSimilarity
+* nn.PairwiseDistance
+
+
+`torch.nn.functional.cosine_similarity(x1, x2, dim=1, eps=1e-8) → Tensor`
+* 输入 x1,x2, 必须要能够 broadcast
+* dim (int, optional) 用于指定要 squeeze 的维度, 默认值 1
+  * 在图像中代表着根据同一个像素点的不同颜色通道计算距离
+* `eps` (float, optional) : 用于防止 x1, x2 中的某一个为0 向量导致 0 除问题的发生
+* 公式
+  * 相当于同时参照了所有颜色
+$$
+  similarity = \frac{x_1\cdot x_2}{max(||x_1||_2, \epsilon)\cdot max(||x_2||_2, \epsilon)}
+$$
+
+
+
+`torch.nn.functional.pairwise_distance(x1, x2, p=2.0, eps=1e-6, keepdim=False) → Tensor`
+* 文档中只写了参照 nn.Module 的同名类
+* 其实就是 pdist 的另一种封包
+
+
+`torch.nn.functional.pdist(input, p=2)-> Tensor`
+* 计算 p-norm 距离, 对 input 中的每个 row verctor 产生的所有 pair
+* 和 `torch.norm` 在功能的一部分上重合
+  * 和 ` torch.norm(input[:, None] - input, dim=2, p=p)` 的不包括对角线的上三角部分相同
+* 通常需要 row vector 在内存上连续以保证计算效率
+* 似乎是假定了 input 是二维的 (N, M)
+  * 输出 的维度会是 1 维的距离值, 长度为 1/2 * N * (N-1), 即 所有行的 $C^2_N$
+* 同样的, 该函数等同于  scipy 中的类似距离函数
+  * 当 p 为正值: `scipy.spatial.distance.pdist(input, 'minkowski', p=p)`
+  * 当 p 为 0 : `scipy.spatial.distance.pdist(input, 'hamming') * M`
+  * p 为正无穷 : `scipy.spatial.distance.pdist(xn, lambda x, y: np.abs(x - y).max())`
+n 
+
+## Loss functions
+
+非 nn.Module 的函数 Loss
+
+
+
+
 
 ## 4.3. Vision functions
 

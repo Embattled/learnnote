@@ -10,7 +10,7 @@
 - [2. NumPy fundamentals](#2-numpy-fundamentals)
   - [2.1. Broadcasting](#21-broadcasting)
     - [2.1.1. General Broadcasting Rules](#211-general-broadcasting-rules)
-- [3. Routines array常规操作 API](#3-routines-array常规操作-api)
+- [3. Routines and objects by topic](#3-routines-and-objects-by-topic)
   - [3.1. Array creation](#31-array-creation)
     - [3.1.1. From shape or value](#311-from-shape-or-value)
     - [3.1.2. From existing data](#312-from-existing-data)
@@ -52,6 +52,9 @@
     - [3.8.2. Solving equations and inverting matrices 计算矩阵方程或者逆](#382-solving-equations-and-inverting-matrices-计算矩阵方程或者逆)
   - [3.9. Logic functions 逻辑计算](#39-logic-functions-逻辑计算)
     - [3.9.1. Truth value testing](#391-truth-value-testing)
+    - [Array contents - 按元素进行特殊值验证](#array-contents---按元素进行特殊值验证)
+    - [Array type testing - 按元素进行类型验证](#array-type-testing---按元素进行类型验证)
+    - [Logical operations - 按元素进行逻辑运算](#logical-operations---按元素进行逻辑运算)
     - [3.9.2. Comparison - 对比两个 array](#392-comparison---对比两个-array)
   - [3.10. Masked array operations](#310-masked-array-operations)
     - [3.10.1. Masked array Creation](#3101-masked-array-creation)
@@ -246,7 +249,7 @@ Result (4d array):  8 x 7 x 6 x 5
 
 
 
-# 3. Routines array常规操作 API
+# 3. Routines and objects by topic
 
 对 Array 数据的各种常规操作
 
@@ -911,6 +914,35 @@ subscripts 是一个以逗号分割的下标标签列表, 每个标签指的是�
 * `numpy.any(a, axis=None, out=None, keepdims=<no value>, *, where=<no value>)` 是否有 True
 
 
+### Array contents - 按元素进行特殊值验证
+
+* isfinite
+* isinf
+* isnan
+* isnat
+* isneginf
+* isposinf
+
+### Array type testing - 按元素进行类型验证
+
+
+* iscomplex
+* iscomplexobj
+* isfortran
+* isreal
+* isrealobj
+* isscalar
+
+
+### Logical operations - 按元素进行逻辑运算
+
+对于值是布尔类型的 array 按照元素进行计算
+
+* `logical_and(x1, x2, /[, out, where, ...])`
+* `logical_or(x1, x2, /[, out, where, casting, ...])`
+* `logical_xor(x1, x2, /[, out, where, ...])`
+* `logical_not(x, /[, out, where, casting, ...])`
+
 ### 3.9.2. Comparison - 对比两个 array
 
 这个分组的函数很有意思
@@ -918,6 +950,9 @@ subscripts 是一个以逗号分割的下标标签列表, 每个标签指的是�
 * `numpy.array_equiv(a1, a2)` : 比较两个array是否相同, 允许 broadcast
 * `numpy.array_equal(a1, a2, equal_nan=False)` : 比较值和 shape 是否都相同, 即不允许 broadcast
   * equal_nan 主要用于负数, 如果实部或者虚部为 nan, 则直接判断该元素相同
+
+* `allclose(a, b[, rtol, atol, equal_nan])`  : 两个array 是否在 tolerance 以内完全相同
+* `isclose(a, b[, rtol, atol, equal_nan])`   : 每个元素是否相同 
 
 ## 3.10. Masked array operations 
 

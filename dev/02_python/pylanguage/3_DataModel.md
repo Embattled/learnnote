@@ -60,7 +60,7 @@ Python 的 Object 永远没有显示的删除功能, 如果一个 object 不可�
 
 
 ## 1.3. Special method names
-
+<!-- 头部完 -->
 一个自定义的类可以通过实现一些特殊的函数来实现被特殊操作符调用, 例如 数值计算, 索引, 切片等   
 其本质是进行 Python 的操作符重载, 例如 
 
@@ -70,7 +70,6 @@ Python 的 Object 永远没有显示的删除功能, 如果一个 object 不可�
 
 此外, 将特殊函数重载为 None, 代表了对应的操作在该类上不可用
 * 例如将 `__iter__` 设为 None, 则该类不可迭代
-
 
 
 一个 class 可以通过实现特殊名称的 方法, 来实现由特殊语法调用的某些操作. 即运算符重载, 索引, 切片 等
@@ -100,7 +99,6 @@ Python 的 Object 永远没有显示的删除功能, 如果一个 object 不可�
 * init和 new 是协同工作的, new 创建对象, init 自定义对象, 因此 `__init__` 接口必须返回 None
 
 
-
 `object.__repr__(self)` : 用于定义该 对象的 `正式 offical` 字符串表达形式, 会作为 `repr(obj)` 的返回值
 * 返回值必须是 字符串对象
 * 如果有条件的话, 返回值应当可以被用于 重新创建 一个具有相同值的对象 `的 Python 表达式`
@@ -118,6 +116,28 @@ Python 的 Object 永远没有显示的删除功能, 如果一个 object 不可�
 
 
 ### 1.3.2. Customizing attribute access
+
+
+
+### With Statement Context Manager
+
+context manager : 上下文管理器
+* 通常当执行 with 表达式的时候被创建, 也可以直接被调用
+* 上下文管理器用于处理 entry into 和 exit from
+
+通常 context managers 用于暂时的保管以及回复某些全局状态, locking and unlocking resources, 打开即关闭文件等  
+
+python 的基本类 object 没有实现上下文管理器的方法  
+
+`object.__enter__(self)`
+* 用于执行 runtime context 启动的时候的语句
+* with 表达式会 bind this method's return value to the target(s) specified in the `as` clause of the statement
+
+`object.__exit__(self, exc_type, exc_value, traceback)`
+* 推出 context manager 时候执行的方法
+* 该方法的三个参数都是用于出现异常时候的退出的, 如果程序没有异常, 则三个参数都是None
+* 如果希望 context manager 抑制传入的异常, 则该方法需要返回 True.
+* `__exit__` 方法本身不应该重复唤起传入的异常
 
 
 
