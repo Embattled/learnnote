@@ -106,12 +106,12 @@ Spline interpolation 的基础步骤
 Scipy 也有图像处理的相关函数, 对比 scikit-image 里较为基础, 但也足够强大  
 
 
-## Filters - 通用滤波
+## 4.1. Filters - 通用滤波
 
 
-## Fourier filters - 傅里叶滤波
+## 4.2. Fourier filters - 傅里叶滤波
 
-## Interpolation - 插值
+## 4.3. Interpolation - 插值
 
 
 # 5. Signal Processing (scipy.signal)
@@ -143,7 +143,7 @@ Filtering : a generic name for any system that modifies an input signal in some 
 
 https://docs.scipy.org/doc/scipy/tutorial/sparse.html
 
-## Sparse array classes 稀疏数列
+## 6.2. Sparse array classes 稀疏数列
 
 
 `class dok_array(arg1, shape=None, dtype=None, copy=False)`
@@ -159,7 +159,7 @@ https://docs.scipy.org/doc/scipy/tutorial/sparse.html
     * `dok_array((M,N), [dtype])` : 通过指定维度来初始化 dok 的 shape
 
 
-## Sparse matrix classes 稀疏矩阵
+## 6.3. Sparse matrix classes 稀疏矩阵
 
 ` class coo_array(arg1, shape=None, dtype=None, copy=False)`
 
@@ -171,7 +171,7 @@ https://docs.scipy.org/doc/scipy/tutorial/sparse.html
   * 
 
 
-## scipy.sparse.csgraph 压缩稀疏图的管线 Compressed sparse graph routines
+## 6.4. scipy.sparse.csgraph 压缩稀疏图的管线 Compressed sparse graph routines
 
 一个有 N 个节点的图可以用 (NxN) 的连接矩阵表达连接关系, 以及每一个边的权重
 
@@ -327,3 +327,45 @@ print(f'Pearson r: {r_coef}')
 print(f'Spearman r: {rho_coef}')
 
 # 8. Multidimensional image processing ( scipy.ndimage )
+
+
+多维度图像处理包
+
+
+## Filters - 图像滤波
+
+
+
+`gaussian_filter(input, sigma, order=0, output=None, mode='reflect', cval=0.0, truncate=4.0, *, radius=None, axes=None)`
+* 参数
+  * input: array_like
+  * sigma : scalar, sequence of scalars 用于指定高斯核的标准差
+  * mode: str or sequence. 用于指定输入图在边界上的拓展方法
+    * `reflect` (d c b a | a b c d | d c b a)
+    * `constant` (k k k k | a b c d | k k k k)
+    * `nearest` (a a a a | a b c d | d d d d)
+    * `mirror` (d c b | a b c d | c b a)
+    * `wrap` (a b c d | a b c d | a b c d)
+  * axes : tuple of int or None, 指定执行 filter 的维度. 默认值 None 会导致滤波在所有维度上执行
+    * 如果 axes 指定, 则 `sigma, order, mode, radius` 必须同 axes 的长度相同
+  * radius : None or int or sequence of ints, 高斯核的尺寸
+    * 默认值 None 会采用 `radius = round(truncate * sigma)`
+  * truncate : float, 默认值 4.0 
+    * 标准差截断值, 用于生成默认的 radius 
+
+
+
+
+## Fourier filters - 傅里叶滤波
+
+
+## Interpolation - 插值
+
+
+## Measurements - 统计测量
+
+
+
+## Morphology - 形态学变换
+
+

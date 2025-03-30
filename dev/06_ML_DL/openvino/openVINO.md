@@ -25,8 +25,10 @@ OpenVINO支持主流的深度学习框架
 ## 2.1. Benchmark Application
 
 Estimates deep learning inference performance on supported devices for synchronous and asynchronous modes.
+  
+该应用有  C++ 和 python 两种实现, 都有这相同的 command interface and backend. 但是根据应用场景的语言的不同, 更加推荐使用相同语言的实现.
 
-该应用有  C++ 和 python 两种实现, 都有这相同的 command interface and backend. 但是根据应用场景的语言的不同, 更加推荐使用相同语言的实现.  
+
 3. https://docs.openvino.ai/2023.0/openvino_inference_engine_tools_benchmark_tool_README.html
 =
 
@@ -40,11 +42,11 @@ benchmark 的工作流程为:
 * 结束 benchmark 后, 报告 minimum, average, and maximum inferencing latency and average the throughput.
 
 
-### 2.1.1. Basic Configuration Options
+## 3.1. Basic Configuration Options
 
 
 
-# 3. OpenVINO Workflow
+# 4. OpenVINO Workflow
 
 OpenVINO 的具体的部署流程
 * 模型准备 Model Preparation ： 下载预训练模型或者将自己训练模型, 并将模型转换成 OpenVINO 格式, 将框架训练好的模型转化成推理引擎专用的中间调达
@@ -59,7 +61,7 @@ OpenVINO 的具体的部署流程
   * DL Workbench : OpenVINO 的可视化工作台, 用于模型管理, 训练后量化, 可视化网络结构等
 
 
-## 3.1. Model Preparation
+## 4.1. Model Preparation
 
 首先, 所有 DL 工作流都需要从获取模型开始, OpenVINO 环境允许从多种框架获取模型源文件, 并转化成 OpenVINO 自己的表达 `openvino.runtime.Model` (ov.Model). 
 
@@ -109,7 +111,7 @@ OpenVINO 的具体的部署流程
 
 
 
-## 3.2. Model Optimization Guide - Model Optimization and Compression
+## 4.2. Model Optimization Guide - Model Optimization and Compression
 
 模型优化是 OpenVINO 工作流中的一个 optional 模块, 通过离线的各种优化方法来提高模型的性能.  例如:
 * 量化 quantization 
@@ -127,7 +129,7 @@ OpenVINO 提供了几种不同的工具用于在不同阶段对模型进行优�
 
 
 
-### 3.2.1. Quantizing Models Post-training - Post-training Quantization
+### 4.2.1. Quantizing Models Post-training - Post-training Quantization
 
 
 训练后优化是通过一些方法使得不经过 retraining or fine-tuning 来优化模型使其更加 hardware-friendly.  
@@ -149,20 +151,20 @@ OpenVINO 目前在实际操作上支持两种 workflow 用于应用 post-trainin
 * Post-training Quantization with POT - 即通过 OpenVINO IR 本身　(OpenVINO 2023.0 deprecated)
 * Post-training Quantization with NNCF - 跨框架的解决方法, 适用于多种框架下的模型, 同时 API 更加简单
 
-#### 3.2.1.1. Post-training Quantization with POT
+#### 4.2.1.1. Post-training Quantization with POT
 
 使用 Post-training Optimization Tool (POT) 来实现 uniform integer quantization
 
 该方法可以将 weights 和 activations  floating-point precision 移动到 integer precision, 例如 8-bit.
 量化后模型会被转化, 具体的量化操作发生在推论的时候
 
-#### 3.2.1.2. Post-training Quantization with NNCF (new)
+#### 4.2.1.2. Post-training Quantization with NNCF (new)
 
 NNCF 更多的用于 Training-time Quantization, 但也提供了 API 用于 Post-training 方法. 
 
 
 
-### 3.2.2. Compressing Models During Training
+### 4.2.2. Compressing Models During Training
 
 Training-time model compression 可以提高模型的性能, 通过在训练的时候应用一些 optimizations (Such as quantization).  注意这里的总标题用的不是 Optimzing 而是 Compressing.  
 
@@ -193,7 +195,7 @@ NNCF 的 Training-time compression methods:
   * Binarization
 
 
-#### 3.2.2.1. Quantization-aware Training (QAT) - 通过 NNCF 来实现量化学习
+#### 4.2.2.1. Quantization-aware Training (QAT) - 通过 NNCF 来实现量化学习
 
 记录了基于 PyTorch 或 TensorFlow 的详细 量化学习工作方法  
 
@@ -256,7 +258,7 @@ state_dict = resuming_checkpoint['state_dict']
 model.load_state_dict(state_dict)
 ```
 
-# 4. OpenVINO python API
+# 5. OpenVINO python API
 
 API 的内容种类不多
 
@@ -267,14 +269,14 @@ API 的内容种类不多
 * openvino.runtime.opset1 ~ openvino.runtime.opset11
 
 
-## 4.1. openvino.runtime - 主要的运行时 API
+## 5.1. openvino.runtime - 主要的运行时 API
 
 openvino module namespace, exposing factory functions for all ops and other classes.
 
 里面定义了数十种类, 以及一些最基本功能的函数  
 
 
-## 4.2. openvino.runtime.Core
+## 5.2. openvino.runtime.Core
 
 `class openvino.runtime.Core`
 Bases: `openvino._pyopenvino.Core`
@@ -289,7 +291,7 @@ Attribute: Core 实例的可访问的属性只有一个
 * available_devices   : Returns devices available for inference Core objects goes over all registered plugins.
 
 
-### 4.2.1. 实际方法
+### 5.2.1. 实际方法
 
 Property 可以参考 https://docs.openvino.ai/2023.0/groupov_property_c_api.html#doxid-group-ov-property-c-api
 
@@ -325,9 +327,9 @@ Property 可以参考 https://docs.openvino.ai/2023.0/groupov_property_c_api.htm
   * Return type  : openvino.runtime.CompiledModel
 
 
-### 4.2.2. 隐藏方法
+### 5.2.2. 隐藏方法
 
-## 4.3. openvino.runtime.CompiledModel
+## 5.3. openvino.runtime.CompiledModel
 
 `class openvino.runtime.CompiledModel(other: openvino._pyopenvino.CompiledModel)`
 Bases: `openvino._pyopenvino.CompiledModel`
@@ -335,7 +337,7 @@ Bases: `openvino._pyopenvino.CompiledModel`
 CompiledModel 代表了 一个为指定设备编译好的模型, 包括应用了多种 optimization transformations, 以及 mapping to compute kernels
 
 
-### 4.3.1. 隐藏方法
+### 5.3.1. 隐藏方法
 
 * `__call__(inputs: Optional[Union[dict, list, tuple, openvino._pyopenvino.Tensor, numpy.ndarray]] = None, shared_memory: bool = True) → openvino.runtime.utils.data_helpers.wrappers.OVDict`
   * 简易的调用推论的方法, Infers specified input(s) in synchronous mode. 在同步模式下进行推论.  
@@ -346,7 +348,7 @@ CompiledModel 代表了 一个为指定设备编译好的模型, 包括应用了
     * 创建好的 InferRequest 会作为一个属性存储在 CompiledModel 实例里面, 用于之后的 __call__ 调用
   * 官方推荐显式的定义一个 InferRequest 并利用它来进行推论, 可以实现配置其他高级设置用于最优化性能.  
 
-### 4.3.2. 实际方法
+### 5.3.2. 实际方法
 
 * `create_infer_request() → openvino.runtime.ie_api.InferRequest`
   * 创建一个 inference request object used to infer the compiled model.
@@ -359,7 +361,7 @@ CompiledModel 代表了 一个为指定设备编译好的模型, 包括应用了
   * `set_property(self: openvino._pyopenvino.CompiledModel, properties: Dict[str, object]) -> None`  : 字典输入为当前 model 配置属性
   * `set_property(self: openvino._pyopenvino.CompiledModel, property: Tuple[str, object]) -> None` ： Tuple 输入为当前 model 配置属性 
 
-## 4.4. openvino.runtime.InferRequest
+## 5.4. openvino.runtime.InferRequest
 
 `class openvino.runtime.InferRequest(other: openvino._pyopenvino.InferRequest)`
 Bases: `openvino.runtime.utils.data_helpers.wrappers._InferRequestWrapper`
@@ -368,7 +370,7 @@ InferRequest class represents infer request which can be run in asynchronous or 
 一个推论请求的类, 代表了一个可以被同步或者异步方式运行的推论请求  
 
 
-### 4.4.1. 实际方法
+### 5.4.1. 实际方法
 
 * `infer(inputs: Optional[Any] = None, shared_memory: bool = False) → openvino.runtime.utils.data_helpers.wrappers.OVDict`
   * 基本上与 `CompiledModel.__call__()` 相同

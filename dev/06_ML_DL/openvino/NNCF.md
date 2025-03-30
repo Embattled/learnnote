@@ -14,6 +14,248 @@ NNCF 的官方推荐工作流:
 2. 如果性能损失过大, 进行 `Quantization-aware training` 来提高精度同时保持优化后的推论速度
 3. 如果量化后的模型仍然速度不够快, 进行 `Filter Pruning` 来进一步删减模型的参数来提高模型的速度.  
 
+# Document - Usage
+
+github 中的说明文档
+https://github.com/openvinotoolkit/nncf/tree/develop/docs
+
+
+文档结构在 2024 年中有一次结构更改
+To align documentation with the latest changes in torch QAT
+
+
+## Post Training Compression
+
+### Post Training Quantization
+
+后量化, 不需要重新训练模型, 使用 initial dataset 中的一个子集来标定量化常数
+量化的实现原理写在了 LegacyQuantization 部分
+
+模型后量化支持 PyTorch, TorchFX, TensorFlow, ONNX, and OpenVINO 格式
+当后量化不满足精度要求的时候, 使用 QAT 进行量化感知学习
+
+NNCF 提供了先进的 PTQ 算法, 包括
+* MinMaxQuantization - 分析模型, 同时插入额外的基于 subset 标定的量化层
+* FastBiasCorrection/BiasCorrection - 降低 量化前后的 bias errors 
+
+使用方法: 需要提供一下实体
+* 原始 model
+* validation part of the dataset, 验证数据集
+* Data Transformation Function (??)
+
+使用方法
+```py
+
+# 1. 构建 Data Transformation Function
+def trans_func(data_item):
+    images, _ = data_item
+    # 拿到输入数据
+    return images
+
+# 2. 创建 NNCF 数据集对象 nncf.Datset
+# data_source : 一个 可迭代的 python 对象, 用于获取 data
+# trans_cunc  : 第一步创建的 转换函数
+calibration_dataset = nncf.Dataset(val_dataset, transform_fn)
+
+# 3. 直接运行量化 pipeline 就行了
+quantized_model = nncf.quantize(model, calibration_dataset)
+```
+
+
+**Data Transformation Function**
+一个 NNCF 的专有概念
+
+应该只是用来方便实现数据格式对齐的接口  
+不同的 pipeline/框架 可能输入模型的数据格式不同, 这个函数专门用来实现格式转换  
+最典型, 可能就是最主要的应对对象就是 onnx 的超麻烦的输入格式  
+
+PyTorch, TorchFX, TensorFlow, OpenVINO 中
+trans_func 的返回值直接输入模型  
+
+ONNX 中
+ONNX Runtime 接受的 pipeline 输入是 `Dict[str, np.ndarray]`, 即 输入的变量名称也需要传入
+
+```py
+# PyTorch, TorchFX, TensorFlow, OpenVINO 中的推理方法
+for data_item in val_loader:
+    model(transform_fn(data_item))
+
+# onnx 的推理方法
+sess = onnxruntime.InferenceSession(model_path)
+output_names = [output.name for output in sess.get_outputs()]
+for data_item in val_loader:
+    sess.run(output_names, input_feed=transform_fn(data_item))
+```
+
+
+**DataSource**
+
+nncf.Dataset 需要传入可迭代的数据集
+`calibration_dataset = nncf.Dataset(data_source, transform_fn)`
+该变量可以直接传入 `pytorch.Dataloader` or `tf.data.Dataset`
+
+但是要注意这些 loader 中 batch_size 的情况, NNCF 支持标定 loader 按照 batch 来读取数据, 但是根据模型的不同, 对应的 batch 所代表的含义有所不同  
+例如 transformers 或者其他非传统的结构, batch 的 axis 并不位于约定俗成的位置, 这种情况下 batch_size 不为 1 会导致标定错误  
+具体原因为 
+`It happens because certain models' internal data arrangements may not align with the assumptions made during quantization, leading to inaccurate statistics calculation issues with batch sizes larger than 1.`   
+
+Please keep in mind that you have to recalculate the subset size for quantization according to the batch size using the following formula: `subset_size = subset_size_for_batch_size_1 // batch_size`  
+最终 nncf 量化所接受的参数 `subset_size` 标定子集的大小也受 loader 的 batch_size 的影响, 需要用户 手动重新计算
+
+### Weights Compression
+
+
+
+## Training Time Compression
+
+
+### Quantization Aware Training (QAT) - Usage
+
+Use NNCF for Quantization Aware Training
+
+在既存的 PyTorch 或者 TensorFlow 项目中集成 NNCF 包 的整体简要文档
+预设用户已经实现了训练 pipeline 并能够生成 floating point 的预训练模型  
+
+The task is to prepare this model for accelerated inference by simulating the compression at train time. Please refer to this document for details of the implementation.
+模拟训练时候的压缩
+
+该文档不涉及 QAT 的实现详细, 具体实现写在了 `LegacyQuantization` 章节
+
+
+**Basic usage 基本用法**
+
+pytorch
+```py
+# 1.应用 后量化, 在应用后量化的同时模型的 QAT 训练也会一并完成初始化, 是NNCF新版本的改进点
+model = TorchModel() # instance of torch.nn.Module
+quantized_model = nncf.quantize(model, ...)
+
+# 2.QAT训练
+# QAT训练完全继承金 training pipeline 中, 完全不需要再附加任何 pipeline 的修改
+# 唯一需要注意的是 模型需要置 model.train() 状态, 即关闭 Dropout 以及 DropConnect
+
+# 3.导出QAT后的模型为 ONNX, 注意格式为 Onnx 但是无法通过 ONNXRuntime 运行
+# To OpenVINO format
+import openvino as ov
+ov_quantized_model = ov.convert_model(quantized_model.cpu(), example_input=dummy_input)
+```
+
+TensorFlow
+```py
+model = TensorFlowModel() # instance of tf.keras.Model
+quantized_model = nncf.quantize(model, ...)
+
+# To OpenVINO format
+import openvino as ov
+
+# Removes auxiliary layers and operations added during the quantization process,
+# resulting in a clean, fully quantized model ready for deployment.
+stripped_model = nncf.strip(quantized_model)
+
+ov_quantized_model = ov.convert_model(stripped_model)
+```
+
+
+**Saving and loading compressed models**
+
+NNCF模型的完整信息包括模型参数本身以及 NNCF Config    
+
+model : 包含了 模型的参数以及模型的拓扑结构  
+NNCF config: 包括如何恢复模型的量化附加结构的信息   
+
+NNCF config 可以通过接口 `nncf.torch.get_config` 从一个既存的压缩模型中获取  
+
+而还原模型则通过 `nncf.torch.load_from_config`  
+
+NNCF 的保存规则允许模型只存储 参数和 NNCF config 以及一个 dummy_input 即可完整的复原模型
+
+
+```py
+import nncf.torch
+
+# save part, 量化过程
+quantized_model = nncf.quantize(model, calibration_dataset)
+# 只需要保存两个部分
+checkpoint = {
+    'state_dict': quantized_model.state_dict(),
+    'nncf_config': nncf.torch.get_config(quantized_model),
+    ...
+}
+torch.save(checkpoint, path)
+
+# load part, 读取字典
+resuming_checkpoint = torch.load(path)
+
+nncf_config = resuming_checkpoint['nncf_config']
+state_dict = resuming_checkpoint['state_dict']
+
+# 传入 模型结构, nncf_config, dummy_input
+quantized_model = nncf.torch.load_from_config(model, nncf_config, dummy_input)
+# 单独再读取 模型参数
+quantized_model.load_state_dict(state_dict)
+
+```
+
+
+```py
+from nncf.tensorflow import ConfigState
+from nncf.tensorflow import get_config
+from nncf.tensorflow.callbacks.checkpoint_callback import CheckpointManagerCallback
+
+nncf_config = get_config(quantized_model)
+checkpoint = tf.train.Checkpoint(model=quantized_model,
+                                 nncf_config_state=ConfigState(nncf_config),
+                                 ... # the rest of the user-defined objects to save
+                                 )
+callbacks = []
+callbacks.append(CheckpointManagerCallback(checkpoint, path_to_checkpoint))
+...
+quantized_model.fit(..., callbacks=callbacks)
+
+from nncf.tensorflow import ConfigState
+from nncf.tensorflow import load_from_config
+
+checkpoint = tf.train.Checkpoint(nncf_config_state=ConfigState())
+checkpoint.restore(path_to_checkpoint)
+
+quantized_model = load_from_config(model, checkpoint.nncf_config_state.config)
+
+checkpoint = tf.train.Checkpoint(model=quantized_model
+                                 ... # the rest of the user-defined objects to load
+                                 )
+checkpoint.restore(path_to_checkpoint)
+
+```
+
+**Advanced usage**
+
+NNCF 只支持 pytorch 原生结构的 压缩, 不支持自定义模块, 如果有自定义模块, 需要预先注册
+
+```py
+import nncf
+
+@nncf.register_module(ignored_algorithms=[...])
+class MyModule(torch.nn.Module):
+    def __init__(self, ...):
+        self.weight = torch.nn.Parameter(...)
+    # ...
+```
+If registered module should be ignored by specific algorithms use ignored_algorithms parameter of decorator.
+
+In the example above, the NNCF-compressed models that contain instances of MyModule will have the corresponding modules extended with functionality that will allow NNCF to quantize the weight parameter of MyModule before it takes part in MyModule's forward calculation.
+
+
+
+### Other Algorithms
+
+
+#### LegacyQuantization - Uniform Quantization with Fine-Tuning
+
+量化的详细实现方法
+
+
+# Examples - 示例代码
+
 # 2. NNCF configuration file
 
 https://openvinotoolkit.github.io/nncf/schema/
