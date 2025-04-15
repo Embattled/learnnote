@@ -12,7 +12,7 @@
 * getpass   : 专门用来处理密码输入的
 * ctypes    : 用于在 Python 中调用 C 库
 
-# 2. os
+# 2. os - Miscellaneous operating system interfaces
 
 * os — Miscellaneous operating system interfaces, 包含了各种操作系统相关的方法, 是一个杂模组
 * 里面很多函数都是限定操作系统的
@@ -156,8 +156,6 @@ Execute the command (a string) in a subshell:
 * 关于 param , 代表了 某个 pid 的调度参数, 目前该 class 只有一个 参数且不可更改 `sched_priority`
   * 实操下来, sched_getparam 的返回值为 `posix.sched_param(sched_priority=0)`
 
-
-
 affinity : 指代一个 进程或者线程与特定的 CPU 核心或处理器的关联性, 会影响CPU任务的调度策略, 确保特定的任务只在指定的 CPU 上执行.  
 * 如果 pid 为 0 , 则代表对当前进程进行操作
 * `os.sched_getaffinity(pid, /)`  : 获取指定 pid 被限制到的 CPUs 集合
@@ -187,7 +185,42 @@ The `time.get_clock_info()` function gives access to all available information a
   * 'thread_time': time.thread_time()
   * 'time': time.time()
 
-  
+## Miscellaneous System Information
+
+
+获取 CPU 信息
+`os.cpu_count()` : 3.4 加入, 3.13 功能更新
+* 返回 system 的逻辑 CPU 数量, 在 undetermined 的情况下返回 `None`
+* 该接口返回的值受解释器以及环境变量的覆盖影响
+  * (应该是解释器的CLI选项)  `-X cpu_cout`
+  * 环境变量 `PYTHON_CPU_COUNT`
+
+`os.process_cpu_count()`
+* get the number of logical CPUs usable by **the calling thread of the current process.**
+* 返回当前 python 进程可用的 CPU 数量
+* 根据 CPU affinity 的情况可能会少于 `os.cpu_cound()`
+  * 查看 affinity 使用 `os.sched_getaffinity()`
+
+`os.getloadavg()`
+* 在 Unix 下查看过去 1,5, 15 分钟的负载: number of processes in the system run queue averaged
+* 如果在其他系统下 负载不可用的话引起 OSError
+
+
+## Random numbers - 系统级别的随机值
+
+`os.getrandom(size, flags=0)`  python 3.6
+* 读取 size bytes 的随机值
+* 会从 设备驱动以及其他的环境噪声源收集 熵
+  * 如果大量的调用该函数会对系统 使用 `/dev/random`  `/dev/urandom` 的其他用户产生负面影响
+* 该接口返回的随机字节适合为 用户的随机数生成器提供种子 或者用于加密
+* `flags`
+  * 掩码形式的 flags, 可以配置以下的两种
+  * os.GRND_RANDOM and GRND_NONBLOCK
+
+`os.urandom(size, /)`
+
+
+
 ## 3.1. 相关定义
 
 * epoch 时间是从 1970, 00:00:00 (UTC) 开始的, 根据平台不同可能会有不同的开始时间

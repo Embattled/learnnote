@@ -30,7 +30,36 @@ else:
     pass
 ```
 
-## 1.3. The with statement - with 表达式
+## 1.3. The for statement
+
+## 1.4. The try statement
+
+
+1. for 循环中经常使用 `range()` 函数来指定循环
+2. 在使用 for 循环遍历字典时, 经常会用到和字典相关的 3 个方法, 即 items()、keys() 以及 values()
+   - 如果使用 for 循环直接遍历字典, 和遍历字典 keys() 方法的返回值是相同的
+
+```python
+for 迭代变量 in 字符串|列表|元组|字典|集合：
+    代码块
+
+my_dic = {'python教程':"http://c.biancheng.net/python/",\
+         'shell教程':"http://c.biancheng.net/shell/",\
+         'java教程':"http://c.biancheng.net/java/"}
+for ele in my_dic.items():
+   print('ele =', ele)
+```
+
+
+- 逻辑流程控制
+  - `break`和`continue` 同C语言是一样的
+  - Python中, while 和for 后也可以紧跟着一个 else 代码块
+    - 当循环条件为 False 跳出循环时, 程序会最先执行 else 代码块中的代码
+    - 但是使用 `break` 跳出当前循环体之后, 该循环后的 `else` 代码块**也不会被执行**
+
+
+
+## 1.5. The with statement - with 表达式
 
 通过 context manager 的方式来包装块的执行
 
@@ -44,14 +73,20 @@ with_item          ::=  expression ["as" target]
 * `with_item` : context expression 会被执行, 其结果会作为 context manager, `["as" target]` 用于给 context manager 赋予名称
 
 
-## 1.4. The match statement - python3.10 加入
+## 1.6. The match statement - python3.10 加入
 
 在 python 3.10 以前的版本使用该语句会报错, 向下兼容性很差
 
+```sh
+match_stmt   ::= 'match' subject_expr ":" NEWLINE INDENT case_block+ DEDENT
+subject_expr ::= star_named_expression "," star_named_expressions?
+                 | named_expression
+case_block   ::= 'case' patterns [guard] ":" block
+```
 
-## 1.5. Function definitions - 函数的定义
+## 1.7. Function definitions - 函数的定义
 
-## 1.6. Class definitions - 类的定义
+## 1.8. Class definitions - 类的定义
 <!-- 完 -->
 
 类同C++无太大区别
@@ -110,16 +145,16 @@ class Foo(object):
 
 
 
-## 1.7. Coroutines - 协程函数的定义
+## 1.9. Coroutines - 协程函数的定义
 
 
-## 1.8. Type parameter lists 
+## 1.10. Type parameter lists 
 
 Python 3.12 新功能
 
 
 
-## 1.9. self
+## 1.11. self
 
 同C++一样, 指向方法的调用者  
 
@@ -142,7 +177,7 @@ clanguage.bar = lambda self: print('--lambda表达式--', self)
 clanguage.bar(clanguage)
 ```
 
-## 1.10. 类的变量
+## 1.12. 类的变量
 
 1. 类变量: 类变量指的是在类中, 但在各个类方法外定义的变量。
    - 所有类的实例化对象都同时共享类变量, 即在所有实例化对象中是作为公用资源存在的
@@ -155,7 +190,7 @@ clanguage.bar(clanguage)
 
 
 
-## 1.11. 类的描述符
+## 1.13. 类的描述符
 
 - 通过使用描述符, 可以让程序员在引用一个对象属性时自定义要完成的工作
 - 一个类可以将属性管理全权委托给描述符类
@@ -194,7 +229,7 @@ class myClass:
     y = 5
 ```
 
-## 1.12. 类的封装
+## 1.14. 类的封装
 
 - Python 并没有提供 public、private 这些修饰符
     默认情况下, Python 类中的变量和方法都是公有（public）的, 它们的名称前都没有下划线（_）；
@@ -203,7 +238,7 @@ class myClass:
   - 对于一个变量 `__私有变量` 在执行过程中实际的变量名变成了 `_类名__私有变量` 因此仍然可以在外部访问
 - 用 `类对象.属性` 的方法访问类中的属性是不妥的, 破坏了类的封装性
 
-### 1.12.1. property()
+### 1.14.1. property()
 
 - 为了实现类似于C++的类私有变量, 即只能通过类方法来间接操作类属性, 一般都会设置 getter setter 方法
 - 虽然保护了封装性, 但是调用起来非常麻烦
@@ -231,7 +266,7 @@ class CLanguage:
     name = property(getname, setname, delname, '指明出处')
 ```
 
-### 1.12.2. @property 装饰器
+### 1.14.2. @property 装饰器
 
 - 同 property 的作用一样, 这个装饰器的目的也是一样, 方便调用代码的书写
 - 通过该装饰器可以让方法的调用变得和属性一样 - 即不带括号
@@ -264,7 +299,7 @@ del rect.area
 print("删除后的area值为：",rect.area)
 ```
 
-## 1.13. 类的继承和多态
+## 1.15. 类的继承和多态
 
 - 类的继承, 在定义子类的时候, 将父类放在子类之后的圆括号即可
   - `class 类名(父类1, 父类2, ...)：`
@@ -272,7 +307,7 @@ print("删除后的area值为：",rect.area)
   - python 支持多继承, 大部分的对象语言都不允许多继承
     - 对于多个父类中的同名方法, 以最早出现的父类为准
 
-### 1.13.1. super
+### 1.15.1. super
   
 - 子类如果定义了自己的构造方法, 则里面必须要调用父类的构造方法
 - 在子类中的构造方法中, 调用父类构造方法的方式有 2 种, 分别是：
@@ -282,4 +317,4 @@ print("删除后的area值为：",rect.area)
 
 `super().__init__(self,...)`
 
-### 1.13.2. MRO Method Resolution Order
+### 1.15.2. MRO Method Resolution Order

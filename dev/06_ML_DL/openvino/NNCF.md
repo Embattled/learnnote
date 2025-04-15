@@ -14,7 +14,7 @@ NNCF 的官方推荐工作流:
 2. 如果性能损失过大, 进行 `Quantization-aware training` 来提高精度同时保持优化后的推论速度
 3. 如果量化后的模型仍然速度不够快, 进行 `Filter Pruning` 来进一步删减模型的参数来提高模型的速度.  
 
-# Document - Usage
+# 2. Document - Usage
 
 github 中的说明文档
 https://github.com/openvinotoolkit/nncf/tree/develop/docs
@@ -24,9 +24,9 @@ https://github.com/openvinotoolkit/nncf/tree/develop/docs
 To align documentation with the latest changes in torch QAT
 
 
-## Post Training Compression
+## 2.1. Post Training Compression
 
-### Post Training Quantization
+### 2.1.1. Post Training Quantization
 
 后量化, 不需要重新训练模型, 使用 initial dataset 中的一个子集来标定量化常数
 量化的实现原理写在了 LegacyQuantization 部分
@@ -102,14 +102,14 @@ nncf.Dataset 需要传入可迭代的数据集
 Please keep in mind that you have to recalculate the subset size for quantization according to the batch size using the following formula: `subset_size = subset_size_for_batch_size_1 // batch_size`  
 最终 nncf 量化所接受的参数 `subset_size` 标定子集的大小也受 loader 的 batch_size 的影响, 需要用户 手动重新计算
 
-### Weights Compression
+### 2.1.2. Weights Compression
 
 
 
-## Training Time Compression
+## 2.2. Training Time Compression
 
 
-### Quantization Aware Training (QAT) - Usage
+### 2.2.1. Quantization Aware Training (QAT) - Usage
 
 Use NNCF for Quantization Aware Training
 
@@ -246,17 +246,27 @@ In the example above, the NNCF-compressed models that contain instances of MyMod
 
 
 
-### Other Algorithms
+### 2.2.2. Other Algorithms
 
 
-#### LegacyQuantization - Uniform Quantization with Fine-Tuning
+#### 2.2.2.1. LegacyQuantization - Uniform Quantization with Fine-Tuning
 
 量化的详细实现方法
 
+uniform fake quantization 方法  
 
-# Examples - 示例代码
+可以实现任意位数的 伪量化, 用于表示不同位宽的 weights and activations  
 
-# 2. NNCF configuration file
+该方法 在 forward 的适合执行 differentiable sampling of the continuous signal, 用于实现对 整数推理的模拟  
+
+
+**Common Quantization Formula**
+
+
+
+# 3. Examples - 示例代码
+
+# 4. NNCF configuration file
 
 https://openvinotoolkit.github.io/nncf/schema/
 
@@ -286,15 +296,15 @@ target_device: 描述要优化的对应目标平台, 默认值 `ANY`
 
 
 
-# 3. NNCF - Top level API
+# 5. NNCF - Top level API
 
 位于 nncf. 直下的顶层API, 是主要的使用对象
 
-## 3.1. Class
+## 5.1. Class
 
 顶层类
 
-### 3.1.1. nncf.NNCFConfig
+### 5.1.1. nncf.NNCFConfig
 
 `from nncf import NNCFConfig` 量化学习的最关键的类, 用于配置整个量化学习过程  
 Contains the configuration parameters required for NNCF to apply the selected algorithms.  
@@ -322,7 +332,7 @@ Contains the configuration parameters required for NNCF to apply the selected al
 * get_redefinable_global_param_value_for_algo(param_name, algo_name)
 
 
-### 3.1.2. nncf.ModelType
+### 5.1.2. nncf.ModelType
 
 Bases: enum.Enum  , 基于 python 的枚举类型  
 
@@ -331,7 +341,7 @@ Bases: enum.Enum  , 基于 python 的枚举类型
 也只有 TRANSFORMER  一种参数  
 
 
-### 3.1.3. nncf.TargetDevice
+### 5.1.3. nncf.TargetDevice
 
 同样也是基于 枚举的类型, 指定了目标终端的类型.  
 ```py
@@ -351,7 +361,7 @@ class TargetDevice(Enum):
 ```
 
 
-## 3.2. nncf.quantize
+## 5.2. nncf.quantize
 
 ```py
 nncf.quantize(model, calibration_dataset, preset=None, target_device=TargetDevice.ANY, subset_size=300, 
@@ -378,7 +388,7 @@ fast_bias_correction=True, model_type=None, ignored_scope=None, advanced_paramet
 * 
 
 
-# 4. nncf.torch
+# 6. nncf.torch
 
 NNCF PyTorch functionality.
 
@@ -388,11 +398,11 @@ import nncf  # Important - should be imported right after torch
 ```
 
 
-## 4.1. Functions
+## 6.1. Functions
 
 nncf.torch 模组下的主要函数接口
 
-### 4.1.1. register_default_init_args - 建立NNCF控制参数
+### 6.1.1. register_default_init_args - 建立NNCF控制参数
 
 ```py
 nncf.torch.register_default_init_args(nncf_config, train_loader, 
@@ -414,7 +424,7 @@ Return type:
 主要作用就是向 nncf.NNCFConfig 绑定标定用的数据集
 
 
-### 4.1.2. create_compressed_model
+### 6.1.2. create_compressed_model
 
 创建优化后的模型的核心接口 
 
@@ -438,7 +448,7 @@ def nncf.torch.create_compressed_model(model, config,
 * CompressionAlgorithmController: 用于控制压缩算法的控制器
 * NNCFNetwork : 经过 NNCF 压缩封装后的模型实例 
 
-### 4.1.3. load_state
+### 6.1.3. load_state
 
 `nncf.torch.load_state(model, state_dict_to_load, is_resume=False, keys_to_ignore=None)`
 * nncf 框架下的 torch 模型加载, 在某些情况下稳定性要优于使用 torch 的接口    
@@ -458,11 +468,11 @@ def nncf.torch.create_compressed_model(model, config,
 
 
 
-# 5. nncf.api 
+# 7. nncf.api 
 
 非顶端接口的, 各种内部实现类  
 
-## 5.1. nncf.api.compression
+## 7.1. nncf.api.compression
 
 与整个模型压缩过程关联的各种内部控制类 , 其下没有函数只有类 
 
@@ -474,7 +484,7 @@ Classes
 * CompressionAlgorithmBuilder   : 
 
 
-### 5.1.1. CompressionAlgorithmController 
+### 7.1.1. CompressionAlgorithmController 
 
 `class nncf.api.compression.CompressionAlgorithmController(target_model)`  
 
@@ -537,7 +547,7 @@ Classes
   * 无参数, 无返回值, 需要参考 sample 学习具体使用场景
 
 
-### 5.1.2. CompressionScheduler
+### 7.1.2. CompressionScheduler
 
 `class nncf.api.compression.CompressionScheduler`
 
@@ -568,7 +578,7 @@ for epoch in range(0, num_epochs):
   *  仅针对 scheduler 的 state
   *  不太清楚实际中的必要应用场景
 
-### 5.1.3. CompressionLoss
+### 7.1.3. CompressionLoss
 
 `class nncf.api.compression.CompressionLoss`  `Bases: abc.ABC`
 
@@ -583,7 +593,7 @@ For example, the $L_0$-based sparsity algorithm calculates the number of non-zer
 * (abstract) load_state(state) get_state()
   * 状态的提取和读取, 同样的, 想想不来需要单独使用 loss 的状态提取读取应用场景  
 
-## 5.2. nncf.api.statistics
+## 7.2. nncf.api.statistics
 
 关于 NNCF 压缩过程中的统计信息  
 

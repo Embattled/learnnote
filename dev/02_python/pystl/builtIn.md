@@ -27,7 +27,7 @@ breakpoint()
     iter()  
 format()  len()
 frozenset()     
-compile()    map()   
+compile() 
 complex()  round()
 ```
 
@@ -427,6 +427,9 @@ for line in f:
 * f.seek(offset,whence)
 
 ## 2.10. 序列类型数据的操作函数
+
+可迭代类型的处理和 生成
+
 ### 2.10.1. range()
 
 - range() 函数能够轻松地生成一系列的数字  
@@ -539,6 +542,16 @@ python官方提供了三个更推荐使用别的函数的使用场景, 可以获
 * 把小数数据提高精度, 使用 `math.fsum()`
 * 把数个 iterables 链接起来, 使用 `itertools.chain()`
 
+
+### map() 函数处理迭代器
+
+`map(function, iterable, *iterables)`
+* 传入一个函数和 1+ 个可迭代对象
+* map 会并行的访问每一个 iterable 并提取元素输入到 function 中
+  * 如果提供了多个 iterable, 那么 function 必须能够处理这些参数输入
+* map 会在首个 iterable 耗尽的时候停止, 即按最短的来
+* 返回函数 function 处理结果的迭代器
+  * 按照 `yielding` 方式返回
 
 
 ### 2.10.7. 迭代器操作

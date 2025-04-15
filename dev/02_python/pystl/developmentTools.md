@@ -133,7 +133,7 @@ def stop(
   * `Tuple[int, float, str]`  空元组可以写作 `Tuple[()]`
   * 可以用 `...` 来代表相同元素的变长元组
   * `Tuple[int, ...]`  一个通用的元组可以用 `Tuple[Any, ...]` 来匹配
-* `typing.Callable (Deprecated)`
+* `typing.Callable (Deprecated)`  使用 `collections.abc.Callable` 作为替代
   * 专门用来描述函数的类型 `Callable[[int], str] is a function of (int) -> str`
   * `Callable[[Arg1Type, Arg2Type], ReturnType]`
   * 一个方括号, 里面有两个参数, 第一个是参数列表, 第二个是返回值类型
@@ -141,7 +141,7 @@ def stop(
 #### 2.3.1.3. Building generic types and type aliases
 
 
-#### Other special directives
+#### 2.3.1.4. Other special directives
 
 
 

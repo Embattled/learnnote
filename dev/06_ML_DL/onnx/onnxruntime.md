@@ -27,3 +27,17 @@ onnx implements a python runtime useful to help understand a model. It is not in
 
 ## InferenceSession
 
+
+# ONNX Runtime Execution Providers 
+
+
+## QNN Execution Provider 
+
+QNN Execution Provider for ONNX Runtime 使得模型可以获得 高通 chipsets 的硬件加速  
+
+该 Provider 基于 高通的 QNN SDK (Qualcomm AI Engine Direct SDK)
+
+可以用在 搭载了高通 SoC 的 Android 以及 Windows 设备  
+
+
+
