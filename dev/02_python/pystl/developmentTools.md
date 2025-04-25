@@ -70,12 +70,12 @@ type 语法是 3.12 新功能, 但旧版本的 typing 包里面已经有 type al
 
 ## 2.3. Module contents
 
+模组的正式 API 文档
 typing 模组定义的一系列用于类型提示的 类, 函数, 描述符
 
 ### 2.3.1. Special typing primitives
 
 用于 annotation 的各种特殊类型 
-
 
 #### 2.3.1.1. Special types 特殊类型
 
@@ -139,6 +139,51 @@ def stop(
   * 一个方括号, 里面有两个参数, 第一个是参数列表, 第二个是返回值类型
 
 #### 2.3.1.3. Building generic types and type aliases
+
+该模组的内容主要是用于定义 `泛型的数据类型` 以及 类型别名  
+该模组的内容不应该直接用作 annotations
+
+该模组的内容对早期 python 有兼容性, 因此有多种定义语法  
+* type parameter lists
+* type statement
+* 模组中的定义方法为更早期 3.11 以前的版本提供了兼容性
+
+
+`class typing.Generic`
+* Abstract base class for generic types.  虚基类, 用于通用的类型定义  
+* 通过定义一个类的方式来定义一个 数据类型 的类
+
+```py
+# 定义一个类的方式来定义一种泛型数据类型, 语法是使用方括号
+# 这个语法会自动的继承 typing.Generic
+class Mapping[KT, VT]:
+    def __getitem__(self, key: KT) -> VT:
+      ...
+
+# 使用该类来为函数参数添加注解
+# 这里 Mapping 后使用方括号 为 泛型数据类型的使用方法
+def lookup_name[X, Y](mapping: Mapping[X, Y], key: X, default: Y) -> Y:
+    try:
+        return mapping[key]
+    except KeyError:
+        return default
+
+# 方括号的语法可能不兼容旧版本 python
+# 直接定义相关的 TypeVar 可以获得旧版本兼容性
+KT = TypeVar('KT')
+VT = TypeVar('VT')
+
+class Mapping(Generic[KT, VT]):
+    def __getitem__(self, key: KT) -> VT:
+        ...
+        # Etc.
+
+```
+
+
+
+
+
 
 
 #### 2.3.1.4. Other special directives

@@ -86,11 +86,35 @@ output = sim.model(dummy_input)
 
 最优化技巧
 
-## 5.1. Batch norm folding
+
+## 5.1. Adaptive rounding
+
+是一种 自适应的 权重 rounding 机制, 通过适应数据使得针对 数据 的量化精度提升  
+
+量化过程中参数并不是 四舍五入最好, AdaRound 就是自动的根据输入数据去做这个判断  
+
+
+AdaRound 本身是一个独立的量化技术, 但是配合其他的技术可以取得更好的效果
+* 在 BNF 和 CLE 后应用 AdaRound 可以进一步提高 AdaRound 的效果
+* 在 QAT 之前应用 AdaRound 能够获得更好的初始化量化权重  
+
+
+AdaRound 的超参数通常情况下不需要更改
+* Hyper Parameters to be changed at will:
+  * Number of batches : 配合 data loader 的 batch size, 要确保 AdaRound 能够基于 500 ~ 1000 张输入进行标定
+  * Number of iterations: 默认值 10000
+* Hyper Parameters to be changed with caution:
+  * Regularization parameter. Default is 0.01. 通常情况下不需要更改
+* Hyper Parameters to avoid changing:
+  * Beta range. Leave the value at the default of (20, 2).
+  * Warm start period. Leave at the default value, 20%.
+
+
+## 5.2. Batch norm folding
 
 
 
-## 5.2. Cross-layer equalization
+## 5.3. Cross-layer equalization
 
 跨层均衡 (CLE) 工具  
 
@@ -252,7 +276,56 @@ sim.compute_encodings(forward_pass_callback=pass_calibration_data,
 ```
 
 
-### 6.1.2. cross_layer_equalization
+
+### 6.1.2. aimet_torch.adaround
+
+
+```py
+aimet_torch.adaround.adaround_weight.Adaround.apply_adaround(
+  model, 
+  dummy_input, 
+  params, 
+  path, 
+  filename_prefix, 
+  default_param_bw=4, 
+  param_bw_override_list=None, 
+  ignore_quant_ops_list=None, 
+  default_quant_scheme=QuantScheme.post_training_tf_enhanced, 
+  default_config_file=None
+)
+```
+
+返回值: Module
+* Model with Adarounded weights and saves corresponding parameter encodings JSON file at provided path
+  * AdaRound 只会量化权重
+  * 激活的量化仍然需要调用 `QuantizationSimModel.compute_encodings`
+* 参数: 似乎因为是一半的量化所以需要传入量化相关的参数
+  * `default_param_bw` (int) – Default bitwidth (4-31) to use for quantizing layer parameters
+    * 量化位宽, 为啥默认值是 4?
+    * 由于该函数只量化 权重, 因此参数也只有一个
+  * `default_quant_scheme` (QuantScheme) – Quantization scheme. Supported options are using Quant Scheme Enum QuantScheme.post_training_tf or QuantScheme.post_training_tf_enhanced
+    * 同 模型量化的含义相同
+  * 
+
+
+```py
+# 传入 apply_adaround 的 params 参数
+class aimet_torch.adaround.adaround_weight.AdaroundParameters(
+  data_loader, 
+  num_batches, 
+  default_num_iterations=None, 
+  default_reg_param=0.01, 
+  default_beta_range=(20, 2), 
+  default_warm_start=0.2, 
+  forward_fn=None
+)
+
+# 这部分参数都在 Feature Guide 中有讨论
+```
+
+
+
+### 6.1.3. cross_layer_equalization
 
 CLE 的包, 只有一个 API 接口
 
@@ -264,7 +337,7 @@ CLE 的包, 只有一个 API 接口
 应用 CLE 不需要将模型创建为 SimQuantize, 单独调用该接口即可 (模型需要事先 prepar)
 
 
-### 6.1.3. aimet_torch.model_preparer
+### 6.1.4. aimet_torch.model_preparer
 
 
 使用了 pytorch 1.9+ 中新增的 new graph transformation feature  

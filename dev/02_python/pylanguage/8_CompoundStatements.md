@@ -152,7 +152,13 @@ class Foo(object):
 
 Python 3.12 新功能
 
+`Changed in version 3.13: Support for default values was added (see PEP 696)`
 
+
+
+
+
+# 旧内容, 等待合并
 
 ## 1.11. self
 

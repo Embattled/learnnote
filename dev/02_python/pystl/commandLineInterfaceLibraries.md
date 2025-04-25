@@ -331,11 +331,17 @@ args.default_func()
 # 4. getpass  — Portable password input 
 
 类似于 argparse , 只是该模组只针对密码界面    
+
+不可以在 WASI 系统下使用
+
 The getpass module provides two functions:
 * `getpass.getpass(prompt='Password: ', stream=None)`
   * prompt : 提示信息
   * 可以用字符串存储得到的密码 `input_str=getpass.getpass()`
+  * 这个界面会保证密码不会显式在屏幕上
+  * 调用该函数会立即进去密码输入界面  
 * `getpass.getuser()`
   * 获取当前进程的用户名
   * This function checks the environment variables `LOGNAME`, `USER`, `LNAME` and `USERNAME`, in order, and returns the value of the first one which is set to a `non-empty string`. 
-  
+  * In general, this function should be preferred over `os.getlogin()`
+    * 该函数旨在替代 os.getlogin()

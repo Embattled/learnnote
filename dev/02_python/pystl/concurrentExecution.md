@@ -314,7 +314,8 @@ One can create a pool of processes which will carry out tasks submitted to it wi
 
 `class multiprocessing.pool.Pool([processes[, initializer[, initargs[, maxtasksperchild[, context]]]]])`
 * 参数:
-  * `processes` : 进程数, 默认使用 `os.cpu_count()`, 即 CPU 吃满
+  * `processes` : 进程数, 默认使用 `os.process_cpu_count()`, 即所有可用的 CPU 吃满
+    * 在 3.13 以前使用 os.cpu_count, 可能会受 CPU 掩码影响导致出错
   * `initializer` : 进程的初始化函数
     * 如果 部位 None, 则会在进程的工作启动之前调用 `initializer(*initargs)`
   * `maxtasksperchild` : 每一个进程在它被退出之前(或者被新的进程替代) 能够执行的任务上限, 主要是为了释放未使用的资源
@@ -331,7 +332,7 @@ Pools 的类方法没有那么多
 * `apply_async(func[, args[, kwds[, callback[, error_callback]]]])`
   * 返回一个 `AsyncResult` 对象
   * 回调函数: callback error_callback
-    * 两个 都是接受单个参数的函数对象
+    * 两个 都是接受单个参数的函数对象, callback 接受 task 的返回值, error_callback 接受 error 的实例
     * 分别处理调用 func 执行成功或者失败时候的情况
     * 回调函数的处理应当非常简单, 否则会阻塞主线程  
 * `map(func, iterable[, chunksize])`
@@ -374,6 +375,8 @@ Pools 的类方法没有那么多
 * `join()`
   * 等待线程池 `exit`
   * 因此必须在调用 join 之前调用 `close ` 或者 `terminate`
+* 线程池最好配合 with 在上下文管理器中使用, 或手动使用 `close()` 和 `terminate()`
+
 
 对于 `chunksize`, 默认的自动计算方法为:  
 `chunksize = max(1, len(iterable) // (4 * processes))`

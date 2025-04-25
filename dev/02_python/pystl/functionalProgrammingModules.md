@@ -54,14 +54,23 @@ higher-order functions: functions that act on or return other functions. 作用�
 
 一般来说, 所有的 python callable object 可以被作为 function 来应用该模组
 
-## 3.1. 函数描述符
-
 用于便捷的将函数封装成特殊形式的库
+该库中所有对象都是函数装饰器  
 
 * cache       : 函数调用获得 unbounded function cache
+* cached_property
+* cmp_to_key
 * lru_cache   : 函数调用获得指定数量的缓存 (least recently used cache)
+* total_ordering
+* partial
+* partialmethod
+* reduce
+* singledispatch
+* singledispatchmethod
+* `functools.update_wrapper(wrapper, wrapped, assigned=WRAPPER_ASSIGNMENTS, updated=WRAPPER_UPDATES)`
+* `@functools.wraps(wrapped, assigned=WRAPPER_ASSIGNMENTS, updated=WRAPPER_UPDATES)`
 
-### 3.1.1. 函数缓存 cache
+## 3.1. 函数缓存 cache
 
 `@functools.cache(user_function)` : Simple lightweight unbounded function cache. Sometimes called `memoize`.
 * 函数会通过一个 dict 保存所有调用的函数值, 且永远不逐出旧值, 对于重复的调用会直接从 dict 获取值
@@ -129,6 +138,34 @@ class DataSet:
     def stdev(self):
         return statistics.stdev(self._data)
 ```
+
+
+## 3.3. wraps - 封装函数修饰器
+
+`functools.update_wrapper(wrapper, wrapped, assigned=WRAPPER_ASSIGNMENTS, updated=WRAPPER_UPDATES)`
+* 试一个封装函数 看起来就像 被他封装的原始函数一样, 如果不这么做的话, 封装函数无法访问任何函数的有用属性, 例如 文档, 参数等, 会大大影响封装函数的易用性
+* 具有两个可选参数, 类型都是 tuple
+  * `assigned` : 指定被封装的原始函数 的哪些属性要直接赋值给 封装函数的相对应匹配属性
+  * `updated`  : 指定封装函数的哪些属性要使用 原函数的相应属性来更新
+  * 不太懂都是从原始函数 -> 封装函数, 为啥要区分 赋值和更新: 因为有一个 dict 的属性, 使用更新更好
+  * 默认值都是模块级常量
+    *  `WRAPPER_ASSIGNMENTS` : 赋值部分, 包括 `__module__, __name__, __qualname__, __annotations__, __type_params__, __doc__`
+    *  `WRAPPER_UPDATES `    : 更新部分, 包括 `__dict__`
+* 也就是说基本上所有属性都会直接继承原本的函数
+  * annotations 是松散的字典
+  * wraps 不会影响 函数的签名, 即 IDE 会使用的 `inspect.signature()`, 参考 typing 的 ParamSpec 
+* 对于某些高级用途, 需要直接访问原始函数的情况下: `introspection` 或者 `bypassing a caching decorator such as lru_cache()`
+  * 该函数会给 封装函数添加一个 `__wrapped__ ` 用于指向原始的函数  
+*  更新历史
+   *  3.2 : `__wrapped__` 属性会被自动添加, `__annotations__` 属性会被拷贝, 原始函数如果缺少对应属性的话不会报错
+   *  3.4 : `__wrapped__ ` 属性总是指向原始函数, 即使原始函数本身也是一个封装函数, 具有 `__wrapped__` 属性
+   *  3.12: `__type_params__` 会被默认拷贝
+ 
+
+
+`@functools.wraps(wrapped, assigned=WRAPPER_ASSIGNMENTS, updated=WRAPPER_UPDATES)`
+* update_wrapper 的便捷调用方法
+* 等同于 `partial(update_wrapper, wrapped=wrapped, assigned=assigned, updated=updated)`
 
 
 # 4. operator — Standard operators as functions
