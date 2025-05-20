@@ -74,7 +74,7 @@ FLOPs 只会统计卷积部分的计算量, 对于其他部分
 
 group 分组数量会增加 MAC, 导致运行速度下降   
 
-分组情况下的 MAC 为 `MAC = hw(c1+c2) + c1c2/g`  输入输出的特征量没有变, 但是参数变少了  
+分组情况下单个层的 MAC 为 `MAC = hw(c1+c2) + c1c2/g`  输入输出的特征量数据没有变, 但是参数变少了使得 MAC 减少
 
 * 带入 `B = hwc1c2/g` 有
 * `MAC = hwc1 + hwc2 + c1c2/g`
@@ -146,8 +146,8 @@ Shuffle V2 的结构
 * 具有卷积的计算分支包括 3 个卷积, 分别是 1x1 channel-wise, 3x3 depth-wise, 1x1 channel-wise
 * 关于降采样
   * ShuffleNet V1 是将 identiy 换乘 3x3 AVG Pool, 同时 depth-wise 的 stride 为2, 最终 分支执行 concat 使得通道数翻倍
-  * ShuffleNet V2 则是跳过了 channel-shuffle, 然后 idenetity 换成 `3x3 depth-wise stride2 + 1x1 channel-wise`, 计算分支 也是 depth-wise 的 stride 为2
-    * 因为跳过了 channel-shuffle 所以最终的通道数翻倍
+  * ShuffleNet V2 则是跳过了 channel-split, 然后 idenetity 换成 `3x3 depth-wise stride2 + 1x1 channel-wise`, 计算分支 也是 depth-wise 的 stride 为2
+    * 因为跳过了 channel-split 所以最终的通道数翻倍
 * 两个 block 相连的地方可以合并
   * 前一个 block 的 concat 后接 channel shuffle, 然后再次 channel split
 

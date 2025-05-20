@@ -154,7 +154,15 @@ Python 3.12 新功能
 
 `Changed in version 3.13: Support for default values was added (see PEP 696)`
 
+自上而下的语法定义为
+```py
+type_params  ::= "[" type_param ("," type_param)* "]"
+type_param   ::= typevar | typevartuple | paramspec
+typevar      ::= identifier (":" expression)? ("=" expression)?
+typevartuple ::= "*" identifier ("=" expression)?
+paramspec    ::= "**" identifier ("=" expression)?
 
+```
 
 
 

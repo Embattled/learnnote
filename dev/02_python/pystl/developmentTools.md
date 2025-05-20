@@ -79,7 +79,8 @@ typing 模组定义的一系列用于类型提示的 类, 函数, 描述符
 
 #### 2.3.1.1. Special types 特殊类型
 
-两个非常常用的类型, 不支持放在方括号中 `[]`
+These can be used as types in annotations. They do not support subscription using [].
+不支持放在方括号中 `[]`
 
 * `typing.Any`
   * Any 作为 annotation 的时候可以匹配任何类型
@@ -97,13 +98,19 @@ def stop(
 
 #### 2.3.1.2. Special forms
 
-* 这几个类型可以用于描述一个使用方括号的类型, 每一个类型都有特殊的语法
+* 这几个类型可以用于描述一个使用方括号 `[]`  的类型, 每一个类型**都有特殊的语法**
 * 最早用于方便 annotation 的类型有一些已经被 新版本的抽象类实现了
 
 整理
 * Union     : 用于定义 `或`
 * Optional  : 相当于 `Union[X|None]`
 * Literal   : 用于定义参数为  一个字符串列表中的其中之一 
+
+
+用于 TypedDict 的特殊 forms
+* 3.11 typing.Required       : 定义一个必须的 key
+* 3.11 typing.NotRequired    : 定义一个非必须的 key
+* 3.13 typing.ReadOnly       : 定义一个只读的 key
 
 
 
@@ -180,14 +187,23 @@ class Mapping(Generic[KT, VT]):
 
 ```
 
+#### 2.3.1.4. Other special directives - 其他特殊的类型指令
+
+这里的对象都是用于 定义类型的 工厂类, 因此不能直接被用于 annotation
 
 
 
+`class typing.TypedDict(dict)`
+* 一个用于 type hint 的 创建字典的特殊类, 在运行的时候该类仍然是普通的 dict
+  * 如果违反规定也只会被 typechecker 报错
+* 会声明该类型是一个特殊的字典, 拥有指定的 key 和其对应的 值类型
 
-
-
-#### 2.3.1.4. Other special directives
-
+```py
+class Point2D(TypedDict):
+    x: int
+    y: int
+    label: NotRequired[str]
+```
 
 
 ## 2.4. 基础用法

@@ -140,10 +140,78 @@ class DataSet:
 ```
 
 
+## partial - 固定参数
+
+
+`functools.partial(func, /, *args, **keywords)`
+* 创建一个新的可调用的对象, 该对象直接调用的时候等同于 使用 args 和 kwargs调用原始对象
+* 新对象的位置参数会 appends, kwargs 则会扩展并且覆盖
+* partial 的功能可以简单的理解为 冻结 `freezes` 一部分参数, 使得函数调用拥有更加简洁的形式  
+
+
+```py
+# partial 的简易实现原理等同于
+def partial(func, /, *args, **keywords):
+    def newfunc(*fargs, **fkeywords):
+        newkeywords = {**keywords, **fkeywords}
+        return func(*args, *fargs, **newkeywords)
+    newfunc.func = func
+    newfunc.args = args
+    newfunc.keywords = keywords
+    return newfunc
+
+# 创建二进制 str 转为 int 的 partial
+from functools import partial
+basetwo = partial(int, base=2)
+basetwo.__doc__ = 'Convert base 2 string to an int.'
+basetwo('10010')
+# 18
+```
+
+
+`class functools.partialmethod(func, /, *args, **keywords)`
+* 动态创建一个 partial, 拥有类似的功能
+  * 区别在于 used as a method definition rather than being directly callable
+  * 主要用于为类的方法做修饰
+* 参数 `func` 必须是 descriptor or callable
+  * (objects which are both, like normal functions, are handled as descriptors).
+  * 如果 func 是 descriptor
+    * 对 `__get__` 的调用会被委托给底层的描述器, 并会返回一个适当的 部分对象 作为结果 (看不懂)
+  * 如果 func 不是 descriptor 的 callable 的时候
+    * 动态创建一个适当的绑定方法
+    * 且使用的时候类似普通函数
+    * 将会插入 self 参数作为第一个位置参数, self 会自动在所有 args 之前
+
+```py
+
+class Cell:
+    def __init__(self):
+        self._alive = False
+
+    @property
+    def alive(self):
+        return self._alive
+
+    def set_state(self, state):
+        self._alive = bool(state)
+
+    set_alive = partialmethod(set_state, True)
+    set_dead = partialmethod(set_state, False)
+
+
+c = Cell()
+c.alive
+# False
+
+c.set_alive()
+c.alive
+# True
+```
+
 ## 3.3. wraps - 封装函数修饰器
 
 `functools.update_wrapper(wrapper, wrapped, assigned=WRAPPER_ASSIGNMENTS, updated=WRAPPER_UPDATES)`
-* 试一个封装函数 看起来就像 被他封装的原始函数一样, 如果不这么做的话, 封装函数无法访问任何函数的有用属性, 例如 文档, 参数等, 会大大影响封装函数的易用性
+* 使一个封装函数 看起来就像 被他封装的原始函数一样, 如果不这么做的话, 封装函数无法访问任何函数的有用属性, 例如 文档, 参数等, 会大大影响封装函数的易用性
 * 具有两个可选参数, 类型都是 tuple
   * `assigned` : 指定被封装的原始函数 的哪些属性要直接赋值给 封装函数的相对应匹配属性
   * `updated`  : 指定封装函数的哪些属性要使用 原函数的相应属性来更新

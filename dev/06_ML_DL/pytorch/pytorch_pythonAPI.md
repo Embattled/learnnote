@@ -286,6 +286,18 @@ tensor([[ 1,  1],
   * `torch.swapdims`
 
 
+`torch.unbind(input, dim=0) → seq`
+* 拆解一个维度
+* 将其分解为长度为对应 shape 的元组, 每个元组元素都移除了对应的维度
+
+
+`torch.split(tensor, split_size_or_sections, dim=0)[source]`
+* 切分一个维度
+* 同样是返回被切分后的 Tensor 元组
+* 根据 split_size_or_sections, 对应 dim 的 shape 为指定大小
+* 不会移除返回值元素的对应维度
+
+
 #### 2.1.2.4. Slicing - 切片函数 
 
 
